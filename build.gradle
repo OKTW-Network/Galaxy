@@ -1,7 +1,11 @@
+plugins {
+    id 'java'
+    id 'org.spongepowered.plugin' version '0.8.1'
+}
+
 group 'one.oktw.sponge'
 version '1.0-SNAPSHOT'
 
-apply plugin: 'java'
 
 sourceCompatibility = 1.8
 
@@ -10,5 +14,5 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'org.spongepowered:spongeapi:6.1.0-20170814.171949-4'
 }

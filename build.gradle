@@ -8,11 +8,12 @@ version '1.0-SNAPSHOT'
 
 
 sourceCompatibility = 1.8
+compileJava.options.encoding = 'UTF-8'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile 'org.spongepowered:spongeapi:6.1.0-20170814.171949-4'
+    compile 'org.spongepowered:spongeapi:6.0.0'
 }

@@ -9,7 +9,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="oktw-world_main" />
-    <orderEntry type="library" name="Gradle: org.spongepowered:spongeapi:6.1.0-20170814.171949-4" level="project" />
+    <orderEntry type="library" name="Gradle: org.spongepowered:spongeapi:6.0.0" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.22" level="project" />
     <orderEntry type="library" name="Gradle: com.google.inject:guice:4.0" level="project" />
     <orderEntry type="library" name="Gradle: org.spongepowered:plugin-meta:0.4.1" level="project" />

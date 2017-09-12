@@ -4,11 +4,10 @@ import one.oktw.sponge.Main;
 import org.slf4j.Logger;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.world.WorldArchetype;
-import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import static one.oktw.sponge.Main.getMain;
 
@@ -16,21 +15,21 @@ public class WorldManager {
     private Main core = getMain();
     private Logger logger = core.getLogger();
     private Server server = Sponge.getServer();
+    private WorldArchetype worldArchetype = WorldArchetype.builder()
+            .keepsSpawnLoaded(false)
+            .generateSpawnOnLoad(false)
+            .loadsOnStartup(false)
+            .gameMode(GameModes.SURVIVAL)
+            .randomSeed()
+            .build("oktw-default", "OKTW Default");
 
-    public void createWorld() {
-        String uuid = UUID.randomUUID().toString();
+    public void createWorld(String uuid) throws IOException {
         logger.info("Create World: " + uuid);
         try {
-            WorldProperties worldProperties = server.createWorldProperties(uuid, WorldArchetype.builder()
-                    .keepsSpawnLoaded(false)
-                    .enabled(true)
-                    .generateSpawnOnLoad(false)
-                    .loadsOnStartup(false)
-                    .randomSeed()
-                    .build(uuid, uuid)
-            );
+            server.createWorldProperties(uuid, worldArchetype);
         } catch (IOException e) {
             logger.error("Create world failed!", e);
+            throw e;
         }
     }
 

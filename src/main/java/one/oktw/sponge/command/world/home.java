@@ -29,11 +29,7 @@ public class home implements CommandBase {
                 return CommandResult.affectedEntities(1);
             } else {
                 player.sendMessages(Text.of(TextColors.RED, "個人世界不存在\n")
-                        .concat(Text.builder("立即創建")
-                                .color(TextColors.AQUA)
-                                .style(TextStyles.UNDERLINE)
-                                .onClick(TextActions.suggestCommand("/world create"))
-                                .build()));
+                        .concat(Text.of(TextColors.AQUA, TextStyles.UNDERLINE, TextActions.runCommand("/world create"), "立即創建")));
                 return CommandResult.empty();
             }
         } else {

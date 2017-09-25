@@ -2,6 +2,7 @@ package one.oktw.sponge.command.world;
 
 import one.oktw.sponge.Main;
 import one.oktw.sponge.command.CommandBase;
+import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -23,11 +24,7 @@ public class create implements CommandBase {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         if (src instanceof Player) {
             Player player = (Player) src;
-            Text transferText = Text.builder("傳送到您的世界")
-                    .color(TextColors.AQUA)
-                    .style(TextStyles.UNDERLINE)
-                    .onClick(TextActions.suggestCommand("/world home"))
-                    .build();
+            Text transferText = Text.of(TextColors.AQUA, TextStyles.UNDERLINE, TextActions.runCommand("/world home"), "傳送到您的世界");
 
             if (Sponge.getServer().getWorldProperties(player.getUniqueId().toString()).isPresent()) {
                 player.sendMessages(Text.of(TextColors.RED, "您已經擁有一個世界！\n").concat(transferText));
@@ -38,7 +35,7 @@ public class create implements CommandBase {
                 main.getWorldManager().createWorld(player.getUniqueId().toString());
                 player.sendMessages(Text.of(TextColors.YELLOW, "世界創建成功！\n").concat(transferText));
             } catch (IOException e) {
-                player.sendMessages(Text.builder("創建世界失敗").color(TextColors.RED).onHover(TextActions.showText(Text.of(e.getLocalizedMessage()))).build());
+                src.sendMessages(Text.of(TextColors.RED, TextActions.showText(Text.of(e.getLocalizedMessage())), "創建世界失敗"));
             }
             return CommandResult.success();
         } else {

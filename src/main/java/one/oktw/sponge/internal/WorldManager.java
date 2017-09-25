@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldArchetype;
 
 import java.io.IOException;
@@ -23,20 +24,25 @@ public class WorldManager {
             .randomSeed()
             .build("oktw-default", "OKTW Default");
 
-    public void createWorld(String uuid) throws IOException {
-        logger.info("Create World: " + uuid);
+    public void createWorld(String name) throws IOException {
+        logger.info("Create World: " + name);
         try {
-            server.createWorldProperties(uuid, worldArchetype);
+            server.createWorldProperties(name, worldArchetype);
         } catch (IOException e) {
             logger.error("Create world failed!", e);
             throw e;
         }
     }
 
-    public void removeWorld(String uuid) {
-        logger.info("Delete World: " + uuid);
-        if (server.getWorldProperties(uuid).isPresent()) {
-            server.deleteWorld(server.getWorldProperties(uuid).get());
+    public void removeWorld(String name) {
+        logger.info("Delete World: " + name);
+        if (server.getWorldProperties(name).isPresent()) {
+            if (server.getWorld(name).isPresent()) {
+                World world = server.getWorld(name).get();
+                world.getPlayers().forEach(player -> player.setLocationSafely(server.getWorld(server.getDefaultWorldName()).get().getSpawnLocation()));
+                server.unloadWorld(world);
+            }
+            server.deleteWorld(server.getWorldProperties(name).get());
         } else {
             logger.error("World not found!");
         }

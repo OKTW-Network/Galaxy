@@ -2,6 +2,8 @@ package one.oktw.sponge.command;
 
 import one.oktw.sponge.command.world.create;
 import one.oktw.sponge.command.world.home;
+import one.oktw.sponge.command.world.info;
+import one.oktw.sponge.command.world.rebuild;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -21,10 +23,12 @@ public class CommandWorld implements CommandBase {
     public CommandSpec getSpec() {
         return CommandSpec.builder()
                 .executor(this)
-                .description(Text.of("世界管理指令"))
+                .description(Text.of("多重世界指令"))
                 .permission("oktw.command.world")
                 .child(new create().getSpec(), "create")
                 .child(new home().getSpec(), "home")
+                .child(new info().getSpec(), "info")
+                .child(new rebuild().getSpec(), "rebuild")
                 .build();
     }
 }

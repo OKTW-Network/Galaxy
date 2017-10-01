@@ -2,7 +2,6 @@ package one.oktw.sponge.command;
 
 import one.oktw.sponge.Main;
 import one.oktw.sponge.internal.WorldManager;
-import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -16,9 +15,12 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nonnull;
 import java.util.Optional;
 
 public class CommandWorld implements CommandBase {
+    private WorldManager worldManager = Main.getMain().getWorldManager();
+
     @Override
     public CommandSpec getSpec() {
         return CommandSpec.builder()
@@ -28,11 +30,9 @@ public class CommandWorld implements CommandBase {
                 .build();
     }
 
+    @Nonnull
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Server server = Sponge.getServer();
-        WorldManager worldManager = Main.getMain().getWorldManager();
-
+    public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
         if (src instanceof Player) {
             Player player = (Player) src;
             Optional<World> worldOptional = worldManager.loadWorld(player.getUniqueId().toString());

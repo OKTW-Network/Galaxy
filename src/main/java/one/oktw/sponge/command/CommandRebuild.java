@@ -2,7 +2,6 @@ package one.oktw.sponge.command;
 
 import one.oktw.sponge.Main;
 import one.oktw.sponge.internal.WorldManager;
-import org.slf4j.Logger;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -17,9 +16,14 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.world.storage.WorldProperties;
 
+import javax.annotation.Nonnull;
 import java.util.Optional;
 
 public class CommandRebuild implements CommandBase {
+    private Main main = Main.getMain();
+    private WorldManager worldManager = main.getWorldManager();
+    private Server server = Sponge.getServer();
+
     @Override
     public CommandSpec getSpec() {
         return CommandSpec.builder()
@@ -32,13 +36,9 @@ public class CommandRebuild implements CommandBase {
                 .build();
     }
 
+    @Nonnull
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Main main = Main.getMain();
-        Logger logger = main.getLogger();
-        WorldManager worldManager = main.getWorldManager();
-        Server server = Sponge.getServer();
-
+    public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
         if (!args.hasAny("world") && src instanceof Player) {
             Optional<WorldProperties> optWorld = server.getWorldProperties(((Player) src).getUniqueId().toString());
             if (optWorld.isPresent()) {

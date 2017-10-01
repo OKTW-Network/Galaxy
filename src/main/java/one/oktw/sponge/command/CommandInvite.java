@@ -17,6 +17,9 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nonnull;
+import java.util.Optional;
+
 public class CommandInvite implements CommandBase {
     private Server server = Sponge.getServer();
     private WorldManager worldManager = Main.getMain().getWorldManager();
@@ -31,8 +34,9 @@ public class CommandInvite implements CommandBase {
                 .build();
     }
 
+    @Nonnull
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
         Player owner = (Player) src;
         Player player = (Player) args.getOne("Player").get();
 
@@ -46,9 +50,15 @@ public class CommandInvite implements CommandBase {
                                 if (owner.getWorld().getName().equals(owner.getUniqueId().toString())) {
                                     player.setLocationSafely(owner.getLocation());
                                 } else {
-                                    World world = worldManager.loadWorld(owner.getUniqueId().toString()).get();
-                                    if (!player.setLocationSafely(world.getSpawnLocation())) {
-                                        player.setLocation(Sponge.getGame().getTeleportHelper().getSafeLocation(world.getSpawnLocation(), 255, 0).get());
+                                    Main.getMain().getLogger().info(owner.getUniqueId().toString());
+                                    Optional<World> worldOptional = worldManager.loadWorld(owner.getUniqueId().toString());
+                                    if (worldOptional.isPresent()) {
+                                        World world = worldOptional.get();
+                                        if (!player.setLocationSafely(world.getSpawnLocation())) {
+                                            player.setLocation(Sponge.getGame().getTeleportHelper().getSafeLocation(world.getSpawnLocation(), 255, 0).get());
+                                        }
+                                    } else {
+                                        player.sendMessages(Text.of(TextColors.RED, "世界載入失敗"));
                                     }
                                 }
                             }),

@@ -52,11 +52,11 @@ public class Main {
     @Listener
     public void onInit(GameInitializationEvent event) {
         logger.info("Loading...");
-        commandRegister = new CommandRegister();
         configManager = new ConfigManager(configLoader);
+        worldManager = new WorldManager();
         databaseManager = new DatabaseManager();
         eventRegister = new EventRegister();
-        worldManager = new WorldManager();
+        commandRegister = new CommandRegister();
         logger.info("Plugin loaded!");
     }
 

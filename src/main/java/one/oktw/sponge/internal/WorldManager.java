@@ -66,8 +66,8 @@ public class WorldManager {
             WorldProperties worldProperties = propertiesOptional.get();
             worldProperties.setGenerateSpawnOnLoad(false);
             return server.loadWorld(worldProperties);
+        } else {
+            return Optional.empty();
         }
-
-        return Optional.empty();
     }
 }

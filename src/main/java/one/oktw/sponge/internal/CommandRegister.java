@@ -12,12 +12,12 @@ public class CommandRegister {
         CommandManager commandManager = Sponge.getCommandManager();
 
         commandManager.register(plugin, new CommandCreate().getSpec(), "create");
-        commandManager.register(plugin, new CommandWorld().getSpec(), "world");
+        commandManager.register(plugin, new CommandWorld().getSpec(), "world", "w");
         commandManager.register(plugin, new CommandRebuild().getSpec(), "rebuild");
         commandManager.register(plugin, new CommandHat().getSpec(), "hat");
         commandManager.register(plugin, new CommandSpawn().getSpec(), "spawn");
-        commandManager.register(plugin, new CommandInvite().getSpec(), "invite");
-        commandManager.register(plugin, new CommandRemove().getSpec(), "remove");
-        commandManager.register(plugin, new CommandHub().getSpec(), "hub");
+        commandManager.register(plugin, new CommandInvite().getSpec(), "invite", "inv", "i");
+        commandManager.register(plugin, new CommandRemove().getSpec(), "remove", "rm");
+        commandManager.register(plugin, new CommandHub().getSpec(), "hub", "h");
     }
 }

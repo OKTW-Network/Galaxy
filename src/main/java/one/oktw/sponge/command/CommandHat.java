@@ -30,14 +30,15 @@ public class CommandHat implements CommandBase {
             Optional<ItemStack> optHat = player.getItemInHand(HandTypes.MAIN_HAND);
 
             if (optHat.isPresent()) {
-               ItemStack hat = optHat.get();
-               if (player.getHelmet().isPresent()) {
-                   ItemStack originHat = player.getHelmet().get();
-                   player.setHelmet(hat);
-                   player.setItemInHand(HandTypes.MAIN_HAND, originHat);
-               } else {
-                   player.setHelmet(hat);
-               }
+                ItemStack hat = optHat.get();
+                if (player.getHelmet().isPresent()) {
+                    ItemStack originHat = player.getHelmet().get();
+                    player.setHelmet(hat);
+                    player.setItemInHand(HandTypes.MAIN_HAND, originHat);
+                } else {
+                    player.setHelmet(hat);
+                    player.setItemInHand(HandTypes.MAIN_HAND, null);
+                }
             } else {
                 player.sendMessage(Text.of(TextColors.RED, "沒有物品在手上！"));
             }

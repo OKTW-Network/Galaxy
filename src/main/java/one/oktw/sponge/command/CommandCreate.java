@@ -29,7 +29,7 @@ public class CommandCreate implements CommandBase {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         if (src instanceof Player) {
             Player player = (Player) src;
-            Text transferText = Text.of(TextColors.AQUA, TextStyles.UNDERLINE, TextActions.runCommand("/home"), "傳送到您的世界");
+            Text transferText = Text.of(TextColors.AQUA, TextStyles.UNDERLINE, TextActions.runCommand("/world"), "傳送到您的世界");
 
             if (Sponge.getServer().getWorldProperties(player.getUniqueId().toString()).isPresent()) {
                 player.sendMessages(Text.of(TextColors.RED, "您已經擁有一個世界！\n").concat(transferText));

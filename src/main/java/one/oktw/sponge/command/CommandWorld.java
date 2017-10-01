@@ -18,13 +18,13 @@ import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Optional;
 
-public class CommandHome implements CommandBase {
+public class CommandWorld implements CommandBase {
     @Override
     public CommandSpec getSpec() {
         return CommandSpec.builder()
                 .executor(this)
                 .description(Text.of("傳送到自己的世界"))
-                .permission("oktw.command.home")
+                .permission("oktw.command.world")
                 .build();
     }
 
@@ -38,8 +38,6 @@ public class CommandHome implements CommandBase {
 
             if (propertiesOptional.isPresent()) {
                 WorldProperties properties = propertiesOptional.get();
-                Main.getMain().getLogger().info(properties.getWorldName());
-
 
 //                properties.setGenerateSpawnOnLoad(false);
 //                server.saveWorldProperties(properties);

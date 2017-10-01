@@ -50,7 +50,7 @@ public class CommandRebuild implements CommandBase {
                                     worldManager.removeWorld(((Player) src).getUniqueId().toString());
                                     worldManager.createWorld(((Player) src).getUniqueId().toString());
                                     src.sendMessage(Text.of(TextColors.YELLOW, "重新創建成功！\n")
-                                            .concat(Text.of(TextColors.AQUA, TextStyles.UNDERLINE, TextActions.runCommand("/home"), "傳送到您的世界")));
+                                            .concat(Text.of(TextColors.AQUA, TextStyles.UNDERLINE, TextActions.runCommand("/world"), "傳送到您的世界")));
                                 }),
                                 "確定重建"));
                 src.sendMessage(confirmText);

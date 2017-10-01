@@ -16,5 +16,8 @@ public class CommandRegister {
         commandManager.register(plugin, new CommandRebuild().getSpec(), "rebuild");
         commandManager.register(plugin, new CommandHat().getSpec(), "hat");
         commandManager.register(plugin, new CommandSpawn().getSpec(), "spawn");
+        commandManager.register(plugin, new CommandInvite().getSpec(), "invite");
+        commandManager.register(plugin, new CommandRemove().getSpec(), "remove");
+        commandManager.register(plugin, new CommandHub().getSpec(), "hub");
     }
 }

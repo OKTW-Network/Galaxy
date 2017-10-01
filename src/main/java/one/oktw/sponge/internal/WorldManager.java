@@ -7,8 +7,10 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.WorldArchetypes;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import static one.oktw.sponge.Main.getMain;
@@ -56,5 +58,16 @@ public class WorldManager {
         } catch (InterruptedException | ExecutionException e) {
             logger.error("Delete world failed!", e);
         }
+    }
+
+    public Optional<World> loadWorld(String name) {
+        Optional<WorldProperties> propertiesOptional = server.getWorldProperties(name);
+        if (propertiesOptional.isPresent()) {
+            WorldProperties worldProperties = propertiesOptional.get();
+            worldProperties.setGenerateSpawnOnLoad(false);
+            return server.loadWorld(worldProperties);
+        }
+
+        return Optional.empty();
     }
 }

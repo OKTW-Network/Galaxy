@@ -16,7 +16,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 import java.nio.file.Path;
 
-@Plugin(id = "oktw-world", name = "OKTW World")
+@Plugin(id = "oktw-world", name = "OKTW World", description = "OKTW MultiWorld Project")
 public class Main {
     private static Main main;
 
@@ -37,7 +37,7 @@ public class Main {
     private CommandRegister commandRegister;
     private ConfigManager configManager;
     private DatabaseManager databaseManager;
-    private EventManager eventManager;
+    private EventRegister eventRegister;
     private WorldManager worldManager;
 
     public static Main getMain() {
@@ -55,7 +55,7 @@ public class Main {
         commandRegister = new CommandRegister();
         configManager = new ConfigManager(configLoader);
         databaseManager = new DatabaseManager();
-        eventManager = new EventManager();
+        eventRegister = new EventRegister();
         worldManager = new WorldManager();
         logger.info("Plugin loaded!");
     }
@@ -81,8 +81,8 @@ public class Main {
         return databaseManager;
     }
 
-    public EventManager getEventManager() {
-        return eventManager;
+    public EventRegister getEventRegister() {
+        return eventRegister;
     }
 
     public WorldManager getWorldManager() {

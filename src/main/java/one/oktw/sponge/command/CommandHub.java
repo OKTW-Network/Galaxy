@@ -20,7 +20,7 @@ public class CommandHub implements CommandBase {
                 .executor(this)
                 .description(Text.of("回到伺服器入口"))
                 .arguments(GenericArguments.playerOrSource(Text.of("Player")))
-                .permission("oktw.command.remove")
+                .permission("oktw.command.hub")
                 .build();
     }
 

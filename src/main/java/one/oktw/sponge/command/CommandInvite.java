@@ -50,7 +50,6 @@ public class CommandInvite implements CommandBase {
                                 if (owner.getWorld().getName().equals(owner.getUniqueId().toString())) {
                                     player.setLocationSafely(owner.getLocation());
                                 } else {
-                                    Main.getMain().getLogger().info(owner.getUniqueId().toString());
                                     Optional<World> worldOptional = worldManager.loadWorld(owner.getUniqueId().toString());
                                     if (worldOptional.isPresent()) {
                                         World world = worldOptional.get();

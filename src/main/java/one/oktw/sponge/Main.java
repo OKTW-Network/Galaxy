@@ -53,8 +53,8 @@ public class Main {
     public void onInit(GameInitializationEvent event) {
         logger.info("Loading...");
         configManager = new ConfigManager(configLoader);
-        worldManager = new WorldManager();
         databaseManager = new DatabaseManager();
+        worldManager = new WorldManager();
         eventRegister = new EventRegister();
         commandRegister = new CommandRegister();
         logger.info("Plugin loaded!");
@@ -89,7 +89,7 @@ public class Main {
         return worldManager;
     }
 
-    public one.oktw.sponge.internal.ConfigManager getConfigManager() {
+    public ConfigManager getConfigManager() {
         return configManager;
     }
 }

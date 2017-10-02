@@ -40,15 +40,16 @@ public class CommandRebuild implements CommandBase {
     @Override
     public CommandResult execute(@Nonnull CommandSource src, @Nonnull CommandContext args) throws CommandException {
         if (!args.hasAny("world") && src instanceof Player) {
-            Optional<WorldProperties> optWorld = server.getWorldProperties(((Player) src).getUniqueId().toString());
+            String name = ((Player) src).getUniqueId().toString();
+            Optional<WorldProperties> optWorld = server.getWorldProperties(name);
             if (optWorld.isPresent()) {
                 Text confirmText = Text.of(TextColors.RED, "確定要重建世界嗎？\n")
                         .concat(Text.of(TextColors.AQUA,
                                 TextStyles.UNDERLINE,
                                 TextActions.showText(Text.of(TextColors.RED, TextStyles.BOLD, "這將沒辦法還原！")),
                                 TextActions.executeCallback(commandSource -> {
-                                    worldManager.removeWorld(((Player) src).getUniqueId().toString());
-                                    worldManager.createWorld(((Player) src).getUniqueId().toString());
+                                    worldManager.removeWorld(name);
+                                    worldManager.createWorld(name);
                                     src.sendMessage(Text.of(TextColors.YELLOW, "重新創建成功！\n")
                                             .concat(Text.of(TextColors.AQUA, TextStyles.UNDERLINE, TextActions.runCommand("/world"), "傳送到您的世界")));
                                 }),

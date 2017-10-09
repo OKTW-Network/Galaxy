@@ -5,6 +5,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -21,6 +22,17 @@ public class ForceGamemode {
                 if (!properties.getGameMode().equals(player.gameMode().get())) {
                     player.offer(Keys.GAME_MODE, properties.getGameMode());
                 }
+            }
+        }
+    }
+
+    @Listener
+    public void onPlayerJoin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
+        WorldProperties properties = player.getWorld().getProperties();
+
+        if (!player.hasPermission("oktw.world.gamemode")) {
+            if (!properties.getGameMode().equals(player.gameMode().get())) {
+                player.offer(Keys.GAME_MODE, properties.getGameMode());
             }
         }
     }

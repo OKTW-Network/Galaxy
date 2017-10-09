@@ -29,16 +29,20 @@ public class CommandCreate implements CommandBase {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         if (src instanceof Player) {
             Player player = (Player) src;
-            Text transferText = Text.of(TextColors.AQUA, TextStyles.UNDERLINE, TextActions.runCommand("/world"), "傳送到您的世界");
+            Text transferText = Text.of(TextColors.AQUA, TextStyles.UNDERLINE, TextActions.runCommand("/oktw-world:world"), "傳送到您的世界");
 
             if (Sponge.getServer().getWorldProperties(player.getUniqueId().toString()).isPresent()) {
                 player.sendMessages(Text.of(TextColors.RED, "您已經擁有一個世界！\n").concat(transferText));
                 return CommandResult.success();
             }
 
-            main.getWorldManager().createWorld(player.getUniqueId().toString());
-            player.sendMessages(Text.of(TextColors.YELLOW, "世界創建成功！\n").concat(transferText));
-            return CommandResult.success();
+            if (main.getWorldManager().createWorld(player.getUniqueId().toString()).isPresent()) {
+                player.sendMessages(Text.of(TextColors.YELLOW, "世界創建成功！\n").concat(transferText));
+                return CommandResult.success();
+            } else {
+                player.sendMessages(Text.of(TextColors.RED, "世界創建失敗！"));
+                return CommandResult.empty();
+            }
         } else {
             src.sendMessage(Text.of("Player Only Command!"));
             return CommandResult.empty();

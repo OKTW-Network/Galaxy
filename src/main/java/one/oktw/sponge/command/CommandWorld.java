@@ -45,7 +45,7 @@ public class CommandWorld implements CommandBase {
                 return CommandResult.affectedEntities(1);
             } else {
                 player.sendMessages(Text.of(TextColors.RED, "個人世界不存在\n")
-                        .concat(Text.of(TextColors.AQUA, TextStyles.UNDERLINE, TextActions.runCommand("/create"), "立即創建")));
+                        .concat(Text.of(TextColors.AQUA, TextStyles.UNDERLINE, TextActions.runCommand("/oktw-world:create"), "立即創建")));
             }
         } else {
             src.sendMessage(Text.of("Player Only Command!"));

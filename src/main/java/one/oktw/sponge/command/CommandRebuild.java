@@ -49,9 +49,12 @@ public class CommandRebuild implements CommandBase {
                                 TextActions.showText(Text.of(TextColors.RED, TextStyles.BOLD, "這將沒辦法還原！")),
                                 TextActions.executeCallback(commandSource -> {
                                     worldManager.removeWorld(name);
-                                    worldManager.createWorld(name);
-                                    src.sendMessage(Text.of(TextColors.YELLOW, "重新創建成功！\n")
-                                            .concat(Text.of(TextColors.AQUA, TextStyles.UNDERLINE, TextActions.runCommand("/world"), "傳送到您的世界")));
+                                    if (worldManager.createWorld(name).isPresent()) {
+                                        src.sendMessage(Text.of(TextColors.YELLOW, "重新創建成功！\n")
+                                                .concat(Text.of(TextColors.AQUA, TextStyles.UNDERLINE, TextActions.runCommand("/oktw-world:world"), "傳送到您的世界")));
+                                    } else {
+                                        src.sendMessages(Text.of(TextColors.RED, "創建世界失敗！"));
+                                    }
                                 }),
                                 "確定重建"));
                 src.sendMessage(confirmText);

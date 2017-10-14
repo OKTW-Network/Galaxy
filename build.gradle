@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'org.spongepowered.plugin' version '0.8.1'
+    id 'com.github.johnrengelman.shadow' version '2.0.1'
 }
 
 group 'one.oktw.sponge'
@@ -17,5 +18,16 @@ repositories {
 
 dependencies {
     compile 'org.spongepowered:spongeapi:7.0.0-SNAPSHOT'
-    //compile 'com.github.codeHusky:HuskyUI-Plugin:v0.3.1'
+//    compile 'com.github.NucleusPowered:Nucleus:1.2.0-PR2'
+//    compile 'com.github.rojo8399:PlaceholderAPI:v4.1'
+    compile 'com.github.codeHusky:HuskyUI-Plugin:v0.3.1'
+    shadow 'org.mongodb:mongodb-driver:3.5.0'
 }
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+
+}
+
+build.dependsOn(shadowJar)
+jar.enabled = false

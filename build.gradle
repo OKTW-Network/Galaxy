@@ -14,6 +14,10 @@ compileJava.options.encoding = 'UTF-8'
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
+    maven {
+        name "luck-repo"
+        url "https://repo.lucko.me/"
+    }
 }
 
 dependencies {
@@ -21,12 +25,16 @@ dependencies {
 //    compile 'com.github.NucleusPowered:Nucleus:1.2.0-PR2'
 //    compile 'com.github.rojo8399:PlaceholderAPI:v4.1'
     compile 'com.github.codeHusky:HuskyUI-Plugin:v0.3.1'
+//    compile ("me.lucko.luckperms:luckperms-api:3.3")
     shadow 'org.mongodb:mongodb-driver:3.5.0'
 }
 
 shadowJar {
     configurations = [project.configurations.shadow]
 
+    dependencies {
+        include dependency('org.mongodb:')
+    }
 }
 
 build.dependsOn(shadowJar)

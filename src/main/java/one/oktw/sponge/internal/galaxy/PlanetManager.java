@@ -1,4 +1,4 @@
-package one.oktw.sponge.internal;
+package one.oktw.sponge.internal.galaxy;
 
 import com.mongodb.client.MongoCollection;
 import one.oktw.sponge.Main;
@@ -6,28 +6,29 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldArchetypes;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static com.mongodb.client.model.Filters.eq;
 import static one.oktw.sponge.Main.getMain;
+import static one.oktw.sponge.internal.galaxy.SecurityLevel.VISIT;
 
-public class WorldManager {
+public class PlanetManager {
     private Main main = getMain();
     private Logger logger = main.getLogger();
-    private MongoCollection<Document> collection = main.getDatabaseManager().getDatabase().getCollection("world");
+    private MongoCollection<Document> collection = main.getDatabaseManager().getDatabase().getCollection("World");
     private Server server = Sponge.getServer();
 
-    public Optional<World> createWorld(String name, Player player) {
+    Planet createWorld(String name) {
         WorldProperties properties;
-        logger.info("Create World [{}], Owner: {}", name, player.getName());
+        logger.info("Create World [{}]", name);
 
         try {
             properties = server.createWorldProperties(name, WorldArchetypes.OVERWORLD);
@@ -37,15 +38,16 @@ public class WorldManager {
             server.saveWorldProperties(properties);
         } catch (IOException e) {
             logger.error("Create world failed!", e);
-            return Optional.empty();
+            throw new UncheckedIOException(e);
         }
 
-        Document worldInfo = new Document("uuid", properties.getUniqueId().toString())
-                .append("name", name)
-                .append("owner", player.getUniqueId());
+        Document worldInfo = new Document("UUID", properties.getUniqueId())
+                .append("Name", name)
+                .append("Size", 32)
+                .append("Security", VISIT);
 
         collection.insertOne(worldInfo);
-        return server.loadWorld(name);
+        return new Planet(properties.getUniqueId());
     }
 
     public void removeWorld(UUID uuid) {
@@ -71,10 +73,10 @@ public class WorldManager {
             return;
         }
 
-        collection.deleteOne(eq("uuid", uuid.toString()));
+        collection.deleteOne(eq("UUID", uuid));
     }
 
-    public Optional<World> loadWorld(UUID uuid) {
+    Optional<World> loadWorld(UUID uuid) {
         if (server.getWorldProperties(uuid).isPresent()) {
             WorldProperties worldProperties = server.getWorldProperties(uuid).get();
             worldProperties.setGenerateSpawnOnLoad(false);

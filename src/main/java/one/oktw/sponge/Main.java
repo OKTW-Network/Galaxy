@@ -3,7 +3,12 @@ package one.oktw.sponge;
 import com.google.inject.Inject;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
-import one.oktw.sponge.internal.*;
+import one.oktw.sponge.internal.CommandRegister;
+import one.oktw.sponge.internal.ConfigManager;
+import one.oktw.sponge.internal.DatabaseManager;
+import one.oktw.sponge.internal.EventRegister;
+import one.oktw.sponge.internal.galaxy.GalaxyManager;
+import one.oktw.sponge.internal.galaxy.PlanetManager;
 import org.slf4j.Logger;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
@@ -38,7 +43,8 @@ public class Main {
     private ConfigManager configManager;
     private DatabaseManager databaseManager;
     private EventRegister eventRegister;
-    private WorldManager worldManager;
+    private PlanetManager planetManager;
+    private GalaxyManager galaxyManager;
 
     public static Main getMain() {
         return main;
@@ -54,7 +60,8 @@ public class Main {
         logger.info("Loading...");
         configManager = new ConfigManager(configLoader);
         databaseManager = new DatabaseManager();
-        worldManager = new WorldManager();
+        galaxyManager = new GalaxyManager();
+        planetManager = new PlanetManager();
         eventRegister = new EventRegister();
         commandRegister = new CommandRegister();
         logger.info("Plugin loaded!");
@@ -85,11 +92,15 @@ public class Main {
         return eventRegister;
     }
 
-    public WorldManager getWorldManager() {
-        return worldManager;
+    public PlanetManager getPlanetManager() {
+        return planetManager;
     }
 
     public ConfigManager getConfigManager() {
         return configManager;
+    }
+
+    public GalaxyManager getGalaxyManager() {
+        return galaxyManager;
     }
 }

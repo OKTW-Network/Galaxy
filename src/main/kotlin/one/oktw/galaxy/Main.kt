@@ -3,19 +3,18 @@ package one.oktw.galaxy
 import com.google.inject.Inject
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
-import one.oktw.sponge.internal.CommandRegister
-import one.oktw.sponge.internal.ConfigManager
-import one.oktw.sponge.internal.DatabaseManager
-import one.oktw.sponge.internal.EventRegister
-import one.oktw.sponge.internal.galaxy.GalaxyManager
-import one.oktw.sponge.internal.galaxy.PlanetManager
+import one.oktw.galaxy.internal.CommandRegister
+import one.oktw.galaxy.internal.ConfigManager
+import one.oktw.galaxy.internal.DatabaseManager
+import one.oktw.galaxy.internal.EventRegister
+import one.oktw.galaxy.internal.galaxy.GalaxyManager
+import one.oktw.galaxy.internal.galaxy.PlanetManager
 import org.slf4j.Logger
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.config.ConfigDir
 import org.spongepowered.api.config.DefaultConfig
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.GameReloadEvent
-import org.spongepowered.api.event.game.state.GameConstructionEvent
 import org.spongepowered.api.event.game.state.GameInitializationEvent
 import org.spongepowered.api.plugin.Dependency
 import org.spongepowered.api.plugin.Plugin
@@ -28,36 +27,38 @@ import java.nio.file.Path
         dependencies = arrayOf(Dependency(id = "spotlin", optional = false, version = "0.1.3"))
 )
 class Main {
+    companion object {
+        @Inject
+        val logger: Logger = null!!
 
-    @Inject
-    val logger: Logger? = null
+        @Inject
+        @DefaultConfig(sharedRoot = false)
+        private val configLoader: ConfigurationLoader<CommentedConfigurationNode> = null!!
 
-    @Inject
-    @DefaultConfig(sharedRoot = false)
-    private val configLoader: ConfigurationLoader<CommentedConfigurationNode>? = null
+        @Inject
+        @ConfigDir(sharedRoot = false)
+        private val privatePluginDir: Path = null!!
 
-    @Inject
-    @ConfigDir(sharedRoot = false)
-    private val privatePluginDir: Path? = null
+        @Inject
+        val plugin: PluginContainer = null!!
 
-    @Inject
-    val plugin: PluginContainer? = null
-
-    private lateinit var commandManager: CommandRegister
-    private lateinit var configManager: ConfigManager
-    private lateinit var databaseManager: DatabaseManager
-    private lateinit var eventRegister: EventRegister
-    private lateinit var planetManager: PlanetManager
-    private lateinit var galaxyManager: GalaxyManager
-
-    @Listener
-    fun construct(event: GameConstructionEvent) {
-        main = this
+        var commandManager: CommandRegister
+            private set
+        var configManager: ConfigManager
+            private set
+        var databaseManager: DatabaseManager
+            private set
+        var eventRegister: EventRegister
+            private set
+        var planetManager: PlanetManager
+            private set
+        var galaxyManager: GalaxyManager
+            private set
     }
 
     @Listener
     fun onInit(event: GameInitializationEvent) {
-        logger!!.info("Loading...")
+        logger.info("Loading...")
         configManager = ConfigManager(configLoader)
         databaseManager = DatabaseManager()
         galaxyManager = GalaxyManager()
@@ -73,8 +74,4 @@ class Main {
         //TODO
     }
 
-    companion object {
-        var main: Main? = null
-            private set
-    }
 }

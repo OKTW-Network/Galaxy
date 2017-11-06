@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IdeaProjects-galaxy.iml" filepath="$PROJECT_DIR$/.idea/modules/IdeaProjects-galaxy.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IdeaProjects-galaxy_main.iml" filepath="$PROJECT_DIR$/.idea/modules/IdeaProjects-galaxy_main.iml" group="galaxy" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IdeaProjects-galaxy_test.iml" filepath="$PROJECT_DIR$/.idea/modules/IdeaProjects-galaxy_test.iml" group="galaxy" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/galaxy.iml" filepath="$PROJECT_DIR$/.idea/modules/galaxy.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/galaxy_main.iml" filepath="$PROJECT_DIR$/.idea/modules/galaxy_main.iml" group="galaxy" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/galaxy_test.iml" filepath="$PROJECT_DIR$/.idea/modules/galaxy_test.iml" group="galaxy" />

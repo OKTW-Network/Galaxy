@@ -1,5 +1,5 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.1.51"
+    id "org.jetbrains.kotlin.jvm" version "1.1.61"
     id 'org.spongepowered.plugin' version '0.8.1'
     id 'com.github.johnrengelman.shadow' version '2.0.1'
 }
@@ -8,6 +8,7 @@ group 'one.oktw'
 version '1.0-SNAPSHOT'
 
 repositories {
+    jcenter()
     mavenCentral()
     maven { url 'https://jitpack.io' }
     maven {
@@ -18,7 +19,7 @@ repositories {
 
 dependencies {
     compile 'org.spongepowered:spongeapi:7.0.0-SNAPSHOT'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.51"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.61"
     shadow 'org.mongodb:mongodb-driver:3.5.0'
 }
 

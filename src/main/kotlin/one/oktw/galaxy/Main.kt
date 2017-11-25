@@ -15,46 +15,54 @@ import org.spongepowered.api.config.ConfigDir
 import org.spongepowered.api.config.DefaultConfig
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.GameReloadEvent
+import org.spongepowered.api.event.game.state.GameConstructionEvent
 import org.spongepowered.api.event.game.state.GameInitializationEvent
 import org.spongepowered.api.plugin.Dependency
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import java.nio.file.Path
 
-@Plugin(id = "oktw-world",
-        name = "OKTW World",
-        description = "OKTW MultiWorld Project",
+@Plugin(id = "galaxy",
+        name = "OKTW Galaxy",
+        description = "OKTW Galaxy Project",
         dependencies = arrayOf(Dependency(id = "spotlin", optional = false, version = "0.1.3"))
 )
 class Main {
     companion object {
-        @Inject
-        val logger: Logger = null!!
+        lateinit var main: Main
 
-        @Inject
-        @DefaultConfig(sharedRoot = false)
-        private val configLoader: ConfigurationLoader<CommentedConfigurationNode> = null!!
-
-        @Inject
-        @ConfigDir(sharedRoot = false)
-        private val privatePluginDir: Path = null!!
-
-        @Inject
-        val plugin: PluginContainer = null!!
-
-        var commandManager: CommandRegister
+        lateinit var commandManager: CommandRegister
             private set
-        var configManager: ConfigManager
+        lateinit var configManager: ConfigManager
             private set
-        var databaseManager: DatabaseManager
+        lateinit var databaseManager: DatabaseManager
             private set
-        var eventRegister: EventRegister
+        lateinit var eventRegister: EventRegister
             private set
-        var planetManager: PlanetManager
+        lateinit var planetManager: PlanetManager
             private set
-        var galaxyManager: GalaxyManager
+        lateinit var galaxyManager: GalaxyManager
             private set
     }
+
+    @Inject lateinit var logger: Logger
+
+    @Inject
+    @DefaultConfig(sharedRoot = false)
+    lateinit var configLoader: ConfigurationLoader<CommentedConfigurationNode>
+
+    @Inject
+    @ConfigDir(sharedRoot = false)
+    lateinit var privatePluginDir: Path
+
+    @Inject
+    lateinit var plugin: PluginContainer
+
+    @Listener
+    fun construct(event: GameConstructionEvent) {
+        main = this
+    }
+
 
     @Listener
     fun onInit(event: GameInitializationEvent) {
@@ -65,7 +73,7 @@ class Main {
         planetManager = PlanetManager()
         eventRegister = EventRegister()
         commandManager = CommandRegister()
-        Sponge.getServer().chunkTicketManager.registerCallback(this) { _, _ -> }
+        Sponge.getServer().chunkTicketManager.registerCallback(this) { _, _ -> } //TODO logger
         logger.info("Plugin loaded!")
     }
 

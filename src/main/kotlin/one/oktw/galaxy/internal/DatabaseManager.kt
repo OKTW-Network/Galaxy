@@ -5,15 +5,15 @@ import com.mongodb.MongoCredential
 import com.mongodb.ServerAddress
 import com.mongodb.client.MongoDatabase
 import one.oktw.galaxy.Main.Companion.configManager
-import one.oktw.galaxy.Main.Companion.logger
+import one.oktw.galaxy.Main.Companion.main
 
 class DatabaseManager {
     val database: MongoDatabase
 
     init {
-        val config = configManager.configNode!!.getNode("database")
+        val config = configManager.configNode.getNode("database")
 
-        logger.info("Loading Database...")
+        main.logger.info("Loading Database...")
 
         if (config.isVirtual) {
             config.setComment("Mongodb connect setting")

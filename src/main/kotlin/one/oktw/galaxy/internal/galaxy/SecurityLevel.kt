@@ -1,7 +1,11 @@
 package one.oktw.galaxy.internal.galaxy
 
-object SecurityLevel {
-    val MEMBER = 0
-    val VISIT = 1
-    val PUBLIC = 2
+enum class SecurityLevel(val level: Int) {
+    MEMBER(0),
+    VISIT(1),
+    PUBLIC(2);
+
+    companion object {
+        fun fromInt(level: Int): SecurityLevel = SecurityLevel.values().first { it.level == level }
+    }
 }

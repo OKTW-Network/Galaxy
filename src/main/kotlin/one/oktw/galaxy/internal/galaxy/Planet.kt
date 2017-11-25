@@ -1,6 +1,7 @@
 package one.oktw.galaxy.internal.galaxy
 
 import com.mongodb.client.model.Filters.eq
+import com.mongodb.client.model.Updates.set
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.planetManager
 import org.bson.Document
@@ -12,16 +13,34 @@ import java.util.*
 class Planet internal constructor(uuid: UUID) {
     private val server = Sponge.getServer()
     private val database = Main.databaseManager.database
+    private val planets = database.getCollection("Planet")
     private val planet: Document
 
     val uniqueId: UUID
         get() = planet["UUID"] as UUID
 
-    val name: String
+    var name: String
         get() = planet.getString("Name")
+        set(name) {
+            planets.findOneAndUpdate(eq("UUID", uniqueId), set("name", name))
+        }
 
-    val size: Int
+    var size: Int
         get() = planet.getInteger("Size")
+        set(size) {
+            val properties = worldProp.get()
+
+            properties.worldBorderTargetDiameter = (size * 16).toDouble()
+            if (server.saveWorldProperties(properties)) {
+                planets.findOneAndUpdate(eq("UUID", uniqueId), set("Size", size))
+            }
+        }
+
+    var security: SecurityLevel
+        get() = SecurityLevel.fromInt(planet.getInteger("Security"))
+        set(level) {
+            planets.findOneAndUpdate(eq("UUID", uniqueId), set("Security", level))
+        }
 
     val world: Optional<World>
         get() = planetManager.loadWorld(uniqueId)
@@ -30,27 +49,6 @@ class Planet internal constructor(uuid: UUID) {
         get() = server.getWorldProperties(uniqueId)
 
     init {
-        this.planet = database.getCollection("World").find(eq("UUID", uuid)).first()
-    }
-
-    fun setSize(size: Int): Int {
-        val properties = worldProp.get()
-
-        database.getCollection("World").findOneAndUpdate(
-                eq("UUID", uniqueId),
-                Document("\$set", Document("Size", size))
-        )
-
-        properties.worldBorderTargetDiameter = (size * 16).toDouble()
-        server.saveWorldProperties(properties)
-
-        return size - size
-    }
-
-    fun setSecurity(level: Int) {
-        database.getCollection("world").findOneAndUpdate(
-                eq("UUID", uniqueId),
-                Document("\$set", Document("Security", level))
-        )
+        this.planet = planets.find(eq("UUID", uuid)).first()
     }
 }

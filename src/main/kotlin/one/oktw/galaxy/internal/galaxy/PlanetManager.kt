@@ -2,7 +2,7 @@ package one.oktw.galaxy.internal.galaxy
 
 import com.mongodb.client.model.Filters.eq
 import one.oktw.galaxy.Main
-import one.oktw.galaxy.Main.Companion.logger
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.internal.galaxy.SecurityLevel.VISIT
 import org.bson.Document
 import org.spongepowered.api.Sponge
@@ -15,7 +15,8 @@ import java.util.*
 import java.util.concurrent.ExecutionException
 
 class PlanetManager {
-    private val collection = Main.databaseManager.database.getCollection("World")
+    private val logger = main.logger
+    private val planets = Main.databaseManager.database.getCollection("Planet")
     private val server = Sponge.getServer()
 
     internal fun createWorld(name: String): Planet {
@@ -38,7 +39,7 @@ class PlanetManager {
                 .append("Size", 32)
                 .append("Security", VISIT)
 
-        collection.insertOne(worldInfo)
+        planets.insertOne(worldInfo)
         return Planet(properties.uniqueId)
     }
 
@@ -68,16 +69,16 @@ class PlanetManager {
             return
         }
 
-        collection.deleteOne(eq("UUID", uuid))
+        planets.deleteOne(eq("UUID", uuid))
     }
 
     internal fun loadWorld(uuid: UUID): Optional<World> {
-        if (server.getWorldProperties(uuid).isPresent) {
+        return if (server.getWorldProperties(uuid).isPresent) {
             val worldProperties = server.getWorldProperties(uuid).get()
             worldProperties.setGenerateSpawnOnLoad(false)
-            return server.loadWorld(worldProperties)
+            server.loadWorld(worldProperties)
         } else {
-            return Optional.empty()
+            Optional.empty()
         }
     }
 }

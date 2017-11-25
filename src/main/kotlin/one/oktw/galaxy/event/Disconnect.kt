@@ -17,11 +17,7 @@ class Disconnect {
     fun onDisconnect(event: ClientConnectionEvent.Disconnect, @Getter("getTargetEntity") player: Player) {
         val location = player.location
         playerData.findOneAndUpdate(eq<UUID>("UUID", player.uniqueId), Document("\$set",
-                Document("Location",
-                        Document("x", location.x)
-                                .append("y", location.y)
-                                .append("z", location.z)
-                )
+                Document("Location", Document("x", location.x).append("y", location.y).append("z", location.z))
                         .append("LastTime", Date())
         ), FindOneAndUpdateOptions().upsert(true))
     }

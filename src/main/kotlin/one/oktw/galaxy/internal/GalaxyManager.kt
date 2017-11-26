@@ -32,9 +32,7 @@ class GalaxyManager {
 
         fun searchGalaxy(galaxyManager: GalaxyManager, name: String): ArrayList<Galaxy> {
             val galaxyList = ArrayList<Galaxy>()
-            database.find(eq("Name", name)).forEach(
-                    { document: Document -> galaxyList += Galaxy(document["UUID"] as UUID) }
-            )
+            database.find(eq("Name", name)).forEach { document: Document -> galaxyList += Galaxy(document["UUID"] as UUID) }
             return galaxyList
         }
     }

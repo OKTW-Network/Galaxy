@@ -16,6 +16,10 @@ class Planet internal constructor(uuid: UUID) {
     private val planets = database.getCollection("Planet")
     private val planet: Document
 
+    init {
+        this.planet = planets.find(eq("UUID", uuid)).first()
+    }
+
     val uniqueId: UUID
         get() = planet["UUID"] as UUID
 
@@ -38,8 +42,8 @@ class Planet internal constructor(uuid: UUID) {
 
     var security: SecurityLevel
         get() = SecurityLevel.fromInt(planet.getInteger("Security"))
-        set(level) {
-            planets.findOneAndUpdate(eq("UUID", uniqueId), set("Security", level))
+        set(securityLevel) {
+            planets.findOneAndUpdate(eq("UUID", uniqueId), set("Security", securityLevel.level))
         }
 
     val world: Optional<World>
@@ -47,8 +51,4 @@ class Planet internal constructor(uuid: UUID) {
 
     val worldProp: Optional<WorldProperties>
         get() = server.getWorldProperties(uniqueId)
-
-    init {
-        this.planet = planets.find(eq("UUID", uuid)).first()
-    }
 }

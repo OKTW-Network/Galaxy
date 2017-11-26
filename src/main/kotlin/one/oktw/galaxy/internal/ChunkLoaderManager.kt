@@ -16,6 +16,7 @@ class ChunkLoaderManager {
 
     init {
         ticketManager.registerCallback(main) { tickets, world ->
+            // TODO
             main.logger.info("registerCallback")
         }
     }

@@ -38,7 +38,7 @@ class PlanetManager {
             val worldInfo = Document("UUID", properties.uniqueId)
                     .append("Name", name)
                     .append("Size", 32)
-                    .append("Security", VISIT)
+                    .append("Security", VISIT.level)
 
             planets.insertOne(worldInfo)
             return Planet(properties.uniqueId)

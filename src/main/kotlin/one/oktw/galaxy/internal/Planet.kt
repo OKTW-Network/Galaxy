@@ -1,9 +1,9 @@
-package one.oktw.galaxy.internal.galaxy
+package one.oktw.galaxy.internal
 
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.Updates.set
 import one.oktw.galaxy.Main
-import one.oktw.galaxy.Main.Companion.planetManager
+import one.oktw.galaxy.internal.PlanetManager.Companion.loadPlanet
 import org.bson.Document
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.world.World
@@ -43,7 +43,7 @@ class Planet internal constructor(uuid: UUID) {
         }
 
     val world: Optional<World>
-        get() = planetManager.loadWorld(uniqueId)
+        get() = loadPlanet(uniqueId)
 
     val worldProp: Optional<WorldProperties>
         get() = server.getWorldProperties(uniqueId)

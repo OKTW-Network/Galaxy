@@ -1,9 +1,8 @@
-package one.oktw.galaxy.internal.galaxy
+package one.oktw.galaxy.internal
 
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.Updates.*
 import one.oktw.galaxy.Main
-import one.oktw.galaxy.Main.Companion.planetManager
 import org.bson.Document
 import org.spongepowered.api.world.World
 import java.util.*
@@ -53,10 +52,10 @@ class Galaxy internal constructor(uuid: UUID) {
         return false
     }
 
-    fun createWorld(name: String): Optional<World> {
+    fun createPlanet(name: String): Optional<World> {
         val worlds = database.getCollection("World")
         return if (worlds.find(eq("Name", name)).first() == null) {
-            val planet = planetManager.createWorld(name)
+            val planet = PlanetManager.createPlanet(name)
             galaxies.findOneAndUpdate(eq("UUID", uniqueId),
                     push("Worlds", planet.uniqueId)
             )

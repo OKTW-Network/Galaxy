@@ -1,4 +1,4 @@
-package one.oktw.galaxy.internal.galaxy
+package one.oktw.galaxy.internal
 
 enum class SecurityLevel(val level: Int) {
     MEMBER(0),

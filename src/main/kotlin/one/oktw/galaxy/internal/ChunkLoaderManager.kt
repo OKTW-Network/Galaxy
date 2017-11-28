@@ -2,6 +2,7 @@ package one.oktw.galaxy.internal
 
 import com.flowpowered.math.vector.Vector3i
 import com.mongodb.client.model.Filters.eq
+import kotlinx.coroutines.experimental.async
 import one.oktw.galaxy.Main.Companion.databaseManager
 import one.oktw.galaxy.Main.Companion.main
 import org.bson.Document
@@ -15,9 +16,8 @@ class ChunkLoaderManager {
     private val database = databaseManager.database.getCollection("ChunkLoader")
 
     init {
-        ticketManager.registerCallback(main) { tickets, world ->
-            // TODO
-            main.logger.info("registerCallback")
+        ticketManager.registerCallback(main) { _, world ->
+            async { reloadChunkLoader(world) }
         }
     }
 
@@ -26,20 +26,17 @@ class ChunkLoaderManager {
         val document = Document("World", block.world.uniqueId)
                 .append("Location", Document("x", blockPos.x).append("y", blockPos.y).append("z", blockPos.z))
                 .append("Range", range)
-        database.insertOne(document)
-        val ticket = ticketManager.createTicket(main, block.world).ifPresent { ticket ->
+        async { database.insertOne(document) }
+        ticketManager.createTicket(main, block.world).ifPresent { ticket ->
             val chunkPos = block.location.chunkPosition
             val chunkList = HashSet<Vector3i>()
-            for (x in chunkPos.x - range..chunkPos.x + range) {
-                for (z in chunkPos.z - range..chunkPos.z + range) {
-                    main.logger.info("loading chunk: ({},{})", x, z)
+            (chunkPos.x - range..chunkPos.x + range).forEach { x ->
+                (chunkPos.z - range..chunkPos.z + range).forEach { z ->
                     chunkList.add(Vector3i(x, 0, z))
                 }
             }
-            if (chunkList.size > ticket.numChunks) {
-                ticket.numChunks = chunkList.size
-            }
-            chunkList.forEach(ticket::forceChunk)
+            if (chunkList.size > ticket.numChunks) ticket.numChunks = chunkList.size
+            chunkList.parallelStream().forEach(ticket::forceChunk)
         }
     }
 
@@ -47,29 +44,24 @@ class ChunkLoaderManager {
         val blockPos = block.position
         val filter = Document("x", blockPos.x).append("y", blockPos.y).append("z", blockPos.z)
         database.deleteOne(eq("Location", filter))
-        reloadChunkLoader(block.world)
+        async { reloadChunkLoader(block.world) }
     }
 
-    private fun reloadChunkLoader(world: World) {// TODO need cleanup
-        ticketManager.getForcedChunks(world).forEach { _, ticket ->
-            ticket.release()
-        }
-        database.find(eq("World", world.uniqueId)).forEach { document: Document ->
+    private suspend fun reloadChunkLoader(world: World) {
+        ticketManager.getForcedChunks(world).values().parallelStream().forEach { it.release() }
+        database.find(eq("World", world.uniqueId)).forEach { document ->
             val location = document["Location"] as Document
             ticketManager.createTicket(main, world).ifPresent { ticket ->
                 val chunkPos = world.getLocation(location["x"] as Int, location["y"] as Int, location["z"] as Int).chunkPosition
                 val chunkList = HashSet<Vector3i>()
                 val range = document["Range"] as Int
-                for (x in chunkPos.x - range..chunkPos.x + range) {
-                    for (z in chunkPos.z - range..chunkPos.z + range) {
-                        main.logger.info("loading chunk: ({},{})", x, z)
+                (chunkPos.x - range..chunkPos.x + range).forEach { x ->
+                    (chunkPos.z - range..chunkPos.z + range).forEach { z ->
                         chunkList.add(Vector3i(x, 0, z))
                     }
                 }
-                if (chunkList.size > ticket.numChunks) {
-                    ticket.numChunks = chunkList.size
-                }
-                chunkList.forEach(ticket::forceChunk)
+                if (chunkList.size > ticket.numChunks) ticket.numChunks = chunkList.size
+                chunkList.parallelStream().forEach(ticket::forceChunk)
             }
         }
     }

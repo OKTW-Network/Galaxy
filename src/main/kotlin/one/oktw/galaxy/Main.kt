@@ -11,15 +11,13 @@ import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.GameReloadEvent
 import org.spongepowered.api.event.game.state.GameConstructionEvent
 import org.spongepowered.api.event.game.state.GameInitializationEvent
-import org.spongepowered.api.plugin.Dependency
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import java.nio.file.Path
 
 @Plugin(id = "galaxy",
         name = "OKTW Galaxy",
-        description = "OKTW Galaxy Project",
-        dependencies = arrayOf(Dependency(id = "spotlin", optional = false, version = "0.1.3"))
+        description = "OKTW Galaxy Project"
 )
 class Main {
     companion object {

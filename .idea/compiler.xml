@@ -2,11 +2,8 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
-      <module name="galaxy_api" target="1.8" />
       <module name="galaxy_main" target="1.8" />
       <module name="galaxy_test" target="1.8" />
-      <module name="IdeaProjects-galaxy_main" target="1.8" />
-      <module name="IdeaProjects-galaxy_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

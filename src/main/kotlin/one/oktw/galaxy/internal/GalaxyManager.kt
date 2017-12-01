@@ -9,7 +9,6 @@ import org.spongepowered.api.entity.living.player.Player
 import java.util.*
 import java.util.stream.Collectors.toList
 
-
 class GalaxyManager {
     companion object {
         private val database = databaseManager.database.getCollection("Galaxy")

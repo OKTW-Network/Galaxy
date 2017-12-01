@@ -17,7 +17,8 @@ import java.nio.file.Path
 
 @Plugin(id = "galaxy",
         name = "OKTW Galaxy",
-        description = "OKTW Galaxy Project"
+        description = "OKTW Galaxy Project",
+        version = "1.0-SNAPSHOT"
 )
 class Main {
     companion object {

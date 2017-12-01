@@ -1,53 +1,58 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.2.0'
-    id "org.jetbrains.kotlin.kapt" version "1.2.0"
-    id 'org.spongepowered.plugin' version '0.8.1'
-    id 'com.github.johnrengelman.shadow' version '2.0.1'
+    id "java"
+    id "signing"
+    id "org.jetbrains.kotlin.jvm" version "1.2.0"
+    id "org.spongepowered.plugin" version "0.8.1"
+    id "com.github.johnrengelman.shadow" version "2.0.1"
 }
 
-group 'one.oktw'
-version '1.0-SNAPSHOT'
+group "one.oktw"
+version "1.0-SNAPSHOT"
 
 repositories {
     jcenter()
     mavenCentral()
-    maven { url 'https://jitpack.io' }
-    maven {
-        name 'luck-repo'
-        url 'https://repo.lucko.me/'
-    }
+    maven { url "https://jitpack.io" }
+    maven { url "https://repo.lucko.me/" }
 }
 
+ext.spongeVersion = "7.0.0-SNAPSHOT"
+ext.CoroutinesVersion = "0.19.3"
+
 dependencies {
-    kapt 'org.spongepowered:spongeapi:7.0.0-SNAPSHOT'
-    compile 'org.spongepowered:spongeapi:7.0.0-SNAPSHOT'
-    compile 'org.jetbrains.kotlin:kotlin-stdlib-jre8'
-    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.19.3'
-    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:0.19.3'
-    compile 'org.mongodb:mongodb-driver:3.5.0'
+    compile "org.spongepowered:spongeapi:$spongeVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$CoroutinesVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$CoroutinesVersion"
+    compile "org.mongodb:mongodb-driver:3.5.0"
 }
 
 kotlin {
     experimental {
-        coroutines 'enable'
+        coroutines "enable"
     }
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = '1.8'
+    kotlinOptions.jvmTarget = "1.8"
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = '1.8'
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 shadowJar {
     classifier = null
+    exclude "META-INF/*"
     dependencies {
-        include dependency('org.mongodb:')
-        include dependency('org.jetbrains.kotlin:')
-        include dependency('org.jetbrains.kotlinx:')
+        include dependency("org.mongodb:")
+        include dependency("org.jetbrains.kotlin:")
+        include dependency("org.jetbrains.kotlinx:")
     }
 }
 
-build.dependsOn(shadowJar)
+signing {
+    sign configurations.archives
+}
+
+jar.dependsOn(shadowJar)
 jar.enabled = false

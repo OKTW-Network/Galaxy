@@ -2,7 +2,7 @@
 <module external.linked.project.id="galaxy:main" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" external.system.module.group="one.oktw" external.system.module.type="sourceSet" external.system.module.version="1.0-SNAPSHOT" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="kotlin-language" name="Kotlin">
-      <configuration version="3" platform="JVM 1.8">
+      <configuration version="3" platform="JVM 1.8" useProjectSettings="false">
         <compilerSettings />
         <compilerArguments>
           <option name="destination" value="$MODULE_DIR$/../../build/classes/kotlin/main" />
@@ -13,7 +13,7 @@
           <option name="addCompilerBuiltIns" value="true" />
           <option name="loadBuiltInsFromDependencies" value="true" />
           <option name="languageVersion" value="1.2" />
-          <option name="apiVersion" value="1.1" />
+          <option name="apiVersion" value="1.2" />
           <option name="pluginOptions">
             <array />
           </option>
@@ -27,12 +27,6 @@
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../build/generated/source/kapt/main">
-      <sourceFolder url="file://$MODULE_DIR$/../../build/generated/source/kapt/main" isTestSource="false" generated="true" />
-    </content>
-    <content url="file://$MODULE_DIR$/../../build/generated/source/kaptKotlin/main">
-      <sourceFolder url="file://$MODULE_DIR$/../../build/generated/source/kaptKotlin/main" isTestSource="false" generated="true" />
-    </content>
     <content url="file://$MODULE_DIR$/../../src/main">
       <sourceFolder url="file://$MODULE_DIR$/../../src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../src/main/kotlin" isTestSource="false" />
@@ -41,7 +35,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: org.spongepowered:spongeapi:7.0.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jre8:1.2.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:0.19.3" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-core:0.19.3" level="project" />
     <orderEntry type="library" name="Gradle: org.mongodb:mongodb-driver:3.5.0" level="project" />
@@ -62,7 +56,7 @@
     <orderEntry type="library" name="Gradle: com.flowpowered:flow-math:1.0.3" level="project" />
     <orderEntry type="library" name="Gradle: com.flowpowered:flow-noise:1.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Gradle: org.ow2.asm:asm:5.2" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jre7:1.2.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.2.0" level="project" />
     <orderEntry type="library" name="Gradle: org.mongodb:mongodb-driver-core:3.5.0" level="project" />
     <orderEntry type="library" name="Gradle: org.mongodb:bson:3.5.0" level="project" />

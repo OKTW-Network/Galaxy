@@ -2,7 +2,7 @@ package one.oktw.galaxy.internal
 
 import com.flowpowered.math.vector.Vector3i
 import com.mongodb.client.model.Filters.eq
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.databaseManager
 import one.oktw.galaxy.Main.Companion.main
 import org.bson.Document
@@ -17,7 +17,7 @@ class ChunkLoaderManager {
 
     init {
         ticketManager.registerCallback(main) { _, world ->
-            async { reloadChunkLoader(world) }
+            launch { reloadChunkLoader(world) }
         }
     }
 
@@ -26,25 +26,26 @@ class ChunkLoaderManager {
         val document = Document("World", block.world.uniqueId)
                 .append("Location", Document("x", blockPos.x).append("y", blockPos.y).append("z", blockPos.z))
                 .append("Range", range)
-        async { database.insertOne(document) }
-        ticketManager.createTicket(main, block.world).ifPresent { ticket ->
-            val chunkPos = block.location.chunkPosition
-            val chunkList = HashSet<Vector3i>()
-            (chunkPos.x - range..chunkPos.x + range).forEach { x ->
-                (chunkPos.z - range..chunkPos.z + range).forEach { z ->
-                    chunkList.add(Vector3i(x, 0, z))
-                }
+        launch { database.insertOne(document) }
+        val ticket = ticketManager.createTicket(main, block.world).get()
+        val chunkPos = block.location.chunkPosition
+        val chunkList = HashSet<Vector3i>()
+        (chunkPos.x - range..chunkPos.x + range).forEach { x ->
+            (chunkPos.z - range..chunkPos.z + range).forEach { z ->
+                chunkList.add(Vector3i(x, 0, z))
             }
-            if (chunkList.size > ticket.numChunks) ticket.numChunks = chunkList.size
-            chunkList.parallelStream().forEach(ticket::forceChunk)
         }
+        if (chunkList.size > ticket.numChunks) {
+            main.logger.warn("ChunkLoader range({} chunks) large then forge limit({} chunks)!", chunkList.size, ticket.numChunks)
+        }
+        chunkList.parallelStream().forEach(ticket::forceChunk)
     }
 
     fun delChunkLoader(block: LocatableBlock) {
         val blockPos = block.position
         val filter = Document("x", blockPos.x).append("y", blockPos.y).append("z", blockPos.z)
-        database.deleteOne(eq("Location", filter))
-        async { reloadChunkLoader(block.world) }
+        launch { database.deleteOne(eq("Location", filter)) }
+        launch { reloadChunkLoader(block.world) }
     }
 
     private suspend fun reloadChunkLoader(world: World) {
@@ -60,7 +61,9 @@ class ChunkLoaderManager {
                         chunkList.add(Vector3i(x, 0, z))
                     }
                 }
-                if (chunkList.size > ticket.numChunks) ticket.numChunks = chunkList.size
+                if (chunkList.size > ticket.numChunks) {
+                    main.logger.warn("ChunkLoader range({} chunks) large then forge limit({} chunks)!", chunkList.size, ticket.numChunks)
+                }
                 chunkList.parallelStream().forEach(ticket::forceChunk)
             }
         }

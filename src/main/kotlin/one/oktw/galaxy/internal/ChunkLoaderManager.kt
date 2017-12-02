@@ -7,28 +7,55 @@ import one.oktw.galaxy.Main.Companion.databaseManager
 import one.oktw.galaxy.Main.Companion.main
 import org.bson.Document
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.world.ChunkTicketManager
 import org.spongepowered.api.world.LocatableBlock
-import org.spongepowered.api.world.World
 import java.util.*
+import kotlin.collections.HashMap
 
 class ChunkLoaderManager {
+    private val logger = main.logger
     private val ticketManager = Sponge.getServer().chunkTicketManager
     private val database = databaseManager.database.getCollection("ChunkLoader")
+    private val worldTickets: HashMap<UUID, HashMap<Vector3i, ChunkTicketManager.LoadingTicket>> = HashMap()
 
     init {
-        ticketManager.registerCallback(main) { _, world ->
-            launch { reloadChunkLoader(world) }
+        ticketManager.registerCallback(main) { tickets, world ->
+            logger.info("Reloading {} ChunkLoader...", world.name)
+            worldTickets[world.uniqueId] = HashMap()
+            launch {
+                val ticketIterator = tickets.iterator()
+                database.find(eq("World", world.uniqueId)).forEach {
+                    val ticket = if (ticketIterator.hasNext()) ticketIterator.next() else ticketManager.createTicket(main, world).get()
+                    val location = it["Location"] as Document
+                    val blockPos = world.getLocation(location["x"] as Int, location["y"] as Int, location["z"] as Int)
+                    val chunkPos = blockPos.chunkPosition
+                    val chunkList = HashSet<Vector3i>()
+                    val range = it["Range"] as Int
+                    (chunkPos.x - range..chunkPos.x + range).forEach { x ->
+                        (chunkPos.z - range..chunkPos.z + range).forEach { z ->
+                            chunkList.add(Vector3i(x, 0, z))
+                        }
+                    }
+                    if (chunkList.size > ticket.numChunks) {
+                        main.logger.warn("ChunkLoader({}) range({} chunks) large then forge limit({} chunks)!", blockPos.toString(), chunkList.size, ticket.numChunks)
+                    }
+                    chunkList.parallelStream().forEach { ticket.forceChunk(it) }
+                    worldTickets[world.uniqueId]!![blockPos.biomePosition] = ticket
+                    logger.info("Loaded ChunkLoader at {}", location.toString())
+                }
+            }
         }
     }
 
-    fun addChunkLoader(block: LocatableBlock, range: Short) {
-        val blockPos = block.position
-        val document = Document("World", block.world.uniqueId)
-                .append("Location", Document("x", blockPos.x).append("y", blockPos.y).append("z", blockPos.z))
+    fun addChunkLoader(locatableBlock: LocatableBlock, range: Short) {
+        val document = Document("World", locatableBlock.world.uniqueId)
+                .append("Location", Document("x", locatableBlock.position.x)
+                        .append("y", locatableBlock.position.y)
+                        .append("z", locatableBlock.position.z))
                 .append("Range", range)
         launch { database.insertOne(document) }
-        val ticket = ticketManager.createTicket(main, block.world).get()
-        val chunkPos = block.location.chunkPosition
+        val ticket = ticketManager.createTicket(main, locatableBlock.world).get()
+        val chunkPos = locatableBlock.location.chunkPosition
         val chunkList = HashSet<Vector3i>()
         (chunkPos.x - range..chunkPos.x + range).forEach { x ->
             (chunkPos.z - range..chunkPos.z + range).forEach { z ->
@@ -36,36 +63,21 @@ class ChunkLoaderManager {
             }
         }
         if (chunkList.size > ticket.numChunks) {
-            main.logger.warn("ChunkLoader range({} chunks) large then forge limit({} chunks)!", chunkList.size, ticket.numChunks)
+            main.logger.warn("ChunkLoader({}) range({} chunks) large then forge limit({} chunks)!", locatableBlock.location.toString(), chunkList.size, ticket.numChunks)
         }
         chunkList.parallelStream().forEach(ticket::forceChunk)
+        worldTickets.getOrDefault(locatableBlock.world.uniqueId, HashMap())
+        logger.info("Added ChunkLoader at {}", locatableBlock.location.toString())
     }
 
-    fun delChunkLoader(block: LocatableBlock) {
-        val blockPos = block.position
-        val filter = Document("x", blockPos.x).append("y", blockPos.y).append("z", blockPos.z)
+    fun delChunkLoader(locatableBlock: LocatableBlock) {
+        val filter = Document("x", locatableBlock.position.x).append("y", locatableBlock.position.y).append("z", locatableBlock.position.z)
+        worldTickets[locatableBlock.world.uniqueId]?.get(locatableBlock.position)?.release()
         launch { database.deleteOne(eq("Location", filter)) }
-        launch { reloadChunkLoader(block.world) }
     }
 
-    private suspend fun reloadChunkLoader(world: World) {
-        ticketManager.getForcedChunks(world).values().parallelStream().forEach { it.release() }
-        database.find(eq("World", world.uniqueId)).forEach { document ->
-            val location = document["Location"] as Document
-            ticketManager.createTicket(main, world).ifPresent { ticket ->
-                val chunkPos = world.getLocation(location["x"] as Int, location["y"] as Int, location["z"] as Int).chunkPosition
-                val chunkList = HashSet<Vector3i>()
-                val range = document["Range"] as Int
-                (chunkPos.x - range..chunkPos.x + range).forEach { x ->
-                    (chunkPos.z - range..chunkPos.z + range).forEach { z ->
-                        chunkList.add(Vector3i(x, 0, z))
-                    }
-                }
-                if (chunkList.size > ticket.numChunks) {
-                    main.logger.warn("ChunkLoader range({} chunks) large then forge limit({} chunks)!", chunkList.size, ticket.numChunks)
-                }
-                chunkList.parallelStream().forEach(ticket::forceChunk)
-            }
-        }
+    fun changeRange(locatableBlock: LocatableBlock, range: Short) {
+        delChunkLoader(locatableBlock)
+        addChunkLoader(locatableBlock, range)
     }
 }

@@ -5,15 +5,14 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
 import one.oktw.galaxy.internal.*
 import org.slf4j.Logger
-import org.spongepowered.api.config.ConfigDir
 import org.spongepowered.api.config.DefaultConfig
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.GameReloadEvent
 import org.spongepowered.api.event.game.state.GameConstructionEvent
 import org.spongepowered.api.event.game.state.GameInitializationEvent
+import org.spongepowered.api.event.game.state.GameStartingServerEvent
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
-import java.nio.file.Path
 
 @Plugin(id = "galaxy",
         name = "OKTW Galaxy",
@@ -42,12 +41,7 @@ class Main {
     @DefaultConfig(sharedRoot = false)
     lateinit var configLoader: ConfigurationLoader<CommentedConfigurationNode>
 
-    @Inject
-    @ConfigDir(sharedRoot = false)
-    lateinit var privatePluginDir: Path
-
-    @Inject
-    lateinit var plugin: PluginContainer
+    @Inject lateinit var plugin: PluginContainer
 
     @Listener
     fun construct(event: GameConstructionEvent) {
@@ -56,13 +50,18 @@ class Main {
 
     @Listener
     fun onInit(event: GameInitializationEvent) {
-        logger.info("Loading...")
+        logger.info("Initialization...")
         configManager = ConfigManager(configLoader)
         databaseManager = DatabaseManager()
         eventRegister = EventRegister()
-        commandManager = CommandRegister()
         chunkLoaderManager = ChunkLoaderManager()
-        logger.info("Plugin loaded!")
+        logger.info("Plugin initialized!")
+    }
+
+    @Listener
+    fun onStarting(event: GameStartingServerEvent) {
+        commandManager = CommandRegister()
+        chunkLoaderManager.loadForcedWorld()
     }
 
     @Listener

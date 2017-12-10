@@ -1,9 +1,9 @@
-package one.oktw.galaxy.internal
+package one.oktw.galaxy.internal.galaxy
 
 import com.mongodb.client.model.Filters.eq
 import one.oktw.galaxy.Main.Companion.databaseManager
-import one.oktw.galaxy.internal.Groups.ADMIN
-import one.oktw.galaxy.internal.Groups.MEMBER
+import one.oktw.galaxy.internal.galaxy.Groups.ADMIN
+import one.oktw.galaxy.internal.galaxy.Groups.MEMBER
 import org.bson.Document
 import org.spongepowered.api.entity.living.player.Player
 import java.util.*

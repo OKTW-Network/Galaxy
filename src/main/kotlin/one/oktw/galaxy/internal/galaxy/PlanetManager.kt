@@ -1,9 +1,10 @@
-package one.oktw.galaxy.internal
+package one.oktw.galaxy.internal.galaxy
 
 import com.mongodb.client.model.Filters.eq
-import one.oktw.galaxy.Main
+import kotlinx.coroutines.experimental.launch
+import one.oktw.galaxy.Main.Companion.databaseManager
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.internal.SecurityLevel.VISIT
+import one.oktw.galaxy.internal.galaxy.SecurityLevel.VISIT
 import org.bson.Document
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.world.World
@@ -12,15 +13,14 @@ import org.spongepowered.api.world.storage.WorldProperties
 import java.io.IOException
 import java.io.UncheckedIOException
 import java.util.*
-import java.util.concurrent.ExecutionException
 
 class PlanetManager {
     companion object {
         private val logger = main.logger
-        private val planets = Main.databaseManager.database.getCollection("Planet")
+        private val planets = databaseManager.database.getCollection("Planet")
         private val server = Sponge.getServer()
 
-        fun createPlanet(name: String): Planet {
+        internal fun createPlanet(name: String): Planet {
             val properties: WorldProperties
             logger.info("Create World [{}]", name)
 
@@ -44,7 +44,7 @@ class PlanetManager {
             return Planet(properties.uniqueId)
         }
 
-        fun removePlanet(uuid: UUID) {
+        internal fun removePlanet(uuid: UUID) {
             val properties: WorldProperties
             if (server.getWorldProperties(uuid).isPresent) {
                 properties = server.getWorldProperties(uuid).get()
@@ -60,17 +60,8 @@ class PlanetManager {
                 server.unloadWorld(world)
             }
 
-            try {
-                server.deleteWorld(properties).get()
-            } catch (e: InterruptedException) {
-                logger.error("Delete world failed!", e)
-                return
-            } catch (e: ExecutionException) {
-                logger.error("Delete world failed!", e)
-                return
-            }
-
-            planets.deleteOne(eq("UUID", uuid))
+            server.deleteWorld(properties).get()
+            launch { planets.deleteOne(eq("UUID", uuid)) }
         }
 
         internal fun loadPlanet(uuid: UUID): Optional<World> {

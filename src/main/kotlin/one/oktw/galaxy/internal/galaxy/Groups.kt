@@ -1,4 +1,4 @@
-package one.oktw.galaxy.internal
+package one.oktw.galaxy.internal.galaxy
 
 enum class Groups(val index: Int) {
     VISITOR(0),

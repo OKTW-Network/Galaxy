@@ -1,5 +1,6 @@
 plugins {
     id "java"
+    id "idea"
     id "signing"
     id "org.jetbrains.kotlin.jvm" version "1.2.0"
     id "org.spongepowered.plugin" version "0.8.1"
@@ -25,6 +26,7 @@ dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$CoroutinesVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$CoroutinesVersion"
     compile "org.mongodb:mongodb-driver:3.5.0"
+    compile "com.github.NucleusPowered.Nucleus:nucleus-api:1.2.0-PR4"
 }
 
 kotlin {
@@ -48,6 +50,11 @@ shadowJar {
         include dependency("org.jetbrains.kotlin:")
         include dependency("org.jetbrains.kotlinx:")
     }
+
+    relocate "com.mongodb", "one.oktw.relocate.com.mongodb"
+    relocate "org.bson", "one.oktw.relocate.org.bson"
+    relocate "kotlin", "one.oktw.relocate.kotlin"
+    relocate "kotlinx", "one.oktw.relocate.kotlinx"
 }
 
 signing {

@@ -5,10 +5,12 @@ import com.mongodb.client.model.Filters.eq
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.databaseManager
 import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.internal.galaxy.PlanetManager
 import org.bson.Document
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.world.ChunkTicketManager
 import org.spongepowered.api.world.LocatableBlock
+import org.spongepowered.api.world.World
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -20,30 +22,8 @@ class ChunkLoaderManager {
 
     init {
         ticketManager.registerCallback(main) { tickets, world ->
-            logger.info("Reloading {} ChunkLoader...", world.name)
-            worldTickets[world.uniqueId] = HashMap()
-            launch {
-                val ticketIterator = tickets.iterator()
-                database.find(eq("World", world.uniqueId)).forEach {
-                    val ticket = if (ticketIterator.hasNext()) ticketIterator.next() else ticketManager.createTicket(main, world).get()
-                    val location = it["Location"] as Document
-                    val blockPos = world.getLocation(location["x"] as Int, location["y"] as Int, location["z"] as Int)
-                    val chunkPos = blockPos.chunkPosition
-                    val chunkList = HashSet<Vector3i>()
-                    val range = it["Range"] as Int
-                    (chunkPos.x - range..chunkPos.x + range).forEach { x ->
-                        (chunkPos.z - range..chunkPos.z + range).forEach { z ->
-                            chunkList.add(Vector3i(x, 0, z))
-                        }
-                    }
-                    if (chunkList.size > ticket.numChunks) {
-                        main.logger.warn("ChunkLoader({}) range({} chunks) large then forge limit({} chunks)!", blockPos.toString(), chunkList.size, ticket.numChunks)
-                    }
-                    chunkList.parallelStream().forEach { ticket.forceChunk(it) }
-                    worldTickets[world.uniqueId]!![blockPos.biomePosition] = ticket
-                    logger.info("Loaded ChunkLoader at {}", location.toString())
-                }
-            }
+            tickets.forEach { it.release() }
+            reloadChunkLoader(world)
         }
     }
 
@@ -79,5 +59,42 @@ class ChunkLoaderManager {
     fun changeRange(locatableBlock: LocatableBlock, range: Short) {
         delChunkLoader(locatableBlock)
         addChunkLoader(locatableBlock, range)
+    }
+
+    fun loadForcedWorld() {
+        logger.info("Loading world has ChunkLoader...")
+        database.distinct("World", UUID::class.java).forEach { PlanetManager.loadPlanet(it).ifPresent { reloadChunkLoader(it) } }
+    }
+
+    fun reloadChunkLoader(world: World) {
+        logger.info("Reloading ChunkLoader in \"{}\" ...", world.name)
+        worldTickets[world.uniqueId] = HashMap()
+        launch {
+            database.find(eq("World", world.uniqueId)).forEach {
+                val ticket = ticketManager.createTicket(main, world).get()
+                val location = it["Location"] as Document
+                val blockPos = world.getLocation(location["x"] as Int, location["y"] as Int, location["z"] as Int)
+                val chunkPos = blockPos.chunkPosition
+                val chunkList = HashSet<Vector3i>()
+                val range = it["Range"] as Int
+
+                // Generate force load chunks list
+                (chunkPos.x - range..chunkPos.x + range).forEach { x ->
+                    (chunkPos.z - range..chunkPos.z + range).forEach { z ->
+                        chunkList.add(Vector3i(x, 0, z))
+                    }
+                }
+
+                // Warn if out of limit
+                if (chunkList.size > ticket.numChunks) {
+                    main.logger.warn("ChunkLoader({}) range({} chunks) large then forge limit({} chunks)!", blockPos.toString(), chunkList.size, ticket.numChunks)
+                }
+
+                // Force load chunks
+                chunkList.parallelStream().forEach { ticket.forceChunk(it) }
+                worldTickets[world.uniqueId]!![blockPos.biomePosition] = ticket
+                logger.info("Loaded ChunkLoader at {}", blockPos.position.toString())
+            }
+        }
     }
 }

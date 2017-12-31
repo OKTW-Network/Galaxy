@@ -25,14 +25,14 @@ class Galaxy constructor(uuid: UUID) {
             launch { galaxyCollection.findOneAndUpdate(eq("UUID", uniqueId), set("Name", name)) }
         }
 
-    val members: List<Member>
-        get() = (galaxy["Members"] as List<Document>).parallelStream().map { document -> Member(document["UUID"] as UUID) }.collect(toList())
+    val members: List<UUID>
+        get() = (galaxy["Members"] as List<Document>).parallelStream().map { document -> document["UUID"] as UUID }.collect(toList())
 
     val planets: List<UUID>
         get() = galaxy["Planets"] as List<UUID>
 
     fun addMember(member: UUID): Boolean {
-        if (!members.any { it.uniqueId == member }) {
+        if (!members.any { it == member }) {
             launch {
                 galaxyCollection.findOneAndUpdate(eq("UUID", uniqueId),
                         push("Members", member)
@@ -44,7 +44,7 @@ class Galaxy constructor(uuid: UUID) {
     }
 
     fun deleteMember(member: UUID): Boolean {
-        if (members.any { it.uniqueId == member }) {
+        if (members.any { it == member }) {
             launch {
                 galaxyCollection.findOneAndUpdate(eq("UUID", uniqueId),
                         pull("Members", member)

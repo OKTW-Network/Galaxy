@@ -2,9 +2,9 @@ plugins {
     id "java"
     id "idea"
     id "signing"
-    id "org.jetbrains.kotlin.jvm" version "1.2.0"
+    id "org.jetbrains.kotlin.jvm" version "1.2.10"
     id "org.spongepowered.plugin" version "0.8.1"
-    id "com.github.johnrengelman.shadow" version "2.0.1"
+    id "com.github.johnrengelman.shadow" version "2.0.2"
 }
 
 group "one.oktw"
@@ -18,15 +18,15 @@ repositories {
 }
 
 ext.spongeVersion = "7.0.0-SNAPSHOT"
-ext.CoroutinesVersion = "0.19.3"
+ext.CoroutinesVersion = "0.21"
 
 dependencies {
     compile "org.spongepowered:spongeapi:$spongeVersion"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$CoroutinesVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$CoroutinesVersion"
-    compile "org.mongodb:mongodb-driver:3.5.0"
-    compile "com.github.NucleusPowered.Nucleus:nucleus-api:1.2.0-PR4"
+    compile "org.mongodb:mongodb-driver:3.6.1"
+    compile "com.github.NucleusPowered.Nucleus:nucleus-api:1.2.0-PR6"
 }
 
 kotlin {

@@ -15,9 +15,10 @@ repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
     maven { url "https://repo.lucko.me/" }
+    maven { url "http://repo.drnaylor.co.uk/artifactory/list/minecraft" }
 }
 
-ext.spongeVersion = "7.0.0-SNAPSHOT"
+ext.spongeVersion = "7.0.0"
 ext.CoroutinesVersion = "0.21"
 
 dependencies {
@@ -26,7 +27,7 @@ dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$CoroutinesVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$CoroutinesVersion"
     compile "org.mongodb:mongodb-driver:3.6.1"
-    compile "com.github.NucleusPowered.Nucleus:nucleus-api:1.2.0-PR6"
+    compile "io.github.nucleuspowered:nucleus-api:1.2.0-S7.0"
 }
 
 kotlin {

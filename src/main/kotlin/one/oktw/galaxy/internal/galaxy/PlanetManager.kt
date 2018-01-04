@@ -17,7 +17,7 @@ import java.util.*
 class PlanetManager {
     companion object {
         private val logger = main.logger
-        private val planets = databaseManager.database.getCollection("Planet")
+        private val planetCollection = databaseManager.database.getCollection("Planet")
         private val server = Sponge.getServer()
 
         internal fun createPlanet(name: String): Planet {
@@ -40,7 +40,7 @@ class PlanetManager {
                     .append("Size", 32)
                     .append("Security", VISIT.level)
 
-            planets.insertOne(worldInfo)
+            planetCollection.insertOne(worldInfo)
             return Planet(properties.uniqueId)
         }
 
@@ -61,7 +61,7 @@ class PlanetManager {
             }
 
             server.deleteWorld(properties).get()
-            launch { planets.deleteOne(eq("UUID", uuid)) }
+            launch { planetCollection.deleteOne(eq("UUID", uuid)) }
         }
 
         internal fun loadPlanet(uuid: UUID): Optional<World> {

@@ -11,7 +11,7 @@ import java.util.stream.Collectors.toList
 
 class GalaxyManager {
     companion object {
-        private val database = databaseManager.database.getCollection("Galaxy")
+        private val galaxyCollection = databaseManager.database.getCollection("Galaxy")
 
         fun createGalaxy(name: String, creator: Player, vararg members: UUID): Galaxy {
             val uuid = UUID.randomUUID()
@@ -22,7 +22,7 @@ class GalaxyManager {
             val document = Document("UUID", uuid)
                     .append("Name", name)
                     .append("Members", memberList)
-            database.insertOne(document)
+            galaxyCollection.insertOne(document)
             return getGalaxy(uuid)
         }
 
@@ -32,7 +32,7 @@ class GalaxyManager {
 
         fun searchGalaxy(galaxyManager: GalaxyManager, name: String): ArrayList<Galaxy> {
             val galaxyList = ArrayList<Galaxy>()
-            database.find(eq("Name", name)).forEach { document: Document -> galaxyList += Galaxy(document["UUID"] as UUID) }
+            galaxyCollection.find(eq("Name", name)).forEach { document: Document -> galaxyList += Galaxy(document["UUID"] as UUID) }
             return galaxyList
         }
     }

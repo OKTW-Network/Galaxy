@@ -10,19 +10,15 @@ import org.spongepowered.api.world.World
 import java.util.*
 import java.util.stream.Collectors.toList
 
-class Galaxy constructor(uuid: UUID) {
+class Galaxy constructor(val uuid: UUID) {
     private val database = Main.databaseManager.database
     private val galaxyCollection = database.getCollection("Galaxy")
     private val galaxy = galaxyCollection.find(eq("UUID", uuid)).first()
 
-
-    val uniqueId: UUID
-        get() = galaxy["UUID"] as UUID
-
     var name: String
         get() = galaxy.getString("Name")
         set(name) {
-            launch { galaxyCollection.findOneAndUpdate(eq("UUID", uniqueId), set("Name", name)) }
+            launch { galaxyCollection.findOneAndUpdate(eq("UUID", uuid), set("Name", name)) }
         }
 
     val members: List<UUID>
@@ -34,7 +30,7 @@ class Galaxy constructor(uuid: UUID) {
     fun addMember(member: UUID): Boolean {
         if (!members.any { it == member }) {
             launch {
-                galaxyCollection.findOneAndUpdate(eq("UUID", uniqueId),
+                galaxyCollection.findOneAndUpdate(eq("UUID", uuid),
                         push("Members", member)
                 )
             }
@@ -46,7 +42,7 @@ class Galaxy constructor(uuid: UUID) {
     fun deleteMember(member: UUID): Boolean {
         if (members.any { it == member }) {
             launch {
-                galaxyCollection.findOneAndUpdate(eq("UUID", uniqueId),
+                galaxyCollection.findOneAndUpdate(eq("UUID", uuid),
                         pull("Members", member)
                 )
             }
@@ -56,11 +52,10 @@ class Galaxy constructor(uuid: UUID) {
     }
 
     fun createPlanet(name: String): Optional<World> {
-        val worlds = database.getCollection("Planet")
-        return if (worlds.find(eq("Name", name)).first() == null) {
+        return if (database.getCollection("Planet").find(eq("Name", name)).first() == null) {
             val planet = PlanetManager.createPlanet(name)
-            galaxyCollection.findOneAndUpdate(eq("UUID", uniqueId),
-                    push("Planets", planet.uniqueId)
+            galaxyCollection.findOneAndUpdate(eq("UUID", uuid),
+                    push("Planets", planet.uuid)
             )
             planet.world
         } else {
@@ -69,7 +64,7 @@ class Galaxy constructor(uuid: UUID) {
     }
 
     fun deletePlanet(world: UUID) {
-        galaxyCollection.findOneAndUpdate(eq("UUID", uniqueId),
+        galaxyCollection.findOneAndUpdate(eq("UUID", uuid),
                 pull("Planets", world)
         )
         removePlanet(world)

@@ -20,7 +20,7 @@ class PlanetManager {
         private val planetCollection = databaseManager.database.getCollection("Planet")
         private val server = Sponge.getServer()
 
-        internal fun createPlanet(name: String): Planet {
+        fun createPlanet(name: String): Planet {
             val properties: WorldProperties
             logger.info("Create World [{}]", name)
 
@@ -44,7 +44,7 @@ class PlanetManager {
             return Planet(properties.uniqueId)
         }
 
-        internal fun removePlanet(uuid: UUID) {
+        fun removePlanet(uuid: UUID) {
             val properties: WorldProperties
             if (server.getWorldProperties(uuid).isPresent) {
                 properties = server.getWorldProperties(uuid).get()

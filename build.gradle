@@ -1,11 +1,21 @@
+buildscript {
+    ext.kotlin_version = '1.2.20'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
 plugins {
     id "java"
     id "idea"
     id "signing"
-    id "org.jetbrains.kotlin.jvm" version "1.2.20"
     id "org.spongepowered.plugin" version "0.8.1"
     id "com.github.johnrengelman.shadow" version "2.0.2"
 }
+apply plugin: 'kotlin'
 
 group "one.oktw"
 version "1.0-SNAPSHOT"
@@ -21,7 +31,7 @@ ext.CoroutinesVersion = "0.21.2"
 
 dependencies {
     compile "org.spongepowered:spongeapi:$spongeVersion"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$CoroutinesVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$CoroutinesVersion"
     compile "org.mongodb:mongodb-driver:3.6.1"

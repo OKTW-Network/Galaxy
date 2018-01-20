@@ -16,6 +16,7 @@ class CommandGalaxy : CommandBase {
                 .build()
     override fun execute(src: CommandSource?, args: CommandContext?): CommandResult {
         if (src is Player) {
+            src.sendMessage(Text.of("Command Executed Successfully").toText())
             return CommandResult.success()
         }
         return CommandResult.empty()

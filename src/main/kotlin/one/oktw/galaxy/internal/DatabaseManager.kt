@@ -7,7 +7,12 @@ import com.mongodb.ServerAddress
 import com.mongodb.client.MongoDatabase
 import one.oktw.galaxy.Main.Companion.configManager
 import one.oktw.galaxy.Main.Companion.main
-
+import one.oktw.galaxy.internal.types.Galaxy
+import one.oktw.galaxy.internal.types.Member
+import one.oktw.galaxy.internal.types.Planet
+import org.bson.codecs.configuration.CodecRegistries.fromProviders
+import org.bson.codecs.configuration.CodecRegistries.fromRegistries
+import org.bson.codecs.pojo.PojoCodecProvider
 
 class DatabaseManager {
     val database: MongoDatabase
@@ -30,21 +35,32 @@ class DatabaseManager {
         }
 
         // Init Database connect
+        val serverAddress = ServerAddress(
+                config.getNode("host").string,
+                config.getNode("port").int
+        )
+
+        val pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
+                fromProviders(PojoCodecProvider.builder().register(
+                        Galaxy::class.java,
+                        Planet::class.java,
+                        Member::class.java
+                ).build()))
+
         database = if (config.getNode("Username").string.isEmpty()) {
-            MongoClient(
-                    config.getNode("host").string,
-                    config.getNode("port").int
-            ).getDatabase(config.getNode("name").string)
+            MongoClient(serverAddress)
+                    .getDatabase(config.getNode("name").string)
+                    .withCodecRegistry(pojoCodecRegistry)
         } else {
-            MongoClient(
-                    ServerAddress(config.getNode("host").string, config.getNode("port").int),
-                    MongoCredential.createCredential(
-                            config.getNode("Username").string,
-                            config.getNode("name").string,
-                            config.getNode("Password").string.toCharArray()
-                    ),
-                    MongoClientOptions.builder().build()
-            ).getDatabase(config.getNode("name").string)
+            val credential = MongoCredential.createCredential(
+                    config.getNode("Username").string,
+                    config.getNode("name").string,
+                    config.getNode("Password").string.toCharArray()
+            )
+
+            MongoClient(serverAddress, credential, MongoClientOptions.builder().build())
+                    .getDatabase(config.getNode("name").string)
+                    .withCodecRegistry(pojoCodecRegistry)
         }
     }
 }

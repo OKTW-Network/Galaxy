@@ -5,7 +5,6 @@ import com.mongodb.client.model.Filters.eq
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.databaseManager
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.internal.galaxy.PlanetManager
 import org.bson.Document
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.world.ChunkTicketManager

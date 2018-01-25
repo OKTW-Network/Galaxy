@@ -17,9 +17,13 @@ class CommandUnStuck : CommandBase {
                 .build()
     override fun execute(src: CommandSource, args: CommandContext?): CommandResult {
         if (src is Player) {
-            src.setLocationSafely(src.location)
-            src.sendMessage(Text.of(TextColors.GREEN, "已嘗試自救"))
-            return CommandResult.success()
+            if (src.setLocationSafely(src.location)) {
+                src.sendMessage(Text.of(TextColors.GREEN, "已嘗試自救"))
+                return CommandResult.affectedEntities(1)
+            } else {
+                src.sendMessage(Text.of(TextColors.RED, "自救失敗，找不到安全位置"))
+                return CommandResult.success()
+            }
         }
         return CommandResult.empty()
     }

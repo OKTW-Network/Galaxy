@@ -15,6 +15,7 @@ class CommandUnStuck : CommandBase {
                 .description(Text.of("卡點自救"))
                 .permission("oktw.command.unstuck")
                 .build()
+
     override fun execute(src: CommandSource, args: CommandContext?): CommandResult {
         if (src is Player) {
             if (src.setLocationSafely(src.location)) {

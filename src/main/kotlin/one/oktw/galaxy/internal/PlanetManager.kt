@@ -31,8 +31,7 @@ internal class PlanetManager {
                 throw UncheckedIOException(e)
             }
 
-            val planet = Planet(world = properties.uniqueId, name = name)
-            return planet
+            return Planet(world = properties.uniqueId, name = name)
         }
 
         fun removePlanet(worldUUID: UUID): CompletableFuture<Boolean>? {

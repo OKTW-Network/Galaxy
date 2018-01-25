@@ -29,6 +29,10 @@ class GalaxyManager {
             return galaxy
         }
 
+        fun saveGalaxy(galaxy: Galaxy) {
+            galaxyCollection.replaceOne(eq("uuid", galaxy.uuid), galaxy)
+        }
+
         fun deleteGalaxy(uuid: UUID) {
             launch { galaxyCollection.deleteOne(eq("uuid", uuid)) }
         }

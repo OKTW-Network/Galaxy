@@ -35,16 +35,18 @@ class Main {
             private set
     }
 
-    @Inject lateinit var logger: Logger
+    @Inject
+    lateinit var logger: Logger
 
     @Inject
     @DefaultConfig(sharedRoot = false)
     lateinit var configLoader: ConfigurationLoader<CommentedConfigurationNode>
 
-    @Inject lateinit var plugin: PluginContainer
+    @Inject
+    lateinit var plugin: PluginContainer
 
     @Listener
-    fun construct(event: GameConstructionEvent) {
+    fun construct(@SuppressWarnings("unused") event: GameConstructionEvent) {
         main = this
     }
 

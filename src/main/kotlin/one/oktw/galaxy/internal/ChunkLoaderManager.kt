@@ -5,7 +5,6 @@ import com.mongodb.client.model.Filters.eq
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.databaseManager
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.internal.galaxy.PlanetManager
 import org.bson.Document
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.world.ChunkTicketManager
@@ -17,7 +16,7 @@ import kotlin.collections.HashMap
 class ChunkLoaderManager {
     private val logger = main.logger
     private val ticketManager = Sponge.getServer().chunkTicketManager
-    private val database = databaseManager.database.getCollection("ChunkLoader")
+    private val chunkLoaderCollection = databaseManager.database.getCollection("ChunkLoader")
     private val worldTickets: HashMap<UUID, HashMap<Vector3i, ChunkTicketManager.LoadingTicket>> = HashMap()
 
     init {
@@ -33,7 +32,7 @@ class ChunkLoaderManager {
                         .append("y", locatableBlock.position.y)
                         .append("z", locatableBlock.position.z))
                 .append("Range", range)
-        launch { database.insertOne(document) }
+        launch { chunkLoaderCollection.insertOne(document) }
         val ticket = ticketManager.createTicket(main, locatableBlock.world).get()
         val chunkPos = locatableBlock.location.chunkPosition
         val chunkList = HashSet<Vector3i>()
@@ -53,7 +52,7 @@ class ChunkLoaderManager {
     fun delChunkLoader(locatableBlock: LocatableBlock) {
         val filter = Document("x", locatableBlock.position.x).append("y", locatableBlock.position.y).append("z", locatableBlock.position.z)
         worldTickets[locatableBlock.world.uniqueId]?.get(locatableBlock.position)?.release()
-        launch { database.deleteOne(eq("Location", filter)) }
+        launch { chunkLoaderCollection.deleteOne(eq("Location", filter)) }
     }
 
     fun changeRange(locatableBlock: LocatableBlock, range: Short) {
@@ -63,14 +62,14 @@ class ChunkLoaderManager {
 
     fun loadForcedWorld() {
         logger.info("Loading world has ChunkLoader...")
-        database.distinct("World", UUID::class.java).forEach { PlanetManager.loadPlanet(it).ifPresent { reloadChunkLoader(it) } }
+        chunkLoaderCollection.distinct("World", UUID::class.java).forEach { PlanetManager.loadPlanet(it).ifPresent { reloadChunkLoader(it) } }
     }
 
     fun reloadChunkLoader(world: World) {
         logger.info("Reloading ChunkLoader in \"{}\" ...", world.name)
         worldTickets[world.uniqueId] = HashMap()
         launch {
-            database.find(eq("World", world.uniqueId)).forEach {
+            chunkLoaderCollection.find(eq("World", world.uniqueId)).forEach {
                 val ticket = ticketManager.createTicket(main, world).get()
                 val location = it["Location"] as Document
                 val blockPos = world.getLocation(location["x"] as Int, location["y"] as Int, location["z"] as Int)

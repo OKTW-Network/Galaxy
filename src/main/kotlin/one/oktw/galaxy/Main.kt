@@ -46,7 +46,7 @@ class Main {
     lateinit var plugin: PluginContainer
 
     @Listener
-    fun construct(@SuppressWarnings("unused") event: GameConstructionEvent) {
+    fun construct(event: GameConstructionEvent) {
         main = this
     }
 

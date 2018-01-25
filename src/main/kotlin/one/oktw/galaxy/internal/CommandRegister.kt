@@ -16,9 +16,3 @@ class CommandRegister {
         }
     }
 }
-
-
-
-
-
-

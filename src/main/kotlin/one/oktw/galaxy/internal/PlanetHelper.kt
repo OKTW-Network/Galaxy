@@ -11,12 +11,17 @@ import java.io.UncheckedIOException
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
-internal class PlanetManager {
+class PlanetHelper {
     companion object {
         private val logger = main.logger
         private val server = Sponge.getServer()
 
         fun createPlanet(name: String): Planet {
+            if (server.getWorldProperties(name).isPresent)
+                throw IllegalArgumentException("World already exists")
+            if (!name.matches(Regex("[a-z0-9]+", RegexOption.IGNORE_CASE)))
+                throw IllegalArgumentException("Name only allow a~z and 0~9")
+
             val properties: WorldProperties
             logger.info("Create World [{}]", name)
 
@@ -34,29 +39,31 @@ internal class PlanetManager {
             return Planet(world = properties.uniqueId, name = name)
         }
 
-        fun removePlanet(worldUUID: UUID): CompletableFuture<Boolean>? {
+        fun removePlanet(worldUUID: UUID): CompletableFuture<Boolean> {
             val properties: WorldProperties
             if (server.getWorldProperties(worldUUID).isPresent) {
                 properties = server.getWorldProperties(worldUUID).get()
             } else {
-                logger.error("Delete World [{}] failed: world not found", worldUUID.toString())
-                return null
+                return CompletableFuture.completedFuture(true)
             }
 
             logger.info("Deleting World [{}]", properties.worldName)
             if (server.getWorld(worldUUID).isPresent) {
                 val world = server.getWorld(worldUUID).get()
-                world.players.parallelStream().forEach { player -> player.setLocationSafely(server.getWorld(server.defaultWorldName).get().spawnLocation) }
+                world.players.parallelStream().forEach { it.setLocationSafely(server.getWorld(server.defaultWorldName).get().spawnLocation) }
                 server.unloadWorld(world)
             }
 
             return server.deleteWorld(properties)
         }
 
-        fun loadPlanet(uuid: UUID): Optional<World> {
-            return if (server.getWorldProperties(uuid).isPresent) {
-                val worldProperties = server.getWorldProperties(uuid).get()
+        fun loadPlanet(planet: Planet): Optional<World> {
+            return if (server.getWorldProperties(planet.world!!).isPresent) {
+                planet.lastTime = Date()
+
+                val worldProperties = server.getWorldProperties(planet.world!!).get()
                 worldProperties.setGenerateSpawnOnLoad(false)
+
                 server.loadWorld(worldProperties)
             } else {
                 Optional.empty()

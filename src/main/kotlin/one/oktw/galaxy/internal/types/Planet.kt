@@ -1,5 +1,6 @@
 package one.oktw.galaxy.internal.types
 
+import one.oktw.galaxy.internal.enums.SecurityLevel
 import java.util.*
 
 data class Planet(
@@ -7,5 +8,6 @@ data class Planet(
         var world: UUID? = null,
         var name: String? = null,
         var size: Int = 32,
-        var security: SecurityLevel = SecurityLevel.VISIT
+        var security: SecurityLevel = SecurityLevel.VISIT,
+        var lastTime: Date = Date()
 )

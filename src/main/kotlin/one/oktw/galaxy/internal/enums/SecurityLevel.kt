@@ -1,4 +1,4 @@
-package one.oktw.galaxy.internal.types
+package one.oktw.galaxy.internal.enums
 
 enum class SecurityLevel {
     MEMBER,

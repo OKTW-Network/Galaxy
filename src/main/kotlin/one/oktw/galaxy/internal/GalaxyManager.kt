@@ -4,9 +4,9 @@ import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.Filters.text
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.databaseManager
+import one.oktw.galaxy.internal.enums.Group.ADMIN
+import one.oktw.galaxy.internal.enums.Group.MEMBER
 import one.oktw.galaxy.internal.types.Galaxy
-import one.oktw.galaxy.internal.types.Groups.ADMIN
-import one.oktw.galaxy.internal.types.Groups.MEMBER
 import one.oktw.galaxy.internal.types.Member
 import org.spongepowered.api.entity.living.player.Player
 import java.util.*
@@ -30,7 +30,7 @@ class GalaxyManager {
         }
 
         fun saveGalaxy(galaxy: Galaxy) {
-            galaxyCollection.replaceOne(eq("uuid", galaxy.uuid), galaxy)
+            launch { galaxyCollection.replaceOne(eq("uuid", galaxy.uuid), galaxy) }
         }
 
         fun deleteGalaxy(uuid: UUID) {

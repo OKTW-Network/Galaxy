@@ -7,12 +7,12 @@ import com.mongodb.ServerAddress
 import com.mongodb.client.MongoDatabase
 import one.oktw.galaxy.Main.Companion.configManager
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.internal.types.Galaxy
-import one.oktw.galaxy.internal.types.Member
-import one.oktw.galaxy.internal.types.Planet
+import one.oktw.galaxy.internal.types.*
 import org.bson.codecs.configuration.CodecRegistries.fromProviders
 import org.bson.codecs.configuration.CodecRegistries.fromRegistries
+import org.bson.codecs.pojo.Conventions.SET_PRIVATE_FIELDS_CONVENTION
 import org.bson.codecs.pojo.PojoCodecProvider
+import java.util.Arrays.asList
 
 class DatabaseManager {
     val database: MongoDatabase
@@ -44,8 +44,12 @@ class DatabaseManager {
                 fromProviders(PojoCodecProvider.builder().register(
                         Galaxy::class.java,
                         Planet::class.java,
-                        Member::class.java
-                ).build()))
+                        Member::class.java,
+                        Traveler::class.java,
+                        Armor::class.java,
+                        Position::class.java
+                ).conventions(asList(SET_PRIVATE_FIELDS_CONVENTION)).build())
+        )
 
         database = if (config.getNode("Username").string.isEmpty()) {
             MongoClient(serverAddress)
@@ -58,9 +62,11 @@ class DatabaseManager {
                     config.getNode("Password").string.toCharArray()
             )
 
-            MongoClient(serverAddress, credential, MongoClientOptions.builder().build())
-                    .getDatabase(config.getNode("name").string)
-                    .withCodecRegistry(pojoCodecRegistry)
+            MongoClient(
+                    serverAddress,
+                    credential,
+                    MongoClientOptions.builder().codecRegistry(pojoCodecRegistry).build()
+            ).getDatabase(config.getNode("name").string)
         }
     }
 }

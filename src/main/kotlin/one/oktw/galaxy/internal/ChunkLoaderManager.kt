@@ -62,7 +62,9 @@ class ChunkLoaderManager {
 
     fun loadForcedWorld() {
         logger.info("Loading world has ChunkLoader...")
-        chunkLoaderCollection.distinct("World", UUID::class.java).forEach { PlanetManager.loadPlanet(it).ifPresent { reloadChunkLoader(it) } }
+        chunkLoaderCollection.distinct("World", UUID::class.java).forEach {
+            Sponge.getServer().loadWorld(it).ifPresent { reloadChunkLoader(it) }
+        }
     }
 
     fun reloadChunkLoader(world: World) {

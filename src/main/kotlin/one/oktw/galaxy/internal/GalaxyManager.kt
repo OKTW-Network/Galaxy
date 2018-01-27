@@ -8,6 +8,7 @@ import one.oktw.galaxy.internal.enums.Group.ADMIN
 import one.oktw.galaxy.internal.enums.Group.MEMBER
 import one.oktw.galaxy.internal.types.Galaxy
 import one.oktw.galaxy.internal.types.Member
+import one.oktw.galaxy.internal.types.Planet
 import org.spongepowered.api.entity.living.player.Player
 import java.util.*
 import java.util.stream.Collectors.toList
@@ -39,6 +40,10 @@ class GalaxyManager {
 
         fun getGalaxy(uuid: UUID): Optional<Galaxy> {
             return Optional.ofNullable(galaxyCollection.find(eq("uuid", uuid)).first())
+        }
+
+        fun getGalaxy(planet: Planet): Galaxy {
+            return galaxyCollection.find(eq("planets.uuid", planet.uuid)).first()!!
         }
 
         fun searchGalaxy(keyword: String): ArrayList<Galaxy> {

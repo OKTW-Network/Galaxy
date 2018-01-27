@@ -1,6 +1,11 @@
 package one.oktw.galaxy.internal.types
 
+import one.oktw.galaxy.internal.GalaxyManager
+import one.oktw.galaxy.internal.enums.AccessLevel
+import one.oktw.galaxy.internal.enums.AccessLevel.*
+import one.oktw.galaxy.internal.enums.Group
 import one.oktw.galaxy.internal.enums.SecurityLevel
+import one.oktw.galaxy.internal.enums.SecurityLevel.*
 import java.util.*
 
 data class Planet(
@@ -8,6 +13,16 @@ data class Planet(
         var world: UUID? = null,
         var name: String? = null,
         var size: Int = 32,
-        var security: SecurityLevel = SecurityLevel.VISIT,
+        var security: SecurityLevel = VISIT,
         var lastTime: Date = Date()
-)
+) {
+    fun checkPermission(traveler: Traveler): AccessLevel {
+        val group = GalaxyManager.getGalaxy(this).getGroup(traveler)
+
+        return when (security) {
+            MEMBER -> if (group !== Group.VISITOR) MODIFY else DENY
+            VISIT -> if (group !== Group.VISITOR) MODIFY else VIEW
+            PUBLIC -> MODIFY
+        }
+    }
+}

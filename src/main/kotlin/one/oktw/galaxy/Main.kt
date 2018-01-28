@@ -23,6 +23,8 @@ class Main {
     companion object {
         lateinit var main: Main
 
+        lateinit var chunkLoaderManager: ChunkLoaderManager
+            private set
         lateinit var commandManager: CommandRegister
             private set
         lateinit var configManager: ConfigManager
@@ -31,7 +33,9 @@ class Main {
             private set
         lateinit var eventRegister: EventRegister
             private set
-        lateinit var chunkLoaderManager: ChunkLoaderManager
+        lateinit var galaxyManager: GalaxyManager
+            private set
+        lateinit var travelerManager: TravelerManager
             private set
     }
 
@@ -55,8 +59,10 @@ class Main {
         logger.info("Initialization...")
         configManager = ConfigManager(configLoader)
         databaseManager = DatabaseManager()
-        eventRegister = EventRegister()
+        galaxyManager = GalaxyManager()
+        travelerManager = TravelerManager()
         chunkLoaderManager = ChunkLoaderManager()
+        eventRegister = EventRegister()
         logger.info("Plugin initialized!")
     }
 

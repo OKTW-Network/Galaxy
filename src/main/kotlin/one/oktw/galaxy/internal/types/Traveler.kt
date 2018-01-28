@@ -1,6 +1,6 @@
 package one.oktw.galaxy.internal.types
 
-import one.oktw.galaxy.internal.TravelerManager
+import one.oktw.galaxy.Main.Companion.travelerManager
 import java.util.*
 
 data class Traveler(
@@ -9,6 +9,6 @@ data class Traveler(
         var position: Position = Position()
 ) {
     fun save() {
-        TravelerManager.saveTraveler(this)
+        travelerManager.saveTraveler(this)
     }
 }

@@ -1,6 +1,6 @@
 package one.oktw.galaxy.internal.types
 
-import one.oktw.galaxy.internal.GalaxyManager
+import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.internal.enums.AccessLevel
 import one.oktw.galaxy.internal.enums.AccessLevel.*
 import one.oktw.galaxy.internal.enums.Group
@@ -17,7 +17,7 @@ data class Planet(
         var lastTime: Date = Date()
 ) {
     fun checkPermission(traveler: Traveler): AccessLevel {
-        val group = GalaxyManager.getGalaxy(this).getGroup(traveler)
+        val group = galaxyManager.getGalaxy(this).getGroup(traveler)
 
         return when (security) {
             MEMBER -> if (group !== Group.VISITOR) MODIFY else DENY

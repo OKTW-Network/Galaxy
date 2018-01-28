@@ -1,6 +1,6 @@
 package one.oktw.galaxy.internal.types
 
-import one.oktw.galaxy.internal.GalaxyManager
+import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.internal.PlanetHelper
 import one.oktw.galaxy.internal.enums.Group
 import one.oktw.galaxy.internal.enums.Group.MEMBER
@@ -14,7 +14,7 @@ data class Galaxy(
         var planets: List<Planet> = ArrayList()
 ) {
     fun save() {
-        GalaxyManager.saveGalaxy(this)
+        galaxyManager.saveGalaxy(this)
     }
 
     fun createPlanet(name: String): Planet {
@@ -35,23 +35,23 @@ data class Galaxy(
     }
 
     fun addMember(uuid: UUID, group: Group = MEMBER) {
-        if (members.any { it.uuid === uuid }) return
+        if (members.any { it.uuid == uuid }) return
 
         members += Member(uuid, group)
         save()
     }
 
     fun delMember(uuid: UUID) {
-        members -= members.find { it.uuid === uuid } ?: return
+        members -= members.find { it.uuid == uuid } ?: return
         save()
     }
 
     fun setMemberGroup(uuid: UUID, group: Group) {
-        members.forEach { if (it.uuid === uuid) it.group = group }
+        members.forEach { if (it.uuid == uuid) it.group = group }
         save()
     }
 
     fun getGroup(traveler: Traveler): Group {
-        return members.find { it.uuid === traveler.uuid }?.group ?: return Group.VISITOR
+        return members.find { it.uuid == traveler.uuid }?.group ?: return Group.VISITOR
     }
 }

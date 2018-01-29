@@ -39,26 +39,18 @@ class CommandTeleportHereAsk : CommandBase {
                         .append(Text.NEW_LINE).append(Text.builder("接受").onHover(TextActions.showText(Text.of(TextColors.RED,"請勿輕易接受其他人的邀請"))).style(TextStyles.UNDERLINE).color(TextColors.GREEN).onClick(
                         TextActions.executeCallback {
                             if(teleportHereAskTemp.containsKey(uuid)){
-                                if(src.isOnline && target.isOnline) {
-                                    src.sendMessage(Text.of(TextColors.GREEN, "對方已接受傳送請求"))
-                                    target.sendMessage(Text.of(TextColors.GREEN, "已接受傳送請求"))
-                                    TPManager.Teleport(target,src.location)
-                                    teleportHereAskTemp.remove(uuid)
-                                }else{
-                                    teleportHereAskTemp.remove(uuid)
-                                }
+                                src.sendMessage(Text.of(TextColors.GREEN, "對方已接受傳送請求"))
+                                target.sendMessage(Text.of(TextColors.GREEN, "已接受傳送請求"))
+                                TPManager.Teleport(target,src.location)
+                                teleportHereAskTemp.remove(uuid)
                             }
                         }).build())
                         .append(Text.builder("拒絕").style(TextStyles.UNDERLINE).onHover(TextActions.showText(Text.of(TextColors.RED,"請勿輕易拒絕其他人的邀請"))).color(TextColors.RED).onClick(
                                 TextActions.executeCallback {
                                     if(teleportHereAskTemp.containsKey(uuid)){
-                                        if(src.isOnline && target.isOnline) {
-                                            src.sendMessage(Text.of(TextColors.RED, "對方已拒絕傳送請求"))
-                                            target.sendMessage(Text.of(TextColors.RED, "已拒絕傳送請求"))
-                                            teleportHereAskTemp.remove(uuid)
-                                        }else{
-                                            teleportHereAskTemp.remove(uuid)
-                                        }
+                                        src.sendMessage(Text.of(TextColors.RED, "對方已拒絕傳送請求"))
+                                        target.sendMessage(Text.of(TextColors.RED, "已拒絕傳送請求"))
+                                        teleportHereAskTemp.remove(uuid)
                                     }
                                 }).build()).build()
                 src.sendMessage(Text.of(TextColors.GREEN, "已傳送請求"))

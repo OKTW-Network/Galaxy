@@ -17,15 +17,13 @@ class TPManager {
 
         fun Teleport( player : Player , location : Location<World> , safty : Boolean = false, delay : Long = 3){
 
-            val x = player.location.x.toInt()
-            val y = player.location.y.toInt()
-            val z = player.location.z.toInt()
+            val first_location = player.location
 
             if(safty){
                 player.sendMessage(Text.of(TextColors.YELLOW,"請站在原地不要移動，將在 " + delay.toString() + " 秒後傳送......").toText())
                 Task.builder()
                         .execute{->
-                            if (x == player.location.x.toInt() && y == player.location.y.toInt() && z == player.location.z.toInt()) {
+                            if (first_location.equals(player.location)) {
                                 player.setLocationSafely(location)
                                 player.sendMessage(Text.of(TextColors.GREEN, "傳送成功").toText())
                             } else {
@@ -37,7 +35,7 @@ class TPManager {
                 player.sendMessage(Text.of(TextColors.YELLOW,"請站在原地不要移動，將在 " + delay.toString() + " 秒後傳送......").toText())
                 Task.builder()
                         .execute{->
-                            if (x == player.location.x.toInt() && y == player.location.y.toInt() && z == player.location.z.toInt()) {
+                            if (first_location.equals(player.location)) {
                                 player.setLocation(location)
                                 player.sendMessage(Text.of(TextColors.GREEN,"傳送成功").toText())
                             }else{

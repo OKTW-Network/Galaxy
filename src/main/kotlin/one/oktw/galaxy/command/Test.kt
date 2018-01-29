@@ -7,7 +7,7 @@ import org.spongepowered.api.command.spec.CommandSpec
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.text.Text
 
-class CommandTest : CommandBase {
+class Test : CommandBase {
     override val spec: CommandSpec
         get() = CommandSpec.builder()
                 .executor(this)

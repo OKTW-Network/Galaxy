@@ -8,7 +8,7 @@ import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 
-class CommandUnStuck : CommandBase {
+class UnStuck : CommandBase {
     override val spec: CommandSpec
         get() = CommandSpec.builder()
                 .executor(this)

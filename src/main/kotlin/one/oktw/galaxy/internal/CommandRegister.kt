@@ -1,8 +1,8 @@
 package one.oktw.galaxy.internal
 
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.command.CommandTest
-import one.oktw.galaxy.command.CommandUnStuck
+import one.oktw.galaxy.command.Test
+import one.oktw.galaxy.command.UnStuck
 import org.spongepowered.api.Sponge
 
 class CommandRegister {
@@ -11,8 +11,8 @@ class CommandRegister {
     init {
         logger.info("Register command...")
         Sponge.getCommandManager().apply {
-            register(main, CommandUnStuck().spec, "unstuck")
-            register(main, CommandTest().spec, "test")
+            register(main, UnStuck().spec, "unstuck")
+            register(main, Test().spec, "test")
         }
     }
 }

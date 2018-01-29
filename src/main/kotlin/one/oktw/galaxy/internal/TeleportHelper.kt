@@ -25,11 +25,12 @@ class TeleportHelper {
             val traveler = travelerManager.getTraveler(player)
             val planet = galaxyManager.getPlanet(location.extent.uniqueId) ?: return false
 
-            result@ PlanetHelper.loadPlanet(planet).ifPresent {
+            if (PlanetHelper.loadPlanet(planet).isPresent) {
                 val result = player.setLocation(location)
 
                 if (result) {
                     traveler.position.fromPosition(location.position).planet = planet.uuid
+
                     if (planet.checkPermission(traveler) == VIEW) {
                         travelerManager.setViewer(player.uniqueId)
                     } else {
@@ -37,7 +38,7 @@ class TeleportHelper {
                     }
                 }
 
-                return@result result
+                return result
             }
 
             return false
@@ -49,11 +50,12 @@ class TeleportHelper {
             val traveler = travelerManager.getTraveler(player)
             val planet = galaxyManager.getPlanet(location.extent.uniqueId) ?: return false
 
-            result@ PlanetHelper.loadPlanet(planet).ifPresent {
+            if (PlanetHelper.loadPlanet(planet).isPresent) {
                 val result = player.setLocationSafely(location)
 
                 if (result) {
                     traveler.position.fromPosition(location.position).planet = planet.uuid
+
                     if (planet.checkPermission(traveler) == VIEW) {
                         travelerManager.setViewer(player.uniqueId)
                     } else {
@@ -61,7 +63,7 @@ class TeleportHelper {
                     }
                 }
 
-                return@result result
+                return result
             }
 
             return false

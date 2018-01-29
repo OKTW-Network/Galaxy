@@ -96,10 +96,13 @@ class TravelerWatcher {
 
     @Listener
     fun onCollideEntity(event: CollideEntityEvent) {
-        val target = event.entities.filterIsInstance<Player>().any { travelerManager.isViewer(it.uniqueId) }
-        val source = event.cause.allOf(Player::class.java).any { travelerManager.isViewer(it.uniqueId) }
+        val source = event.cause.filterIsInstance<Player>().any { travelerManager.isViewer(it.uniqueId) }
 
-        if (target || source) event.isCancelled = true
+        if (source) {
+            event.isCancelled = true
+        } else {
+            event.filterEntities { !travelerManager.isViewer(it.uniqueId) }
+        }
     }
 
     @Listener

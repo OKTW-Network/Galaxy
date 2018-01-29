@@ -1,4 +1,4 @@
-package one.oktw.galaxy.internal
+package one.oktw.galaxy.internal.manager
 
 import com.mongodb.MongoClient
 import com.mongodb.MongoClientOptions

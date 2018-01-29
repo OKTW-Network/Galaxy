@@ -1,4 +1,4 @@
-package one.oktw.galaxy.internal
+package one.oktw.galaxy.internal.manager
 
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Filters.eq
@@ -6,6 +6,7 @@ import com.mongodb.client.model.Filters.text
 import com.mongodb.client.model.Projections
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.databaseManager
+import one.oktw.galaxy.internal.PlanetHelper
 import one.oktw.galaxy.internal.enums.Group.ADMIN
 import one.oktw.galaxy.internal.enums.Group.MEMBER
 import one.oktw.galaxy.internal.types.Galaxy

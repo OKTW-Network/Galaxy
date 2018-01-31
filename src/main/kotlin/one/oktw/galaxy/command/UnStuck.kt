@@ -1,6 +1,7 @@
 package one.oktw.galaxy.command
 
 import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.internal.DelayHelper
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -43,21 +44,20 @@ class UnStuck : CommandBase {
             if (src.setLocationSafely(src.location)) {
                 Btnlist.add(random)
                 src.sendMessage(Text.of(TextColors.GREEN, "已嘗試自救\n",TextColors.GOLD,"覺得沒被救到嗎?",retrybutton))
-                Task.builder()
-                        .execute{->
-                            Btnlist.remove(random)
-                        }
-                        .delay(300,TimeUnit.SECONDS).submit(main)
-                return CommandResult.affectedEntities(1)
+                DelayHelper.Delay(Runnable{
+                    if (random in Btnlist){
+                        Btnlist.remove(random)
+                    }
+                },300)
             } else {
                 if (src.setLocationSafely(src.location.add(0.0, 2.0, 0.0))){
                     Btnlist.add(random)
                     src.sendMessage(Text.of(TextColors.GREEN, "已嘗試自救\n",TextColors.GOLD,"覺得沒被救到嗎?",retrybutton))
-                    Task.builder()
-                            .execute{->
-                                Btnlist.remove(random)
-                            }
-                            .delay(300,TimeUnit.SECONDS).submit(main)
+                    DelayHelper.Delay(Runnable{
+                        if (random in Btnlist){
+                            Btnlist.remove(random)
+                        }
+                    },300)
                     return CommandResult.affectedEntities(1)
                 }else {
                     src.sendMessage(Text.of(TextColors.RED, "自救失敗，找不到安全位置"))

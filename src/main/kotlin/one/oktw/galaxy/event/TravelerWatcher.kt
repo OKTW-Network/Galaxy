@@ -20,6 +20,7 @@ import org.spongepowered.api.item.ItemTypes
 
 class TravelerWatcher {
     @Listener
+    @Suppress("UNUSED_PARAMETER")
     fun onDisconnect(event: ClientConnectionEvent.Disconnect, @Getter("getTargetEntity") player: Player) {
         travelerManager.updateTraveler(player)
         travelerManager.removeViewer(player.uniqueId)

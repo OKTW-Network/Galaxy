@@ -83,11 +83,14 @@ class CommandTeleportAsk : CommandBase {
 
         player.sendMessage(Text.of(TextColors.YELLOW,"請站在原地不要移動，將在 3 秒後傳送......").toText())
 
-
         DelayHelper.Delay(Runnable {
             if (first_location.equals(player.location)) {
-                TeleportHelper.teleport(player,location,false)
-                player.sendMessage(Text.of(TextColors.GREEN, "傳送成功").toText())
+                if (TeleportHelper.teleport(player,location,false)){
+                    player.sendMessage(Text.of(TextColors.GREEN, "傳送成功").toText())
+                }else{
+                    player.sendMessage(Text.of(TextColors.RED, "傳送失敗，或許是對方或是你的權限不足").toText())
+                }
+
             } else {
                 player.sendMessage(Text.of(TextColors.RED, "位置移動，傳送取消").toText())
             }

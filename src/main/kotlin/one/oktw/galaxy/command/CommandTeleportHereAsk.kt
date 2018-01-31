@@ -84,8 +84,12 @@ class CommandTeleportHereAsk : CommandBase {
 
         DelayHelper.Delay(Runnable {
                 if (first_location.equals(player.location)) {
-                    TeleportHelper.teleport(player,location,false)
-                    player.sendMessage(Text.of(TextColors.GREEN, "傳送成功").toText())
+                    if (TeleportHelper.teleport(player,location,false)){
+                        player.sendMessage(Text.of(TextColors.GREEN, "傳送成功").toText())
+                    }else{
+                        player.sendMessage(Text.of(TextColors.RED, "傳送失敗，或許是對方或是你的權限不足").toText())
+                    }
+
                 } else {
                     player.sendMessage(Text.of(TextColors.RED, "位置移動，傳送取消").toText())
                 }

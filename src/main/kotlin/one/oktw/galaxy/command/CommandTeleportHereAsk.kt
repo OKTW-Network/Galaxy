@@ -17,73 +17,76 @@ import org.spongepowered.api.world.World
 import java.util.*
 
 class CommandTeleportHereAsk : CommandBase {
-
-    var teleportHereAskTemp = HashMap<UUID, Player>()
+    private var callbackLimit = HashMap<UUID, Player>()
 
     override val spec: CommandSpec
         get() = CommandSpec.builder()
                 .executor(this)
                 .arguments(GenericArguments.onlyOne(GenericArguments.player(Text.of("Player"))))
-                .permission("oktw.command.teleporthereask")
+                .permission("oktw.command.teleport.ask.here")
                 .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-
-
         if (src is Player) {
-
             if (args.getOne<Player>("Player").isPresent) {
-
                 val uuid = UUID.randomUUID()
                 val target = args.getOne<Player>("Player").get()
-                teleportHereAskTemp.put(uuid, target)
+                callbackLimit[uuid] = target
 
-                DelayHelper.Delay(Runnable {
-                    if (teleportHereAskTemp.containsKey(uuid)) {
-                        teleportHereAskTemp.remove(uuid)
+                DelayHelper.delay(Runnable {
+                    if (callbackLimit.containsKey(uuid)) {
+                        callbackLimit.remove(uuid)
                     }
                 }, 300)
 
-                val teleportMsg = Text.builder("玩家 ").color(TextColors.YELLOW).append(Text.builder(src.name).color(TextColors.AQUA).build()).append(Text.builder(" 想要傳送你到他的位置，是否接受?").color(TextColors.YELLOW).build())
-                        .append(Text.NEW_LINE).append(Text.builder("接受").onHover(TextActions.showText(Text.of(TextColors.RED, "請勿輕易接受其他人的邀請"))).style(TextStyles.UNDERLINE).color(TextColors.GREEN).onClick(
-                        TextActions.executeCallback {
-                            if (teleportHereAskTemp.containsKey(uuid)) {
-                                src.sendMessage(Text.of(TextColors.GREEN, "對方已接受傳送請求"))
-                                target.sendMessage(Text.of(TextColors.GREEN, "已接受傳送請求"))
-                                Teleport(target, src.location)
-                                teleportHereAskTemp.remove(uuid)
-                            }
-                        }).build())
-                        .append(Text.builder("拒絕").style(TextStyles.UNDERLINE).onHover(TextActions.showText(Text.of(TextColors.RED, "請勿輕易拒絕其他人的邀請"))).color(TextColors.RED).onClick(
+                val teleportMsg = Text.of(TextColors.YELLOW, "玩家 ", TextColors.AQUA, src.name, TextColors.YELLOW, " 想要傳送你到他的位置，是否接受?")
+                        .concat(Text.NEW_LINE)
+                        .concat(Text.of(
+                                TextActions.showText(Text.of(TextColors.RED, "請勿輕易接受其他人的邀請")),
                                 TextActions.executeCallback {
-                                    if (teleportHereAskTemp.containsKey(uuid)) {
+                                    if (callbackLimit.containsKey(uuid)) {
+                                        src.sendMessage(Text.of(TextColors.GREEN, "對方已接受傳送請求"))
+                                        target.sendMessage(Text.of(TextColors.GREEN, "已接受傳送請求"))
+                                        teleport(target, src.location)
+                                        callbackLimit.remove(uuid)
+                                    }
+                                },
+                                TextColors.GREEN,
+                                TextStyles.UNDERLINE,
+                                "接受",
+                                TextStyles.RESET,
+                                " ",
+                                TextActions.executeCallback {
+                                    if (callbackLimit.containsKey(uuid)) {
                                         src.sendMessage(Text.of(TextColors.RED, "對方已拒絕傳送請求"))
                                         target.sendMessage(Text.of(TextColors.RED, "已拒絕傳送請求"))
-                                        teleportHereAskTemp.remove(uuid)
+                                        callbackLimit.remove(uuid)
                                     }
-                                }).build()).build()
+                                },
+                                TextColors.RED,
+                                TextStyles.UNDERLINE,
+                                "拒絕"
+                        ))
+
                 src.sendMessage(Text.of(TextColors.GREEN, "已傳送請求"))
                 target.sendMessage(teleportMsg)
+
                 return CommandResult.success()
             } else {
                 return CommandResult.empty()
             }
-
         }
 
         return CommandResult.empty()
-
     }
 
-
-    private fun Teleport(player: Player, location: Location<World>) {
-
-        val first_location = player.location
+    private fun teleport(player: Player, location: Location<World>) {
+        val originLocation = player.location
 
         player.sendMessage(Text.of(TextColors.YELLOW, "請站在原地不要移動，將在 3 秒後傳送......").toText())
 
-        DelayHelper.Delay(Runnable {
-            if (first_location.equals(player.location)) {
+        DelayHelper.delay(Runnable {
+            if (originLocation == player.location) {
                 if (TeleportHelper.teleport(player, location, false)) {
                     player.sendMessage(Text.of(TextColors.GREEN, "傳送成功").toText())
                 } else {
@@ -95,5 +98,4 @@ class CommandTeleportHereAsk : CommandBase {
             }
         }, 3)
     }
-
 }

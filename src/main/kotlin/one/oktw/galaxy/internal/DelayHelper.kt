@@ -6,10 +6,11 @@ import java.util.concurrent.TimeUnit
 
 class DelayHelper {
     companion object {
-        fun Delay(code: Runnable, delay: Long = 3) {
+        fun delay(code: Runnable, delay: Long = 3) {
             Task.builder()
                     .execute(code)
-                    .delay(delay, TimeUnit.SECONDS).submit(main)
+                    .delay(delay, TimeUnit.SECONDS)
+                    .submit(main)
         }
     }
 }

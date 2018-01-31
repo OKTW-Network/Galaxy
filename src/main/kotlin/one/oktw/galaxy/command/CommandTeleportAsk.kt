@@ -1,5 +1,6 @@
 package one.oktw.galaxy.command
 
+import kotlinx.coroutines.experimental.delay
 import one.oktw.galaxy.internal.DelayHelper
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
@@ -32,11 +33,17 @@ class CommandTeleportAsk : CommandBase {
 
         if (src is Player) {
 
-            if(args.getOne<Player>("Player").get().isOnline){
+            if(args.getOne<Player>("Player").isPresent){
 
                 val uuid = UUID.randomUUID()
                 val target = args.getOne<Player>("Player").get()
                 teleportAskTemp.put(uuid,target)
+
+                DelayHelper.Delay(Runnable {
+                    if(teleportAskTemp.containsKey(uuid)){
+                        teleportAskTemp.remove(uuid)
+                    }
+                    },300)
 
                 val teleportMsg = Text.builder("玩家 ").color(TextColors.YELLOW).append(Text.builder(src.name).color(TextColors.AQUA).build()).append(Text.builder(" 想要傳送到你這，是否接受?").color(TextColors.YELLOW).build())
                         .append(Text.NEW_LINE).append(Text.builder("接受").onHover(TextActions.showText(Text.of(TextColors.RED,"請勿輕易接受其他人的邀請"))).style(TextStyles.UNDERLINE).color(TextColors.GREEN).onClick(
@@ -70,7 +77,7 @@ class CommandTeleportAsk : CommandBase {
 
     }
 
-    fun Teleport(player : Player, location : Location<World>){
+    private fun Teleport(player : Player, location : Location<World>){
 
         val first_location = player.location
 

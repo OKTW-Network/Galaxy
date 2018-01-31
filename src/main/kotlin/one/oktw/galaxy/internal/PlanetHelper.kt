@@ -36,7 +36,10 @@ class PlanetHelper {
                 throw UncheckedIOException(e)
             }
 
-            return Planet(world = properties.uniqueId, name = name)
+            val planet = Planet(world = properties.uniqueId, name = name)
+            updatePlanet(planet)
+
+            return planet
         }
 
         fun removePlanet(worldUUID: UUID): CompletableFuture<Boolean> {
@@ -67,6 +70,12 @@ class PlanetHelper {
                 server.loadWorld(worldProperties)
             } else {
                 Optional.empty()
+            }
+        }
+
+        fun updatePlanet(planet: Planet) {
+            server.getWorldProperties(planet.world!!).ifPresent {
+                it.worldBorderDiameter = (planet.size * 16).toDouble()
             }
         }
     }

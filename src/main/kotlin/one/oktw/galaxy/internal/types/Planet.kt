@@ -1,6 +1,7 @@
 package one.oktw.galaxy.internal.types
 
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.internal.PlanetHelper
 import one.oktw.galaxy.internal.enums.AccessLevel
 import one.oktw.galaxy.internal.enums.AccessLevel.*
 import one.oktw.galaxy.internal.enums.Group
@@ -16,6 +17,11 @@ data class Planet(
         var security: SecurityLevel = VISIT,
         var lastTime: Date = Date()
 ) {
+    fun save() {
+        PlanetHelper.updatePlanet(this)
+        galaxyManager.getGalaxy(this).save()
+    }
+
     fun checkPermission(traveler: Traveler): AccessLevel {
         val group = galaxyManager.getGalaxy(this).getGroup(traveler)
 

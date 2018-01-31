@@ -34,7 +34,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Gradle: com.github.NucleusPowered.Nucleus:nucleus-api:1.2.2" level="project" />
     <orderEntry type="library" name="Gradle: org.spongepowered:spongeapi:7.0.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.21" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:0.21.2" level="project" />

@@ -10,9 +10,10 @@ import org.spongepowered.api.event.block.InteractBlockEvent
 import org.spongepowered.api.event.entity.CollideEntityEvent
 import org.spongepowered.api.event.entity.DamageEntityEvent
 import org.spongepowered.api.event.entity.InteractEntityEvent
+import org.spongepowered.api.event.entity.SpawnEntityEvent
 import org.spongepowered.api.event.entity.ai.SetAITargetEvent
 import org.spongepowered.api.event.filter.Getter
-import org.spongepowered.api.event.item.inventory.DropItemEvent
+import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
 import org.spongepowered.api.event.network.ClientConnectionEvent
 import org.spongepowered.api.item.ItemTypes
@@ -30,8 +31,15 @@ class TravelerWatcher {
     }
 
     @Listener
-    fun onDropItem(event: DropItemEvent, @Getter("getSource") player: Player) {
+    fun onClickInventory(event: ClickInventoryEvent.Drop, @Getter("getSource") player: Player) {
         if (travelerManager.isViewer(player.uniqueId)) event.isCancelled = true
+    }
+
+    @Listener
+    fun onSpawnEntity(event: SpawnEntityEvent) {
+        val source = event.cause.allOf(Player::class.java).any { travelerManager.isViewer(it.uniqueId) }
+
+        if (source) event.isCancelled = true
     }
 
     @Listener
@@ -88,10 +96,13 @@ class TravelerWatcher {
 
     @Listener
     fun onCollideEntity(event: CollideEntityEvent) {
-        val target = event.entities.filterIsInstance<Player>().any { travelerManager.isViewer(it.uniqueId) }
-        val source = event.cause.allOf(Player::class.java).any { travelerManager.isViewer(it.uniqueId) }
+        val source = event.cause.filterIsInstance<Player>().any { travelerManager.isViewer(it.uniqueId) }
 
-        if (target || source) event.isCancelled = true
+        if (source) {
+            event.isCancelled = true
+        } else {
+            event.filterEntities { !travelerManager.isViewer(it.uniqueId) }
+        }
     }
 
     @Listener

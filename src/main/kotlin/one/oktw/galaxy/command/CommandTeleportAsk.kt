@@ -1,6 +1,7 @@
 package one.oktw.galaxy.command
 
 import one.oktw.galaxy.internal.DelayHelper
+import one.oktw.galaxy.internal.TeleportHelper
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -85,7 +86,7 @@ class CommandTeleportAsk : CommandBase {
 
         DelayHelper.Delay(Runnable {
             if (first_location.equals(player.location)) {
-                player.setLocationSafely(location)
+                TeleportHelper.teleport(player,location,false)
                 player.sendMessage(Text.of(TextColors.GREEN, "傳送成功").toText())
             } else {
                 player.sendMessage(Text.of(TextColors.RED, "位置移動，傳送取消").toText())

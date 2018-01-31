@@ -46,17 +46,20 @@ class Main {
 
     @Inject
     @DefaultConfig(sharedRoot = false)
+    @Suppress("MemberVisibilityCanBePrivate")
     lateinit var configLoader: ConfigurationLoader<CommentedConfigurationNode>
 
     @Inject
     lateinit var plugin: PluginContainer
 
     @Listener
+    @Suppress("UNUSED_PARAMETER", "unused")
     fun construct(event: GameConstructionEvent) {
         main = this
     }
 
     @Listener
+    @Suppress("UNUSED_PARAMETER", "unused")
     fun onInit(event: GameInitializationEvent) {
         logger.info("Initialization...")
         configManager = ConfigManager(configLoader)
@@ -69,12 +72,14 @@ class Main {
     }
 
     @Listener
+    @Suppress("UNUSED_PARAMETER", "unused")
     fun onStarting(event: GameStartingServerEvent) {
         commandManager = CommandRegister()
         chunkLoaderManager.loadForcedWorld()
     }
 
     @Listener
+    @Suppress("UNUSED_PARAMETER", "unused")
     fun onReload(event: GameReloadEvent) {
         //TODO
     }

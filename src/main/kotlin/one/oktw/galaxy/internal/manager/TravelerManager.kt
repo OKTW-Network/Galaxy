@@ -8,9 +8,11 @@ import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.internal.types.Position
 import one.oktw.galaxy.internal.types.Traveler
 import org.spongepowered.api.entity.living.player.Player
+import java.util.*
 
 class TravelerManager {
     private val travelerCollation = databaseManager.database.getCollection("Traveler", Traveler::class.java)
+    private val cache = HashMap<UUID, Traveler>()
 
     private fun createTraveler(player: Player): Traveler {
         val traveler = Traveler(player.uniqueId, position = Position().fromPosition(player.location.position))
@@ -19,11 +21,14 @@ class TravelerManager {
     }
 
     fun getTraveler(player: Player): Traveler {
-        return travelerCollation.find(eq("uuid", player.uniqueId)).first() ?: createTraveler(player)
+        return cache.getOrPut(player.uniqueId) {
+            travelerCollation.find(eq("uuid", player.uniqueId)).first() ?: createTraveler(player)
+        }
     }
 
     fun saveTraveler(traveler: Traveler) {
         launch { travelerCollation.replaceOne(eq("uuid", traveler.uuid), traveler, UpdateOptions().upsert(true)) }
+        cache.remove(traveler.uuid)
     }
 
     fun updateTraveler(player: Player) {

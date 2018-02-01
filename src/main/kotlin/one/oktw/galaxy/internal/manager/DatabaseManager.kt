@@ -7,7 +7,6 @@ import com.mongodb.ServerAddress
 import com.mongodb.client.MongoDatabase
 import one.oktw.galaxy.Main.Companion.configManager
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.internal.types.*
 import org.bson.codecs.configuration.CodecRegistries.fromProviders
 import org.bson.codecs.configuration.CodecRegistries.fromRegistries
 import org.bson.codecs.pojo.Conventions.SET_PRIVATE_FIELDS_CONVENTION
@@ -41,14 +40,11 @@ class DatabaseManager {
         )
 
         val pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
-                fromProviders(PojoCodecProvider.builder().register(
-                        Galaxy::class.java,
-                        Planet::class.java,
-                        Member::class.java,
-                        Traveler::class.java,
-                        Armor::class.java,
-                        Position::class.java
-                ).conventions(asList(SET_PRIVATE_FIELDS_CONVENTION)).build())
+                fromProviders(PojoCodecProvider.builder()
+                        .register("one.oktw.galaxy.internal.types")
+                        .automatic(true)
+                        .conventions(asList(SET_PRIVATE_FIELDS_CONVENTION)).build()
+                )
         )
 
         database = if (config.getNode("Username").string.isEmpty()) {

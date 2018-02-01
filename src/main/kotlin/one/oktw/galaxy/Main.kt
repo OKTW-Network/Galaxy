@@ -39,6 +39,8 @@ class Main {
             private set
         lateinit var travelerManager: TravelerManager
             private set
+        lateinit var viewerManager: ViewerManager
+            private set
     }
 
     @Inject
@@ -75,6 +77,7 @@ class Main {
     @Suppress("UNUSED_PARAMETER", "unused")
     fun onStarting(event: GameStartingServerEvent) {
         commandManager = CommandRegister()
+        viewerManager = ViewerManager()
         chunkLoaderManager.loadForcedWorld()
     }
 

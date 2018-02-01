@@ -5,8 +5,8 @@ import java.util.*
 
 data class Traveler(
         val uuid: UUID? = null,
-        var armor: Armor = Armor(),
-        var position: Position = Position()
+        var position: Position = Position(),
+        var item: Item = Item()
 ) {
     fun save() {
         travelerManager.saveTraveler(this)

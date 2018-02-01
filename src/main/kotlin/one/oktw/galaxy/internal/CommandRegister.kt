@@ -1,10 +1,7 @@
 package one.oktw.galaxy.internal
 
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.command.CommandTeleportAsk
-import one.oktw.galaxy.command.CommandTeleportHereAsk
-import one.oktw.galaxy.command.Test
-import one.oktw.galaxy.command.UnStuck
+import one.oktw.galaxy.command.*
 import org.spongepowered.api.Sponge
 
 class CommandRegister {
@@ -17,6 +14,7 @@ class CommandRegister {
             register(main, Test().spec, "test")
             register(main, CommandTeleportHereAsk().spec, "tpahere")
             register(main, CommandTeleportAsk().spec, "tpa")
+            register(main, Gun().spec, "gun")
         }
     }
 }

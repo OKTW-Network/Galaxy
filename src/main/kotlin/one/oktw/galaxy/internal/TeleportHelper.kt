@@ -2,9 +2,8 @@ package one.oktw.galaxy.internal
 
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.travelerManager
+import one.oktw.galaxy.Main.Companion.viewerManager
 import one.oktw.galaxy.internal.enums.AccessLevel.*
-import one.oktw.galaxy.internal.types.Planet
-import one.oktw.galaxy.internal.types.Traveler
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
@@ -12,35 +11,29 @@ import org.spongepowered.api.world.World
 class TeleportHelper {
     companion object {
         fun checkValid(player: Player, location: Location<World>): Boolean {
-            val traveler = travelerManager.getTraveler(player)
             val planet = galaxyManager.getPlanet(location.extent.uniqueId) ?: return false
 
-            return checkValid(traveler, planet)
-        }
-
-        fun checkValid(traveler: Traveler, planet: Planet): Boolean {
-            return when (planet.checkPermission(traveler)) {
+            return when (planet.checkPermission(player)) {
                 MODIFY, VIEW -> true
                 DENY -> false
             }
         }
 
         fun teleport(player: Player, location: Location<World>, safety: Boolean): Boolean {
-            val traveler = travelerManager.getTraveler(player)
             val planet = galaxyManager.getPlanet(location.extent.uniqueId) ?: return false
 
-            if (!checkValid(traveler, planet)) return false
+            if (!checkValid(player, location)) return false
 
             if (PlanetHelper.loadPlanet(planet).isPresent) {
                 val result = if (safety) player.setLocationSafely(location) else player.setLocation(location)
 
                 if (result) {
-                    traveler.position.fromPosition(location.position).planet = planet.uuid
+                    travelerManager.updateTraveler(player)
 
-                    if (planet.checkPermission(traveler) == VIEW) {
-                        travelerManager.setViewer(player.uniqueId)
+                    if (planet.checkPermission(player) == VIEW) {
+                        viewerManager.setViewer(player.uniqueId)
                     } else {
-                        travelerManager.removeViewer(player.uniqueId)
+                        viewerManager.removeViewer(player.uniqueId)
                     }
                 }
 

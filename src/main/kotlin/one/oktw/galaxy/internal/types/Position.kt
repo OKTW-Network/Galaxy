@@ -4,9 +4,9 @@ import com.flowpowered.math.vector.Vector3d
 import java.util.*
 
 data class Position(
-        var x: Double? = null,
-        var y: Double? = null,
-        var z: Double? = null,
+        var x: Double = 0.0,
+        var y: Double = 0.0,
+        var z: Double = 0.0,
         var planet: UUID? = null
 ) {
     fun fromPosition(vector3d: Vector3d): Position {

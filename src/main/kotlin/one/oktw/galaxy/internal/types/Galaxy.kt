@@ -4,6 +4,7 @@ import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.internal.PlanetHelper
 import one.oktw.galaxy.internal.enums.Group
 import one.oktw.galaxy.internal.enums.Group.MEMBER
+import org.spongepowered.api.entity.living.player.Player
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -51,7 +52,7 @@ data class Galaxy(
         save()
     }
 
-    fun getGroup(traveler: Traveler): Group {
-        return members.find { it.uuid == traveler.uuid }?.group ?: return Group.VISITOR
+    fun getGroup(player: Player): Group {
+        return members.find { it.uuid == player.uniqueId }?.group ?: return Group.VISITOR
     }
 }

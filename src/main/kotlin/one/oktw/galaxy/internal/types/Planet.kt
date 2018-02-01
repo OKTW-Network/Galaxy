@@ -1,12 +1,12 @@
 package one.oktw.galaxy.internal.types
 
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.internal.PlanetHelper
 import one.oktw.galaxy.internal.enums.AccessLevel
 import one.oktw.galaxy.internal.enums.AccessLevel.*
 import one.oktw.galaxy.internal.enums.Group
 import one.oktw.galaxy.internal.enums.SecurityLevel
 import one.oktw.galaxy.internal.enums.SecurityLevel.*
+import org.spongepowered.api.entity.living.player.Player
 import java.util.*
 
 data class Planet(
@@ -17,13 +17,8 @@ data class Planet(
         var security: SecurityLevel = VISIT,
         var lastTime: Date = Date()
 ) {
-    fun save() {
-        PlanetHelper.updatePlanet(this)
-        galaxyManager.getGalaxy(this).save()
-    }
-
-    fun checkPermission(traveler: Traveler): AccessLevel {
-        val group = galaxyManager.getGalaxy(this).getGroup(traveler)
+    fun checkPermission(player: Player): AccessLevel {
+        val group = galaxyManager.getGalaxy(this).getGroup(player)
 
         return when (security) {
             MEMBER -> if (group !== Group.VISITOR) MODIFY else DENY

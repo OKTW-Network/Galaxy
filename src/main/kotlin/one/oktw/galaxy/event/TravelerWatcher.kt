@@ -13,7 +13,7 @@ import org.spongepowered.api.event.entity.InteractEntityEvent
 import org.spongepowered.api.event.entity.SpawnEntityEvent
 import org.spongepowered.api.event.entity.ai.SetAITargetEvent
 import org.spongepowered.api.event.filter.Getter
-import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
+import org.spongepowered.api.event.item.inventory.DropItemEvent
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
 import org.spongepowered.api.event.network.ClientConnectionEvent
 import org.spongepowered.api.item.ItemTypes
@@ -32,7 +32,7 @@ class TravelerWatcher {
     }
 
     @Listener
-    fun onClickInventory(event: ClickInventoryEvent.Drop, @Getter("getSource") player: Player) {
+    fun onDropItem(event: DropItemEvent.Pre, @Getter("getSource") player: Player) {
         if (travelerManager.isViewer(player.uniqueId)) event.isCancelled = true
     }
 
@@ -84,6 +84,7 @@ class TravelerWatcher {
             ItemTypes.EXPERIENCE_BOTTLE -> event.isCancelled = true
             ItemTypes.CHORUS_FRUIT -> event.isCancelled = true
             ItemTypes.DRAGON_BREATH -> event.isCancelled = true
+            ItemTypes.WOODEN_SWORD -> event.isCancelled = true //Gun
         }
     }
 

@@ -33,7 +33,7 @@ class Gun {
                 { it.entity !is Player && it.entity is Living && (it.entity as Living).health().get() > 0 }
         ).firstOrNull()
         val wall = BlockRay.from(player)
-                .distanceLimit(target?.distance ?: gun.range)
+                .distanceLimit(if (target != null) target.entity.location.position.distance(source) else gun.range)
                 .stopFilter(BlockRay.continueAfterFilter(BlockRay.onlyAirFilter(), 1))
                 .end().filter { it.location.block.type != BlockTypes.AIR }
 
@@ -41,8 +41,8 @@ class Gun {
             val entity = target.entity as Living
 
             if (!wall.isPresent) {
-                entity.damage(0.0, DamageSources.MAGIC)
                 entity.transform(Keys.HEALTH) { it - gun.damage }
+                entity.damage(0.0, DamageSources.MAGIC)
                 if (entity.health().get() < 1) {
                     player.playSound(SoundTypes.ENTITY_EXPERIENCE_ORB_PICKUP, player.location.position, 1.0)
                 } else {

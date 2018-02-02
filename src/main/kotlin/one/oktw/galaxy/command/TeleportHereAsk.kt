@@ -16,7 +16,7 @@ import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
 import java.util.*
 
-class CommandTeleportHereAsk : CommandBase {
+class TeleportHereAsk : CommandBase {
     private var callbackLimit = HashMap<UUID, Player>()
 
     override val spec: CommandSpec

@@ -12,8 +12,8 @@ class CommandRegister {
         Sponge.getCommandManager().apply {
             register(main, UnStuck().spec, "unstuck")
             register(main, Test().spec, "test")
-            register(main, CommandTeleportHereAsk().spec, "tpahere")
-            register(main, CommandTeleportAsk().spec, "tpa")
+            register(main, TeleportHereAsk().spec, "tpahere")
+            register(main, TeleportAsk().spec, "tpa")
             register(main, Gun().spec, "gun")
         }
     }

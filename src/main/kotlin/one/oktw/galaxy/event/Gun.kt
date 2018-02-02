@@ -8,6 +8,7 @@ import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.effect.particle.ParticleEffect
 import org.spongepowered.api.effect.particle.ParticleTypes
 import org.spongepowered.api.effect.sound.SoundCategories
+import org.spongepowered.api.effect.sound.SoundType
 import org.spongepowered.api.effect.sound.SoundTypes
 import org.spongepowered.api.entity.living.Living
 import org.spongepowered.api.entity.living.player.Player
@@ -17,6 +18,7 @@ import org.spongepowered.api.event.filter.Getter
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.util.blockray.BlockRay
+import java.lang.Math.random
 
 class Gun {
     @Listener
@@ -44,9 +46,9 @@ class Gun {
                 entity.transform(Keys.HEALTH) { it - gun.damage }
                 entity.damage(0.0, DamageSources.MAGIC)
                 if (entity.health().get() < 1) {
-                    player.playSound(SoundTypes.ENTITY_EXPERIENCE_ORB_PICKUP, player.location.position, 1.0)
+                    player.playSound(SoundTypes.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategories.PLAYER, player.location.position, 1.0, 0.5)
                 } else {
-                    player.playSound(SoundTypes.ENTITY_EXPERIENCE_ORB_PICKUP, player.location.position, 1.0, 0.5)
+                    player.playSound(SoundTypes.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategories.PLAYER, player.location.position, 1.0)
                 }
             }
         }
@@ -78,8 +80,6 @@ class Gun {
         }
 
         // Play gun sound
-        world.playSound(SoundTypes.ENTITY_BLAZE_HURT, SoundCategories.PLAYER, source, 1.0, 2.0, 1.0)
-        world.playSound(SoundTypes.ENTITY_FIREWORK_BLAST, SoundCategories.PLAYER, source, 1.0, 0.0, 1.0)
-        world.playSound(SoundTypes.BLOCK_PISTON_EXTEND, SoundCategories.PLAYER, source, 1.0, 2.0, 1.0)
+        world.playSound(SoundType.of("gun.phaser_rifle_fire"), SoundCategories.PLAYER, source, 1.0, 1 + random() / 10 - random() / 10)
     }
 }

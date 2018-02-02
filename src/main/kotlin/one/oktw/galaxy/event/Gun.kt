@@ -33,7 +33,7 @@ class Gun {
                 { it.entity !is Player && it.entity is Living && (it.entity as Living).health().get() > 0 }
         ).firstOrNull()
         val wall = BlockRay.from(player)
-                .distanceLimit(if (target != null) target.entity.location.position.distance(source) else gun.range)
+                .distanceLimit(if (target != null) target.intersection.distance(source) else gun.range)
                 .stopFilter(BlockRay.continueAfterFilter(BlockRay.onlyAirFilter(), 1))
                 .end().filter { it.location.block.type != BlockTypes.AIR }
 

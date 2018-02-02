@@ -17,7 +17,7 @@ import org.spongepowered.api.world.World
 import java.util.*
 import kotlin.collections.HashMap
 
-class CommandTeleportAsk : CommandBase {
+class TeleportAsk : CommandBase {
     private var callbackLimit = HashMap<UUID, Player>()
 
     override val spec: CommandSpec

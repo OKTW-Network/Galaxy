@@ -55,7 +55,7 @@ class Sign : CommandBase {
                 block.tileEntity.get().offer(lines)
                 src.sendMessage(Text.of(TextColors.GREEN, "修改成功"))
             } else {
-                src.sendMessage(Text.of(TextColors.RED, "請把準星對準告示牌"))
+                src.sendMessage(Text.of(TextColors.RED, "請把準心對準告示牌"))
             }
             return CommandResult.success()
         }

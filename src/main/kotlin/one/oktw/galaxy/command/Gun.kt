@@ -1,6 +1,8 @@
 package one.oktw.galaxy.command
 
 import one.oktw.galaxy.Main.Companion.travelerManager
+import one.oktw.galaxy.enums.UpgradeType.THROUGH
+import one.oktw.galaxy.types.Upgrade
 import one.oktw.galaxy.types.item.Gun
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
@@ -18,19 +20,23 @@ class Gun : CommandBase {
                 .arguments(
                         GenericArguments.doubleNum(Text.of("CoolDown")),
                         GenericArguments.doubleNum(Text.of("Range")),
-                        GenericArguments.doubleNum(Text.of("Damage"))
+                        GenericArguments.doubleNum(Text.of("Damage")),
+                        GenericArguments.optional(GenericArguments.integer(Text.of("Through")))
                 )
                 .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src is Player) {
             val traveler = travelerManager.getTraveler(src)
-            traveler.item.gun = Gun(
+            val gun = Gun(
                     args.getOne<Double>("CoolDown").orElse(null),
                     args.getOne<Double>("Range").orElse(null),
                     args.getOne<Double>("Damage").orElse(null)
             )
 
+            args.getOne<Int>("Through").ifPresent { gun.upgrade += Upgrade(THROUGH, it) }
+
+            traveler.item.gun = gun
             traveler.save()
         }
         return CommandResult.success()

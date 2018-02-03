@@ -28,7 +28,7 @@ import kotlin.math.roundToInt
 class Gun {
     @Listener
     @Suppress("unused")
-    fun onInteractItem(event: InteractItemEvent.Secondary, @Getter("getSource") player: Player) {
+    fun onInteractItem(event: InteractItemEvent.Secondary.MainHand, @Getter("getSource") player: Player) {
         if (event.itemStack.type != ItemTypes.WOODEN_SWORD) return
 
         val world = player.world
@@ -63,8 +63,9 @@ class Gun {
                         GLASS, STAINED_GLASS,
                         GLASS_PANE, STAINED_GLASS_PANE,
                         IRON_BARS,
-                        GRASS, TALLGRASS,
-                        TORCH, REDSTONE_TORCH, UNLIT_REDSTONE_TORCH -> false
+                        TALLGRASS, DOUBLE_PLANT,
+                        TORCH, REDSTONE_TORCH, UNLIT_REDSTONE_TORCH,
+                        REEDS -> false
 
                         else -> true
                     }

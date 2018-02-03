@@ -6,7 +6,8 @@ import com.mongodb.client.model.Filters.text
 import com.mongodb.client.model.Projections
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.databaseManager
-import one.oktw.galaxy.enums.Group
+import one.oktw.galaxy.enums.Group.ADMIN
+import one.oktw.galaxy.enums.Group.MEMBER
 import one.oktw.galaxy.helper.PlanetHelper
 import one.oktw.galaxy.types.Galaxy
 import one.oktw.galaxy.types.Member
@@ -21,9 +22,9 @@ class GalaxyManager {
 
     fun createGalaxy(name: String, creator: Player, vararg members: UUID): Galaxy {
         val memberList = listOf(*members).parallelStream()
-                .map { member -> Member(member, Group.MEMBER) }
+                .map { member -> Member(member, MEMBER) }
                 .collect(toList())
-        memberList += Member(creator.uniqueId, Group.ADMIN)
+        memberList += Member(creator.uniqueId, ADMIN)
 
         val galaxy = Galaxy(name = name, members = memberList.filterNotNull())
 

@@ -39,7 +39,7 @@ class Gun {
         var coolDown = gun.coolDown
         var range = gun.range
         var damage = gun.damage
-        var through = 1
+        var through = gun.through
 
         gun.upgrade.forEach {
             when (it.type) {
@@ -65,7 +65,8 @@ class Gun {
                         IRON_BARS,
                         TALLGRASS, DOUBLE_PLANT,
                         TORCH, REDSTONE_TORCH, UNLIT_REDSTONE_TORCH,
-                        REEDS -> false
+                        REEDS,
+                        LEAVES, LEAVES2 -> false
 
                         else -> true
                     }

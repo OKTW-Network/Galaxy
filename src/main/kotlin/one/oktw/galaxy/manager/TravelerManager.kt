@@ -5,7 +5,6 @@ import com.mongodb.client.model.UpdateOptions
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.databaseManager
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.types.Position
 import one.oktw.galaxy.types.Traveler
 import org.spongepowered.api.entity.living.player.Player
@@ -23,7 +22,6 @@ class TravelerManager {
 
     fun getTraveler(player: Player): Traveler {
         return cache.getOrPut(player.uniqueId) {
-            main.logger.info("Load traveler from database...")
             travelerCollation.find(eq("uuid", player.uniqueId)).first() ?: createTraveler(player)
         }
     }

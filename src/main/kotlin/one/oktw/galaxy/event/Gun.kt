@@ -105,7 +105,6 @@ class Gun {
 
         // Show trajectory
         launch {
-            var pos = source
             val line = when {
                 wall.hasNext() -> wall.next().position.sub(source)
                 !target.isEmpty() -> target.first().intersection.sub(source)
@@ -117,8 +116,9 @@ class Gun {
                 2 -> line.abs().z.div(0.3)
                 else -> 10.0
             }
+            var pos = source.add(line.div(interval / 4))
 
-            for (i in 0..interval.roundToInt()) {
+            for (i in 4..interval.roundToInt()) {
                 world.spawnParticles(
                         ParticleEffect.builder()
                                 .type(ParticleTypes.MAGIC_CRITICAL_HIT)

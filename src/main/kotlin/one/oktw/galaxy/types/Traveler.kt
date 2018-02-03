@@ -1,4 +1,4 @@
-package one.oktw.galaxy.internal.types
+package one.oktw.galaxy.types
 
 import one.oktw.galaxy.Main.Companion.travelerManager
 import java.util.*

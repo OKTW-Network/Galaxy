@@ -1,7 +1,7 @@
-package one.oktw.galaxy.internal
+package one.oktw.galaxy.helper
 
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.internal.types.Planet
+import one.oktw.galaxy.types.Planet
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.world.World
 import org.spongepowered.api.world.WorldArchetypes

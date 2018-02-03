@@ -1,4 +1,4 @@
-package one.oktw.galaxy.internal.manager
+package one.oktw.galaxy.manager
 
 import com.mongodb.MongoClient
 import com.mongodb.MongoClientOptions
@@ -41,7 +41,7 @@ class DatabaseManager {
 
         val pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
                 fromProviders(PojoCodecProvider.builder()
-                        .register("one.oktw.galaxy.internal.types")
+                        .register("one.oktw.galaxy.types")
                         .automatic(true)
                         .conventions(asList(SET_PRIVATE_FIELDS_CONVENTION)).build()
                 )

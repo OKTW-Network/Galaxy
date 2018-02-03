@@ -1,9 +1,9 @@
-package one.oktw.galaxy.internal
+package one.oktw.galaxy.helper
 
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.Main.Companion.viewerManager
-import one.oktw.galaxy.internal.enums.AccessLevel.*
+import one.oktw.galaxy.enums.AccessLevel.*
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World

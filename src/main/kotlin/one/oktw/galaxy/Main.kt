@@ -3,9 +3,7 @@ package one.oktw.galaxy
 import com.google.inject.Inject
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
-import one.oktw.galaxy.internal.CommandRegister
-import one.oktw.galaxy.internal.EventRegister
-import one.oktw.galaxy.internal.manager.*
+import one.oktw.galaxy.manager.*
 import org.slf4j.Logger
 import org.spongepowered.api.config.DefaultConfig
 import org.spongepowered.api.event.Listener

@@ -1,4 +1,4 @@
-package one.oktw.galaxy.internal.manager
+package one.oktw.galaxy.manager
 
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Filters.eq
@@ -6,12 +6,11 @@ import com.mongodb.client.model.Filters.text
 import com.mongodb.client.model.Projections
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.databaseManager
-import one.oktw.galaxy.internal.PlanetHelper
-import one.oktw.galaxy.internal.enums.Group.ADMIN
-import one.oktw.galaxy.internal.enums.Group.MEMBER
-import one.oktw.galaxy.internal.types.Galaxy
-import one.oktw.galaxy.internal.types.Member
-import one.oktw.galaxy.internal.types.Planet
+import one.oktw.galaxy.enums.Group
+import one.oktw.galaxy.helper.PlanetHelper
+import one.oktw.galaxy.types.Galaxy
+import one.oktw.galaxy.types.Member
+import one.oktw.galaxy.types.Planet
 import org.spongepowered.api.entity.living.player.Player
 import java.util.*
 import java.util.stream.Collectors.toList
@@ -22,9 +21,9 @@ class GalaxyManager {
 
     fun createGalaxy(name: String, creator: Player, vararg members: UUID): Galaxy {
         val memberList = listOf(*members).parallelStream()
-                .map { member -> Member(member, MEMBER) }
+                .map { member -> Member(member, Group.MEMBER) }
                 .collect(toList())
-        memberList += Member(creator.uniqueId, ADMIN)
+        memberList += Member(creator.uniqueId, Group.ADMIN)
 
         val galaxy = Galaxy(name = name, members = memberList.filterNotNull())
 

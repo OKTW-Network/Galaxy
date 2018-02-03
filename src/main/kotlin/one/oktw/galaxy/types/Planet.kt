@@ -1,11 +1,11 @@
-package one.oktw.galaxy.internal.types
+package one.oktw.galaxy.types
 
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.internal.enums.AccessLevel
-import one.oktw.galaxy.internal.enums.AccessLevel.*
-import one.oktw.galaxy.internal.enums.Group
-import one.oktw.galaxy.internal.enums.SecurityLevel
-import one.oktw.galaxy.internal.enums.SecurityLevel.*
+import one.oktw.galaxy.enums.AccessLevel
+import one.oktw.galaxy.enums.AccessLevel.*
+import one.oktw.galaxy.enums.Group
+import one.oktw.galaxy.enums.SecurityLevel
+import one.oktw.galaxy.enums.SecurityLevel.*
 import org.spongepowered.api.entity.living.player.Player
 import java.util.*
 

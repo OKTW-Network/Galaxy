@@ -1,7 +1,7 @@
 package one.oktw.galaxy.command
 
-import one.oktw.galaxy.internal.DelayHelper
-import one.oktw.galaxy.internal.TeleportHelper
+import one.oktw.galaxy.helper.DelayHelper
+import one.oktw.galaxy.helper.TeleportHelper
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext

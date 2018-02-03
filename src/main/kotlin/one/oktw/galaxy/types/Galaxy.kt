@@ -1,9 +1,10 @@
-package one.oktw.galaxy.internal.types
+package one.oktw.galaxy.types
 
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.internal.PlanetHelper
-import one.oktw.galaxy.internal.enums.Group
-import one.oktw.galaxy.internal.enums.Group.MEMBER
+import one.oktw.galaxy.enums.Group
+import one.oktw.galaxy.enums.Group.MEMBER
+import one.oktw.galaxy.enums.Group.VISITOR
+import one.oktw.galaxy.helper.PlanetHelper
 import org.spongepowered.api.entity.living.player.Player
 import java.util.*
 import kotlin.collections.ArrayList
@@ -53,6 +54,6 @@ data class Galaxy(
     }
 
     fun getGroup(player: Player): Group {
-        return members.find { it.uuid == player.uniqueId }?.group ?: return Group.VISITOR
+        return members.find { it.uuid == player.uniqueId }?.group ?: return VISITOR
     }
 }

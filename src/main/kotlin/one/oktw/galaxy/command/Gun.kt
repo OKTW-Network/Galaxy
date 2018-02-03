@@ -1,7 +1,7 @@
 package one.oktw.galaxy.command
 
 import one.oktw.galaxy.Main.Companion.travelerManager
-import one.oktw.galaxy.internal.types.item.Gun
+import one.oktw.galaxy.types.item.Gun
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext

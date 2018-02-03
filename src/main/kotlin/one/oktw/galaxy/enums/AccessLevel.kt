@@ -1,4 +1,4 @@
-package one.oktw.galaxy.internal.enums
+package one.oktw.galaxy.enums
 
 enum class AccessLevel {
     MODIFY,

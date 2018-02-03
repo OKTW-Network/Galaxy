@@ -1,4 +1,4 @@
-package one.oktw.galaxy.internal.manager
+package one.oktw.galaxy.manager
 
 import java.util.*
 

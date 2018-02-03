@@ -1,4 +1,4 @@
-package one.oktw.galaxy.internal
+package one.oktw.galaxy
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.*

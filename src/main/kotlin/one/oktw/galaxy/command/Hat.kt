@@ -20,14 +20,14 @@ class Hat : CommandBase {
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src is Player) {
-            if(src.getItemInHand(HandTypes.MAIN_HAND).isPresent){
-                var originHelmet : ItemStack = ItemStack.empty()
-                src.helmet.ifPresent{originHelmet = src.helmet.get()}
+            if (src.getItemInHand(HandTypes.MAIN_HAND).isPresent) {
+                var originHelmet: ItemStack = ItemStack.empty()
+                src.helmet.ifPresent { originHelmet = src.helmet.get() }
                 src.setHelmet(src.getItemInHand(HandTypes.MAIN_HAND).get())
                 src.setItemInHand(HandTypes.MAIN_HAND, originHelmet)
-                src.sendMessage(Text.of(TextColors.GREEN,"帽子已戴上了喔"))
-            }else{
-                src.sendMessage(Text.of(TextColors.RED,"請把物品拿在手上"))
+                src.sendMessage(Text.of(TextColors.GREEN, "帽子已戴上了喔"))
+            } else {
+                src.sendMessage(Text.of(TextColors.RED, "請把物品拿在手上"))
             }
             return CommandResult.success()
         }

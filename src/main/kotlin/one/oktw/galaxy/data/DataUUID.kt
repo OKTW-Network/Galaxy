@@ -56,6 +56,10 @@ class DataUUID(uuid: UUID) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutab
         return Sponge.getRegistry().valueFactory.createValue(key, value)
     }
 
+    override fun toContainer(): DataContainer {
+        return super.toContainer().set(key, value)
+    }
+
     class Immutable(uuid: UUID) : AbstractImmutableSingleData<UUID, Immutable, DataUUID>(uuid, key) {
         private val immutableValue: ImmutableValue<UUID> = Sponge.getRegistry().valueFactory.createValue(key, value).asImmutable()
 
@@ -69,6 +73,10 @@ class DataUUID(uuid: UUID) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutab
 
         override fun getValueGetter(): ImmutableValue<UUID> {
             return immutableValue
+        }
+
+        override fun toContainer(): DataContainer {
+            return super.toContainer().set(key, value)
         }
     }
 

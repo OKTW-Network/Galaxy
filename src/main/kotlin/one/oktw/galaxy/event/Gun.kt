@@ -3,6 +3,7 @@ package one.oktw.galaxy.event
 import com.flowpowered.math.imaginary.Quaterniond
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.travelerManager
+import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.UpgradeType.*
 import org.spongepowered.api.block.BlockTypes.*
 import org.spongepowered.api.data.key.Keys
@@ -32,7 +33,8 @@ class Gun {
         if (event.itemStack.type != ItemTypes.WOODEN_SWORD) return
 
         val world = player.world
-        val gun = travelerManager.getTraveler(player).item.gun ?: return // TODO Multi gun support
+        val gun = travelerManager.getTraveler(player).item.gun
+                .find { it.uuid == event.itemStack[DataUUID.key].orElse(null) } ?: return
         val source = player.getProperty(EyeLocationProperty::class.java)
                 .map(EyeLocationProperty::getValue).orElse(null) ?: return
 

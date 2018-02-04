@@ -3,7 +3,9 @@ package one.oktw.galaxy.data
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.DataContainer
 import org.spongepowered.api.data.DataHolder
+import org.spongepowered.api.data.DataQuery
 import org.spongepowered.api.data.DataView
+import org.spongepowered.api.data.key.Key
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder
 import org.spongepowered.api.data.manipulator.immutable.common.AbstractImmutableSingleData
 import org.spongepowered.api.data.manipulator.mutable.common.AbstractSingleData
@@ -11,12 +13,26 @@ import org.spongepowered.api.data.merge.MergeFunction
 import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.value.immutable.ImmutableValue
 import org.spongepowered.api.data.value.mutable.Value
+import org.spongepowered.api.util.TypeTokens
 import java.util.*
-import java.util.UUID.randomUUID
 
-class DataUUID(uuid: UUID) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutable>(uuid, DataKeys.UUID) {
-    override fun from(container: DataContainer?): Optional<DataUUID> {
-        return Optional.of(this)
+class DataUUID(uuid: UUID) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutable>(uuid, key) {
+    companion object {
+        val key: Key<Value<UUID>> = Key.builder()
+                .type(TypeTokens.UUID_VALUE_TOKEN)
+                .id("uuid")
+                .name("UUID")
+                .query(DataQuery.of("uuid"))
+                .build()
+    }
+
+    override fun from(container: DataContainer): Optional<DataUUID> {
+        return if (container[key.query].isPresent) {
+            value = container.getObject(key.query, UUID::class.java).get()
+            Optional.of(this)
+        } else {
+            Optional.empty()
+        }
     }
 
     override fun copy(): DataUUID {
@@ -28,13 +44,7 @@ class DataUUID(uuid: UUID) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutab
     }
 
     override fun fill(dataHolder: DataHolder, overlap: MergeFunction): Optional<DataUUID> {
-        val data = dataHolder.get(DataUUID::class.java)
-
-        data.ifPresent {
-            val finalData = overlap.merge(this, it)
-            value = finalData.value
-        }
-
+        value = overlap.merge(this, dataHolder[DataUUID::class.java].orElse(null)).value
         return Optional.of(this)
     }
 
@@ -43,10 +53,12 @@ class DataUUID(uuid: UUID) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutab
     }
 
     override fun getValueGetter(): Value<UUID> {
-        return Sponge.getRegistry().valueFactory.createValue(DataKeys.UUID, value)
+        return Sponge.getRegistry().valueFactory.createValue(key, value)
     }
 
-    class Immutable(uuid: UUID) : AbstractImmutableSingleData<UUID, Immutable, DataUUID>(uuid, DataKeys.UUID) {
+    class Immutable(uuid: UUID) : AbstractImmutableSingleData<UUID, Immutable, DataUUID>(uuid, key) {
+        private val immutableValue: ImmutableValue<UUID> = Sponge.getRegistry().valueFactory.createValue(key, value).asImmutable()
+
         override fun getContentVersion(): Int {
             return 1
         }
@@ -56,7 +68,7 @@ class DataUUID(uuid: UUID) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutab
         }
 
         override fun getValueGetter(): ImmutableValue<UUID> {
-            return Sponge.getRegistry().valueFactory.createValue(DataKeys.UUID, value).asImmutable()
+            return immutableValue
         }
     }
 
@@ -66,11 +78,11 @@ class DataUUID(uuid: UUID) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutab
         }
 
         override fun create(): DataUUID {
-            return DataUUID(randomUUID())
+            return DataUUID(UUID.randomUUID())
         }
 
-        override fun buildContent(container: DataView?): Optional<DataUUID> {
-            return Optional.of(create())
+        override fun buildContent(container: DataView): Optional<DataUUID> {
+            return create().from(container.copy())
         }
     }
 }

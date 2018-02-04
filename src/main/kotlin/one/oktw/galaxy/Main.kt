@@ -3,17 +3,21 @@ package one.oktw.galaxy
 import com.google.inject.Inject
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
+import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.manager.*
 import org.slf4j.Logger
 import org.spongepowered.api.config.DefaultConfig
+import org.spongepowered.api.data.DataRegistration
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.GameReloadEvent
 import org.spongepowered.api.event.game.state.GameConstructionEvent
 import org.spongepowered.api.event.game.state.GameInitializationEvent
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent
 import org.spongepowered.api.event.game.state.GameStartingServerEvent
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 
+@Suppress("unused", "UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
 @Plugin(id = "galaxy",
         name = "OKTW Galaxy",
         description = "OKTW Galaxy Project",
@@ -46,20 +50,27 @@ class Main {
 
     @Inject
     @DefaultConfig(sharedRoot = false)
-    @Suppress("MemberVisibilityCanBePrivate")
     lateinit var configLoader: ConfigurationLoader<CommentedConfigurationNode>
 
     @Inject
     lateinit var plugin: PluginContainer
 
     @Listener
-    @Suppress("UNUSED_PARAMETER", "unused")
+
     fun construct(event: GameConstructionEvent) {
         main = this
     }
 
     @Listener
-    @Suppress("UNUSED_PARAMETER", "unused")
+    fun onPreInit(event: GamePreInitializationEvent) {
+        DataRegistration.builder()
+                .dataName("UUID").manipulatorId("uuid")
+                .dataClass(DataUUID::class.java).immutableClass(DataUUID.Immutable::class.java)
+                .builder(DataUUID.Builder())
+                .buildAndRegister(plugin)
+    }
+
+    @Listener
     fun onInit(event: GameInitializationEvent) {
         logger.info("Initialization...")
         configManager = ConfigManager(configLoader)
@@ -72,7 +83,6 @@ class Main {
     }
 
     @Listener
-    @Suppress("UNUSED_PARAMETER", "unused")
     fun onStarting(event: GameStartingServerEvent) {
         commandManager = CommandRegister()
         viewerManager = ViewerManager()
@@ -80,7 +90,6 @@ class Main {
     }
 
     @Listener
-    @Suppress("UNUSED_PARAMETER", "unused")
     fun onReload(event: GameReloadEvent) {
         //TODO
     }

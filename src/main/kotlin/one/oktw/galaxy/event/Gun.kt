@@ -131,7 +131,7 @@ class Gun {
 
         // Play gun sound
         world.playSound(
-                SoundType.of("gun.phaser_rifle_fire"),
+                SoundType.of("gun.shot"),
                 SoundCategories.PLAYER,
                 source,
                 1.0,

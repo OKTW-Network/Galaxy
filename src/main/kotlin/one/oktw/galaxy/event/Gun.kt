@@ -5,6 +5,7 @@ import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.UpgradeType.*
+import one.oktw.galaxy.helper.CoolDownHelper
 import org.spongepowered.api.block.BlockTypes.*
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.property.entity.EyeLocationProperty
@@ -38,18 +39,33 @@ class Gun {
         val source = player.getProperty(EyeLocationProperty::class.java)
                 .map(EyeLocationProperty::getValue).orElse(null) ?: return
 
-        var coolDown = gun.coolDown
+        var cooling = gun.cooling
         var range = gun.range
         var damage = gun.damage
         var through = gun.through
+        var maxTemp = gun.maxTemp
 
+        // TODO
         gun.upgrade.forEach {
             when (it.type) {
                 DAMAGE -> damage += it.level * 3
                 RANGE -> range += it.level * 5
-                COOLING -> coolDown += it.level * 2
+                COOLING -> cooling += it.level * 2
                 THROUGH -> through += it.level
+                HEAT -> maxTemp += it.level * 5
             }
+        }
+
+        var heatStatus = CoolDownHelper.getCoolDown(gun.uuid)
+        if (heatStatus == null) {
+            heatStatus = CoolDownHelper.HeatStatus(gun.uuid, max = maxTemp, cooling = cooling)
+            CoolDownHelper.addCoolDown(heatStatus)
+        }
+
+        if (heatStatus.isOverheat()) return
+
+        if (heatStatus.addHeat(gun.heat)) {
+            player.playSound(SoundType.of("gun.overheat"), SoundCategories.PLAYER, source, 1.0)
         }
 
         val target = world.getIntersectingEntities(

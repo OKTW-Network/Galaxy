@@ -4,5 +4,6 @@ enum class UpgradeType {
     DAMAGE,
     RANGE,
     COOLING,
+    HEAT,
     THROUGH
 }

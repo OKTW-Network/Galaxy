@@ -22,7 +22,7 @@ class DataUUID(uuid: UUID) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutab
                 .type(TypeTokens.UUID_VALUE_TOKEN)
                 .id("uuid")
                 .name("UUID")
-                .query(DataQuery.of("uuid"))
+                .query(DataQuery.of("item", "uuid"))
                 .build()
     }
 

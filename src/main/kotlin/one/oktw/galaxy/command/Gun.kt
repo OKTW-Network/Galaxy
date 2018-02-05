@@ -24,9 +24,10 @@ class Gun : CommandBase {
                 .executor(this)
                 .permission("oktw.command.gun")
                 .arguments(
-                        GenericArguments.doubleNum(Text.of("CoolDown")),
+                        GenericArguments.integer(Text.of("Max Heat")),
                         GenericArguments.doubleNum(Text.of("Range")),
                         GenericArguments.doubleNum(Text.of("Damage")),
+                        GenericArguments.optional(GenericArguments.integer(Text.of("Cooling")), 1),
                         GenericArguments.optional(GenericArguments.integer(Text.of("Through"))),
                         GenericArguments.optional(GenericArguments.enumValue(Text.of("Type"), GunType::class.java), GunType.ORIGIN)
                 )
@@ -37,7 +38,8 @@ class Gun : CommandBase {
             val traveler = travelerManager.getTraveler(src)
             val gun = Gun(
                     type = args.getOne<GunType>("Type").get(),
-                    coolDown = args.getOne<Double>("CoolDown").get(),
+                    maxTemp = args.getOne<Int>("Max Heat").get(),
+                    cooling = args.getOne<Int>("Cooling").get(),
                     range = args.getOne<Double>("Range").get(),
                     damage = args.getOne<Double>("Damage").get()
             )

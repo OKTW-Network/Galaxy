@@ -92,6 +92,7 @@ class Gun {
 
         if (!target.isEmpty() && !wall.hasNext()) target.stream()
                 .filter { it.entity !is Boss }
+                .sorted { hit1, hit2 -> ((hit1.intersection.distance(source) - hit2.intersection.distance(source)) * 10).roundToInt() }
                 .limit(through.toLong())
                 .forEach {
                     val entity = it.entity as Living

@@ -4,6 +4,7 @@ import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.GunType
 import one.oktw.galaxy.enums.UpgradeType.THROUGH
+import one.oktw.galaxy.helper.CoolDownHelper
 import one.oktw.galaxy.types.Upgrade
 import one.oktw.galaxy.types.item.Gun
 import org.spongepowered.api.command.CommandResult
@@ -21,49 +22,130 @@ import org.spongepowered.api.text.Text
 class Gun : CommandBase {
     override val spec: CommandSpec
         get() = CommandSpec.builder()
-                .executor(this)
                 .permission("oktw.command.gun")
-                .arguments(
-                        GenericArguments.integer(Text.of("Max Heat")),
-                        GenericArguments.doubleNum(Text.of("Range")),
-                        GenericArguments.doubleNum(Text.of("Damage")),
-                        GenericArguments.optional(GenericArguments.integer(Text.of("Cooling")), 1),
-                        GenericArguments.optional(GenericArguments.integer(Text.of("Through"))),
-                        GenericArguments.optional(GenericArguments.enumValue(Text.of("Type"), GunType::class.java), GunType.ORIGIN)
-                )
+                .child(Add().spec, "add")
+                .child(Remove().spec, "remove")
+                .child(Get().spec, "get")
+                .child(List().spec, "list")
                 .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-        if (src is Player) {
-            val traveler = travelerManager.getTraveler(src)
-            val gun = Gun(
-                    type = args.getOne<GunType>("Type").get(),
-                    maxTemp = args.getOne<Int>("Max Heat").get(),
-                    cooling = args.getOne<Int>("Cooling").get(),
-                    range = args.getOne<Double>("Range").get(),
-                    damage = args.getOne<Double>("Damage").get()
-            )
+        return CommandResult.empty()
+    }
 
-            args.getOne<Int>("Through").ifPresent { gun.upgrade += Upgrade(THROUGH, it) }
-
-            traveler.item.gun.clear()
-            traveler.item.gun.add(gun)
-            traveler.save()
-
-            val item = ItemStack.builder()
-                    .itemType(ItemTypes.WOODEN_SWORD)
-                    .itemData(DataUUID.Immutable(gun.uuid))
-                    .add(Keys.UNBREAKABLE, true)
-                    .add(Keys.HIDE_UNBREAKABLE, true)
-                    .add(Keys.HIDE_MISCELLANEOUS, true)
-                    .add(Keys.HIDE_ATTRIBUTES, true)
-                    .add(Keys.HIDE_ENCHANTMENTS, true)
-                    .add(Keys.ITEM_DURABILITY, gun.type.id.toInt())
+    class Add : CommandBase {
+        override val spec: CommandSpec
+            get() = CommandSpec.builder()
+                    .executor(this)
+                    .permission("oktw.command.gun.add")
+                    .arguments(
+                            GenericArguments.integer(Text.of("Max Heat")),
+                            GenericArguments.doubleNum(Text.of("Range")),
+                            GenericArguments.doubleNum(Text.of("Damage")),
+                            GenericArguments.optional(GenericArguments.integer(Text.of("Cooling")), 1),
+                            GenericArguments.optional(GenericArguments.integer(Text.of("Through"))),
+                            GenericArguments.optional(GenericArguments.enumValue(Text.of("Type"), GunType::class.java), GunType.ORIGIN)
+                    )
                     .build()
 
-            src.setItemInHand(HandTypes.MAIN_HAND, item)
-            src.sendMessage(Text.of(gun.uuid.toString()))
+        override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+            if (src is Player) {
+                val traveler = travelerManager.getTraveler(src)
+                val gun = Gun(
+                        type = args.getOne<GunType>("Type").get(),
+                        maxTemp = args.getOne<Int>("Max Heat").get(),
+                        cooling = args.getOne<Int>("Cooling").get(),
+                        range = args.getOne<Double>("Range").get(),
+                        damage = args.getOne<Double>("Damage").get()
+                )
+
+                args.getOne<Int>("Through").ifPresent { gun.upgrade += Upgrade(THROUGH, it) }
+
+                traveler.item.gun.add(gun)
+                traveler.save()
+
+                val item = ItemStack.builder()
+                        .itemType(ItemTypes.WOODEN_SWORD)
+                        .itemData(DataUUID.Immutable(gun.uuid))
+                        .add(Keys.UNBREAKABLE, true)
+                        .add(Keys.HIDE_UNBREAKABLE, true)
+                        .add(Keys.HIDE_MISCELLANEOUS, true)
+                        .add(Keys.HIDE_ATTRIBUTES, true)
+                        .add(Keys.HIDE_ENCHANTMENTS, true)
+                        .add(Keys.ITEM_DURABILITY, gun.type.id.toInt())
+                        .build()
+
+                src.setItemInHand(HandTypes.MAIN_HAND, item)
+                src.sendMessage(Text.of(gun.uuid.toString()))
+            }
+            return CommandResult.success()
         }
-        return CommandResult.success()
+    }
+
+    class Remove : CommandBase {
+        override val spec: CommandSpec
+            get() = CommandSpec.builder()
+                    .executor(this)
+                    .permission("oktw.command.gun.remove")
+                    .arguments(GenericArguments.integer(Text.of("Gun")))
+                    .build()
+
+        override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+            if (src is Player) {
+                val traveler = travelerManager.getTraveler(src)
+
+                CoolDownHelper.removeCoolDown(CoolDownHelper.getCoolDown(traveler.item.gun.removeAt(args.getOne<Int>("Gun").get()).uuid)!!)
+                traveler.save()
+            }
+            return CommandResult.success()
+        }
+    }
+
+    class Get : CommandBase {
+        override val spec: CommandSpec
+            get() = CommandSpec.builder()
+                    .executor(this)
+                    .permission("oktw.command.gun.get")
+                    .arguments(GenericArguments.integer(Text.of("Gun")))
+                    .build()
+
+        override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+            if (src is Player) {
+                val traveler = travelerManager.getTraveler(src)
+                val gun = traveler.item.gun[args.getOne<Int>("Gun").get()]
+
+                val item = ItemStack.builder()
+                        .itemType(ItemTypes.WOODEN_SWORD)
+                        .itemData(DataUUID.Immutable(gun.uuid))
+                        .add(Keys.UNBREAKABLE, true)
+                        .add(Keys.HIDE_UNBREAKABLE, true)
+                        .add(Keys.HIDE_MISCELLANEOUS, true)
+                        .add(Keys.HIDE_ATTRIBUTES, true)
+                        .add(Keys.HIDE_ENCHANTMENTS, true)
+                        .add(Keys.ITEM_DURABILITY, gun.type.id.toInt())
+                        .build()
+
+                src.setItemInHand(HandTypes.MAIN_HAND, item)
+                src.sendMessage(Text.of(gun.uuid.toString()))
+            }
+            return CommandResult.success()
+        }
+    }
+
+    class List : CommandBase {
+        override val spec: CommandSpec
+            get() = CommandSpec.builder()
+                    .executor(this)
+                    .permission("oktw.command.gun.list")
+                    .build()
+
+        override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+            if (src is Player) {
+                val traveler = travelerManager.getTraveler(src)
+
+                src.sendMessage(Text.of(traveler.item.gun.toString()))
+            }
+            return CommandResult.success()
+        }
     }
 }

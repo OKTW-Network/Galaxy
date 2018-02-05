@@ -7,7 +7,6 @@ import org.spongepowered.api.data.type.HandTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.filter.cause.First
-import org.spongepowered.api.event.filter.type.Include
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
 import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.text.Text
@@ -20,7 +19,6 @@ class CoolingBar {
     private val coolingBar = HashMap<Player, Task>()
 
     @Listener
-    @Include(ChangeInventoryEvent.SwapHand::class, ChangeInventoryEvent.Held::class)
     @Suppress("UNUSED_PARAMETER")
     fun onChangeHeld(event: ChangeInventoryEvent, @First player: Player) {
         val mainHand = player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataUUID.key].isPresent }.orElse(null)
@@ -34,12 +32,12 @@ class CoolingBar {
         val heatStatus1 = CoolDownHelper.getCoolDown(mainHand[DataUUID.key].get()) ?: return
         val heatStatus2 = if (offHand != null) CoolDownHelper.getCoolDown(offHand[DataUUID.key].get()) else null
 
-        fun bar(heatStatus: CoolDownHelper.HeatStatus): Int {
+        fun normalize(heatStatus: CoolDownHelper.HeatStatus): Int {
             return Math.min((heatStatus.now.toDouble() / heatStatus.max) * 100, 100.0).toInt()
         }
 
-        fun color(temp: Int): TextColor {
-            return when (temp) {
+        fun color(heatStatus: CoolDownHelper.HeatStatus): TextColor {
+            return if (heatStatus.isOverheat()) TextColors.RED else when (normalize(heatStatus)) {
                 in 0..40 -> TextColors.AQUA
                 in 41..70 -> TextColors.GOLD
                 in 71..100 -> TextColors.RED
@@ -51,22 +49,22 @@ class CoolingBar {
                 .name("CoolingBar")
                 .intervalTicks(1)
                 .execute({ _ ->
-                    val temp1 = bar(heatStatus1)
+                    val temp1 = normalize(heatStatus1)
 
                     if (heatStatus2 == null) {
                         player.sendTitle(Title.builder()
                                 .actionBar(Text.of(
-                                        color(temp1), "|".repeat(temp1 / 2), " ", heatStatus1.now, "°C ", "|".repeat(temp1 / 2)
+                                        color(heatStatus1), "|".repeat(temp1 / 2), " ", heatStatus1.now, "°C ", "|".repeat(temp1 / 2)
                                 ))
                                 .build())
                     } else {
-                        val temp2 = bar(heatStatus2)
+                        val temp2 = normalize(heatStatus2)
                         player.sendTitle(Title.builder()
                                 .actionBar(Text.of(
                                         TextColors.GRAY, "|".repeat(50 - temp2 / 2),
-                                        color(temp2), "|".repeat(temp2 / 2), " ", heatStatus2.now, "°C",
+                                        color(heatStatus2), "|".repeat(temp2 / 2), " ", heatStatus2.now, "°C",
                                         TextColors.RESET, " | ",
-                                        color(temp1), heatStatus1.now, "°C ", "|".repeat(temp1 / 2),
+                                        color(heatStatus1), heatStatus1.now, "°C ", "|".repeat(temp1 / 2),
                                         TextColors.GRAY, "|".repeat(50 - temp1 / 2)
                                 ))
                                 .build())

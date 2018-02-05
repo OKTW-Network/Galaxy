@@ -3,14 +3,13 @@ package one.oktw.galaxy.helper
 import one.oktw.galaxy.Main.Companion.main
 import org.spongepowered.api.scheduler.Task
 import java.util.*
-import java.util.concurrent.CopyOnWriteArrayList
 
 class CoolDownHelper {
     data class HeatStatus(
             val uuid: UUID,
             val cooling: Int,
             var now: Int = 0,
-            private val max: Int,
+            val max: Int,
             private var overheat: Boolean = false
     ) {
         fun isOverheat(): Boolean {
@@ -25,10 +24,10 @@ class CoolDownHelper {
     }
 
     companion object {
-        private val coolDown = CopyOnWriteArrayList<HeatStatus>()
+        private val coolDown = ArrayList<HeatStatus>()
 
         init {
-            Task.builder().intervalTicks(1).async().name("CoolDown").execute { _ ->
+            Task.builder().intervalTicks(1).name("CoolDown").execute { _ ->
                 coolDown.filter { it -> it.now > 0 }.forEach { it -> it.now -= it.cooling }
             }.submit(main)
         }

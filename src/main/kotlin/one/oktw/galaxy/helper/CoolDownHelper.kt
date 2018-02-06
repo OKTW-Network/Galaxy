@@ -13,7 +13,7 @@ class CoolDownHelper {
             private var overheat: Boolean = false
     ) {
         fun isOverheat(): Boolean {
-            overheat = if (now > max) true else if (now == 0) false else overheat
+            overheat = if (now > max) true else if (now <= 0) false else overheat
             return overheat
         }
 

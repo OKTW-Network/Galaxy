@@ -66,7 +66,7 @@ class Gun {
         if (heatStatus.isOverheat()) return
 
         if (heatStatus.addHeat(gun.heat)) {
-            player.playSound(SoundType.of("gun.overheat"), SoundCategories.PLAYER, source, 1.0)
+            world.playSound(SoundType.of("gun.overheat"), SoundCategories.PLAYER, source, 1.0)
         }
 
         val target = world.getIntersectingEntities(

@@ -20,6 +20,7 @@ import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
+import org.spongepowered.api.text.format.TextStyles
 
 class Gun : CommandBase {
     override val spec: CommandSpec
@@ -76,7 +77,7 @@ class Gun : CommandBase {
                         .add(Keys.HIDE_ATTRIBUTES, true)
                         .add(Keys.HIDE_ENCHANTMENTS, true)
                         .add(Keys.ITEM_DURABILITY, gun.type.id.toInt())
-                        .add(Keys.DISPLAY_NAME, Text.of(TextColors.AQUA, "Laser Gun"))
+                        .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.AQUA, "Laser Gun"))
                         .build()
 
                 src.setItemInHand(HandTypes.MAIN_HAND, item)
@@ -128,7 +129,7 @@ class Gun : CommandBase {
                         .add(Keys.HIDE_ATTRIBUTES, true)
                         .add(Keys.HIDE_ENCHANTMENTS, true)
                         .add(Keys.ITEM_DURABILITY, gun.type.id.toInt())
-                        .add(Keys.DISPLAY_NAME, Text.of(TextColors.AQUA, "Laser Gun"))
+                        .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.AQUA, "Laser Gun"))
                         .build()
 
                 src.setItemInHand(HandTypes.MAIN_HAND, item)

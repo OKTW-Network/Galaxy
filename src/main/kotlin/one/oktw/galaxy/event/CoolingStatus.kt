@@ -28,7 +28,7 @@ class CoolingStatus {
         if (!player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataOverheat.key].isPresent }.isPresent) return
 
         fun normalize(heatStatus: CoolDownHelper.HeatStatus): Int {
-            return Math.min((heatStatus.now.toDouble() / heatStatus.max) * 100, 100.0).toInt()
+            return Math.max(Math.min((heatStatus.now.toDouble() / heatStatus.max) * 100, 100.0), 0.0).toInt()
         }
 
         fun color(heatStatus: CoolDownHelper.HeatStatus?): TextColor {
@@ -45,8 +45,14 @@ class CoolingStatus {
         coolingBar[player] = Task.builder()
                 .name("CoolingBar")
                 .intervalTicks(1)
-                .execute({ _ ->
+                .execute({ task ->
+                    if (!player.isOnline) {
+                        task.cancel()
+                        coolingBar -= player
+                    }
+
                     val mainHand = player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataOverheat.key].isPresent }.orElse(null)
+                            ?: return@execute
                     val offHand = player.getItemInHand(HandTypes.OFF_HAND).filter { it[DataOverheat.key].isPresent }.orElse(null)
                     val heatStatus1 = CoolDownHelper.getCoolDown(mainHand[DataUUID.key].get())
                     val heatStatus2 = if (offHand != null) CoolDownHelper.getCoolDown(offHand[DataUUID.key].get()) else null
@@ -54,10 +60,10 @@ class CoolingStatus {
                     val bar1 = if (heatStatus1 != null) normalize(heatStatus1) / 2 else 0
                     val temp1 = heatStatus1?.now ?: 0
 
-                    if (temp1 == 0) {
+                    if (temp1 == 0 && mainHand[DataOverheat.key].get() == true) {
                         mainHand.transform(DataOverheat.key, { false })
                         player.setItemInHand(HandTypes.MAIN_HAND, mainHand)
-                    } else if (heatStatus1?.isOverheat() == true) {
+                    } else if (heatStatus1?.isOverheat() == true && mainHand[DataOverheat.key].get() == false) {
                         mainHand.transform(DataOverheat.key, { true })
                         player.setItemInHand(HandTypes.MAIN_HAND, mainHand)
                     }
@@ -72,10 +78,10 @@ class CoolingStatus {
                         val bar2 = if (heatStatus2 != null) normalize(heatStatus2) / 2 else 0
                         val temp2 = heatStatus2?.now ?: 0
 
-                        if (temp2 == 0) {
+                        if (temp2 == 0 && offHand[DataOverheat.key].get() == true) {
                             offHand.transform(DataOverheat.key, { false })
                             player.setItemInHand(HandTypes.OFF_HAND, offHand)
-                        } else if (heatStatus2?.isOverheat() == true) {
+                        } else if (heatStatus2?.isOverheat() == true && offHand[DataOverheat.key].get() == false) {
                             offHand.transform(DataOverheat.key, { true })
                             player.setItemInHand(HandTypes.OFF_HAND, offHand)
                         }
@@ -83,7 +89,7 @@ class CoolingStatus {
                         player.sendTitle(Title.builder()
                                 .actionBar(Text.of(
                                         TextColors.GRAY, "|".repeat(50 - bar2),
-                                        color(heatStatus2), "|".repeat(bar2 / 2), " ", temp2, "°C",
+                                        color(heatStatus2), "|".repeat(bar2), " ", temp2, "°C",
                                         TextColors.RESET, " | ",
                                         color(heatStatus1), temp1, "°C ", "|".repeat(bar1),
                                         TextColors.GRAY, "|".repeat(50 - bar1)

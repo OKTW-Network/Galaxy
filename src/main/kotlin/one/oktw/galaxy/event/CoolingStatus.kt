@@ -22,13 +22,10 @@ class CoolingStatus {
     @Listener
     @Suppress("UNUSED_PARAMETER")
     fun onChangeHeld(event: ChangeInventoryEvent, @First player: Player) {
-        val mainHand = player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataOverheat.key].isPresent }.orElse(null)
-        val offHand = player.getItemInHand(HandTypes.OFF_HAND).filter { it[DataOverheat.key].isPresent }.orElse(null)
-
         coolingBar[player]?.cancel()
         coolingBar -= player
 
-        if (mainHand == null) return
+        if (!player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataOverheat.key].isPresent }.isPresent) return
 
         fun normalize(heatStatus: CoolDownHelper.HeatStatus): Int {
             return Math.min((heatStatus.now.toDouble() / heatStatus.max) * 100, 100.0).toInt()
@@ -48,8 +45,9 @@ class CoolingStatus {
         coolingBar[player] = Task.builder()
                 .name("CoolingBar")
                 .intervalTicks(1)
-                .async()
                 .execute({ _ ->
+                    val mainHand = player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataOverheat.key].isPresent }.orElse(null)
+                    val offHand = player.getItemInHand(HandTypes.OFF_HAND).filter { it[DataOverheat.key].isPresent }.orElse(null)
                     val heatStatus1 = CoolDownHelper.getCoolDown(mainHand[DataUUID.key].get())
                     val heatStatus2 = if (offHand != null) CoolDownHelper.getCoolDown(offHand[DataUUID.key].get()) else null
 

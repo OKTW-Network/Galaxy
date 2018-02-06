@@ -1,6 +1,7 @@
 package one.oktw.galaxy.command
 
 import one.oktw.galaxy.Main.Companion.travelerManager
+import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.GunType
 import one.oktw.galaxy.enums.UpgradeType.THROUGH
@@ -68,6 +69,7 @@ class Gun : CommandBase {
                 val item = ItemStack.builder()
                         .itemType(ItemTypes.WOODEN_SWORD)
                         .itemData(DataUUID.Immutable(gun.uuid))
+                        .itemData(DataOverheat(false))
                         .add(Keys.UNBREAKABLE, true)
                         .add(Keys.HIDE_UNBREAKABLE, true)
                         .add(Keys.HIDE_MISCELLANEOUS, true)
@@ -119,6 +121,7 @@ class Gun : CommandBase {
                 val item = ItemStack.builder()
                         .itemType(ItemTypes.WOODEN_SWORD)
                         .itemData(DataUUID.Immutable(gun.uuid))
+                        .itemData(DataOverheat(false))
                         .add(Keys.UNBREAKABLE, true)
                         .add(Keys.HIDE_UNBREAKABLE, true)
                         .add(Keys.HIDE_MISCELLANEOUS, true)

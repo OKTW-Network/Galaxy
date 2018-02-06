@@ -3,6 +3,7 @@ package one.oktw.galaxy
 import com.google.inject.Inject
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
+import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.manager.*
 import org.slf4j.Logger
@@ -67,6 +68,12 @@ class Main {
                 .dataName("UUID").manipulatorId("uuid")
                 .dataClass(DataUUID::class.java).immutableClass(DataUUID.Immutable::class.java)
                 .builder(DataUUID.Builder())
+                .buildAndRegister(plugin)
+
+        DataRegistration.builder()
+                .dataName("Overheat").manipulatorId("overheat")
+                .dataClass(DataOverheat::class.java).immutableClass(DataOverheat.Immutable::class.java)
+                .builder(DataOverheat.Builder())
                 .buildAndRegister(plugin)
     }
 

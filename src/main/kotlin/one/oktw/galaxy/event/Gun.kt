@@ -31,11 +31,12 @@ class Gun {
     @Listener
     @Suppress("unused")
     fun onInteractItem(event: InteractItemEvent.Secondary.MainHand, @Getter("getSource") player: Player) {
-        if (event.itemStack.type != ItemTypes.WOODEN_SWORD) return
+        val itemStack = event.itemStack
+        if (itemStack.type != ItemTypes.WOODEN_SWORD || !itemStack[DataUUID.key].isPresent) return
 
         val world = player.world
         val gun = travelerManager.getTraveler(player).item.gun
-                .find { it.uuid == event.itemStack[DataUUID.key].orElse(null) } ?: return
+                .find { it.uuid == itemStack[DataUUID.key].get() }!!
         val source = player.getProperty(EyeLocationProperty::class.java)
                 .map(EyeLocationProperty::getValue).orElse(null) ?: return
 

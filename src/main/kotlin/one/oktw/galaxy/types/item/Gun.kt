@@ -2,10 +2,12 @@ package one.oktw.galaxy.types.item
 
 import one.oktw.galaxy.enums.GunType
 import one.oktw.galaxy.types.Upgrade
+import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import java.util.*
 
+@BsonDiscriminator
 data class Gun(
-        val uuid: UUID = UUID.randomUUID(),
+        override val uuid: UUID = UUID.randomUUID(),
         var type: GunType = GunType.ORIGIN,
         var maxTemp: Int = 100,
         var heat: Int = 10,
@@ -15,4 +17,4 @@ data class Gun(
         var through: Int = 1,
         var slot: Int = 1,
         var upgrade: List<Upgrade> = ArrayList()
-)
+) : ItemBase

@@ -6,6 +6,7 @@ import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.UpgradeType.*
 import one.oktw.galaxy.helper.CoolDownHelper
+import one.oktw.galaxy.types.item.Gun
 import org.spongepowered.api.block.BlockTypes.*
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.property.entity.EyeLocationProperty
@@ -35,8 +36,9 @@ class Gun {
         if (itemStack.type != ItemTypes.WOODEN_SWORD || !itemStack[DataUUID.key].isPresent) return
 
         val world = player.world
-        val gun = travelerManager.getTraveler(player).item.gun
-                .find { it.uuid == itemStack[DataUUID.key].get() }!!
+        val gun = travelerManager.getTraveler(player).item
+                .filter { it is Gun }
+                .find { it.uuid == itemStack[DataUUID.key].get() } as Gun? ?: return
         val source = player.getProperty(EyeLocationProperty::class.java)
                 .map(EyeLocationProperty::getValue).orElse(null) ?: return
 

@@ -64,7 +64,7 @@ class Gun : CommandBase {
 
                 args.getOne<Int>("Through").ifPresent { gun.upgrade += Upgrade(THROUGH, it) }
 
-                traveler.item.gun.add(gun)
+                traveler.item.add(gun)
                 traveler.save()
 
                 val item = ItemStack.builder()
@@ -99,7 +99,7 @@ class Gun : CommandBase {
             if (src is Player) {
                 val traveler = travelerManager.getTraveler(src)
 
-                CoolDownHelper.removeCoolDown(CoolDownHelper.getCoolDown(traveler.item.gun.removeAt(args.getOne<Int>("Gun").get()).uuid)!!)
+                CoolDownHelper.removeCoolDown(CoolDownHelper.getCoolDown(traveler.item.removeAt(args.getOne<Int>("Gun").get()).uuid)!!)
                 traveler.save()
             }
             return CommandResult.success()
@@ -117,7 +117,7 @@ class Gun : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
                 val traveler = travelerManager.getTraveler(src)
-                val gun = traveler.item.gun[args.getOne<Int>("Gun").get()]
+                val gun = traveler.item[args.getOne<Int>("Gun").get()] as? Gun ?: return CommandResult.empty()
 
                 val item = ItemStack.builder()
                         .itemType(ItemTypes.WOODEN_SWORD)
@@ -150,7 +150,7 @@ class Gun : CommandBase {
             if (src is Player) {
                 val traveler = travelerManager.getTraveler(src)
 
-                src.sendMessage(Text.of(traveler.item.gun.toString()))
+                src.sendMessage(Text.of(traveler.item.toString()))
             }
             return CommandResult.success()
         }

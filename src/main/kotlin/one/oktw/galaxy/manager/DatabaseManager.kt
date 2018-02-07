@@ -9,7 +9,7 @@ import one.oktw.galaxy.Main.Companion.configManager
 import one.oktw.galaxy.Main.Companion.main
 import org.bson.codecs.configuration.CodecRegistries.fromProviders
 import org.bson.codecs.configuration.CodecRegistries.fromRegistries
-import org.bson.codecs.pojo.Conventions.SET_PRIVATE_FIELDS_CONVENTION
+import org.bson.codecs.pojo.Conventions.*
 import org.bson.codecs.pojo.PojoCodecProvider
 import java.util.Arrays.asList
 
@@ -43,7 +43,12 @@ class DatabaseManager {
                 fromProviders(PojoCodecProvider.builder()
                         .register("one.oktw.galaxy.types")
                         .automatic(true)
-                        .conventions(asList(SET_PRIVATE_FIELDS_CONVENTION)).build()
+                        .conventions(asList(
+                                SET_PRIVATE_FIELDS_CONVENTION,
+                                ANNOTATION_CONVENTION,
+                                CLASS_AND_PROPERTY_CONVENTION
+                        ))
+                        .build()
                 )
         )
 

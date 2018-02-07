@@ -1,4 +1,4 @@
-package one.oktw.galaxy.types.item
+package one.oktw.galaxy.types
 
 data class Armor(
         var shield: Int = 0,

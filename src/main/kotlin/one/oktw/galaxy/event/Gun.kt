@@ -2,25 +2,26 @@ package one.oktw.galaxy.event
 
 import com.flowpowered.math.imaginary.Quaterniond
 import kotlinx.coroutines.experimental.launch
+import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.util.EntityDamageSource
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.UpgradeType.*
 import one.oktw.galaxy.helper.CoolDownHelper
 import one.oktw.galaxy.types.item.Gun
 import org.spongepowered.api.block.BlockTypes.*
-import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.property.entity.EyeLocationProperty
 import org.spongepowered.api.effect.particle.ParticleEffect
 import org.spongepowered.api.effect.particle.ParticleTypes
 import org.spongepowered.api.effect.sound.SoundCategories
 import org.spongepowered.api.effect.sound.SoundType
 import org.spongepowered.api.effect.sound.SoundTypes
-import org.spongepowered.api.entity.living.ArmorStand
 import org.spongepowered.api.entity.living.Living
 import org.spongepowered.api.entity.living.monster.Boss
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
-import org.spongepowered.api.event.cause.entity.damage.source.DamageSources
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource
 import org.spongepowered.api.event.filter.Getter
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
 import org.spongepowered.api.item.ItemTypes
@@ -100,12 +101,9 @@ class Gun {
                 .forEach {
                     val entity = it.entity as Living
 
-                    if (entity is ArmorStand) {
-                        entity.damage(damage, DamageSources.MAGIC)
-                    } else {
-                        entity.transform(Keys.HEALTH) { it - damage }
-                        entity.damage(0.0, DamageSources.MAGIC)
-                    }
+                    val damageSource = EntityDamageSource("player", player as EntityPlayer).setProjectile() as DamageSource
+                    entity.damage(damage, damageSource)
+                    (entity as EntityLivingBase).hurtResistantTime = 0
 
                     if (entity.health().get() < 1) {
                         player.playSound(

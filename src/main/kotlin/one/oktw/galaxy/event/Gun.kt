@@ -77,7 +77,7 @@ class Gun {
         val target = world.getIntersectingEntities(
                 player,
                 range,
-                { it.entity is Living && it.entity !is Player && it.entity !is ArmorStand && (it.entity as Living).health().get() > 0 }
+                { it.entity is Living && it.entity !is Player && it.entity !is ArmorStand && (it.entity as EntityLivingBase).isEntityAlive }
         )
         val wall = BlockRay.from(player)
                 .distanceLimit(if (!target.isEmpty()) target.first().intersection.distance(source) else range)
@@ -108,20 +108,20 @@ class Gun {
                     entity.damage(damage, damageSource)
                     damage *= 0.9
 
-                    if (entity.health().get() < 1) {
+                    if ((entity as EntityLivingBase).isEntityAlive) {
                         player.playSound(
                                 SoundTypes.ENTITY_EXPERIENCE_ORB_PICKUP,
                                 SoundCategories.PLAYER,
                                 player.location.position,
-                                1.0,
-                                0.5
+                                1.0
                         )
                     } else {
                         player.playSound(
                                 SoundTypes.ENTITY_EXPERIENCE_ORB_PICKUP,
                                 SoundCategories.PLAYER,
                                 player.location.position,
-                                1.0
+                                1.0,
+                                0.5
                         )
                     }
                 }

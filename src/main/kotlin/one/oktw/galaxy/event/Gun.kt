@@ -28,6 +28,7 @@ import org.spongepowered.api.event.item.inventory.InteractItemEvent
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.util.blockray.BlockRay
 import java.lang.Math.random
+import java.util.Arrays.asList
 import kotlin.math.roundToInt
 
 class Gun {
@@ -35,7 +36,7 @@ class Gun {
     @Suppress("unused")
     fun onInteractItem(event: InteractItemEvent.Secondary.MainHand, @Getter("getSource") player: Player) {
         val itemStack = event.itemStack
-        if (itemStack.type != ItemTypes.WOODEN_SWORD || !itemStack[DataUUID.key].isPresent) return
+        if (itemStack.type !in asList(ItemTypes.WOODEN_SWORD, ItemTypes.IRON_SWORD) || !itemStack[DataUUID.key].isPresent) return
 
         val world = player.world
         val gun = travelerManager.getTraveler(player).item
@@ -103,8 +104,9 @@ class Gun {
                     val entity = it.entity as Living
 
                     val damageSource = EntityDamageSource("player", player as EntityPlayer).setProjectile() as DamageSource
-                    entity.damage(damage, damageSource)
                     (entity as EntityLivingBase).hurtResistantTime = 0
+                    entity.damage(damage, damageSource)
+                    damage *= 0.9
 
                     if (entity.health().get() < 1) {
                         player.playSound(

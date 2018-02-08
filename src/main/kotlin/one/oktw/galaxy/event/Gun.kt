@@ -17,6 +17,7 @@ import org.spongepowered.api.effect.particle.ParticleTypes
 import org.spongepowered.api.effect.sound.SoundCategories
 import org.spongepowered.api.effect.sound.SoundType
 import org.spongepowered.api.effect.sound.SoundTypes
+import org.spongepowered.api.entity.living.ArmorStand
 import org.spongepowered.api.entity.living.Living
 import org.spongepowered.api.entity.living.monster.Boss
 import org.spongepowered.api.entity.living.player.Player
@@ -75,7 +76,7 @@ class Gun {
         val target = world.getIntersectingEntities(
                 player,
                 range,
-                { it.entity !is Player && it.entity is Living && (it.entity as Living).health().get() > 0 }
+                { it.entity is Living && it.entity !is Player && it.entity !is ArmorStand && (it.entity as Living).health().get() > 0 }
         )
         val wall = BlockRay.from(player)
                 .distanceLimit(if (!target.isEmpty()) target.first().intersection.distance(source) else range)

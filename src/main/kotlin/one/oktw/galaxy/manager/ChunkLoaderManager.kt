@@ -105,11 +105,12 @@ class ChunkLoaderManager {
     fun loadForcedWorld() {
         logger.info("Loading world has ChunkLoader...")
 
-        launch {
-            collection.find().forEach {
-                val world = galaxyManager.getPlanet(it.uuid)?.getWorld()?.orElse(null) ?: return@forEach
-                loadChunk(world.getLocation(it.position.toVector3d()), it.range)
-            }
+        collection.find().forEach {
+            val world = galaxyManager.getPlanet(
+                    it.position.planet ?: return@forEach
+            )?.getWorld()?.orElse(null) ?: return@forEach
+
+            launch { loadChunk(world.getLocation(it.position.toVector3d()), it.range) }
         }
     }
 }

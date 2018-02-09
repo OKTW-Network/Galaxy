@@ -28,6 +28,7 @@ class TPX : CommandBase {
             get() = CommandSpec.builder()
                     .executor(this)
                     .arguments(GenericArguments.onlyOne(GenericArguments.player(Text.of("Player"))))
+                    .permission("oktw.command.tpx")
                     .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
@@ -44,6 +45,7 @@ class TPX : CommandBase {
             get() = CommandSpec.builder()
                     .executor(this)
                     .arguments(GenericArguments.onlyOne(GenericArguments.string((Text.of("world")))))
+                    .permission("oktw.command.tpx")
                     .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {

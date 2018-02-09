@@ -56,7 +56,7 @@ class ChunkLoaderManager {
         launch {
             collection.find(eq("position.planet", planet.uuid)).forEach {
                 val chunkLoader = it
-                planet.getWorld().ifPresent {
+                planet.loadWorld().ifPresent {
                     worldTickets[chunkLoader.uuid] = loadChunk(
                             it.getLocation(chunkLoader.position.toVector3d()),
                             chunkLoader.range
@@ -108,7 +108,7 @@ class ChunkLoaderManager {
         collection.find().forEach {
             val world = galaxyManager.getPlanet(
                     it.position.planet ?: return@forEach
-            )?.getWorld()?.orElse(null) ?: return@forEach
+            )?.loadWorld()?.orElse(null) ?: return@forEach
 
             launch { loadChunk(world.getLocation(it.position.toVector3d()), it.range) }
         }

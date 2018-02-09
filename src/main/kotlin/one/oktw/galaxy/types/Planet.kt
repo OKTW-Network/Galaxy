@@ -29,7 +29,7 @@ data class Planet(
         }
     }
 
-    fun getWorld(): Optional<World> {
+    fun loadWorld(): Optional<World> {
         return PlanetHelper.loadPlanet(this)
     }
 }

@@ -15,7 +15,7 @@ class TPX : CommandBase {
         get() = CommandSpec.builder()
                 .executor(this)
                 .child(TpxPlayer().spec, "player")
-                .child(TpxDim().spec, "dim")
+                .child(TpxWorld().spec, "world")
                 .permission("oktw.command.tpx")
                 .build()
 
@@ -39,7 +39,7 @@ class TPX : CommandBase {
             return CommandResult.success()
         }
     }
-    class TpxDim : CommandBase {
+    class TpxWorld : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
                     .executor(this)

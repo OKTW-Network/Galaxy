@@ -35,7 +35,7 @@ class TravelerManager {
         val traveler = getTraveler(player)
 
         traveler.position.fromPosition(player.location.position)
-        traveler.position.planet = galaxyManager.getPlanet(player.world.uniqueId)?.uuid
+        traveler.position.planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId)?.uuid
 
         traveler.save()
     }

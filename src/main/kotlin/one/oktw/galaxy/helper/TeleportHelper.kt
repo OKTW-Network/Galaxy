@@ -11,7 +11,7 @@ import org.spongepowered.api.world.World
 class TeleportHelper {
     companion object {
         fun checkValid(player: Player, location: Location<World>): Boolean {
-            val planet = galaxyManager.getPlanet(location.extent.uniqueId) ?: return false
+            val planet = galaxyManager.getPlanetFromWorld(location.extent.uniqueId) ?: return false
 
             return when (planet.checkPermission(player)) {
                 MODIFY, VIEW -> true
@@ -20,7 +20,7 @@ class TeleportHelper {
         }
 
         fun teleport(player: Player, location: Location<World>, safety: Boolean): Boolean {
-            val planet = galaxyManager.getPlanet(location.extent.uniqueId) ?: return false
+            val planet = galaxyManager.getPlanetFromWorld(location.extent.uniqueId) ?: return false
 
             if (!checkValid(player, location)) return false
 

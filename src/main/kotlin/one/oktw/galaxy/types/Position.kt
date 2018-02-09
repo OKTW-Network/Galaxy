@@ -15,4 +15,8 @@ data class Position(
         z = vector3d.z
         return this
     }
+
+    fun toVector3d(): Vector3d {
+        return Vector3d(x, y, z)
+    }
 }

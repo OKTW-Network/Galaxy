@@ -6,7 +6,9 @@ import one.oktw.galaxy.enums.AccessLevel.*
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.enums.SecurityLevel
 import one.oktw.galaxy.enums.SecurityLevel.*
+import one.oktw.galaxy.helper.PlanetHelper
 import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.world.World
 import java.util.*
 
 data class Planet(
@@ -25,5 +27,9 @@ data class Planet(
             VISIT -> if (group !== Group.VISITOR) MODIFY else VIEW
             PUBLIC -> MODIFY
         }
+    }
+
+    fun getWorld(): Optional<World> {
+        return PlanetHelper.loadPlanet(this)
     }
 }

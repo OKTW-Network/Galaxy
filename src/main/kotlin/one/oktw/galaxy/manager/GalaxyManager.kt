@@ -1,9 +1,7 @@
 package one.oktw.galaxy.manager
 
-import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.Filters.text
-import com.mongodb.client.model.Projections
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.databaseManager
 import one.oktw.galaxy.enums.Group.ADMIN
@@ -60,8 +58,11 @@ class GalaxyManager {
         return galaxyList
     }
 
-    fun getPlanet(worldUUID: UUID): Planet? {
-        return galaxyCollection.find(Filters.eq("planets.world", worldUUID))
-                .projection(Projections.slice("planets", 1)).first()?.planets?.get(0)
+    fun getPlanet(uuid: UUID): Planet? {
+        return galaxyCollection.distinct("planets", eq("planets.uuid", uuid), Planet::class.java).firstOrNull()
+    }
+
+    fun getPlanetFromWorld(uuid: UUID): Planet? {
+        return galaxyCollection.distinct("planets", eq("planets.world", uuid), Planet::class.java).firstOrNull()
     }
 }

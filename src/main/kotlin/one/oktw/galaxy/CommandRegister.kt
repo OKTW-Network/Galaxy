@@ -14,6 +14,7 @@ class CommandRegister {
             register(main, Test().spec, "test")
             register(main, TeleportHereAsk().spec, "tpahere")
             register(main, TeleportAsk().spec, "tpa")
+            register(main, TPX().spec, "tpx")
             register(main, Hat().spec, "hat")
             register(main, Sign().spec, "sign")
             register(main, Gun().spec, "gun")

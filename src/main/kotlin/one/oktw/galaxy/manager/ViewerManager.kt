@@ -1,9 +1,10 @@
 package one.oktw.galaxy.manager
 
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 class ViewerManager {
-    private val viewer = ArrayList<UUID>()
+    private val viewer = ConcurrentHashMap.newKeySet<UUID>()
 
     fun setViewer(uuid: UUID) {
         if (viewer.contains(uuid)) return

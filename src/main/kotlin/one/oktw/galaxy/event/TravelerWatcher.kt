@@ -1,5 +1,6 @@
 package one.oktw.galaxy.event
 
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.Main.Companion.viewerManager
@@ -16,11 +17,13 @@ import org.spongepowered.api.event.network.ClientConnectionEvent
 class TravelerWatcher {
     @Listener
     fun onJoin(event: ClientConnectionEvent.Join, @Getter("getTargetEntity") player: Player) {
-        val planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId) ?: return
-        when (planet.checkPermission(player)) {
-            MODIFY -> return
-            VIEW -> viewerManager.setViewer(player.uniqueId)
-            DENY -> Sponge.getServer().defaultWorld.ifPresent { player.transferToWorld(it.uniqueId, it.spawnPosition.toDouble()) }
+        launch {
+            val planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId) ?: return@launch
+            when (planet.checkPermission(player)) {
+                MODIFY -> return@launch
+                VIEW -> viewerManager.setViewer(player.uniqueId)
+                DENY -> Sponge.getServer().defaultWorld.ifPresent { player.transferToWorld(it.uniqueId, it.spawnPosition.toDouble()) }
+            }
         }
     }
 

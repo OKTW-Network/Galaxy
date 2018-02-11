@@ -9,10 +9,11 @@ import one.oktw.galaxy.types.Position
 import one.oktw.galaxy.types.Traveler
 import org.spongepowered.api.entity.living.player.Player
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 class TravelerManager {
     private val travelerCollation = databaseManager.database.getCollection("Traveler", Traveler::class.java)
-    private val cache = HashMap<UUID, Traveler>()
+    private val cache = ConcurrentHashMap<UUID, Traveler>()
 
     private fun createTraveler(player: Player): Traveler {
         val traveler = Traveler(player.uniqueId, position = Position().fromPosition(player.location.position))

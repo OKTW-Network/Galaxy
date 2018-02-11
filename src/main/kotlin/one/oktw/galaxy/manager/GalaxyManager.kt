@@ -1,5 +1,6 @@
 package one.oktw.galaxy.manager
 
+import com.mongodb.client.MongoCursor
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.Filters.text
 import kotlinx.coroutines.experimental.launch
@@ -50,6 +51,10 @@ class GalaxyManager {
 
     fun getGalaxy(planet: Planet): Galaxy {
         return galaxyCollection.find(eq("planets.uuid", planet.uuid)).first()!!
+    }
+
+    fun listGalaxy(): MongoCursor<Galaxy> {
+        return galaxyCollection.find().iterator()
     }
 
     fun searchGalaxy(keyword: String): ArrayList<Galaxy> {

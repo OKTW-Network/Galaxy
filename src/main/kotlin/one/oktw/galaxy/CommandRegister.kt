@@ -18,6 +18,7 @@ class CommandRegister {
             register(main, Hat().spec, "hat")
             register(main, Sign().spec, "sign")
             register(main, Gun().spec, "gun")
+            register(main, Sniper().spec, "sniper")
         }
     }
 }

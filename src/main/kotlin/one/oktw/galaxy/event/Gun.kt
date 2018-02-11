@@ -6,12 +6,16 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.EntityDamageSource
 import one.oktw.galaxy.Main.Companion.travelerManager
+import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.UpgradeType.*
 import one.oktw.galaxy.helper.CoolDownHelper
 import one.oktw.galaxy.types.item.Gun
 import org.spongepowered.api.block.BlockTypes.*
+import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.manipulator.mutable.entity.MovementSpeedData
 import org.spongepowered.api.data.property.entity.EyeLocationProperty
+import org.spongepowered.api.data.type.HandTypes
 import org.spongepowered.api.effect.particle.ParticleEffect
 import org.spongepowered.api.effect.particle.ParticleTypes
 import org.spongepowered.api.effect.sound.SoundCategories
@@ -24,8 +28,13 @@ import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource
 import org.spongepowered.api.event.filter.Getter
+import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
 import org.spongepowered.api.item.ItemTypes
+import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.format.TextColors
+import org.spongepowered.api.text.format.TextStyles
 import org.spongepowered.api.util.blockray.BlockRay
 import java.lang.Math.random
 import java.util.Arrays.asList
@@ -52,6 +61,66 @@ class Gun {
         var maxTemp = gun.maxTemp
 
         // TODO
+        //Sniper_Scope
+        if (player.get(Keys.IS_SNEAKING).get() && itemStack.type == ItemTypes.IRON_SWORD){
+            if (itemStack.get(Keys.ITEM_DURABILITY).get() in asList(1, 3) ) {
+                val itemBuilder = ItemStack.builder()
+                        .itemType(ItemTypes.IRON_SWORD)
+                        .itemData(DataUUID.Immutable(gun.uuid))
+                        .itemData(DataOverheat(false))
+                        .add(Keys.WALKING_SPEED,-10.0)
+                        .add(Keys.UNBREAKABLE, true)
+                        .add(Keys.HIDE_UNBREAKABLE, true)
+                        .add(Keys.HIDE_MISCELLANEOUS, true)
+                        .add(Keys.HIDE_ATTRIBUTES, true)
+                        .add(Keys.HIDE_ENCHANTMENTS, true)
+                        .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.GOLD, "Sniper"))
+                player.playSound(
+                        SoundType.of("entity.bat.takeoff"),
+                        SoundCategories.PLAYER,
+                        source,
+                        0.3,
+                        0.7
+                )
+                if (gun.type.id.toInt() == 1 ) {
+                    itemBuilder.add(Keys.ITEM_DURABILITY, 2)
+                    val item = itemBuilder.build()
+                    player.setItemInHand(HandTypes.MAIN_HAND, item)
+                    return
+                }
+                if (gun.type.id.toInt() == 3 ) {
+                    itemBuilder.add(Keys.ITEM_DURABILITY, 4)
+                    val item = itemBuilder.build()
+                    player.setItemInHand(HandTypes.MAIN_HAND, item)
+                    return
+                }
+            }
+        }
+        if (!player.get(Keys.IS_SNEAKING).get() && itemStack.type == ItemTypes.IRON_SWORD){
+            if (itemStack.get(Keys.ITEM_DURABILITY).get() in asList(2, 4) ){
+                val item = ItemStack.builder()
+                    .itemType(ItemTypes.IRON_SWORD)
+                    .itemData(DataUUID.Immutable(gun.uuid))
+                    .itemData(DataOverheat(false))
+                    .add(Keys.UNBREAKABLE, true)
+                    .add(Keys.HIDE_UNBREAKABLE, true)
+                    .add(Keys.HIDE_MISCELLANEOUS, true)
+                    .add(Keys.HIDE_ATTRIBUTES, true)
+                    .add(Keys.HIDE_ENCHANTMENTS, true)
+                    .add(Keys.ITEM_DURABILITY, gun.type.id.toInt())
+                    .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.GOLD, "Sniper"))
+                    .build()
+                player.playSound(
+                        SoundType.of("entity.bat.takeoff"),
+                        SoundCategories.PLAYER,
+                        source,
+                        0.3,
+                        0.7
+                )
+                player.setItemInHand(HandTypes.MAIN_HAND, item)
+            }
+        }
+
         gun.upgrade.forEach {
             when (it.type) {
                 DAMAGE -> damage += it.level * 3
@@ -153,12 +222,38 @@ class Gun {
         }
 
         // Play gun sound
-        world.playSound(
-                SoundType.of("gun.shot"),
-                SoundCategories.PLAYER,
-                source,
-                1.0,
-                1 + random() / 10 - random() / 10
-        )
+        if (itemStack.type == ItemTypes.WOODEN_SWORD) {
+            world.playSound(
+                    SoundType.of("gun.shot"),
+                    SoundCategories.PLAYER,
+                    source,
+                    1.0,
+                    1 + random() / 10 - random() / 10
+            )
+        }
+        if (itemStack.type == ItemTypes.IRON_SWORD) {
+            world.playSound(
+                    SoundType.of("entity.blaze.hurt"),
+                    SoundCategories.PLAYER,
+                    source,
+                    1.0,
+                    2.0
+            )
+            world.playSound(
+                    SoundType.of("entity.firework.blast"),
+                    SoundCategories.PLAYER,
+                    source,
+                    1.0,
+                    0.0
+            )
+            world.playSound(
+                    SoundType.of("block.piston.extend"),
+                    SoundCategories.PLAYER,
+                    source,
+                    1.0,
+                    2.0
+            )
+        }
+
     }
 }

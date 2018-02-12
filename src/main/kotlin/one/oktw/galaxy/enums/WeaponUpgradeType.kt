@@ -1,6 +1,6 @@
 package one.oktw.galaxy.enums
 
-enum class UpgradeType {
+enum class WeaponUpgradeType {
     DAMAGE,
     RANGE,
     COOLING,

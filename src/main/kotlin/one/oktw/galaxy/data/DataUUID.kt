@@ -22,9 +22,15 @@ class DataUUID(uuid: UUID) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutab
                 .type(TypeTokens.UUID_VALUE_TOKEN)
                 .id("uuid")
                 .name("UUID")
-                .query(DataQuery.of("item", "uuid"))
+                .query(DataQuery.of("uuid"))
                 .build()
     }
+
+    override fun getContentVersion() = 1
+    override fun asImmutable() = Immutable(value)
+    override fun copy() = DataUUID(value)
+    override fun getValueGetter(): Value<UUID> = Sponge.getRegistry().valueFactory.createValue(key, value)
+    override fun toContainer(): DataContainer = super.toContainer().set(key, value)
 
     override fun from(container: DataContainer): Optional<DataUUID> {
         return if (container[key.query].isPresent) {
@@ -35,62 +41,23 @@ class DataUUID(uuid: UUID) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutab
         }
     }
 
-    override fun copy(): DataUUID {
-        return DataUUID(value)
-    }
-
-    override fun getContentVersion(): Int {
-        return 1
-    }
-
     override fun fill(dataHolder: DataHolder, overlap: MergeFunction): Optional<DataUUID> {
         value = overlap.merge(this, dataHolder[DataUUID::class.java].orElse(null)).value
         return Optional.of(this)
     }
 
-    override fun asImmutable(): Immutable {
-        return Immutable(value)
-    }
-
-    override fun getValueGetter(): Value<UUID> {
-        return Sponge.getRegistry().valueFactory.createValue(key, value)
-    }
-
-    override fun toContainer(): DataContainer {
-        return super.toContainer().set(key, value)
-    }
-
     class Immutable(uuid: UUID) : AbstractImmutableSingleData<UUID, Immutable, DataUUID>(uuid, key) {
         private val immutableValue: ImmutableValue<UUID> = Sponge.getRegistry().valueFactory.createValue(key, value).asImmutable()
 
-        override fun getContentVersion(): Int {
-            return 1
-        }
-
-        override fun asMutable(): DataUUID {
-            return DataUUID(value)
-        }
-
-        override fun getValueGetter(): ImmutableValue<UUID> {
-            return immutableValue
-        }
-
-        override fun toContainer(): DataContainer {
-            return super.toContainer().set(key, value)
-        }
+        override fun getContentVersion() = 1
+        override fun asMutable() = DataUUID(value)
+        override fun getValueGetter() = immutableValue
+        override fun toContainer(): DataContainer = super.toContainer().set(key, value)
     }
 
     class Builder : AbstractDataBuilder<DataUUID>(DataUUID::class.java, 1), DataManipulatorBuilder<DataUUID, Immutable> {
-        override fun createFrom(dataHolder: DataHolder): Optional<DataUUID> {
-            return create().fill(dataHolder)
-        }
-
-        override fun create(): DataUUID {
-            return DataUUID(UUID.randomUUID())
-        }
-
-        override fun buildContent(container: DataView): Optional<DataUUID> {
-            return create().from(container.copy())
-        }
+        override fun createFrom(dataHolder: DataHolder): Optional<DataUUID> = create().fill(dataHolder)
+        override fun create() = DataUUID(UUID.randomUUID())
+        override fun buildContent(container: DataView) = create().from(container.copy())
     }
 }

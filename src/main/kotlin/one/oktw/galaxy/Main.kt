@@ -5,6 +5,7 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
 import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.data.DataUpgrade
 import one.oktw.galaxy.manager.*
 import one.oktw.galaxy.task.CoolingStatus
 import org.slf4j.Logger
@@ -76,6 +77,12 @@ class Main {
                 .dataName("Overheat").manipulatorId("overheat")
                 .dataClass(DataOverheat::class.java).immutableClass(DataOverheat.Immutable::class.java)
                 .builder(DataOverheat.Builder())
+                .buildAndRegister(plugin)
+
+        DataRegistration.builder()
+                .dataName("Upgrade").manipulatorId("upgrade")
+                .dataClass(DataUpgrade::class.java).immutableClass(DataUpgrade.Immutable::class.java)
+                .builder(DataUpgrade.Builder())
                 .buildAndRegister(plugin)
     }
 

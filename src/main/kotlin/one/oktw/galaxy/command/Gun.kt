@@ -4,7 +4,7 @@ import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.GunType
-import one.oktw.galaxy.enums.UpgradeType.THROUGH
+import one.oktw.galaxy.enums.WeaponUpgradeType.THROUGH
 import one.oktw.galaxy.helper.CoolDownHelper
 import one.oktw.galaxy.types.Upgrade
 import one.oktw.galaxy.types.item.Gun

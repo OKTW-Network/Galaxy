@@ -199,7 +199,9 @@ class Gun {
     @Suppress("unused")
     fun onChangeDataHolder(event: ChangeDataHolderEvent.ValueChange) {
         val player = event.targetHolder as? Player ?: return
-        scope(player,!player.get(Keys.IS_SNEAKING).get())
+        event.endResult.successfulData
+                .filter { it.key == Keys.IS_SNEAKING }
+                .forEach { scope(player,!player.get(Keys.IS_SNEAKING).get()) }
 
     }
     @Listener

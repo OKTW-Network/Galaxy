@@ -12,6 +12,7 @@ import one.oktw.galaxy.helper.CoolDownHelper
 import one.oktw.galaxy.types.item.Gun
 import org.spongepowered.api.block.BlockTypes.*
 import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData
 import org.spongepowered.api.data.property.entity.EyeLocationProperty
 import org.spongepowered.api.data.type.HandType
 import org.spongepowered.api.data.type.HandTypes
@@ -28,6 +29,8 @@ import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource
 import org.spongepowered.api.event.data.ChangeDataHolderEvent
 import org.spongepowered.api.event.filter.Getter
+import org.spongepowered.api.event.filter.data.Has
+import org.spongepowered.api.event.filter.type.Include
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
 import org.spongepowered.api.item.ItemTypes
@@ -47,7 +50,7 @@ class Gun {
         val world = player.world
         val gun = travelerManager.getTraveler(player).item
                 .filter { it is Gun }
-                .find { it.uuid == itemStack[DataUUID.key].get() } as Gun? ?: return
+                .find { it.uuid == itemStack[DataUUID.key].get() } as? Gun ?: return
         val source = player.getProperty(EyeLocationProperty::class.java)
                 .map(EyeLocationProperty::getValue).orElse(null) ?: return
 
@@ -58,8 +61,6 @@ class Gun {
         var maxTemp = gun.maxTemp
 
         // TODO
-
-
         gun.upgrade.forEach {
             when (it.type) {
                 DAMAGE -> damage += it.level * 3
@@ -169,8 +170,7 @@ class Gun {
                     1.0,
                     1 + random() / 10 - random() / 10
             )
-        }
-        if (itemStack.type == ItemTypes.IRON_SWORD) {
+        } else if (itemStack.type == ItemTypes.IRON_SWORD) {
             world.playSound(
                     SoundType.of("entity.blaze.hurt"),
                     SoundCategories.PLAYER,
@@ -195,28 +195,23 @@ class Gun {
         }
 
     }
-    @Listener
-    @Suppress("unused")
-    fun onChangeDataHolder(event: ChangeDataHolderEvent.ValueChange) {
-        val player = event.targetHolder as? Player ?: return
-        event.endResult.successfulData
-                .filter { it.key == Keys.IS_SNEAKING }
-                .forEach { scope(player,!player.get(Keys.IS_SNEAKING).get()) }
 
-    }
     @Listener
-    @Suppress("unused","UNUSED_PARAMETER")
-    fun onChangeInventory(event:ChangeInventoryEvent.Held,@Getter("getSource") player: Player){
-        scope(player,player.get(Keys.IS_SNEAKING).get())
+    @Suppress("unused", "UNUSED_PARAMETER")
+    fun onChangeDataHolder(event: ChangeDataHolderEvent.ValueChange, @Getter("getTargetHolder") @Has(SneakingData::class) player: Player) {
+        player[Keys.IS_SNEAKING].ifPresent { scope(player, it) }
     }
-    @Listener
-    @Suppress("unused","UNUSED_PARAMETER")
-    fun onChangeInventory(event:ChangeInventoryEvent.SwapHand,@Getter("getSource") player: Player){
-        scope(player,player.get(Keys.IS_SNEAKING).get())
 
+    @Listener
+    @Include(ChangeInventoryEvent.Held::class, ChangeInventoryEvent.SwapHand::class)
+    @Suppress("unused", "UNUSED_PARAMETER")
+    fun onChangeInventory(event: ChangeInventoryEvent, @Getter("getSource") player: Player) {
+        scope(player, !player.get(Keys.IS_SNEAKING).get())
     }
-    private fun scope(player: Player,sneaking: Boolean){
-        player.offer(Keys.WALKING_SPEED,0.100000001490116)
+
+    private fun scope(player: Player, sneaking: Boolean) {
+        player.offer(Keys.WALKING_SPEED, 0.100000001490116)
+
         player.getItemInHand(HandTypes.OFF_HAND).ifPresent {
             if (it.type == ItemTypes.IRON_SWORD && it[DataUUID.key].isPresent) {
                 val offHandItem = it
@@ -224,66 +219,43 @@ class Gun {
                         .filter { it is Gun }
                         .find { it.uuid == offHandItem[DataUUID.key].get() } as Gun? ?: return@ifPresent
 
-                resetScope(player,offHandItem,gun,HandTypes.OFF_HAND,true)
+                resetScope(player, offHandItem, gun, HandTypes.OFF_HAND)
             }
         }
+
         player.getItemInHand(HandTypes.MAIN_HAND).ifPresent {
             val itemStack = it
             if (itemStack.type != ItemTypes.IRON_SWORD || !itemStack[DataUUID.key].isPresent) return@ifPresent
             val gun = travelerManager.getTraveler(player).item
                     .filter { it is Gun }
-                    .find { it.uuid == itemStack[DataUUID.key].get() } as Gun? ?: return@ifPresent
-            if (sneaking && itemStack.type == ItemTypes.IRON_SWORD){
-                enterScope(player,itemStack,gun)
+                    .find { it.uuid == itemStack[DataUUID.key].get() } as? Gun ?: return@ifPresent
+            if (sneaking && itemStack.type == ItemTypes.IRON_SWORD) {
+                enterScope(player, itemStack, gun)
             }
-            if (!sneaking && itemStack.type == ItemTypes.IRON_SWORD){
-                resetScope(player,itemStack,gun,HandTypes.MAIN_HAND,false)
+            if (!sneaking && itemStack.type == ItemTypes.IRON_SWORD) {
+                resetScope(player, itemStack, gun, HandTypes.MAIN_HAND)
             }
         }
     }
+
     private fun enterScope(player: Player, itemStack: ItemStack, gun: Gun) {
-        val source = player.getProperty(EyeLocationProperty::class.java)
-                .map(EyeLocationProperty::getValue).orElse(null) ?: return
-        player.offer(Keys.WALKING_SPEED,-10.0)
-        if (itemStack.get(Keys.ITEM_DURABILITY).get() in asList(1, 3) ) {
-            val itemBuilder = ItemStack.builder().fromItemStack(itemStack)
-            player.playSound(
-                    SoundType.of("entity.bat.takeoff"),
-                    SoundCategories.PLAYER,
-                    source,
-                    0.3,
-                    0.7
-            )
-            if (gun.type.id.toInt() == 1 ) {
-                itemBuilder.add(Keys.ITEM_DURABILITY, 2)
-                val item = itemBuilder.build()
-                player.setItemInHand(HandTypes.MAIN_HAND, item)
+        if (itemStack.get(Keys.ITEM_DURABILITY).get() in asList(1, 3)) {
+            if (gun.type.id.toInt() == 1) {
+                itemStack.offer(Keys.ITEM_DURABILITY, 2)
+                player.setItemInHand(HandTypes.MAIN_HAND, itemStack)
             }
-            if (gun.type.id.toInt() == 3 ) {
-                itemBuilder.add(Keys.ITEM_DURABILITY, 4)
-                val item = itemBuilder.build()
-                player.setItemInHand(HandTypes.MAIN_HAND, item)
+            if (gun.type.id.toInt() == 3) {
+                itemStack.offer(Keys.ITEM_DURABILITY, 4)
+                player.setItemInHand(HandTypes.MAIN_HAND, itemStack)
             }
         }
     }
-    private fun resetScope(player: Player, itemStack: ItemStack, gun: Gun,handType: HandType,silent: Boolean) {
-        val source = player.getProperty(EyeLocationProperty::class.java)
-                .map(EyeLocationProperty::getValue).orElse(null) ?: return
-        if (itemStack.get(Keys.ITEM_DURABILITY).get() in asList(2, 4) ){
-            val item = ItemStack.builder().fromItemStack(itemStack)
-                    .add(Keys.ITEM_DURABILITY,gun.type.id.toInt())
-                    .build()
-            if (!silent){
-                player.playSound(
-                        SoundType.of("entity.bat.takeoff"),
-                        SoundCategories.PLAYER,
-                        source,
-                        0.3,
-                        0.7
-                )
-            }
-            player.offer(Keys.WALKING_SPEED,0.100000001490116)
-            player.setItemInHand(handType, item)
+
+    private fun resetScope(player: Player, itemStack: ItemStack, gun: Gun, handType: HandType) {
+        if (itemStack.get(Keys.ITEM_DURABILITY).get() in asList(2, 4)) {
+            itemStack.offer(Keys.ITEM_DURABILITY, gun.type.id.toInt())
+            player.offer(Keys.WALKING_SPEED, 0.100000001490116)
+            player.setItemInHand(handType, itemStack)
         }
     }
 }

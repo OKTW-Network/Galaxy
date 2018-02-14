@@ -199,19 +199,21 @@ class Gun {
     @Listener
     @Suppress("unused", "UNUSED_PARAMETER")
     fun onChangeDataHolder(event: ChangeDataHolderEvent.ValueChange, @Getter("getTargetHolder") @Has(SneakingData::class) player: Player) {
-        player[Keys.IS_SNEAKING].ifPresent { scope(player, it) }
+        //detects if changed data is sneak
+        event.endResult.successfulData
+                        .filter { it.key == Keys.IS_SNEAKING }
+                        .forEach { scope(player,!player.get(Keys.IS_SNEAKING).get()) }
     }
 
     @Listener
     @Include(ChangeInventoryEvent.Held::class, ChangeInventoryEvent.SwapHand::class)
     @Suppress("unused", "UNUSED_PARAMETER")
     fun onChangeInventory(event: ChangeInventoryEvent, @Getter("getSource") player: Player) {
-        scope(player, !player.get(Keys.IS_SNEAKING).get())
+        scope(player, player.get(Keys.IS_SNEAKING).get())
     }
 
     private fun scope(player: Player, sneaking: Boolean) {
-        player.offer(Keys.WALKING_SPEED, 0.100000001490116)
-
+        player.offer(Keys.WALKING_SPEED, 0.1)
         player.getItemInHand(HandTypes.OFF_HAND).ifPresent {
             if (it.type == ItemTypes.IRON_SWORD && it[DataUUID.key].isPresent) {
                 val offHandItem = it
@@ -239,22 +241,17 @@ class Gun {
     }
 
     private fun enterScope(player: Player, itemStack: ItemStack, gun: Gun) {
+        player.offer(Keys.WALKING_SPEED, -10.0)
         if (itemStack.get(Keys.ITEM_DURABILITY).get() in asList(1, 3)) {
-            if (gun.type.id.toInt() == 1) {
-                itemStack.offer(Keys.ITEM_DURABILITY, 2)
-                player.setItemInHand(HandTypes.MAIN_HAND, itemStack)
-            }
-            if (gun.type.id.toInt() == 3) {
-                itemStack.offer(Keys.ITEM_DURABILITY, 4)
-                player.setItemInHand(HandTypes.MAIN_HAND, itemStack)
-            }
+            itemStack.offer(Keys.ITEM_DURABILITY, gun.type.id.toInt() +1)
+            player.setItemInHand(HandTypes.MAIN_HAND, itemStack)
         }
     }
 
     private fun resetScope(player: Player, itemStack: ItemStack, gun: Gun, handType: HandType) {
         if (itemStack.get(Keys.ITEM_DURABILITY).get() in asList(2, 4)) {
             itemStack.offer(Keys.ITEM_DURABILITY, gun.type.id.toInt())
-            player.offer(Keys.WALKING_SPEED, 0.100000001490116)
+            player.offer(Keys.WALKING_SPEED, 0.1)
             player.setItemInHand(handType, itemStack)
         }
     }

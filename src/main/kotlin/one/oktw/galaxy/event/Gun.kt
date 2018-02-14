@@ -202,14 +202,14 @@ class Gun {
         //detects if changed data is sneak
         event.endResult.successfulData
                         .filter { it.key == Keys.IS_SNEAKING }
-                        .forEach { scope(player,!player.get(Keys.IS_SNEAKING).get()) }
+                        .forEach { scope(player,!player[Keys.IS_SNEAKING].get()) }
     }
 
     @Listener
     @Include(ChangeInventoryEvent.Held::class, ChangeInventoryEvent.SwapHand::class)
     @Suppress("unused", "UNUSED_PARAMETER")
     fun onChangeInventory(event: ChangeInventoryEvent, @Getter("getSource") player: Player) {
-        scope(player, player.get(Keys.IS_SNEAKING).get())
+        scope(player, player[Keys.IS_SNEAKING].get())
     }
 
     private fun scope(player: Player, sneaking: Boolean) {

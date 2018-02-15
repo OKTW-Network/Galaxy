@@ -3,6 +3,7 @@ package one.oktw.galaxy.manager
 import com.flowpowered.math.vector.Vector3i
 import com.mongodb.client.model.Filters.eq
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main.Companion.databaseManager
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
@@ -25,7 +26,7 @@ class ChunkLoaderManager {
     init {
         ticketManager.registerCallback(main) { tickets, world ->
             tickets.forEach { it.release() }
-            reloadChunkLoader(world)
+            runBlocking { reloadChunkLoader(world) }
         }
     }
 
@@ -49,33 +50,27 @@ class ChunkLoaderManager {
         return ticket
     }
 
-    private fun reloadChunkLoader(world: World) {
+    private suspend fun reloadChunkLoader(world: World) {
         logger.info("Reloading ChunkLoader in \"{}\" ...", world.name)
 
-        val planet = galaxyManager.getPlanetFromWorld(world.uniqueId) ?: return
-        launch {
-            collection.find(eq("position.planet", planet.uuid)).forEach {
-                val chunkLoader = it
-                planet.loadWorld().ifPresent {
-                    worldTickets[chunkLoader.uuid] = loadChunk(
-                            it.getLocation(chunkLoader.position.toVector3d()),
-                            chunkLoader.range
-                    )
-                }
-
-                logger.info("Loaded ChunkLoader at {}", it.position.toString())
+        val planet = galaxyManager.getPlanetFromWorld(world.uniqueId).await() ?: return
+        collection.find(eq("position.planet", planet.uuid)).forEach {
+            val chunkLoader = it
+            planet.loadWorld().ifPresent {
+                worldTickets[chunkLoader.uuid] = loadChunk(
+                        it.getLocation(chunkLoader.position.toVector3d()),
+                        chunkLoader.range
+                )
             }
+
+            logger.info("Loaded ChunkLoader at {}", it.position.toString())
         }
     }
 
-    fun addChunkLoader(location: Location<World>, range: Short): UUID {
+    suspend fun addChunkLoader(location: Location<World>, range: Short): UUID {
         val chunkLoader = ChunkLoader(
-                position = Position(
-                        location.x,
-                        location.y,
-                        location.z,
-                        galaxyManager.getPlanetFromWorld(location.extent.uniqueId)?.uuid
-                ),
+                position = Position(planet = galaxyManager.getPlanetFromWorld(location.extent.uniqueId).await()?.uuid)
+                        .fromPosition(location.position),
                 range = range
         )
         launch { collection.insertOne(chunkLoader) }
@@ -91,9 +86,9 @@ class ChunkLoaderManager {
         launch { collection.deleteOne(eq("uuid", uuid)) }
     }
 
-    fun changeRange(uuid: UUID, range: Short) {
+    suspend fun changeRange(uuid: UUID, range: Short) {
         val chunkLoader = collection.find(eq("uuid", uuid)).firstOrNull() ?: return
-        val planet = galaxyManager.getPlanet(chunkLoader.position.planet!!) ?: return
+        val planet = galaxyManager.getPlanet(chunkLoader.position.planet!!).await() ?: return
 
         chunkLoader.range = range
         collection.replaceOne(eq("uuid", chunkLoader.uuid), chunkLoader)
@@ -102,15 +97,15 @@ class ChunkLoaderManager {
         PlanetHelper.loadPlanet(planet).ifPresent { loadChunk(it.getLocation(chunkLoader.position.toVector3d()), range) }
     }
 
-    fun loadForcedWorld() {
+    fun loadForcedWorld() = runBlocking {
         logger.info("Loading world has ChunkLoader...")
 
         collection.find().forEach {
             val world = galaxyManager.getPlanet(
                     it.position.planet ?: return@forEach
-            )?.loadWorld()?.orElse(null) ?: return@forEach
+            ).await()?.loadWorld()?.orElse(null) ?: return@forEach
 
-            launch { loadChunk(world.getLocation(it.position.toVector3d()), it.range) }
+            loadChunk(world.getLocation(it.position.toVector3d()), it.range)
         }
     }
 }

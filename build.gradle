@@ -46,7 +46,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$CoroutinesVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$CoroutinesVersion"
-    compile "org.mongodb:mongodb-driver:3.6.2"
+    compile "org.mongodb:mongodb-driver:3.6.3"
 //    compile "com.github.NucleusPowered.Nucleus:nucleus-api:1.2.2"
 }
 

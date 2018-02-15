@@ -32,11 +32,11 @@ class TravelerManager {
         cache.remove(traveler.uuid)
     }
 
-    fun updateTraveler(player: Player) {
+    suspend fun updateTraveler(player: Player) {
         val traveler = getTraveler(player)
 
         traveler.position.fromPosition(player.location.position)
-        traveler.position.planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId)?.uuid
+        traveler.position.planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId).await()?.uuid
 
         traveler.save()
     }

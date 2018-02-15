@@ -18,7 +18,7 @@ class TravelerWatcher {
     @Listener
     fun onJoin(event: ClientConnectionEvent.Join, @Getter("getTargetEntity") player: Player) {
         launch {
-            val planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId) ?: return@launch
+            val planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId).await() ?: return@launch
             when (planet.checkPermission(player)) {
                 MODIFY -> return@launch
                 VIEW -> viewerManager.setViewer(player.uniqueId)
@@ -29,8 +29,10 @@ class TravelerWatcher {
 
     @Listener
     fun onDisconnect(event: ClientConnectionEvent.Disconnect, @Getter("getTargetEntity") player: Player) {
-        travelerManager.getTraveler(player).item.forEach { getCoolDown(it.uuid)?.let { it1 -> removeCoolDown(it1) } }
-        travelerManager.updateTraveler(player)
-        viewerManager.removeViewer(player.uniqueId)
+        launch {
+            travelerManager.getTraveler(player).item.forEach { getCoolDown(it.uuid)?.let { removeCoolDown(it) } }
+            travelerManager.updateTraveler(player)
+            viewerManager.removeViewer(player.uniqueId)
+        }
     }
 }

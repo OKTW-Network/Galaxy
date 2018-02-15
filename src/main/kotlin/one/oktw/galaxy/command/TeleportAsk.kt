@@ -1,7 +1,7 @@
 package one.oktw.galaxy.command
 
 import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.helper.DelayHelper
 import one.oktw.galaxy.helper.TeleportHelper
 import org.spongepowered.api.command.CommandResult
@@ -51,7 +51,7 @@ class TeleportAsk : CommandBase {
                                     if (callbackLimit.containsKey(uuid)) {
                                         src.sendMessage(Text.of(TextColors.GREEN, "對方已接受傳送請求"))
                                         target.sendMessage(Text.of(TextColors.GREEN, "已接受傳送請求"))
-                                        launch { teleport(src, target.location) }
+                                        runBlocking { teleport(src, target.location) }
                                         callbackLimit.remove(uuid)
                                     }
                                 },

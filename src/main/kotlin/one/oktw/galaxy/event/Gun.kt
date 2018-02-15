@@ -6,6 +6,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.EntityDamageSource
 import one.oktw.galaxy.Main.Companion.travelerManager
+import one.oktw.galaxy.data.DataScope
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.WeaponUpgradeType.*
 import one.oktw.galaxy.helper.CoolDownHelper
@@ -242,15 +243,17 @@ class Gun {
 
     private fun enterScope(player: Player, itemStack: ItemStack, gun: Gun) {
         player.offer(Keys.WALKING_SPEED, -10.0)
-        if (itemStack.get(Keys.ITEM_DURABILITY).get() in asList(1, 3)) {
+        if (!itemStack[DataScope.key].get()) {
             itemStack.offer(Keys.ITEM_DURABILITY, gun.type.id.toInt() +1)
+            itemStack.transform(DataScope.key) {true}
             player.setItemInHand(HandTypes.MAIN_HAND, itemStack)
         }
     }
 
     private fun resetScope(player: Player, itemStack: ItemStack, gun: Gun, handType: HandType) {
-        if (itemStack.get(Keys.ITEM_DURABILITY).get() in asList(2, 4)) {
+        if (itemStack[DataScope.key].get()) {
             itemStack.offer(Keys.ITEM_DURABILITY, gun.type.id.toInt())
+            itemStack.transform(DataScope.key) {false}
             player.offer(Keys.WALKING_SPEED, 0.1)
             player.setItemInHand(handType, itemStack)
         }

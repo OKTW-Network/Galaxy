@@ -2,6 +2,7 @@ package one.oktw.galaxy.command
 
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataOverheat
+import one.oktw.galaxy.data.DataScope
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.GunType
 import one.oktw.galaxy.enums.WeaponUpgradeType.THROUGH
@@ -71,6 +72,7 @@ class Sniper : CommandBase {
                         .itemType(ItemTypes.IRON_SWORD)
                         .itemData(DataUUID.Immutable(gun.uuid))
                         .itemData(DataOverheat(false))
+                        .itemData(DataScope(false))
                         .add(Keys.UNBREAKABLE, true)
                         .add(Keys.HIDE_UNBREAKABLE, true)
                         .add(Keys.HIDE_MISCELLANEOUS, true)
@@ -123,6 +125,7 @@ class Sniper : CommandBase {
                         .itemType(ItemTypes.IRON_SWORD)
                         .itemData(DataUUID.Immutable(gun.uuid))
                         .itemData(DataOverheat(false))
+                        .itemData(DataScope(false))
                         .add(Keys.UNBREAKABLE, true)
                         .add(Keys.HIDE_UNBREAKABLE, true)
                         .add(Keys.HIDE_MISCELLANEOUS, true)

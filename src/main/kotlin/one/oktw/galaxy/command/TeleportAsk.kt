@@ -1,8 +1,8 @@
 package one.oktw.galaxy.command
 
 import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
-import one.oktw.galaxy.helper.DelayHelper
 import one.oktw.galaxy.helper.TeleportHelper
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
@@ -37,11 +37,12 @@ class TeleportAsk : CommandBase {
                 val target = args.getOne<Player>("Player").get()
                 callbackLimit[uuid] = target
 
-                DelayHelper.delay(Runnable {
+                launch {
+                    delay(5, TimeUnit.MINUTES)
                     if (callbackLimit.containsKey(uuid)) {
                         callbackLimit.remove(uuid)
                     }
-                }, 300)
+                }
 
                 val teleportMsg = Text.of(TextColors.YELLOW, "玩家 ", TextColors.AQUA, src.name, TextColors.YELLOW, " 想要傳送到你這，是否接受?")
                         .concat(Text.NEW_LINE)

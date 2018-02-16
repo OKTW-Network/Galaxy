@@ -61,10 +61,12 @@ class PlanetHelper {
         }
 
         fun loadPlanet(planet: Planet): Optional<World> {
-            return if (server.getWorldProperties(planet.world!!).isPresent) {
+            val world = planet.world ?: return Optional.empty()
+
+            return if (server.getWorldProperties(world).isPresent) {
                 planet.lastTime = Date()
 
-                val worldProperties = server.getWorldProperties(planet.world!!).get()
+                val worldProperties = server.getWorldProperties(world).get()
                 worldProperties.setGenerateSpawnOnLoad(false)
 
                 server.loadWorld(worldProperties)
@@ -74,8 +76,8 @@ class PlanetHelper {
         }
 
         fun updatePlanet(planet: Planet) {
-            server.getWorldProperties(planet.world!!).ifPresent {
-                it.worldBorderDiameter = (planet.size * 16).toDouble()
+            planet.world?.let {
+                server.getWorldProperties(it).ifPresent { it.worldBorderDiameter = (planet.size * 16).toDouble() }
             }
         }
     }

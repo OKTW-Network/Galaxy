@@ -202,8 +202,8 @@ class Gun {
     fun onChangeDataHolder(event: ChangeDataHolderEvent.ValueChange, @Getter("getTargetHolder") @Has(SneakingData::class) player: Player) {
         //detects if changed data is sneak
         event.endResult.successfulData
-                        .filter { it.key == Keys.IS_SNEAKING }
-                        .forEach { scope(player,!player[Keys.IS_SNEAKING].get()) }
+                .filter { it.key == Keys.IS_SNEAKING }
+                .forEach { scope(player, !player[Keys.IS_SNEAKING].get()) }
     }
 
     @Listener
@@ -244,8 +244,8 @@ class Gun {
     private fun enterScope(player: Player, itemStack: ItemStack, gun: Gun) {
         player.offer(Keys.WALKING_SPEED, -10.0)
         if (!itemStack[DataScope.key].get()) {
-            itemStack.offer(Keys.ITEM_DURABILITY, gun.type.id.toInt() +1)
-            itemStack.transform(DataScope.key) {true}
+            itemStack.offer(Keys.ITEM_DURABILITY, gun.type.id.toInt() + 1)
+            itemStack.transform(DataScope.key) { true }
             player.setItemInHand(HandTypes.MAIN_HAND, itemStack)
         }
     }
@@ -253,7 +253,7 @@ class Gun {
     private fun resetScope(player: Player, itemStack: ItemStack, gun: Gun, handType: HandType) {
         if (itemStack[DataScope.key].get()) {
             itemStack.offer(Keys.ITEM_DURABILITY, gun.type.id.toInt())
-            itemStack.transform(DataScope.key) {false}
+            itemStack.transform(DataScope.key) { false }
             player.offer(Keys.WALKING_SPEED, 0.1)
             player.setItemInHand(handType, itemStack)
         }

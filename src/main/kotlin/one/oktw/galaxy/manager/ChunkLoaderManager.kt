@@ -36,8 +36,8 @@ class ChunkLoaderManager {
         launch {
             val chunkPos = location.chunkPosition
             val chunkList = HashSet<Vector3i>()
-            (chunkPos.x - range..chunkPos.x + range).forEach { x ->
-                (chunkPos.z - range..chunkPos.z + range).forEach { z ->
+            for (x in chunkPos.x - range..chunkPos.x + range) {
+                for (z in chunkPos.z - range..chunkPos.z + range) {
                     chunkList.add(Vector3i(x, 0, z))
                 }
             }
@@ -88,7 +88,7 @@ class ChunkLoaderManager {
 
     suspend fun changeRange(uuid: UUID, range: Short) {
         val chunkLoader = collection.find(eq("uuid", uuid)).firstOrNull() ?: return
-        val planet = galaxyManager.getPlanet(chunkLoader.position.planet!!).await() ?: return
+        val planet = chunkLoader.position.planet?.let { galaxyManager.getPlanet(it).await() } ?: return
 
         chunkLoader.range = range
         collection.replaceOne(eq("uuid", chunkLoader.uuid), chunkLoader)

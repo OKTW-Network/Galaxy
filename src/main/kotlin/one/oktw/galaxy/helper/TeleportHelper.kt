@@ -20,24 +20,24 @@ class TeleportHelper {
         }
 
         suspend fun teleport(player: Player, location: Location<World>, safety: Boolean): Boolean {
-            val planet = galaxyManager.getPlanetFromWorld(location.extent.uniqueId).await() ?: return false
-
             if (!checkValid(player, location)) return false
 
-            if (PlanetHelper.loadPlanet(planet).isPresent) {
-                val result = if (safety) player.setLocationSafely(location) else player.setLocation(location)
+            galaxyManager.getPlanetFromWorld(location.extent.uniqueId).await()?.let {
+                if (PlanetHelper.loadPlanet(it).isPresent) {
+                    val result = if (safety) player.setLocationSafely(location) else player.setLocation(location)
 
-                if (result) {
-                    travelerManager.updateTraveler(player)
+                    if (result) {
+                        travelerManager.updateTraveler(player)
 
-                    if (planet.checkPermission(player) == VIEW) {
-                        viewerManager.setViewer(player.uniqueId)
-                    } else {
-                        viewerManager.removeViewer(player.uniqueId)
+                        if (it.checkPermission(player) == VIEW) {
+                            viewerManager.setViewer(player.uniqueId)
+                        } else {
+                            viewerManager.removeViewer(player.uniqueId)
+                        }
                     }
-                }
 
-                return result
+                    return result
+                }
             }
 
             return false

@@ -61,7 +61,6 @@ class Main {
     lateinit var plugin: PluginContainer
 
     @Listener
-
     fun construct(event: GameConstructionEvent) {
         main = this
     }
@@ -79,7 +78,6 @@ class Main {
                 .dataClass(DataOverheat::class.java).immutableClass(DataOverheat.Immutable::class.java)
                 .builder(DataOverheat.Builder())
                 .buildAndRegister(plugin)
-
         DataRegistration.builder()
                 .dataName("Scoping").manipulatorId("scoping")
                 .dataClass(DataScope::class.java).immutableClass(DataScope.Immutable::class.java)

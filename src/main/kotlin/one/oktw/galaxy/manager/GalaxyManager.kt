@@ -20,7 +20,7 @@ class GalaxyManager {
     private val galaxyCollection = databaseManager.database.getCollection("Galaxy", Galaxy::class.java)
 
     fun createGalaxy(name: String, creator: Player, vararg members: UUID): Galaxy {
-        val memberList = listOf(*members).parallelStream()
+        val memberList = members.toSet().parallelStream()
                 .map { member -> Member(member, MEMBER) }
                 .collect(toList())
         memberList += Member(creator.uniqueId, ADMIN)
@@ -36,7 +36,7 @@ class GalaxyManager {
     suspend fun deleteGalaxy(uuid: UUID) {
         getGalaxy(uuid).await().ifPresent {
             it.planets.forEach {
-                PlanetHelper.removePlanet(it.world!!)
+                it.world?.let { PlanetHelper.removePlanet(it) }
             }
         }
 
@@ -45,7 +45,7 @@ class GalaxyManager {
 
     fun getGalaxy(uuid: UUID) = async { Optional.ofNullable(galaxyCollection.find(eq("uuid", uuid)).first()) }
 
-    fun getGalaxy(planet: Planet) = galaxyCollection.find(eq("planets.uuid", planet.uuid)).first()!!
+    fun getGalaxy(planet: Planet): Galaxy = galaxyCollection.find(eq("planets.uuid", planet.uuid)).first()
 
     fun listGalaxy() = async { galaxyCollection.find().iterator() }
 

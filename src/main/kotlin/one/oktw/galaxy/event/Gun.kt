@@ -6,12 +6,17 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.EntityDamageSource
 import one.oktw.galaxy.Main.Companion.travelerManager
+import one.oktw.galaxy.data.DataScope
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.WeaponUpgradeType.*
 import one.oktw.galaxy.helper.CoolDownHelper
 import one.oktw.galaxy.types.item.Gun
 import org.spongepowered.api.block.BlockTypes.*
+import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData
 import org.spongepowered.api.data.property.entity.EyeLocationProperty
+import org.spongepowered.api.data.type.HandType
+import org.spongepowered.api.data.type.HandTypes
 import org.spongepowered.api.effect.particle.ParticleEffect
 import org.spongepowered.api.effect.particle.ParticleTypes
 import org.spongepowered.api.effect.sound.SoundCategories
@@ -23,9 +28,14 @@ import org.spongepowered.api.entity.living.monster.Boss
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource
+import org.spongepowered.api.event.data.ChangeDataHolderEvent
 import org.spongepowered.api.event.filter.Getter
+import org.spongepowered.api.event.filter.data.Has
+import org.spongepowered.api.event.filter.type.Include
+import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
 import org.spongepowered.api.item.ItemTypes
+import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.util.blockray.BlockRay
 import java.lang.Math.random
 import java.util.Arrays.asList
@@ -153,12 +163,99 @@ class Gun {
         }
 
         // Play gun sound
-        world.playSound(
-                SoundType.of("gun.shot"),
-                SoundCategories.PLAYER,
-                source,
-                1.0,
-                1 + random() / 10 - random() / 10
-        )
+        if (itemStack.type == ItemTypes.WOODEN_SWORD) {
+            world.playSound(
+                    SoundType.of("gun.shot"),
+                    SoundCategories.PLAYER,
+                    source,
+                    1.0,
+                    1 + random() / 10 - random() / 10
+            )
+        } else if (itemStack.type == ItemTypes.IRON_SWORD) {
+            world.playSound(
+                    SoundType.of("entity.blaze.hurt"),
+                    SoundCategories.PLAYER,
+                    source,
+                    1.0,
+                    2.0
+            )
+            world.playSound(
+                    SoundType.of("entity.firework.blast"),
+                    SoundCategories.PLAYER,
+                    source,
+                    1.0,
+                    0.0
+            )
+            world.playSound(
+                    SoundType.of("block.piston.extend"),
+                    SoundCategories.PLAYER,
+                    source,
+                    1.0,
+                    2.0
+            )
+        }
+
+    }
+
+    @Listener
+    @Suppress("unused", "UNUSED_PARAMETER")
+    fun onChangeDataHolder(event: ChangeDataHolderEvent.ValueChange, @Getter("getTargetHolder") @Has(SneakingData::class) player: Player) {
+        //detects if changed data is sneak
+        event.endResult.successfulData
+                        .filter { it.key == Keys.IS_SNEAKING }
+                        .forEach { scope(player,!player[Keys.IS_SNEAKING].get()) }
+    }
+
+    @Listener
+    @Include(ChangeInventoryEvent.Held::class, ChangeInventoryEvent.SwapHand::class)
+    @Suppress("unused", "UNUSED_PARAMETER")
+    fun onChangeInventory(event: ChangeInventoryEvent, @Getter("getSource") player: Player) {
+        scope(player, player[Keys.IS_SNEAKING].get())
+    }
+
+    private fun scope(player: Player, sneaking: Boolean) {
+        player.offer(Keys.WALKING_SPEED, 0.1)
+        player.getItemInHand(HandTypes.OFF_HAND).ifPresent {
+            if (it.type == ItemTypes.IRON_SWORD && it[DataUUID.key].isPresent) {
+                val offHandItem = it
+                val gun = travelerManager.getTraveler(player).item
+                        .filter { it is Gun }
+                        .find { it.uuid == offHandItem[DataUUID.key].get() } as Gun? ?: return@ifPresent
+
+                resetScope(player, offHandItem, gun, HandTypes.OFF_HAND)
+            }
+        }
+
+        player.getItemInHand(HandTypes.MAIN_HAND).ifPresent {
+            val itemStack = it
+            if (itemStack.type != ItemTypes.IRON_SWORD || !itemStack[DataUUID.key].isPresent) return@ifPresent
+            val gun = travelerManager.getTraveler(player).item
+                    .filter { it is Gun }
+                    .find { it.uuid == itemStack[DataUUID.key].get() } as? Gun ?: return@ifPresent
+            if (sneaking && itemStack.type == ItemTypes.IRON_SWORD) {
+                enterScope(player, itemStack, gun)
+            }
+            if (!sneaking && itemStack.type == ItemTypes.IRON_SWORD) {
+                resetScope(player, itemStack, gun, HandTypes.MAIN_HAND)
+            }
+        }
+    }
+
+    private fun enterScope(player: Player, itemStack: ItemStack, gun: Gun) {
+        player.offer(Keys.WALKING_SPEED, -10.0)
+        if (!itemStack[DataScope.key].get()) {
+            itemStack.offer(Keys.ITEM_DURABILITY, gun.type.id.toInt() +1)
+            itemStack.transform(DataScope.key) {true}
+            player.setItemInHand(HandTypes.MAIN_HAND, itemStack)
+        }
+    }
+
+    private fun resetScope(player: Player, itemStack: ItemStack, gun: Gun, handType: HandType) {
+        if (itemStack[DataScope.key].get()) {
+            itemStack.offer(Keys.ITEM_DURABILITY, gun.type.id.toInt())
+            itemStack.transform(DataScope.key) {false}
+            player.offer(Keys.WALKING_SPEED, 0.1)
+            player.setItemInHand(handType, itemStack)
+        }
     }
 }

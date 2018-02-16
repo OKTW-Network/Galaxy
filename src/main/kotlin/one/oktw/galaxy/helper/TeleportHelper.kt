@@ -23,20 +23,16 @@ class TeleportHelper {
             if (!checkValid(player, location)) return false
 
             galaxyManager.getPlanetFromWorld(location.extent.uniqueId).await()?.let {
-                if (PlanetHelper.loadPlanet(it).isPresent) {
-                    val result = if (safety) player.setLocationSafely(location) else player.setLocation(location)
+                it.loadWorld().orElse(null) ?: return@let
 
-                    if (result) {
-                        travelerManager.updateTraveler(player)
+                val result = if (safety) player.setLocationSafely(location) else player.setLocation(location)
+                if (!result) return@let
 
-                        if (it.checkPermission(player) == VIEW) {
-                            viewerManager.setViewer(player.uniqueId)
-                        } else {
-                            viewerManager.removeViewer(player.uniqueId)
-                        }
-                    }
-
-                    return result
+                travelerManager.updateTraveler(player)
+                if (it.checkPermission(player) == VIEW) {
+                    viewerManager.setViewer(player.uniqueId)
+                } else {
+                    viewerManager.removeViewer(player.uniqueId)
                 }
             }
 

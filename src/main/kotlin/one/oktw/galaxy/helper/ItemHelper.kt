@@ -1,5 +1,8 @@
 package one.oktw.galaxy.helper
 
+import net.minecraft.entity.SharedMonsterAttributes
+import net.minecraft.entity.ai.attributes.AttributeModifier
+import net.minecraft.inventory.EntityEquipmentSlot
 import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataScope
 import one.oktw.galaxy.data.DataUUID
@@ -18,9 +21,20 @@ class ItemHelper {
     companion object {
         fun getItem(item: ItemBase): Optional<ItemStack> {
             return when (item) {
-                is Gun -> Optional.of(getGun(item))
+                is Gun -> Optional.of(removeCoolDown(getGun(item)))
                 else -> Optional.empty()
             }
+        }
+
+        private fun removeCoolDown(itemStack: ItemStack): ItemStack {
+            @Suppress("CAST_NEVER_SUCCEEDS")
+            (itemStack as net.minecraft.item.ItemStack).addAttributeModifier(
+                    SharedMonsterAttributes.ATTACK_SPEED.name,
+                    AttributeModifier("Weapon modifier", 0.0, 0),
+                    EntityEquipmentSlot.MAINHAND
+            )
+
+            return itemStack
         }
 
         private fun getGun(gun: Gun): ItemStack {
@@ -44,7 +58,16 @@ class ItemHelper {
                 }
             }
 
-            return item.build()
+            val itemStack = item.build()
+
+            @Suppress("CAST_NEVER_SUCCEEDS")
+            (itemStack as net.minecraft.item.ItemStack).addAttributeModifier(
+                    SharedMonsterAttributes.ATTACK_DAMAGE.name,
+                    AttributeModifier("Weapon modifier", 1.0, 0),
+                    EntityEquipmentSlot.MAINHAND
+            )
+
+            return itemStack
         }
     }
 }

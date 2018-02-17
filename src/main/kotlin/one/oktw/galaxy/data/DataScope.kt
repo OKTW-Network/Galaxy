@@ -14,7 +14,7 @@ import org.spongepowered.api.data.value.mutable.Value
 import org.spongepowered.api.util.TypeTokens
 import java.util.*
 
-class DataScope(scoping: Boolean) : AbstractBooleanData<DataScope, DataScope.Immutable>(scoping, key, false) {
+class DataScope(scoping: Boolean = false) : AbstractBooleanData<DataScope, DataScope.Immutable>(scoping, key, false) {
     companion object {
         val key: Key<Value<Boolean>> = Key.builder()
                 .type(TypeTokens.BOOLEAN_VALUE_TOKEN)
@@ -42,7 +42,7 @@ class DataScope(scoping: Boolean) : AbstractBooleanData<DataScope, DataScope.Imm
         return Optional.of(this)
     }
 
-    class Immutable(scoping: Boolean) : AbstractImmutableBooleanData<Immutable, DataScope>(scoping, key, false) {
+    class Immutable(scoping: Boolean = false) : AbstractImmutableBooleanData<Immutable, DataScope>(scoping, key, false) {
         override fun getContentVersion() = 1
         override fun asMutable() = DataScope(value)
     }

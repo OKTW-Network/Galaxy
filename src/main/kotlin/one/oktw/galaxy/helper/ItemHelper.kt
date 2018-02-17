@@ -1,5 +1,6 @@
 package one.oktw.galaxy.helper
 
+import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataScope
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.types.item.Gun
@@ -26,6 +27,7 @@ class ItemHelper {
             val item = ItemStack.builder()
                     .itemType(gun.type.item)
                     .itemData(DataUUID.Immutable(gun.uuid))
+                    .itemData(DataOverheat())
                     .add(Keys.UNBREAKABLE, true)
                     .add(Keys.HIDE_UNBREAKABLE, true)
                     .add(Keys.HIDE_MISCELLANEOUS, true)
@@ -37,7 +39,7 @@ class ItemHelper {
                 WOODEN_SWORD -> item.add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.AQUA, "Laser Gun"))
 
                 IRON_SWORD -> {
-                    item.itemData(DataScope(false))
+                    item.itemData(DataScope())
                     item.add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.GOLD, "Sniper"))
                 }
             }

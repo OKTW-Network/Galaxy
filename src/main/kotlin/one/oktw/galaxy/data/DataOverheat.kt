@@ -14,7 +14,7 @@ import org.spongepowered.api.data.value.mutable.Value
 import org.spongepowered.api.util.TypeTokens
 import java.util.*
 
-class DataOverheat(overheat: Boolean) : AbstractBooleanData<DataOverheat, DataOverheat.Immutable>(overheat, key, false) {
+class DataOverheat(overheat: Boolean = false) : AbstractBooleanData<DataOverheat, DataOverheat.Immutable>(overheat, key, false) {
     companion object {
         val key: Key<Value<Boolean>> = Key.builder()
                 .type(TypeTokens.BOOLEAN_VALUE_TOKEN)
@@ -42,7 +42,7 @@ class DataOverheat(overheat: Boolean) : AbstractBooleanData<DataOverheat, DataOv
         return Optional.of(this)
     }
 
-    class Immutable(overheat: Boolean) : AbstractImmutableBooleanData<Immutable, DataOverheat>(overheat, key, false) {
+    class Immutable(overheat: Boolean = false) : AbstractImmutableBooleanData<Immutable, DataOverheat>(overheat, key, false) {
         override fun getContentVersion() = 1
         override fun asMutable() = DataOverheat(value)
     }

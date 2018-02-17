@@ -194,7 +194,6 @@ class Gun {
                     2.0
             )
         }
-
     }
 
     @Listener

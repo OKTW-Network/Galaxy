@@ -16,7 +16,6 @@ import org.spongepowered.api.block.BlockTypes.*
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData
 import org.spongepowered.api.data.property.entity.EyeLocationProperty
-import org.spongepowered.api.data.type.HandType
 import org.spongepowered.api.data.type.HandTypes
 import org.spongepowered.api.effect.particle.ParticleEffect
 import org.spongepowered.api.effect.particle.ParticleTypes
@@ -87,17 +86,28 @@ class Gun {
     @Listener
     @Suppress("unused", "UNUSED_PARAMETER")
     fun onChangeDataHolder(event: ChangeDataHolderEvent.ValueChange, @Getter("getTargetHolder") @Has(SneakingData::class) player: Player) {
-        //detects if changed data is sneak
-        event.endResult.successfulData
-                .filter { it.key == Keys.IS_SNEAKING }
-                .forEach { scope(player, !player[Keys.IS_SNEAKING].get()) }
+        player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataScope.key].isPresent }.ifPresent {
+            val sneak: Boolean = event.endResult.successfulData.firstOrNull { it.key == Keys.IS_SNEAKING }?.get() as Boolean?
+                    ?: player[Keys.IS_SNEAKING].get()
+            if (it[DataScope.key].get() != sneak) {
+                player.setItemInHand(HandTypes.MAIN_HAND, toggleScope(it))
+            }
+        }
     }
 
     @Listener
     @Include(ChangeInventoryEvent.Held::class, ChangeInventoryEvent.SwapHand::class)
     @Suppress("unused", "UNUSED_PARAMETER")
     fun onChangeInventory(event: ChangeInventoryEvent, @Getter("getSource") player: Player) {
-        scope(player, player[Keys.IS_SNEAKING].get())
+        player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataScope.key].isPresent }.ifPresent {
+            if (it[DataScope.key].get() != player[Keys.IS_SNEAKING].get()) {
+                player.setItemInHand(HandTypes.MAIN_HAND, toggleScope(it))
+            }
+        }
+
+        player.getItemInHand(HandTypes.OFF_HAND).filter { it[DataScope.key].isPresent }.ifPresent {
+            if (it[DataScope.key].get()) player.setItemInHand(HandTypes.OFF_HAND, toggleScope(it))
+        }
     }
 
     private fun doUpgrade(gun: Gun) {
@@ -243,49 +253,12 @@ class Gun {
         }
     }
 
-    private fun scope(player: Player, sneaking: Boolean) {
-        player.offer(Keys.WALKING_SPEED, 0.1)
-        player.getItemInHand(HandTypes.OFF_HAND).ifPresent {
-            if (it.type == IRON_SWORD && it[DataUUID.key].isPresent) {
-                val offHandItem = it
-                val gun = travelerManager.getTraveler(player).item
-                        .filter { it is Gun }
-                        .find { it.uuid == offHandItem[DataUUID.key].get() } as Gun? ?: return@ifPresent
-
-                resetScope(player, offHandItem, gun, HandTypes.OFF_HAND)
-            }
+    private fun toggleScope(item: ItemStack): ItemStack {
+        item.transform(Keys.ITEM_DURABILITY) {
+            if (item[DataScope.key].get()) it - 1 else it + 1
         }
+        item.transform(DataScope.key) { !it }
 
-        player.getItemInHand(HandTypes.MAIN_HAND).ifPresent {
-            val itemStack = it
-            if (itemStack.type != IRON_SWORD || !itemStack[DataUUID.key].isPresent) return@ifPresent
-            val gun = travelerManager.getTraveler(player).item
-                    .filter { it is Gun }
-                    .find { it.uuid == itemStack[DataUUID.key].get() } as? Gun ?: return@ifPresent
-            if (sneaking && itemStack.type == IRON_SWORD) {
-                enterScope(player, itemStack, gun)
-            }
-            if (!sneaking && itemStack.type == IRON_SWORD) {
-                resetScope(player, itemStack, gun, HandTypes.MAIN_HAND)
-            }
-        }
-    }
-
-    private fun enterScope(player: Player, itemStack: ItemStack, gun: Gun) {
-        player.offer(Keys.WALKING_SPEED, -10.0)
-        if (!itemStack[DataScope.key].get()) {
-            itemStack.offer(Keys.ITEM_DURABILITY, gun.type.id.toInt() + 1)
-            itemStack.transform(DataScope.key) { true }
-            player.setItemInHand(HandTypes.MAIN_HAND, itemStack)
-        }
-    }
-
-    private fun resetScope(player: Player, itemStack: ItemStack, gun: Gun, handType: HandType) {
-        if (itemStack[DataScope.key].get()) {
-            itemStack.offer(Keys.ITEM_DURABILITY, gun.type.id.toInt())
-            itemStack.transform(DataScope.key) { false }
-            player.offer(Keys.WALKING_SPEED, 0.1)
-            player.setItemInHand(handType, itemStack)
-        }
+        return item
     }
 }

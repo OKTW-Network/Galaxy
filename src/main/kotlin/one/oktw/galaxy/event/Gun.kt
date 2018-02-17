@@ -58,11 +58,13 @@ class Gun {
                 .find { it.uuid == itemStack[DataUUID.key].get() } as? Gun ?: return).copy()
         val source = player.getProperty(EyeLocationProperty::class.java)
                 .map(EyeLocationProperty::getValue).orElse(null) ?: return
-        val direction = Quaterniond.fromAxesAnglesDeg(player.rotation.x, -player.rotation.y, player.rotation.z).direction
+        var direction = Quaterniond.fromAxesAnglesDeg(player.rotation.x, -player.rotation.y, player.rotation.z).direction
 
         doUpgrade(gun)
 
         if (checkOverheat(world, source, gun)) return
+
+        itemStack[DataScope.key].filter { !it }.ifPresent { direction = drift(direction) }
 
         val target = getTarget(world, source, direction, gun.range)
         val wall = getWall(
@@ -92,6 +94,8 @@ class Gun {
             if (it[DataScope.key].get() != sneak) {
                 player.setItemInHand(HandTypes.MAIN_HAND, toggleScope(it))
             }
+
+            if (sneak) player.offer(Keys.WALKING_SPEED, -10.0) else player.offer(Keys.WALKING_SPEED, 0.1)
         }
     }
 
@@ -99,15 +103,25 @@ class Gun {
     @Include(ChangeInventoryEvent.Held::class, ChangeInventoryEvent.SwapHand::class)
     @Suppress("unused", "UNUSED_PARAMETER")
     fun onChangeInventory(event: ChangeInventoryEvent, @Getter("getSource") player: Player) {
-        player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataScope.key].isPresent }.ifPresent {
-            if (it[DataScope.key].get() != player[Keys.IS_SNEAKING].get()) {
+        val mainHand = player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataScope.key].isPresent }.orElse(null)
+        mainHand?.let {
+            val sneak = player[Keys.IS_SNEAKING].get()
+            if (it[DataScope.key].get() != sneak) {
                 player.setItemInHand(HandTypes.MAIN_HAND, toggleScope(it))
             }
+
+            if (sneak) player.offer(Keys.WALKING_SPEED, -10.0) else player.offer(Keys.WALKING_SPEED, 0.1)
         }
+
+        if (mainHand == null) player.offer(Keys.WALKING_SPEED, 0.1)
 
         player.getItemInHand(HandTypes.OFF_HAND).filter { it[DataScope.key].isPresent }.ifPresent {
             if (it[DataScope.key].get()) player.setItemInHand(HandTypes.OFF_HAND, toggleScope(it))
         }
+    }
+
+    private fun drift(direction: Vector3d): Vector3d {
+        return direction.mul(10.0).add(Math.random(), Math.random(), Math.random()).sub(Math.random(), Math.random(), Math.random()).div(10.0)
     }
 
     private fun doUpgrade(gun: Gun) {

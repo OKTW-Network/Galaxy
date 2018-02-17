@@ -56,15 +56,17 @@ class Gun {
         val gun = (travelerManager.getTraveler(player).item
                 .filter { it is Gun }
                 .find { it.uuid == itemStack[DataUUID.key].get() } as? Gun ?: return).copy()
-        val source = player.getProperty(EyeLocationProperty::class.java)
-                .map(EyeLocationProperty::getValue).orElse(null) ?: return
         var direction = Quaterniond.fromAxesAnglesDeg(player.rotation.x, -player.rotation.y, player.rotation.z).direction
+        val source = player.getProperty(EyeLocationProperty::class.java)
+                .map(EyeLocationProperty::getValue).orElse(null)?.add(direction) ?: return
 
         doUpgrade(gun)
 
         if (checkOverheat(world, source, gun)) return
 
-        itemStack[DataScope.key].filter { !it }.ifPresent { direction = drift(direction) }
+        if (!player[Keys.IS_SNEAKING].get()) {
+            direction = drift(direction)
+        }
 
         val target = getTarget(world, source, direction, gun.range)
         val wall = getWall(
@@ -220,9 +222,10 @@ class Gun {
             2 -> line.abs().z.div(0.3)
             else -> 10.0
         }
-        var pos = source.add(line.div(interval / 4))
+        var pos = source
+//                .add(line.div(interval / 4))
 
-        for (i in 4..interval.roundToInt()) {
+        for (i in 0..interval.roundToInt()) {
             world.spawnParticles(
                     ParticleEffect.builder()
                             .type(ParticleTypes.MAGIC_CRITICAL_HIT)

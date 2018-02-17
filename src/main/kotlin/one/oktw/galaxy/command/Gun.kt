@@ -1,11 +1,10 @@
 package one.oktw.galaxy.command
 
 import one.oktw.galaxy.Main.Companion.travelerManager
-import one.oktw.galaxy.data.DataOverheat
-import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.GunType
 import one.oktw.galaxy.enums.WeaponUpgradeType.THROUGH
 import one.oktw.galaxy.helper.CoolDownHelper
+import one.oktw.galaxy.helper.ItemHelper
 import one.oktw.galaxy.types.Upgrade
 import one.oktw.galaxy.types.item.Gun
 import org.spongepowered.api.command.CommandResult
@@ -13,14 +12,9 @@ import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
 import org.spongepowered.api.command.args.GenericArguments
 import org.spongepowered.api.command.spec.CommandSpec
-import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.HandTypes
 import org.spongepowered.api.entity.living.player.Player
-import org.spongepowered.api.item.ItemTypes
-import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.format.TextColors
-import org.spongepowered.api.text.format.TextStyles
 
 class Gun : CommandBase {
     override val spec: CommandSpec
@@ -47,7 +41,7 @@ class Gun : CommandBase {
                             GenericArguments.doubleNum(Text.of("Damage")),
                             GenericArguments.optional(GenericArguments.integer(Text.of("Cooling")), 1),
                             GenericArguments.optional(GenericArguments.integer(Text.of("Through"))),
-                            GenericArguments.optional(GenericArguments.enumValue(Text.of("Type"), GunType::class.java), GunType.ORIGIN)
+                            GenericArguments.optional(GenericArguments.enumValue(Text.of("Type"), GunType::class.java), GunType.PISTOL_ORIGIN)
                     )
                     .build()
 
@@ -67,20 +61,7 @@ class Gun : CommandBase {
                 traveler.item.add(gun)
                 traveler.save()
 
-                val item = ItemStack.builder()
-                        .itemType(ItemTypes.WOODEN_SWORD)
-                        .itemData(DataUUID.Immutable(gun.uuid))
-                        .itemData(DataOverheat(false))
-                        .add(Keys.UNBREAKABLE, true)
-                        .add(Keys.HIDE_UNBREAKABLE, true)
-                        .add(Keys.HIDE_MISCELLANEOUS, true)
-                        .add(Keys.HIDE_ATTRIBUTES, true)
-                        .add(Keys.HIDE_ENCHANTMENTS, true)
-                        .add(Keys.ITEM_DURABILITY, gun.type.id.toInt())
-                        .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.AQUA, "Laser Gun"))
-                        .build()
-
-                src.setItemInHand(HandTypes.MAIN_HAND, item)
+                src.setItemInHand(HandTypes.MAIN_HAND, ItemHelper.getItem(gun).get())
                 src.sendMessage(Text.of(gun.uuid.toString()))
             }
             return CommandResult.success()
@@ -119,20 +100,7 @@ class Gun : CommandBase {
                 val traveler = travelerManager.getTraveler(src)
                 val gun = traveler.item[args.getOne<Int>("Gun").get()] as? Gun ?: return CommandResult.empty()
 
-                val item = ItemStack.builder()
-                        .itemType(ItemTypes.WOODEN_SWORD)
-                        .itemData(DataUUID.Immutable(gun.uuid))
-                        .itemData(DataOverheat(false))
-                        .add(Keys.UNBREAKABLE, true)
-                        .add(Keys.HIDE_UNBREAKABLE, true)
-                        .add(Keys.HIDE_MISCELLANEOUS, true)
-                        .add(Keys.HIDE_ATTRIBUTES, true)
-                        .add(Keys.HIDE_ENCHANTMENTS, true)
-                        .add(Keys.ITEM_DURABILITY, gun.type.id.toInt())
-                        .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.AQUA, "Laser Gun"))
-                        .build()
-
-                src.setItemInHand(HandTypes.MAIN_HAND, item)
+                src.setItemInHand(HandTypes.MAIN_HAND, ItemHelper.getItem(gun).get())
                 src.sendMessage(Text.of(gun.uuid.toString()))
             }
             return CommandResult.success()

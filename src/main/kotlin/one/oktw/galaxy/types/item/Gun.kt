@@ -8,7 +8,7 @@ import java.util.*
 @BsonDiscriminator
 data class Gun(
         override val uuid: UUID = UUID.randomUUID(),
-        var type: GunType = GunType.ORIGIN,
+        var type: GunType = GunType.PISTOL_ORIGIN,
         var maxTemp: Int = 100,
         var heat: Int = 10,
         var cooling: Int = 1,

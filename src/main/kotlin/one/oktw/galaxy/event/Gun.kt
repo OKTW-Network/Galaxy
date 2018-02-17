@@ -71,7 +71,7 @@ class Gun {
         val target = getTarget(world, source, direction, gun.range)
         val wall = getWall(
                 world,
-                source,
+                source.sub(direction),
                 direction,
                 if (!target.isEmpty()) target.first().intersection.distance(source) else gun.range
         )

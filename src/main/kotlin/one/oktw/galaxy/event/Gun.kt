@@ -3,9 +3,11 @@ package one.oktw.galaxy.event
 import com.flowpowered.math.imaginary.Quaterniond
 import com.flowpowered.math.vector.Vector3d
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.EntityDamageSource
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataScope
 import one.oktw.galaxy.data.DataUUID
@@ -38,6 +40,7 @@ import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.ItemTypes.IRON_SWORD
 import org.spongepowered.api.item.ItemTypes.WOODEN_SWORD
 import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.util.blockray.BlockRay
 import org.spongepowered.api.world.World
 import org.spongepowered.api.world.extent.EntityUniverse.EntityHit
@@ -53,38 +56,41 @@ class Gun {
         if (itemStack.type !in asList(WOODEN_SWORD, IRON_SWORD) || !itemStack[DataUUID.key].isPresent) return
 
         val world = player.world
-        val gun = (travelerManager.getTraveler(player).item
-                .filter { it is Gun }
-                .find { it.uuid == itemStack[DataUUID.key].get() } as? Gun ?: return).copy()
         var direction = Quaterniond.fromAxesAnglesDeg(player.rotation.x, -player.rotation.y, player.rotation.z).direction
         val source = player.getProperty(EyeLocationProperty::class.java)
                 .map(EyeLocationProperty::getValue).orElse(null)?.add(direction) ?: return
 
-        doUpgrade(gun)
+        launch {
+            val gun = (travelerManager.getTraveler(player).item
+                    .filter { it is Gun }
+                    .find { it.uuid == itemStack[DataUUID.key].get() } as? Gun ?: return@launch).copy()
 
-        if (checkOverheat(world, source, gun)) return
+            doUpgrade(gun).await()
 
-        if (!player[Keys.IS_SNEAKING].get()) {
-            direction = drift(direction)
+            if (checkOverheat(world, source, gun).await()) return@launch
+
+            if (!player[Keys.IS_SNEAKING].get()) {
+                direction = drift(direction)
+            }
+
+            val target = getTarget(world, source, direction, gun.range).await()
+            val wall = getWall(
+                    world,
+                    source.sub(direction),
+                    direction,
+                    if (!target.isEmpty()) target.first().intersection.distance(source) else gun.range
+            ).await()
+
+            if (!target.isEmpty() && !wall.hasNext()) Task.builder().execute { _ -> damageEntity(player, source, gun, target) }.submit(main)
+
+            showTrajectory(world, source, when {
+                wall.hasNext() -> wall.next().position.sub(source)
+                !target.isEmpty() -> target.first().intersection.sub(source)
+                else -> direction.mul(gun.range)
+            })
+
+            playShotSound(world, source, itemStack.type)
         }
-
-        val target = getTarget(world, source, direction, gun.range)
-        val wall = getWall(
-                world,
-                source.sub(direction),
-                direction,
-                if (!target.isEmpty()) target.first().intersection.distance(source) else gun.range
-        )
-
-        if (!target.isEmpty() && !wall.hasNext()) damageEntity(player, source, gun, target)
-
-        showTrajectory(world, source, when {
-            wall.hasNext() -> wall.next().position.sub(source)
-            !target.isEmpty() -> target.first().intersection.sub(source)
-            else -> direction.mul(gun.range)
-        })
-
-        playShotSound(world, source, itemStack.type)
     }
 
     @Listener
@@ -126,7 +132,7 @@ class Gun {
         return direction.mul(10.0).add(Math.random(), Math.random(), Math.random()).sub(Math.random(), Math.random(), Math.random()).div(10.0)
     }
 
-    private fun doUpgrade(gun: Gun) {
+    private fun doUpgrade(gun: Gun) = async {
         gun.upgrade.forEach {
             when (it.type) {
                 DAMAGE -> gun.damage += it.level * 3
@@ -138,24 +144,24 @@ class Gun {
         }
     }
 
-    private fun checkOverheat(world: World, source: Vector3d, gun: Gun): Boolean {
+    private fun checkOverheat(world: World, source: Vector3d, gun: Gun) = async {
         var heatStatus = CoolDownHelper.getCoolDown(gun.uuid)
         if (heatStatus == null) {
             heatStatus = CoolDownHelper.HeatStatus(gun.uuid, max = gun.maxTemp, cooling = gun.cooling)
             CoolDownHelper.addCoolDown(heatStatus)
         }
 
-        if (heatStatus.isOverheat()) return true
+        if (heatStatus.isOverheat()) return@async true
 
         if (heatStatus.addHeat(gun.heat)) {
             world.playSound(SoundType.of("gun.overheat"), SoundCategories.PLAYER, source, 1.0)
         }
 
-        return false
+        return@async false
     }
 
-    private fun getTarget(world: World, source: Vector3d, direction: Vector3d, range: Double): Set<EntityHit> {
-        return world.getIntersectingEntities(
+    private fun getTarget(world: World, source: Vector3d, direction: Vector3d, range: Double) = async {
+        world.getIntersectingEntities(
                 source,
                 direction,
                 range,
@@ -163,8 +169,8 @@ class Gun {
         )
     }
 
-    private fun getWall(world: World, source: Vector3d, direction: Vector3d, range: Double): BlockRay<World> {
-        return BlockRay.from(world, source)
+    private fun getWall(world: World, source: Vector3d, direction: Vector3d, range: Double) = async {
+        BlockRay.from(world, source)
                 .direction(direction)
                 .distanceLimit(range)
                 .skipFilter {

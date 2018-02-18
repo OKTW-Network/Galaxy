@@ -16,23 +16,19 @@ import org.spongepowered.api.event.network.ClientConnectionEvent
 @Suppress("unused", "UNUSED_PARAMETER")
 class TravelerWatcher {
     @Listener
-    fun onJoin(event: ClientConnectionEvent.Join, @Getter("getTargetEntity") player: Player) {
-        launch {
-            val planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId).await() ?: return@launch
-            when (planet.checkPermission(player)) {
-                MODIFY -> return@launch
-                VIEW -> viewerManager.setViewer(player.uniqueId)
-                DENY -> Sponge.getServer().defaultWorld.ifPresent { player.transferToWorld(it.uniqueId, it.spawnPosition.toDouble()) }
-            }
+    fun onJoin(event: ClientConnectionEvent.Join, @Getter("getTargetEntity") player: Player) = launch {
+        val planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId).await() ?: return@launch
+        when (planet.checkPermission(player)) {
+            MODIFY -> return@launch
+            VIEW -> viewerManager.setViewer(player.uniqueId)
+            DENY -> Sponge.getServer().defaultWorld.ifPresent { player.transferToWorld(it.uniqueId, it.spawnPosition.toDouble()) }
         }
     }
 
     @Listener
-    fun onDisconnect(event: ClientConnectionEvent.Disconnect, @Getter("getTargetEntity") player: Player) {
-        launch {
-            travelerManager.getTraveler(player).item.forEach { getCoolDown(it.uuid)?.let { removeCoolDown(it) } }
-            travelerManager.updateTraveler(player)
-            viewerManager.removeViewer(player.uniqueId)
-        }
+    fun onDisconnect(event: ClientConnectionEvent.Disconnect, @Getter("getTargetEntity") player: Player) = launch {
+        travelerManager.getTraveler(player).item.forEach { getCoolDown(it.uuid)?.let { removeCoolDown(it) } }
+        travelerManager.updateTraveler(player)
+        viewerManager.removeViewer(player.uniqueId)
     }
 }

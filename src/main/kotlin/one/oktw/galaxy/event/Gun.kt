@@ -40,7 +40,7 @@ import org.spongepowered.api.item.ItemTypes.WOODEN_SWORD
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.util.blockray.BlockRay
 import org.spongepowered.api.world.World
-import org.spongepowered.api.world.extent.EntityUniverse
+import org.spongepowered.api.world.extent.EntityUniverse.EntityHit
 import java.lang.Math.random
 import java.util.Arrays.asList
 import kotlin.math.roundToInt
@@ -154,7 +154,7 @@ class Gun {
         return false
     }
 
-    private fun getTarget(world: World, source: Vector3d, direction: Vector3d, range: Double): MutableSet<EntityUniverse.EntityHit> {
+    private fun getTarget(world: World, source: Vector3d, direction: Vector3d, range: Double): Set<EntityHit> {
         return world.getIntersectingEntities(
                 source,
                 direction,
@@ -183,7 +183,7 @@ class Gun {
                 }.build()
     }
 
-    private fun damageEntity(player: Player, source: Vector3d, gun: Gun, target: Set<EntityUniverse.EntityHit>) {
+    private fun damageEntity(player: Player, source: Vector3d, gun: Gun, target: Set<EntityHit>) {
         target.stream()
                 .filter { it.entity !is Boss }
                 .sorted { hit1, hit2 -> ((hit1.intersection.distance(source) - hit2.intersection.distance(source)) * 10).roundToInt() }

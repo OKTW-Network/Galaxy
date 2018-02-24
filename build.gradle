@@ -38,7 +38,8 @@ ext.CoroutinesVersion = "0.21.2"
 
 minecraft {
     version = "1.12.2"
-    mappings = "snapshot_20180207"
+    mappings = "snapshot_20180223"
+    makeObfSourceJar = false
 }
 
 dependencies {

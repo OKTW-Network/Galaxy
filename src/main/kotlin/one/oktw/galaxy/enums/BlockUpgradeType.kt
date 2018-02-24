@@ -1,5 +1,5 @@
 package one.oktw.galaxy.enums
 
-enum class BlockUpgradeType {
+enum class BlockUpgradeType : UpgradeType {
     RANGE
 }

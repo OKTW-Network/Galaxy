@@ -15,8 +15,9 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue
 import org.spongepowered.api.data.value.mutable.Value
 import org.spongepowered.api.util.TypeTokens
 import java.util.*
+import java.util.UUID.randomUUID
 
-class DataUUID(uuid: UUID) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutable>(uuid, key) {
+class DataUUID(uuid: UUID = randomUUID()) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutable>(uuid, key) {
     companion object {
         val key: Key<Value<UUID>> = Key.builder()
                 .type(TypeTokens.UUID_VALUE_TOKEN)
@@ -57,7 +58,7 @@ class DataUUID(uuid: UUID) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutab
 
     class Builder : AbstractDataBuilder<DataUUID>(DataUUID::class.java, 1), DataManipulatorBuilder<DataUUID, Immutable> {
         override fun createFrom(dataHolder: DataHolder): Optional<DataUUID> = create().fill(dataHolder)
-        override fun create() = DataUUID(UUID.randomUUID())
+        override fun create() = DataUUID(randomUUID())
         override fun buildContent(container: DataView) = create().from(container.copy())
     }
 }

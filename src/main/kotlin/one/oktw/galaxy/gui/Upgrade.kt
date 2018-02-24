@@ -8,7 +8,6 @@ import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
 import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.item.inventory.property.InventoryDimension
 import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.type.OrderedInventory
 import org.spongepowered.api.text.Text
@@ -19,11 +18,16 @@ class Upgrade(vararg acceptUpgradeType: UpgradeType) {
     private val inventory: Inventory = Inventory.builder()
             .of(InventoryArchetypes.HOPPER)
             .property(InventoryTitle.of(Text.of("Upgrade")))
-            .property(InventoryDimension.of(5, 1))
             .listener(InteractInventoryEvent::class.java) {
                 val item = it.targetInventory.first<Inventory>().first<OrderedInventory>()
                         .mapNotNull { it.peek().orElse(null) }
-                        .mapNotNull { it[DataUpgrade::class.java].orElse(null) }
+                        .map { it[DataUpgrade::class.java].orElse(null) }
+
+                if (item.contains(null)) {
+                    it.isCancelled = true
+                    return@listener
+                }
+
                 val upgrade = HashMap<UpgradeType, Int>()
 
                 val filter = item.sortedBy { it.level }.all {
@@ -48,6 +52,7 @@ class Upgrade(vararg acceptUpgradeType: UpgradeType) {
             .build(main)
 
     fun offer(itemStack: ItemStack) {
+        // TODO
         inventory.offer(itemStack)
     }
 

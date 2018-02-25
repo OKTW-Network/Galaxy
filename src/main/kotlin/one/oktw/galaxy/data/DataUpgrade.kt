@@ -1,8 +1,8 @@
 package one.oktw.galaxy.data
 
 import com.google.common.reflect.TypeToken
-import one.oktw.galaxy.enums.BlockUpgradeType
-import one.oktw.galaxy.enums.BlockUpgradeType.RANGE
+import one.oktw.galaxy.enums.UpgradeType
+import one.oktw.galaxy.enums.UpgradeType.RANGE
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.DataContainer
 import org.spongepowered.api.data.DataHolder
@@ -18,10 +18,10 @@ import org.spongepowered.api.data.value.mutable.Value
 import org.spongepowered.api.util.TypeTokens
 import java.util.*
 
-class DataUpgrade(type: BlockUpgradeType, level: Int) : AbstractData<DataUpgrade, DataUpgrade.Immutable>() {
+class DataUpgrade(type: UpgradeType, level: Int) : AbstractData<DataUpgrade, DataUpgrade.Immutable>() {
     companion object {
-        val TYPE: Key<Value<BlockUpgradeType>> = Key.builder()
-                .type(object : TypeToken<Value<BlockUpgradeType>>() {})
+        val TYPE: Key<Value<UpgradeType>> = Key.builder()
+                .type(object : TypeToken<Value<UpgradeType>>() {})
                 .id("upgrade_type")
                 .name("Upgrade Type")
                 .query(DataQuery.of("upgrade", "type"))
@@ -34,7 +34,7 @@ class DataUpgrade(type: BlockUpgradeType, level: Int) : AbstractData<DataUpgrade
                 .build()
     }
 
-    var type: BlockUpgradeType = type
+    var type: UpgradeType = type
         private set
 
     var level: Int = level
@@ -48,7 +48,7 @@ class DataUpgrade(type: BlockUpgradeType, level: Int) : AbstractData<DataUpgrade
     override fun from(container: DataContainer): Optional<DataUpgrade> {
         if (!container.contains(TYPE, LEVEL)) return Optional.empty()
 
-        type = BlockUpgradeType.valueOf(container.getString(TYPE.query).get())
+        type = UpgradeType.valueOf(container.getString(TYPE.query).get())
         level = container.getInt(LEVEL.query).get()
 
         return Optional.of(this)
@@ -74,7 +74,7 @@ class DataUpgrade(type: BlockUpgradeType, level: Int) : AbstractData<DataUpgrade
         registerFieldSetter(LEVEL) { level = it }
     }
 
-    class Immutable(private val type: BlockUpgradeType, private val level: Int) : AbstractImmutableData<Immutable, DataUpgrade>() {
+    class Immutable(private val type: UpgradeType, private val level: Int) : AbstractImmutableData<Immutable, DataUpgrade>() {
         override fun getContentVersion() = 1
         override fun asMutable() = DataUpgrade(type, level)
         override fun toContainer(): DataContainer = super.toContainer().set(TYPE.query, type.name).set(LEVEL, level)

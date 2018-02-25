@@ -1,3 +1,10 @@
 package one.oktw.galaxy.enums
 
-interface UpgradeType
+enum class UpgradeType {
+    EMPTY,
+    DAMAGE,
+    RANGE,
+    COOLING,
+    HEAT,
+    THROUGH
+}

@@ -11,7 +11,7 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataScope
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.WeaponUpgradeType.*
+import one.oktw.galaxy.enums.UpgradeType.*
 import one.oktw.galaxy.helper.CoolDownHelper
 import one.oktw.galaxy.types.item.Gun
 import org.spongepowered.api.block.BlockTypes.*
@@ -140,6 +140,8 @@ class Gun {
                 COOLING -> gun.cooling += it.level * 2
                 THROUGH -> gun.through += it.level
                 HEAT -> gun.maxTemp += it.level * 5
+                else -> {
+                }
             }
         }
     }

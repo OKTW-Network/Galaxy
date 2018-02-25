@@ -6,6 +6,7 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.UpgradeType
 import one.oktw.galaxy.helper.ItemHelper
+import one.oktw.galaxy.helper.SampleLock
 import one.oktw.galaxy.types.ChunkLoader
 import one.oktw.galaxy.types.item.Upgrade
 import org.spongepowered.api.data.key.Keys
@@ -22,6 +23,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
+import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
@@ -38,6 +40,8 @@ class ChunkLoader(val entity: Entity) {
             .property(InventoryTitle.of(Text.of("ChunkLoader")))
             .listener(InteractInventoryEvent::class.java) {
                 if (it is InteractInventoryEvent.Open || it is InteractInventoryEvent.Close) {
+                    if (it is InteractInventoryEvent.Close) SampleLock.unlock(uuid)
+
                     it.cursorTransaction.setCustom(ItemStackSnapshot.NONE)
                     it.cursorTransaction.isValid = true
                 }
@@ -74,6 +78,7 @@ class ChunkLoader(val entity: Entity) {
     }
 
     fun open(player: Player) {
+        if (!SampleLock.lock(uuid)) return
         this@ChunkLoader.player = player
 
         player.openInventory(this.inventory)
@@ -84,6 +89,8 @@ class ChunkLoader(val entity: Entity) {
 
         UpgradeSlot(chunkLoader.upgrade, UpgradeType.RANGE)
                 .onClose {
+                    SampleLock.unlock(uuid)
+
                     val originLevel = chunkLoader.upgrade.maxBy { it.level }?.level ?: 0
                     val newLevel = it.maxBy { it.level }?.level ?: 0
 
@@ -120,6 +127,6 @@ class ChunkLoader(val entity: Entity) {
 
         location.spawnEntities(itemEntities)
         entity.remove()
-        player.closeInventory()
+        Task.builder().execute { _ -> player.closeInventory() }.submit(main)
     }
 }

@@ -39,9 +39,7 @@ class ChunkLoader {
 
     @Listener
     fun onAttackEntity(event: AttackEntityEvent, @Getter("getTargetEntity") enderCrystal: EnderCrystal) {
-        if (enderCrystal[DataUUID.key].isPresent) {
-            event.isCancelled = true
-        }
+        if (enderCrystal[DataUUID.key].isPresent) event.isCancelled = true
     }
 
     @Listener

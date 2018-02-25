@@ -6,6 +6,7 @@ import java.util.*
 
 @BsonDiscriminator
 data class Gun(
+        override val uuid: UUID = UUID.randomUUID(),
         var type: GunType = GunType.PISTOL_ORIGIN,
         var maxTemp: Int = 100,
         var heat: Int = 10,
@@ -14,6 +15,5 @@ data class Gun(
         var damage: Double = 3.0,
         var through: Int = 1,
         var slot: Int = 1,
-        var upgrade: ArrayList<Upgrade> = ArrayList(),
-        override val uuid: UUID = UUID.randomUUID()
-) : ItemBase
+        var upgrade: ArrayList<Upgrade> = ArrayList()
+) : IItem, ICoolDown

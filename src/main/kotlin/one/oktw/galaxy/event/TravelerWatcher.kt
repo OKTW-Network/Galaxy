@@ -7,6 +7,7 @@ import one.oktw.galaxy.Main.Companion.viewerManager
 import one.oktw.galaxy.enums.AccessLevel.*
 import one.oktw.galaxy.helper.CoolDownHelper.Companion.getCoolDown
 import one.oktw.galaxy.helper.CoolDownHelper.Companion.removeCoolDown
+import one.oktw.galaxy.types.item.ICoolDown
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
@@ -30,7 +31,9 @@ class TravelerWatcher {
     @Listener
     fun onDisconnect(event: ClientConnectionEvent.Disconnect, @Getter("getTargetEntity") player: Player) {
         launch {
-            travelerManager.getTraveler(player).item.forEach { getCoolDown(it.uuid)?.let { removeCoolDown(it) } }
+            travelerManager.getTraveler(player).item
+                    .filter { it is ICoolDown }
+                    .forEach { getCoolDown((it as ICoolDown).uuid)?.let { removeCoolDown(it) } }
             travelerManager.updateTraveler(player)
             viewerManager.removeViewer(player.uniqueId)
         }

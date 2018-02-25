@@ -63,7 +63,7 @@ class Gun {
         launch {
             val gun = (travelerManager.getTraveler(player).item
                     .filter { it is Gun }
-                    .find { it.uuid == itemStack[DataUUID.key].get() } as? Gun ?: return@launch).copy()
+                    .find { (it as Gun).uuid == itemStack[DataUUID.key].get() } as? Gun ?: return@launch).copy()
 
             doUpgrade(gun).await()
 

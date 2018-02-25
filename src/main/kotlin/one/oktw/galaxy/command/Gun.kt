@@ -80,7 +80,7 @@ class Gun : CommandBase {
             if (src is Player) {
                 val traveler = travelerManager.getTraveler(src)
 
-                CoolDownHelper.removeCoolDown(CoolDownHelper.getCoolDown(traveler.item.removeAt(args.getOne<Int>("Gun").get()).uuid)!!)
+                CoolDownHelper.getCoolDown((traveler.item.removeAt(args.getOne<Int>("Gun").get()) as Gun).uuid)?.let { CoolDownHelper.removeCoolDown(it) }
                 traveler.save()
             }
             return CommandResult.success()

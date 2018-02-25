@@ -2,10 +2,10 @@ package one.oktw.galaxy.types.item
 
 import one.oktw.galaxy.enums.UpgradeType
 import one.oktw.galaxy.enums.UpgradeType.EMPTY
-import java.util.*
+import org.bson.codecs.pojo.annotations.BsonDiscriminator
 
+@BsonDiscriminator
 data class Upgrade(
-        override val uuid: UUID = UUID.randomUUID(),
         val type: UpgradeType = EMPTY,
         var level: Int = 1
-) : ItemBase
+) : IItem

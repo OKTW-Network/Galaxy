@@ -4,10 +4,13 @@ import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.chunkLoaderManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.data.DataUpgrade
-import one.oktw.galaxy.enums.BlockUpgradeType
+import one.oktw.galaxy.enums.UpgradeType
+import one.oktw.galaxy.helper.ItemHelper
 import one.oktw.galaxy.types.ChunkLoader
+import one.oktw.galaxy.types.item.Upgrade
 import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.entity.Entity
+import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
@@ -24,7 +27,8 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-class ChunkLoader(uuid: UUID) {
+class ChunkLoader(val entity: Entity) {
+    private val uuid = entity[DataUUID.key].orElse(null)
     private lateinit var chunkLoader: ChunkLoader
     private lateinit var player: Player
     private val upgradeButton = UUID.randomUUID()
@@ -51,7 +55,7 @@ class ChunkLoader(uuid: UUID) {
             .build(main)
 
     init {
-        launch { chunkLoader = chunkLoaderManager.getChunkLoader(uuid).await() ?: return@launch }
+        launch { chunkLoader = chunkLoaderManager.get(uuid).await() ?: return@launch }
 
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
         val upgradeItem = ItemStack.builder()
@@ -76,27 +80,46 @@ class ChunkLoader(uuid: UUID) {
     }
 
     private fun clickUpgrade() {
-        if (!this::player.isInitialized || !this::chunkLoader.isInitialized) return
+        if (!this::chunkLoader.isInitialized) return
 
-        Upgrade(BlockUpgradeType.RANGE)
-                .apply {
-                    for (i in 1..chunkLoader.level / 2) {
-                        this.offer(ItemStack.builder()
-                                .itemType(ItemTypes.ENCHANTED_BOOK)
-                                .itemData(DataUpgrade(BlockUpgradeType.RANGE, i))
-                                .quantity(1)
-                                .build())
-                    }
-                }
+        UpgradeSlot(chunkLoader.upgrade, UpgradeType.RANGE)
                 .onClose {
-                    val level = it.getOrDefault(BlockUpgradeType.RANGE, 0)
+                    val originLevel = chunkLoader.upgrade.maxBy { it.level }?.level ?: 0
+                    val newLevel = it.maxBy { it.level }?.level ?: 0
 
-                    if (level != chunkLoader.level) launch { chunkLoaderManager.changeRange(chunkLoader.uuid, (level)) }
+                    chunkLoader.upgrade = it as ArrayList<Upgrade>
+
+                    if (newLevel != originLevel) {
+                        launch { chunkLoaderManager.updateChunkLoader(chunkLoader, true) }
+                    } else {
+                        launch { chunkLoaderManager.updateChunkLoader(chunkLoader) }
+                    }
                 }
                 .open(player)
     }
 
     private fun clickRemove() {
-        // TODO
+        if (!this::chunkLoader.isInitialized) return
+
+        val location = entity.location
+        val itemEntities = arrayListOf(
+                location.createEntity(EntityTypes.ITEM).also {
+                    it.offer(Keys.REPRESENTED_ITEM, ItemStack.of(ItemTypes.END_CRYSTAL, 1).createSnapshot())
+                }
+        )
+
+        launch { chunkLoaderManager.delete(uuid) }
+
+        chunkLoader.upgrade.forEach {
+            val entity = location.createEntity(EntityTypes.ITEM)
+            val upgrade = ItemHelper.getItem(it).orElse(null) ?: return@forEach
+
+            entity.offer(Keys.REPRESENTED_ITEM, upgrade.createSnapshot())
+            itemEntities += entity
+        }
+
+        location.spawnEntities(itemEntities)
+        entity.remove()
+        player.closeInventory()
     }
 }

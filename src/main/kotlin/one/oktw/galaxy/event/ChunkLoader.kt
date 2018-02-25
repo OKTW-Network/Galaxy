@@ -7,6 +7,8 @@ import one.oktw.galaxy.gui.ChunkLoader
 import org.spongepowered.api.entity.EnderCrystal
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
+import org.spongepowered.api.event.entity.AttackEntityEvent
+import org.spongepowered.api.event.entity.CollideEntityEvent
 import org.spongepowered.api.event.entity.InteractEntityEvent
 import org.spongepowered.api.event.entity.SpawnEntityEvent
 import org.spongepowered.api.event.filter.Getter
@@ -22,7 +24,7 @@ class ChunkLoader {
         val enderCrystal = event.entities.firstOrNull { it is EnderCrystal } as? EnderCrystal ?: return
 
         launch {
-            val uuid = chunkLoaderManager.addChunkLoader(enderCrystal.location, 0)
+            val uuid = chunkLoaderManager.addChunkLoader(enderCrystal.location).uuid
             enderCrystal.offer(DataUUID(uuid))
         }
     }
@@ -34,6 +36,18 @@ class ChunkLoader {
             @First player: Player,
             @Getter("getTargetEntity") enderCrystal: EnderCrystal
     ) {
-        ChunkLoader(enderCrystal[DataUUID.key].orElse(null) ?: return).open(player)
+        ChunkLoader(enderCrystal).open(player)
+    }
+
+    @Listener
+    fun onAttackEntity(event: AttackEntityEvent, @First player: Player, @Getter("getTargetEntity") enderCrystal: EnderCrystal) {
+        if (enderCrystal[DataUUID.key].isPresent) {
+            event.isCancelled = true
+        }
+    }
+
+    @Listener
+    fun onCollideEntity(event: CollideEntityEvent) {
+        event.filterEntities { !(it is EnderCrystal && it[DataUUID.key].isPresent) }
     }
 }

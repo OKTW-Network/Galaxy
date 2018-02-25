@@ -6,9 +6,13 @@ import net.minecraft.inventory.EntityEquipmentSlot
 import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataScope
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.data.DataUpgrade
+import one.oktw.galaxy.enums.UpgradeType
 import one.oktw.galaxy.types.item.Gun
-import one.oktw.galaxy.types.item.ItemBase
+import one.oktw.galaxy.types.item.IItem
+import one.oktw.galaxy.types.item.Upgrade
 import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.ItemTypes.IRON_SWORD
 import org.spongepowered.api.item.ItemTypes.WOODEN_SWORD
 import org.spongepowered.api.item.inventory.ItemStack
@@ -19,9 +23,10 @@ import java.util.*
 
 class ItemHelper {
     companion object {
-        fun getItem(item: ItemBase): Optional<ItemStack> {
+        fun getItem(item: IItem): Optional<ItemStack> {
             return when (item) {
                 is Gun -> Optional.of(removeCoolDown(getGun(item)))
+                is Upgrade -> Optional.of(getItemUpgrade(item))
                 else -> Optional.empty()
             }
         }
@@ -68,6 +73,20 @@ class ItemHelper {
             )
 
             return itemStack
+        }
+
+        private fun getItemUpgrade(upgrade: Upgrade): ItemStack {
+            val name = upgrade.type.name.substring(0, 1) + upgrade.type.name.substring(1).toLowerCase()
+            val color = when (upgrade.type) {
+                UpgradeType.RANGE -> TextColors.GREEN
+                else -> TextColors.NONE
+            }
+
+            return ItemStack.builder()
+                    .itemType(ItemTypes.ENCHANTED_BOOK)
+                    .itemData(DataUpgrade(upgrade.type, upgrade.level))
+                    .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, color, "$name Upgrade Lv.${upgrade.level}"))
+                    .build()
         }
     }
 }

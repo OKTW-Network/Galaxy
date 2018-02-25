@@ -25,7 +25,7 @@ class GalaxyManager {
                 .collect(toList())
         memberList += Member(creator.uniqueId, ADMIN)
 
-        val galaxy = Galaxy(name = name, members = memberList.filterNotNull())
+        val galaxy = Galaxy(name = name, members = memberList.filterNotNull() as ArrayList<Member>)
 
         launch { galaxyCollection.insertOne(galaxy) }
         return galaxy

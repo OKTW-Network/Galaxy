@@ -12,8 +12,8 @@ import kotlin.collections.ArrayList
 data class Galaxy(
         val uuid: UUID = UUID.randomUUID(),
         var name: String? = null,
-        var members: List<Member> = ArrayList(),
-        var planets: List<Planet> = ArrayList()
+        var members: ArrayList<Member> = ArrayList(),
+        var planets: ArrayList<Planet> = ArrayList()
 ) {
     fun save() {
         galaxyManager.saveGalaxy(this)
@@ -21,7 +21,7 @@ data class Galaxy(
 
     fun createPlanet(name: String): Planet {
         val planet = PlanetHelper.createPlanet(name)
-        planets += planet
+        planets.add(planet)
         save()
 
         return planet
@@ -31,7 +31,7 @@ data class Galaxy(
         val planet = planets.find { it.uuid === uuid } ?: return
 
         PlanetHelper.removePlanet(planet.world!!).thenAccept {
-            if (it) planets -= planet
+            if (it) planets.remove(planet)
             save()
         }
     }
@@ -39,12 +39,12 @@ data class Galaxy(
     fun addMember(uuid: UUID, group: Group = MEMBER) {
         if (members.any { it.uuid == uuid }) return
 
-        members += Member(uuid, group)
+        members.add(Member(uuid, group))
         save()
     }
 
     fun delMember(uuid: UUID) {
-        members -= members.find { it.uuid == uuid } ?: return
+        members.remove(members.find { it.uuid == uuid } ?: return)
         save()
     }
 

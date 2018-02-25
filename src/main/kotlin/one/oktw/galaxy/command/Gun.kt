@@ -2,11 +2,11 @@ package one.oktw.galaxy.command
 
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.enums.GunType
-import one.oktw.galaxy.enums.WeaponUpgradeType.THROUGH
+import one.oktw.galaxy.enums.UpgradeType.THROUGH
 import one.oktw.galaxy.helper.CoolDownHelper
 import one.oktw.galaxy.helper.ItemHelper
-import one.oktw.galaxy.types.Upgrade
 import one.oktw.galaxy.types.item.Gun
+import one.oktw.galaxy.types.item.Upgrade
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -56,7 +56,7 @@ class Gun : CommandBase {
                         damage = args.getOne<Double>("Damage").get()
                 )
 
-                args.getOne<Int>("Through").ifPresent { gun.upgrade += Upgrade(THROUGH, it) }
+                args.getOne<Int>("Through").ifPresent { gun.upgrade.add(Upgrade(type = THROUGH, level = it)) }
 
                 traveler.item.add(gun)
                 traveler.save()

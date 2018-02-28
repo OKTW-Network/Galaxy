@@ -20,10 +20,10 @@ class CoolingStatus : Consumer<Task> {
     override fun accept(task: Task) {
         Sponge.getServer().onlinePlayers.forEach {
             val mainHand: ItemStack? = it.getItemInHand(HandTypes.MAIN_HAND)
-                    .filter { it[DataOverheat.key].isPresent }
+                    .filter { it[DataOverheat.key].isPresent && it[DataUUID.key].isPresent }
                     .orElse(null)
             val offHand: ItemStack? = it.getItemInHand(HandTypes.OFF_HAND)
-                    .filter { it[DataOverheat.key].isPresent }
+                    .filter { it[DataOverheat.key].isPresent && it[DataUUID.key].isPresent }
                     .orElse(null)
 
             fun updateOverheat(itemStack: ItemStack, handType: HandType) {

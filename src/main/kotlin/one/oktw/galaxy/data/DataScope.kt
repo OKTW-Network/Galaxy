@@ -51,7 +51,7 @@ class DataScope(scoping: Boolean = false) : AbstractBooleanData<DataScope, DataS
     class Builder : AbstractDataBuilder<DataScope>(DataScope::class.java, 1),
         DataManipulatorBuilder<DataScope, Immutable> {
         override fun createFrom(dataHolder: DataHolder): Optional<DataScope> = create().fill(dataHolder)
-        override fun create() = DataScope(false)
+        override fun create() = DataScope()
         override fun buildContent(container: DataView) = create().from(container.copy())
     }
 }

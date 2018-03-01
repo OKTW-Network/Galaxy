@@ -47,7 +47,7 @@ class DataUUID(uuid: UUID = randomUUID()) : AbstractSingleData<UUID, DataUUID, D
         return Optional.of(this)
     }
 
-    class Immutable(uuid: UUID) : AbstractImmutableSingleData<UUID, Immutable, DataUUID>(uuid, key) {
+    class Immutable(uuid: UUID = randomUUID()) : AbstractImmutableSingleData<UUID, Immutable, DataUUID>(uuid, key) {
         private val immutableValue: ImmutableValue<UUID> =
             Sponge.getRegistry().valueFactory.createValue(key, value).asImmutable()
 
@@ -60,7 +60,7 @@ class DataUUID(uuid: UUID = randomUUID()) : AbstractSingleData<UUID, DataUUID, D
     class Builder : AbstractDataBuilder<DataUUID>(DataUUID::class.java, 1),
         DataManipulatorBuilder<DataUUID, Immutable> {
         override fun createFrom(dataHolder: DataHolder): Optional<DataUUID> = create().fill(dataHolder)
-        override fun create() = DataUUID(randomUUID())
+        override fun create() = DataUUID()
         override fun buildContent(container: DataView) = create().from(container.copy())
     }
 }

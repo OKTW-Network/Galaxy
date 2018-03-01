@@ -2,7 +2,7 @@ package one.oktw.galaxy.data
 
 import com.google.common.reflect.TypeToken
 import one.oktw.galaxy.enums.UpgradeType
-import one.oktw.galaxy.enums.UpgradeType.RANGE
+import one.oktw.galaxy.enums.UpgradeType.EMPTY
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.DataContainer
 import org.spongepowered.api.data.DataHolder
@@ -18,7 +18,7 @@ import org.spongepowered.api.data.value.mutable.Value
 import org.spongepowered.api.util.TypeTokens
 import java.util.*
 
-class DataUpgrade(type: UpgradeType, level: Int) : AbstractData<DataUpgrade, DataUpgrade.Immutable>() {
+class DataUpgrade(type: UpgradeType = EMPTY, level: Int = 0) : AbstractData<DataUpgrade, DataUpgrade.Immutable>() {
     companion object {
         val TYPE: Key<Value<UpgradeType>> = Key.builder()
             .type(object : TypeToken<Value<UpgradeType>>() {})
@@ -75,7 +75,7 @@ class DataUpgrade(type: UpgradeType, level: Int) : AbstractData<DataUpgrade, Dat
         registerFieldSetter(LEVEL) { level = it }
     }
 
-    class Immutable(private val type: UpgradeType, private val level: Int) :
+    class Immutable(private val type: UpgradeType = EMPTY, private val level: Int = 0) :
         AbstractImmutableData<Immutable, DataUpgrade>() {
         override fun getContentVersion() = 1
         override fun asMutable() = DataUpgrade(type, level)
@@ -93,7 +93,7 @@ class DataUpgrade(type: UpgradeType, level: Int) : AbstractData<DataUpgrade, Dat
     class Builder : AbstractDataBuilder<DataUpgrade>(DataUpgrade::class.java, 1),
         DataManipulatorBuilder<DataUpgrade, Immutable> {
         override fun createFrom(dataHolder: DataHolder): Optional<DataUpgrade> = create().fill(dataHolder)
-        override fun create() = DataUpgrade(RANGE, 1)
+        override fun create() = DataUpgrade()
         override fun buildContent(container: DataView) = create().from(container.copy())
     }
 }

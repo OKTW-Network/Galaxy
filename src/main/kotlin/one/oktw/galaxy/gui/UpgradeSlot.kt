@@ -29,6 +29,7 @@ class UpgradeSlot(private var upgrade: List<Upgrade>, private vararg val acceptU
         val item = inventory.slots<Slot>()
                 .mapNotNull { it.peek().orElse(null) }
                 .map { it[DataUpgrade::class.java].orElse(null) }
+                .sortedBy { it?.level }
 
         if (item.contains(null)) {
             event.isCancelled = true
@@ -37,7 +38,7 @@ class UpgradeSlot(private var upgrade: List<Upgrade>, private vararg val acceptU
 
         val upgrade = HashMap<UpgradeType, Int>()
 
-        val filter = item.sortedBy { it.level }.all {
+        val filter = item.all {
             if (it.type !in acceptUpgradeType) return@all false
 
             if (upgrade.getOrDefault(it.type, 0) == it.level - 1) {

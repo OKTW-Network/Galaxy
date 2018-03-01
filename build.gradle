@@ -1,5 +1,8 @@
 buildscript {
-    ext.kotlin_version = '1.2.21'
+    ext.kotlin_version = '1.2.30'
+    ext.sponge_version = "8.0.0-SNAPSHOT"
+    ext.Coroutines_version = "0.22.3"
+
     repositories {
         mavenCentral()
         maven {
@@ -32,10 +35,6 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
-ext.spongeVersion = "8.0.0-SNAPSHOT"
-ext.CoroutinesVersion = "0.22.3"
-
-
 minecraft {
     version = "1.12.2"
     mappings = "snapshot_20180223"
@@ -43,10 +42,10 @@ minecraft {
 }
 
 dependencies {
-    compile "org.spongepowered:spongeapi:$spongeVersion"
+    compile "org.spongepowered:spongeapi:$sponge_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$CoroutinesVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$CoroutinesVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$Coroutines_version"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$Coroutines_version"
     compile "org.mongodb:mongodb-driver:3.6.3"
 }
 

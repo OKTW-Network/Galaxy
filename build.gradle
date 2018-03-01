@@ -32,8 +32,8 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
-ext.spongeVersion = "7.0.0"
-ext.CoroutinesVersion = "0.21.2"
+ext.spongeVersion = "8.0.0-SNAPSHOT"
+ext.CoroutinesVersion = "0.22.3"
 
 
 minecraft {

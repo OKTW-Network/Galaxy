@@ -19,7 +19,7 @@ class TeleportHelper {
             }
         }
 
-        suspend fun teleport(player: Player, location: Location<World>, safety: Boolean): Boolean {
+        suspend fun teleport(player: Player, location: Location<World>, safety: Boolean = false): Boolean {
             if (!checkValid(player, location)) return false
 
             galaxyManager.getPlanetFromWorld(location.extent.uniqueId).await()?.let {

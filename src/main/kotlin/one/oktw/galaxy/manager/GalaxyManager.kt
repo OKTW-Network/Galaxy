@@ -21,8 +21,8 @@ class GalaxyManager {
 
     fun createGalaxy(name: String, creator: Player, vararg members: UUID): Galaxy {
         val memberList = members.toSet().parallelStream()
-                .map { member -> Member(member, MEMBER) }
-                .collect(toList())
+            .map { member -> Member(member, MEMBER) }
+            .collect(toList())
         memberList += Member(creator.uniqueId, ADMIN)
 
         val galaxy = Galaxy(name = name, members = memberList.filterNotNull() as ArrayList<Member>)

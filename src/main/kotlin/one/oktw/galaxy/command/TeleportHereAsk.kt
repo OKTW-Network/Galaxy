@@ -24,10 +24,10 @@ class TeleportHereAsk : CommandBase {
 
     override val spec: CommandSpec
         get() = CommandSpec.builder()
-                .executor(this)
-                .arguments(GenericArguments.onlyOne(GenericArguments.player(Text.of("Player"))))
-                .permission("oktw.command.teleport.ask.here")
-                .build()
+            .executor(this)
+            .arguments(GenericArguments.onlyOne(GenericArguments.player(Text.of("Player"))))
+            .permission("oktw.command.teleport.ask.here")
+            .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src is Player) {
@@ -43,9 +43,11 @@ class TeleportHereAsk : CommandBase {
                     }
                 }
 
-                val teleportMsg = Text.of(TextColors.YELLOW, "玩家 ", TextColors.AQUA, src.name, TextColors.YELLOW, " 想要傳送你到他的位置，是否接受?")
+                val teleportMsg =
+                    Text.of(TextColors.YELLOW, "玩家 ", TextColors.AQUA, src.name, TextColors.YELLOW, " 想要傳送你到他的位置，是否接受?")
                         .concat(Text.NEW_LINE)
-                        .concat(Text.of(
+                        .concat(
+                            Text.of(
                                 TextActions.showText(Text.of(TextColors.RED, "請勿輕易接受其他人的邀請")),
                                 TextActions.executeCallback {
                                     if (callbackLimit.containsKey(uuid)) {
@@ -70,7 +72,8 @@ class TeleportHereAsk : CommandBase {
                                 TextColors.RED,
                                 TextStyles.UNDERLINE,
                                 "拒絕"
-                        ))
+                            )
+                        )
 
                 src.sendMessage(Text.of(TextColors.GREEN, "已傳送請求"))
                 target.sendMessage(teleportMsg)

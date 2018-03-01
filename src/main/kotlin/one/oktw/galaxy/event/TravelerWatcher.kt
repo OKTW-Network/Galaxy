@@ -23,7 +23,12 @@ class TravelerWatcher {
             when (planet.checkPermission(player)) {
                 MODIFY -> return@launch
                 VIEW -> viewerManager.setViewer(player.uniqueId)
-                DENY -> Sponge.getServer().defaultWorld.ifPresent { player.transferToWorld(it.uniqueId, it.spawnPosition.toDouble()) } // TODO
+                DENY -> Sponge.getServer().defaultWorld.ifPresent {
+                    player.transferToWorld(
+                        it.uniqueId,
+                        it.spawnPosition.toDouble()
+                    )
+                } // TODO
             }
         }
     }
@@ -32,8 +37,8 @@ class TravelerWatcher {
     fun onDisconnect(event: ClientConnectionEvent.Disconnect, @Getter("getTargetEntity") player: Player) {
         launch {
             travelerManager.getTraveler(player).item
-                    .filter { it is ICoolable }
-                    .forEach { getCoolDown((it as ICoolable).uuid)?.let { removeCoolDown(it) } }
+                .filter { it is ICoolable }
+                .forEach { getCoolDown((it as ICoolable).uuid)?.let { removeCoolDown(it) } }
             travelerManager.updateTraveler(player)
             viewerManager.removeViewer(player.uniqueId)
         }

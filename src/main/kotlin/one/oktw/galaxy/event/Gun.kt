@@ -56,14 +56,15 @@ class Gun {
         if (itemStack.type !in asList(WOODEN_SWORD, IRON_SWORD) || !itemStack[DataUUID.key].isPresent) return
 
         val world = player.world
-        var direction = Quaterniond.fromAxesAnglesDeg(player.rotation.x, -player.rotation.y, player.rotation.z).direction
+        var direction =
+            Quaterniond.fromAxesAnglesDeg(player.rotation.x, -player.rotation.y, player.rotation.z).direction
         val source = player.getProperty(EyeLocationProperty::class.java)
-                .map(EyeLocationProperty::getValue).orElse(null)?.add(direction) ?: return
+            .map(EyeLocationProperty::getValue).orElse(null)?.add(direction) ?: return
 
         launch {
             val gun = (travelerManager.getTraveler(player).item
-                    .filter { it is Gun }
-                    .find { (it as Gun).uuid == itemStack[DataUUID.key].get() } as? Gun ?: return@launch).copy()
+                .filter { it is Gun }
+                .find { (it as Gun).uuid == itemStack[DataUUID.key].get() } as? Gun ?: return@launch).copy()
 
             doUpgrade(gun).await()
 
@@ -75,19 +76,28 @@ class Gun {
 
             val target = getTarget(world, source, direction, gun.range).await()
             val wall = getWall(
-                    world,
-                    source.sub(direction),
-                    direction,
-                    if (!target.isEmpty()) target.first().intersection.distance(source) else gun.range
+                world,
+                source.sub(direction),
+                direction,
+                if (!target.isEmpty()) target.first().intersection.distance(source) else gun.range
             ).await()
 
-            if (!target.isEmpty() && !wall.hasNext()) Task.builder().execute { _ -> damageEntity(player, source, gun, target) }.submit(main)
+            if (!target.isEmpty() && !wall.hasNext()) Task.builder().execute { _ ->
+                damageEntity(
+                    player,
+                    source,
+                    gun,
+                    target
+                )
+            }.submit(main)
 
-            showTrajectory(world, source, when {
-                wall.hasNext() -> wall.next().position.sub(source)
-                !target.isEmpty() -> target.first().intersection.sub(source)
-                else -> direction.mul(gun.range)
-            })
+            showTrajectory(
+                world, source, when {
+                    wall.hasNext() -> wall.next().position.sub(source)
+                    !target.isEmpty() -> target.first().intersection.sub(source)
+                    else -> direction.mul(gun.range)
+                }
+            )
 
             playShotSound(world, source, itemStack.type)
         }
@@ -97,8 +107,9 @@ class Gun {
     @Suppress("unused", "UNUSED_PARAMETER")
     fun onChangeDataHolder(event: ChangeDataHolderEvent.ValueChange, @Getter("getTargetHolder") @Has(SneakingData::class) player: Player) {
         player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataScope.key].isPresent }.ifPresent {
-            val sneak: Boolean = event.endResult.successfulData.firstOrNull { it.key == Keys.IS_SNEAKING }?.get() as Boolean?
-                    ?: player[Keys.IS_SNEAKING].get()
+            val sneak: Boolean =
+                event.endResult.successfulData.firstOrNull { it.key == Keys.IS_SNEAKING }?.get() as Boolean?
+                        ?: player[Keys.IS_SNEAKING].get()
             if (it[DataScope.key].get() != sneak) {
                 player.setItemInHand(HandTypes.MAIN_HAND, toggleScope(it))
             }
@@ -129,7 +140,8 @@ class Gun {
     }
 
     private fun drift(direction: Vector3d): Vector3d {
-        return direction.mul(10.0).add(Math.random(), Math.random(), Math.random()).sub(Math.random(), Math.random(), Math.random()).div(10.0)
+        return direction.mul(10.0).add(Math.random(), Math.random(), Math.random())
+            .sub(Math.random(), Math.random(), Math.random()).div(10.0)
     }
 
     private fun doUpgrade(gun: Gun) = async {
@@ -164,63 +176,63 @@ class Gun {
 
     private fun getTarget(world: World, source: Vector3d, direction: Vector3d, range: Double) = async {
         world.getIntersectingEntities(
-                source,
-                direction,
-                range,
-                { it.entity is Living && it.entity !is Player && it.entity !is ArmorStand && (it.entity as EntityLivingBase).isEntityAlive }
+            source,
+            direction,
+            range,
+            { it.entity is Living && it.entity !is Player && it.entity !is ArmorStand && (it.entity as EntityLivingBase).isEntityAlive }
         )
     }
 
     private fun getWall(world: World, source: Vector3d, direction: Vector3d, range: Double) = async {
         BlockRay.from(world, source)
-                .direction(direction)
-                .distanceLimit(range)
-                .skipFilter {
-                    when (it.location.blockType) {
-                        AIR,
-                        GLASS, STAINED_GLASS,
-                        GLASS_PANE, STAINED_GLASS_PANE,
-                        IRON_BARS,
-                        TALLGRASS, DOUBLE_PLANT,
-                        TORCH, REDSTONE_TORCH, UNLIT_REDSTONE_TORCH,
-                        REEDS,
-                        LEAVES, LEAVES2 -> false
+            .direction(direction)
+            .distanceLimit(range)
+            .skipFilter {
+                when (it.location.blockType) {
+                    AIR,
+                    GLASS, STAINED_GLASS,
+                    GLASS_PANE, STAINED_GLASS_PANE,
+                    IRON_BARS,
+                    TALLGRASS, DOUBLE_PLANT,
+                    TORCH, REDSTONE_TORCH, UNLIT_REDSTONE_TORCH,
+                    REEDS,
+                    LEAVES, LEAVES2 -> false
 
-                        else -> true
-                    }
-                }.build()
+                    else -> true
+                }
+            }.build()
     }
 
     private fun damageEntity(player: Player, source: Vector3d, gun: Gun, target: Set<EntityHit>) {
         target.stream()
-                .filter { it.entity !is Boss }
-                .sorted { hit1, hit2 -> ((hit1.intersection.distance(source) - hit2.intersection.distance(source)) * 10).roundToInt() }
-                .limit(gun.through.toLong())
-                .forEach {
-                    val entity = it.entity as Living
+            .filter { it.entity !is Boss }
+            .sorted { hit1, hit2 -> ((hit1.intersection.distance(source) - hit2.intersection.distance(source)) * 10).roundToInt() }
+            .limit(gun.through.toLong())
+            .forEach {
+                val entity = it.entity as Living
 
-                    val damageSource = EntityDamageSource("player", player as EntityPlayer).setProjectile() as DamageSource
-                    (entity as EntityLivingBase).hurtResistantTime = 0
-                    entity.damage(gun.damage, damageSource)
-                    gun.damage *= 0.9
+                val damageSource = EntityDamageSource("player", player as EntityPlayer).setProjectile() as DamageSource
+                (entity as EntityLivingBase).hurtResistantTime = 0
+                entity.damage(gun.damage, damageSource)
+                gun.damage *= 0.9
 
-                    if ((entity as EntityLivingBase).isEntityAlive) {
-                        player.playSound(
-                                SoundTypes.ENTITY_EXPERIENCE_ORB_PICKUP,
-                                SoundCategories.PLAYER,
-                                source,
-                                1.0
-                        )
-                    } else {
-                        player.playSound(
-                                SoundTypes.ENTITY_EXPERIENCE_ORB_PICKUP,
-                                SoundCategories.PLAYER,
-                                source,
-                                1.0,
-                                0.5
-                        )
-                    }
+                if ((entity as EntityLivingBase).isEntityAlive) {
+                    player.playSound(
+                        SoundTypes.ENTITY_EXPERIENCE_ORB_PICKUP,
+                        SoundCategories.PLAYER,
+                        source,
+                        1.0
+                    )
+                } else {
+                    player.playSound(
+                        SoundTypes.ENTITY_EXPERIENCE_ORB_PICKUP,
+                        SoundCategories.PLAYER,
+                        source,
+                        1.0,
+                        0.5
+                    )
                 }
+            }
     }
 
     private fun showTrajectory(world: World, source: Vector3d, line: Vector3d) = async {
@@ -235,10 +247,10 @@ class Gun {
 
         for (i in 0..interval.roundToInt()) {
             world.spawnParticles(
-                    ParticleEffect.builder()
-                            .type(ParticleTypes.MAGIC_CRITICAL_HIT)
-                            .build(),
-                    pos
+                ParticleEffect.builder()
+                    .type(ParticleTypes.MAGIC_CRITICAL_HIT)
+                    .build(),
+                pos
             )
             pos = pos.add(line.div(interval))
         }
@@ -247,33 +259,33 @@ class Gun {
     private fun playShotSound(world: World, position: Vector3d, type: ItemType) = async {
         if (type == WOODEN_SWORD) {
             world.playSound(
-                    SoundType.of("gun.shot"),
-                    SoundCategories.PLAYER,
-                    position,
-                    1.0,
-                    1 + random() / 10 - random() / 10
+                SoundType.of("gun.shot"),
+                SoundCategories.PLAYER,
+                position,
+                1.0,
+                1 + random() / 10 - random() / 10
             )
         } else if (type == IRON_SWORD) {
             world.playSound(
-                    SoundType.of("entity.blaze.hurt"),
-                    SoundCategories.PLAYER,
-                    position,
-                    1.0,
-                    2.0
+                SoundType.of("entity.blaze.hurt"),
+                SoundCategories.PLAYER,
+                position,
+                1.0,
+                2.0
             )
             world.playSound(
-                    SoundType.of("entity.firework.blast"),
-                    SoundCategories.PLAYER,
-                    position,
-                    1.0,
-                    0.0
+                SoundType.of("entity.firework.blast"),
+                SoundCategories.PLAYER,
+                position,
+                1.0,
+                0.0
             )
             world.playSound(
-                    SoundType.of("block.piston.extend"),
-                    SoundCategories.PLAYER,
-                    position,
-                    1.0,
-                    2.0
+                SoundType.of("block.piston.extend"),
+                SoundCategories.PLAYER,
+                position,
+                1.0,
+                2.0
             )
         }
     }

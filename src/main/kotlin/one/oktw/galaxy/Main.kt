@@ -23,10 +23,11 @@ import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.scheduler.Task
 
 @Suppress("unused", "UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
-@Plugin(id = "galaxy",
-        name = "OKTW Galaxy",
-        description = "OKTW Galaxy Project",
-        version = "1.0-SNAPSHOT"
+@Plugin(
+    id = "galaxy",
+    name = "OKTW Galaxy",
+    description = "OKTW Galaxy Project",
+    version = "1.0-SNAPSHOT"
 )
 class Main {
     companion object {
@@ -68,27 +69,27 @@ class Main {
     @Listener
     fun onPreInit(event: GamePreInitializationEvent) {
         DataRegistration.builder()
-                .dataName("UUID").manipulatorId("uuid")
-                .dataClass(DataUUID::class.java).immutableClass(DataUUID.Immutable::class.java)
-                .builder(DataUUID.Builder())
-                .buildAndRegister(plugin)
+            .dataName("UUID").manipulatorId("uuid")
+            .dataClass(DataUUID::class.java).immutableClass(DataUUID.Immutable::class.java)
+            .builder(DataUUID.Builder())
+            .buildAndRegister(plugin)
 
         DataRegistration.builder()
-                .dataName("Overheat").manipulatorId("overheat")
-                .dataClass(DataOverheat::class.java).immutableClass(DataOverheat.Immutable::class.java)
-                .builder(DataOverheat.Builder())
-                .buildAndRegister(plugin)
+            .dataName("Overheat").manipulatorId("overheat")
+            .dataClass(DataOverheat::class.java).immutableClass(DataOverheat.Immutable::class.java)
+            .builder(DataOverheat.Builder())
+            .buildAndRegister(plugin)
         DataRegistration.builder()
-                .dataName("Scoping").manipulatorId("scoping")
-                .dataClass(DataScope::class.java).immutableClass(DataScope.Immutable::class.java)
-                .builder(DataScope.Builder())
-                .buildAndRegister(plugin)
+            .dataName("Scoping").manipulatorId("scoping")
+            .dataClass(DataScope::class.java).immutableClass(DataScope.Immutable::class.java)
+            .builder(DataScope.Builder())
+            .buildAndRegister(plugin)
 
         DataRegistration.builder()
-                .dataName("Upgrade").manipulatorId("upgrade")
-                .dataClass(DataUpgrade::class.java).immutableClass(DataUpgrade.Immutable::class.java)
-                .builder(DataUpgrade.Builder())
-                .buildAndRegister(plugin)
+            .dataName("Upgrade").manipulatorId("upgrade")
+            .dataClass(DataUpgrade::class.java).immutableClass(DataUpgrade.Immutable::class.java)
+            .builder(DataUpgrade.Builder())
+            .buildAndRegister(plugin)
     }
 
     @Listener
@@ -110,10 +111,10 @@ class Main {
         chunkLoaderManager.loadForcedWorld()
 
         Task.builder()
-                .name("CoolingStatus")
-                .intervalTicks(1)
-                .execute(CoolingStatus())
-                .submit(this)
+            .name("CoolingStatus")
+            .intervalTicks(1)
+            .execute(CoolingStatus())
+            .submit(this)
     }
 
     @Listener

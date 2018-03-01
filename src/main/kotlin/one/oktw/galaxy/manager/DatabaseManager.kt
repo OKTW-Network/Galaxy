@@ -50,40 +50,43 @@ class DatabaseManager {
 
         // Init Database connect
         val serverAddress = ServerAddress(
-                config.getNode("host").string,
-                config.getNode("port").int
+            config.getNode("host").string,
+            config.getNode("port").int
         )
 
-        val pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
-                fromProviders(
-                        SpongeDataCodecProvider(),
-                        PojoCodecProvider.builder()
-                                .register("one.oktw.galaxy.types", "one.oktw.galaxy.types.item")
+        val pojoCodecRegistry = fromRegistries(
+            MongoClient.getDefaultCodecRegistry(),
+            fromProviders(
+                SpongeDataCodecProvider(),
+                PojoCodecProvider.builder()
+                    .register("one.oktw.galaxy.types", "one.oktw.galaxy.types.item")
 //                                .automatic(true)
-                                .conventions(asList(
-                                        SET_PRIVATE_FIELDS_CONVENTION,
-                                        ANNOTATION_CONVENTION,
-                                        CLASS_AND_PROPERTY_CONVENTION
-                                ))
-                                .build()
-                )
+                    .conventions(
+                        asList(
+                            SET_PRIVATE_FIELDS_CONVENTION,
+                            ANNOTATION_CONVENTION,
+                            CLASS_AND_PROPERTY_CONVENTION
+                        )
+                    )
+                    .build()
+            )
         )
 
         database = if (config.getNode("Username").string.isEmpty()) {
             MongoClient(serverAddress)
-                    .getDatabase(config.getNode("name").string)
-                    .withCodecRegistry(pojoCodecRegistry)
+                .getDatabase(config.getNode("name").string)
+                .withCodecRegistry(pojoCodecRegistry)
         } else {
             val credential = MongoCredential.createCredential(
-                    config.getNode("Username").string,
-                    config.getNode("name").string,
-                    config.getNode("Password").string.toCharArray()
+                config.getNode("Username").string,
+                config.getNode("name").string,
+                config.getNode("Password").string.toCharArray()
             )
 
             MongoClient(
-                    serverAddress,
-                    credential,
-                    MongoClientOptions.builder().codecRegistry(pojoCodecRegistry).build()
+                serverAddress,
+                credential,
+                MongoClientOptions.builder().codecRegistry(pojoCodecRegistry).build()
             ).getDatabase(config.getNode("name").string)
         }
     }
@@ -105,7 +108,10 @@ class DatabaseManager {
                         main.logger.info(json.toString())
 
                         @Suppress("UNCHECKED_CAST")
-                        return Sponge.getDataManager().deserialize(clazz as Class<out DataSerializable>, DataFormats.JSON.read(json.toString())).get() as T
+                        return Sponge.getDataManager().deserialize(
+                            clazz as Class<out DataSerializable>,
+                            DataFormats.JSON.read(json.toString())
+                        ).get() as T
                     }
                 }
             }

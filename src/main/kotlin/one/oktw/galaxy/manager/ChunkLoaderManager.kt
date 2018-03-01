@@ -44,10 +44,12 @@ class ChunkLoaderManager {
                 }
             }
             if (chunkList.size > ticket.numChunks) {
-                main.logger.warn("ChunkLoader({}) level({} chunks) large then forge limit({} chunks)!",
-                        location.extent.toString(),
-                        chunkList.size,
-                        ticket.numChunks)
+                main.logger.warn(
+                    "ChunkLoader({}) level({} chunks) large then forge limit({} chunks)!",
+                    location.extent.toString(),
+                    chunkList.size,
+                    ticket.numChunks
+                )
             }
             chunkList.parallelStream().forEach(ticket::forceChunk)
         }
@@ -73,8 +75,8 @@ class ChunkLoaderManager {
 
     suspend fun addChunkLoader(location: Location<World>): ChunkLoader {
         val chunkLoader = ChunkLoader(
-                position = Position(planet = galaxyManager.getPlanetFromWorld(location.extent.uniqueId).await()?.uuid)
-                        .fromPosition(location.position)
+            position = Position(planet = galaxyManager.getPlanetFromWorld(location.extent.uniqueId).await()?.uuid)
+                .fromPosition(location.position)
         )
         launch { collection.insertOne(chunkLoader) }
 
@@ -102,7 +104,8 @@ class ChunkLoaderManager {
 
             worldTickets[chunkLoader.uuid]?.release()
             PlanetHelper.loadPlanet(planet).ifPresent {
-                worldTickets[chunkLoader.uuid] = loadChunk(it.getLocation(chunkLoader.position.toVector3d()), range * 2 + 1)
+                worldTickets[chunkLoader.uuid] =
+                        loadChunk(it.getLocation(chunkLoader.position.toVector3d()), range * 2 + 1)
             }
         }
     }
@@ -113,7 +116,7 @@ class ChunkLoaderManager {
         collection.find().forEach {
             launch {
                 val planet = galaxyManager.getPlanet(
-                        it.position.planet ?: return@launch
+                    it.position.planet ?: return@launch
                 ).await() ?: return@launch
                 val range = (it.upgrade.maxBy { it.level }?.level ?: 0) * 2 + 1
                 val world = withContext(this@runBlocking.coroutineContext) { planet.loadWorld().orElse(null) }

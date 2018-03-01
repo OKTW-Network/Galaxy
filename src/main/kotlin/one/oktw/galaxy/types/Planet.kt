@@ -12,12 +12,12 @@ import org.spongepowered.api.world.World
 import java.util.*
 
 data class Planet(
-        val uuid: UUID = UUID.randomUUID(),
-        var world: UUID? = null,
-        var name: String? = null,
-        var size: Int = 32,
-        var security: SecurityLevel = VISIT,
-        var lastTime: Date = Date()
+    val uuid: UUID = UUID.randomUUID(),
+    var world: UUID? = null,
+    var name: String? = null,
+    var size: Int = 32,
+    var security: SecurityLevel = VISIT,
+    var lastTime: Date = Date()
 ) {
     fun checkPermission(player: Player): AccessLevel {
         val group = galaxyManager.getGalaxy(this).getGroup(player)

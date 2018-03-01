@@ -19,12 +19,12 @@ import org.spongepowered.api.text.Text
 class Gun : CommandBase {
     override val spec: CommandSpec
         get() = CommandSpec.builder()
-                .permission("oktw.command.gun")
-                .child(Add().spec, "add")
-                .child(Remove().spec, "remove")
-                .child(Get().spec, "get")
-                .child(List().spec, "list")
-                .build()
+            .permission("oktw.command.gun")
+            .child(Add().spec, "add")
+            .child(Remove().spec, "remove")
+            .child(Get().spec, "get")
+            .child(List().spec, "list")
+            .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         return CommandResult.empty()
@@ -33,27 +33,30 @@ class Gun : CommandBase {
     class Add : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
-                    .executor(this)
-                    .permission("oktw.command.gun.add")
-                    .arguments(
-                            GenericArguments.integer(Text.of("Max Heat")),
-                            GenericArguments.doubleNum(Text.of("Range")),
-                            GenericArguments.doubleNum(Text.of("Damage")),
-                            GenericArguments.optional(GenericArguments.integer(Text.of("Cooling")), 1),
-                            GenericArguments.optional(GenericArguments.integer(Text.of("Through"))),
-                            GenericArguments.optional(GenericArguments.enumValue(Text.of("Type"), GunType::class.java), GunType.PISTOL_ORIGIN)
+                .executor(this)
+                .permission("oktw.command.gun.add")
+                .arguments(
+                    GenericArguments.integer(Text.of("Max Heat")),
+                    GenericArguments.doubleNum(Text.of("Range")),
+                    GenericArguments.doubleNum(Text.of("Damage")),
+                    GenericArguments.optional(GenericArguments.integer(Text.of("Cooling")), 1),
+                    GenericArguments.optional(GenericArguments.integer(Text.of("Through"))),
+                    GenericArguments.optional(
+                        GenericArguments.enumValue(Text.of("Type"), GunType::class.java),
+                        GunType.PISTOL_ORIGIN
                     )
-                    .build()
+                )
+                .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
                 val traveler = travelerManager.getTraveler(src)
                 val gun = Gun(
-                        type = args.getOne<GunType>("Type").get(),
-                        maxTemp = args.getOne<Int>("Max Heat").get(),
-                        cooling = args.getOne<Int>("Cooling").get(),
-                        range = args.getOne<Double>("Range").get(),
-                        damage = args.getOne<Double>("Damage").get()
+                    type = args.getOne<GunType>("Type").get(),
+                    maxTemp = args.getOne<Int>("Max Heat").get(),
+                    cooling = args.getOne<Int>("Cooling").get(),
+                    range = args.getOne<Double>("Range").get(),
+                    damage = args.getOne<Double>("Damage").get()
                 )
 
                 args.getOne<Int>("Through").ifPresent { gun.upgrade.add(Upgrade(type = THROUGH, level = it)) }
@@ -71,16 +74,17 @@ class Gun : CommandBase {
     class Remove : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
-                    .executor(this)
-                    .permission("oktw.command.gun.remove")
-                    .arguments(GenericArguments.integer(Text.of("Gun")))
-                    .build()
+                .executor(this)
+                .permission("oktw.command.gun.remove")
+                .arguments(GenericArguments.integer(Text.of("Gun")))
+                .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
                 val traveler = travelerManager.getTraveler(src)
 
-                CoolDownHelper.getCoolDown((traveler.item.removeAt(args.getOne<Int>("Gun").get()) as Gun).uuid)?.let { CoolDownHelper.removeCoolDown(it) }
+                CoolDownHelper.getCoolDown((traveler.item.removeAt(args.getOne<Int>("Gun").get()) as Gun).uuid)
+                    ?.let { CoolDownHelper.removeCoolDown(it) }
                 traveler.save()
             }
             return CommandResult.success()
@@ -90,10 +94,10 @@ class Gun : CommandBase {
     class Get : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
-                    .executor(this)
-                    .permission("oktw.command.gun.get")
-                    .arguments(GenericArguments.integer(Text.of("Gun")))
-                    .build()
+                .executor(this)
+                .permission("oktw.command.gun.get")
+                .arguments(GenericArguments.integer(Text.of("Gun")))
+                .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
@@ -110,9 +114,9 @@ class Gun : CommandBase {
     class List : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
-                    .executor(this)
-                    .permission("oktw.command.gun.list")
-                    .build()
+                .executor(this)
+                .permission("oktw.command.gun.list")
+                .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {

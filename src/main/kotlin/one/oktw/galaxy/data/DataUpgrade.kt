@@ -21,17 +21,17 @@ import java.util.*
 class DataUpgrade(type: UpgradeType, level: Int) : AbstractData<DataUpgrade, DataUpgrade.Immutable>() {
     companion object {
         val TYPE: Key<Value<UpgradeType>> = Key.builder()
-                .type(object : TypeToken<Value<UpgradeType>>() {})
-                .id("upgrade_type")
-                .name("Upgrade Type")
-                .query(DataQuery.of("upgrade", "type"))
-                .build()
+            .type(object : TypeToken<Value<UpgradeType>>() {})
+            .id("upgrade_type")
+            .name("Upgrade Type")
+            .query(DataQuery.of("upgrade", "type"))
+            .build()
         val LEVEL: Key<Value<Int>> = Key.builder()
-                .type(TypeTokens.INTEGER_VALUE_TOKEN)
-                .id("upgrade_level")
-                .name("Upgrade Level")
-                .query(DataQuery.of("upgrade", "level"))
-                .build()
+            .type(TypeTokens.INTEGER_VALUE_TOKEN)
+            .id("upgrade_level")
+            .name("Upgrade Level")
+            .query(DataQuery.of("upgrade", "level"))
+            .build()
     }
 
     var type: UpgradeType = type
@@ -75,7 +75,8 @@ class DataUpgrade(type: UpgradeType, level: Int) : AbstractData<DataUpgrade, Dat
         registerFieldSetter(LEVEL) { level = it }
     }
 
-    class Immutable(private val type: UpgradeType, private val level: Int) : AbstractImmutableData<Immutable, DataUpgrade>() {
+    class Immutable(private val type: UpgradeType, private val level: Int) :
+        AbstractImmutableData<Immutable, DataUpgrade>() {
         override fun getContentVersion() = 1
         override fun asMutable() = DataUpgrade(type, level)
         override fun toContainer(): DataContainer = super.toContainer().set(TYPE.query, type.name).set(LEVEL, level)
@@ -89,7 +90,8 @@ class DataUpgrade(type: UpgradeType, level: Int) : AbstractData<DataUpgrade, Dat
         }
     }
 
-    class Builder : AbstractDataBuilder<DataUpgrade>(DataUpgrade::class.java, 1), DataManipulatorBuilder<DataUpgrade, Immutable> {
+    class Builder : AbstractDataBuilder<DataUpgrade>(DataUpgrade::class.java, 1),
+        DataManipulatorBuilder<DataUpgrade, Immutable> {
         override fun createFrom(dataHolder: DataHolder): Optional<DataUpgrade> = create().fill(dataHolder)
         override fun create() = DataUpgrade(RANGE, 1)
         override fun buildContent(container: DataView) = create().from(container.copy())

@@ -14,14 +14,15 @@ import org.spongepowered.api.data.value.mutable.Value
 import org.spongepowered.api.util.TypeTokens
 import java.util.*
 
-class DataOverheat(overheat: Boolean = false) : AbstractBooleanData<DataOverheat, DataOverheat.Immutable>(overheat, key, false) {
+class DataOverheat(overheat: Boolean = false) :
+    AbstractBooleanData<DataOverheat, DataOverheat.Immutable>(overheat, key, false) {
     companion object {
         val key: Key<Value<Boolean>> = Key.builder()
-                .type(TypeTokens.BOOLEAN_VALUE_TOKEN)
-                .id("overheat")
-                .name("Overheat")
-                .query(DataQuery.of("overheat"))
-                .build()
+            .type(TypeTokens.BOOLEAN_VALUE_TOKEN)
+            .id("overheat")
+            .name("Overheat")
+            .query(DataQuery.of("overheat"))
+            .build()
     }
 
     override fun getContentVersion() = 1
@@ -42,12 +43,14 @@ class DataOverheat(overheat: Boolean = false) : AbstractBooleanData<DataOverheat
         return Optional.of(this)
     }
 
-    class Immutable(overheat: Boolean = false) : AbstractImmutableBooleanData<Immutable, DataOverheat>(overheat, key, false) {
+    class Immutable(overheat: Boolean = false) :
+        AbstractImmutableBooleanData<Immutable, DataOverheat>(overheat, key, false) {
         override fun getContentVersion() = 1
         override fun asMutable() = DataOverheat(value)
     }
 
-    class Builder : AbstractDataBuilder<DataOverheat>(DataOverheat::class.java, 1), DataManipulatorBuilder<DataOverheat, Immutable> {
+    class Builder : AbstractDataBuilder<DataOverheat>(DataOverheat::class.java, 1),
+        DataManipulatorBuilder<DataOverheat, Immutable> {
         override fun createFrom(dataHolder: DataHolder): Optional<DataOverheat> = create().fill(dataHolder)
         override fun create() = DataOverheat(false)
         override fun buildContent(container: DataView) = create().from(container.copy())

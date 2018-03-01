@@ -19,28 +19,28 @@ class UnStuck : CommandBase {
 
     override val spec: CommandSpec
         get() = CommandSpec.builder()
-                .executor(this)
-                .description(Text.of("卡點自救"))
-                .permission("oktw.command.unstuck")
-                .build()
+            .executor(this)
+            .description(Text.of("卡點自救"))
+            .permission("oktw.command.unstuck")
+            .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src is Player) {
             val random = UUID.randomUUID()
             val retryButton = Text.of(
-                    TextColors.AQUA,
-                    TextStyles.UNDERLINE,
-                    TextActions.executeCallback {
-                        if (random in callbackLimit) {
-                            callbackLimit.remove(random)
-                            if (src.setLocationSafely(src.location.add(0.0, 2.0, 0.0))) {
-                                src.sendMessage(Text.of(TextColors.GREEN, "已嘗試自救"))
-                            } else {
-                                src.sendMessage(Text.of(TextColors.RED, "自救失敗，找不到安全位置"))
-                            }
+                TextColors.AQUA,
+                TextStyles.UNDERLINE,
+                TextActions.executeCallback {
+                    if (random in callbackLimit) {
+                        callbackLimit.remove(random)
+                        if (src.setLocationSafely(src.location.add(0.0, 2.0, 0.0))) {
+                            src.sendMessage(Text.of(TextColors.GREEN, "已嘗試自救"))
+                        } else {
+                            src.sendMessage(Text.of(TextColors.RED, "自救失敗，找不到安全位置"))
                         }
-                    },
-                    "高度提高一點試試"
+                    }
+                },
+                "高度提高一點試試"
             )
 
             if (src.setLocationSafely(src.location)) {

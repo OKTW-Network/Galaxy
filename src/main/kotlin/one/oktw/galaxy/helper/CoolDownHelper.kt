@@ -6,11 +6,11 @@ import java.util.*
 
 class CoolDownHelper {
     data class HeatStatus(
-            val uuid: UUID,
-            val cooling: Int,
-            var now: Int = 0,
-            val max: Int,
-            private var overheat: Boolean = false
+        val uuid: UUID,
+        val cooling: Int,
+        var now: Int = 0,
+        val max: Int,
+        private var overheat: Boolean = false
     ) {
         fun isOverheat(): Boolean {
             overheat = if (now > max) true else if (now <= 0) false else overheat

@@ -34,9 +34,9 @@ class ItemHelper {
         private fun removeCoolDown(itemStack: ItemStack): ItemStack {
             @Suppress("CAST_NEVER_SUCCEEDS")
             (itemStack as net.minecraft.item.ItemStack).addAttributeModifier(
-                    SharedMonsterAttributes.ATTACK_SPEED.name,
-                    AttributeModifier("Weapon modifier", 0.0, 0),
-                    EntityEquipmentSlot.MAINHAND
+                SharedMonsterAttributes.ATTACK_SPEED.name,
+                AttributeModifier("Weapon modifier", 0.0, 0),
+                EntityEquipmentSlot.MAINHAND
             )
 
             return itemStack
@@ -44,15 +44,15 @@ class ItemHelper {
 
         private fun getGun(gun: Gun): ItemStack {
             val item = ItemStack.builder()
-                    .itemType(gun.type.item)
-                    .itemData(DataUUID.Immutable(gun.uuid))
-                    .itemData(DataOverheat())
-                    .add(Keys.UNBREAKABLE, true)
-                    .add(Keys.HIDE_UNBREAKABLE, true)
-                    .add(Keys.HIDE_MISCELLANEOUS, true)
-                    .add(Keys.HIDE_ATTRIBUTES, true)
-                    .add(Keys.HIDE_ENCHANTMENTS, true)
-                    .add(Keys.ITEM_DURABILITY, gun.type.id.toInt())
+                .itemType(gun.type.item)
+                .itemData(DataUUID.Immutable(gun.uuid))
+                .itemData(DataOverheat())
+                .add(Keys.UNBREAKABLE, true)
+                .add(Keys.HIDE_UNBREAKABLE, true)
+                .add(Keys.HIDE_MISCELLANEOUS, true)
+                .add(Keys.HIDE_ATTRIBUTES, true)
+                .add(Keys.HIDE_ENCHANTMENTS, true)
+                .add(Keys.ITEM_DURABILITY, gun.type.id.toInt())
 
             when (gun.type.item) {
                 WOODEN_SWORD -> item.add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.AQUA, "Laser Gun"))
@@ -67,9 +67,9 @@ class ItemHelper {
 
             @Suppress("CAST_NEVER_SUCCEEDS")
             (itemStack as net.minecraft.item.ItemStack).addAttributeModifier(
-                    SharedMonsterAttributes.ATTACK_DAMAGE.name,
-                    AttributeModifier("Weapon modifier", 1.0, 0),
-                    EntityEquipmentSlot.MAINHAND
+                SharedMonsterAttributes.ATTACK_DAMAGE.name,
+                AttributeModifier("Weapon modifier", 1.0, 0),
+                EntityEquipmentSlot.MAINHAND
             )
 
             return itemStack
@@ -83,10 +83,10 @@ class ItemHelper {
             }
 
             return ItemStack.builder()
-                    .itemType(ItemTypes.ENCHANTED_BOOK)
-                    .itemData(DataUpgrade(upgrade.type, upgrade.level))
-                    .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, color, "$name Upgrade Lv.${upgrade.level}"))
-                    .build()
+                .itemType(ItemTypes.ENCHANTED_BOOK)
+                .itemData(DataUpgrade(upgrade.type, upgrade.level))
+                .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, color, "$name Upgrade Lv.${upgrade.level}"))
+                .build()
         }
     }
 }

@@ -17,11 +17,11 @@ import java.util.*
 class DataScope(scoping: Boolean = false) : AbstractBooleanData<DataScope, DataScope.Immutable>(scoping, key, false) {
     companion object {
         val key: Key<Value<Boolean>> = Key.builder()
-                .type(TypeTokens.BOOLEAN_VALUE_TOKEN)
-                .id("scoping")
-                .name("Scoping")
-                .query(DataQuery.of("scoping"))
-                .build()
+            .type(TypeTokens.BOOLEAN_VALUE_TOKEN)
+            .id("scoping")
+            .name("Scoping")
+            .query(DataQuery.of("scoping"))
+            .build()
     }
 
     override fun getContentVersion() = 1
@@ -42,12 +42,14 @@ class DataScope(scoping: Boolean = false) : AbstractBooleanData<DataScope, DataS
         return Optional.of(this)
     }
 
-    class Immutable(scoping: Boolean = false) : AbstractImmutableBooleanData<Immutable, DataScope>(scoping, key, false) {
+    class Immutable(scoping: Boolean = false) :
+        AbstractImmutableBooleanData<Immutable, DataScope>(scoping, key, false) {
         override fun getContentVersion() = 1
         override fun asMutable() = DataScope(value)
     }
 
-    class Builder : AbstractDataBuilder<DataScope>(DataScope::class.java, 1), DataManipulatorBuilder<DataScope, Immutable> {
+    class Builder : AbstractDataBuilder<DataScope>(DataScope::class.java, 1),
+        DataManipulatorBuilder<DataScope, Immutable> {
         override fun createFrom(dataHolder: DataHolder): Optional<DataScope> = create().fill(dataHolder)
         override fun create() = DataScope(false)
         override fun buildContent(container: DataView) = create().from(container.copy())

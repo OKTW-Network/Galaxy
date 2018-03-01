@@ -14,9 +14,9 @@ class Hat : CommandBase {
 
     override val spec: CommandSpec
         get() = CommandSpec.builder()
-                .executor(this)
-                .permission("oktw.command.hat")
-                .build()
+            .executor(this)
+            .permission("oktw.command.hat")
+            .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src is Player) {

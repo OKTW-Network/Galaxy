@@ -20,11 +20,11 @@ class CoolingStatus : Consumer<Task> {
     override fun accept(task: Task) {
         Sponge.getServer().onlinePlayers.forEach {
             val mainHand: ItemStack? = it.getItemInHand(HandTypes.MAIN_HAND)
-                    .filter { it[DataOverheat.key].isPresent && it[DataUUID.key].isPresent }
-                    .orElse(null)
+                .filter { it[DataOverheat.key].isPresent && it[DataUUID.key].isPresent }
+                .orElse(null)
             val offHand: ItemStack? = it.getItemInHand(HandTypes.OFF_HAND)
-                    .filter { it[DataOverheat.key].isPresent && it[DataUUID.key].isPresent }
-                    .orElse(null)
+                .filter { it[DataOverheat.key].isPresent && it[DataUUID.key].isPresent }
+                .orElse(null)
 
             fun updateOverheat(itemStack: ItemStack, handType: HandType) {
                 val overheat = getHeatStatus(itemStack[DataUUID.key].get())?.isOverheat() ?: false
@@ -43,25 +43,33 @@ class CoolingStatus : Consumer<Task> {
                 val bar1 = if (heatStatus1 != null) normalize(heatStatus1) / 2 else 0
                 val bar2 = if (heatStatus2 != null) normalize(heatStatus2) / 2 else 0
 
-                it.sendTitle(Title.builder()
-                        .actionBar(Text.of(
+                it.sendTitle(
+                    Title.builder()
+                        .actionBar(
+                            Text.of(
                                 TextColors.GRAY, "|".repeat(50 - bar2),
                                 color(heatStatus2), "|".repeat(bar2), " ", heatStatus2?.now ?: 0, "°C",
                                 TextColors.RESET, " | ",
                                 color(heatStatus1), heatStatus1?.now ?: 0, "°C ", "|".repeat(bar1),
                                 TextColors.GRAY, "|".repeat(50 - bar1)
-                        ))
-                        .build())
+                            )
+                        )
+                        .build()
+                )
             } else if (mainHand != null) {
                 val heatStatus1 = getHeatStatus(mainHand[DataUUID.key].get())
                 val bar1 = if (heatStatus1 != null) normalize(heatStatus1) / 2 else 0
 
-                it.sendTitle(Title.builder()
-                        .actionBar(Text.of(
+                it.sendTitle(
+                    Title.builder()
+                        .actionBar(
+                            Text.of(
                                 color(heatStatus1), "|".repeat(bar1), " ", heatStatus1?.now
-                                ?: 0, "°C ", "|".repeat(bar1)
-                        ))
-                        .build())
+                                        ?: 0, "°C ", "|".repeat(bar1)
+                            )
+                        )
+                        .build()
+                )
             }
         }
     }

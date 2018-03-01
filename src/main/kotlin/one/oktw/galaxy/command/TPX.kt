@@ -13,21 +13,23 @@ import org.spongepowered.api.world.storage.WorldProperties
 class TPX : CommandBase {
     override val spec: CommandSpec
         get() = CommandSpec.builder()
-                .permission("oktw.command.tpx")
-                .executor(this)
-                .arguments(GenericArguments.firstParsing(
-                        GenericArguments.world(Text.of("World")),
-                        GenericArguments.player(Text.of("Player"))
-                ))
-                .build()
+            .permission("oktw.command.tpx")
+            .executor(this)
+            .arguments(
+                GenericArguments.firstParsing(
+                    GenericArguments.world(Text.of("World")),
+                    GenericArguments.player(Text.of("Player"))
+                )
+            )
+            .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src !is Player) return CommandResult.empty()
 
         if (args.hasAny("World")) {
             Sponge.getServer()
-                    .loadWorld(args.getOne<WorldProperties>("World").get())
-                    .ifPresent { src.transferToWorld(it) }
+                .loadWorld(args.getOne<WorldProperties>("World").get())
+                .ifPresent { src.transferToWorld(it) }
         } else if (args.hasAny("Player")) {
             src.setLocationSafely(args.getOne<Player>("Player").get().location)
         }

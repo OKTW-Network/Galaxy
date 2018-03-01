@@ -20,11 +20,11 @@ import java.util.UUID.randomUUID
 class DataUUID(uuid: UUID = randomUUID()) : AbstractSingleData<UUID, DataUUID, DataUUID.Immutable>(uuid, key) {
     companion object {
         val key: Key<Value<UUID>> = Key.builder()
-                .type(TypeTokens.UUID_VALUE_TOKEN)
-                .id("uuid")
-                .name("UUID")
-                .query(DataQuery.of("uuid"))
-                .build()
+            .type(TypeTokens.UUID_VALUE_TOKEN)
+            .id("uuid")
+            .name("UUID")
+            .query(DataQuery.of("uuid"))
+            .build()
     }
 
     override fun getContentVersion() = 1
@@ -48,7 +48,8 @@ class DataUUID(uuid: UUID = randomUUID()) : AbstractSingleData<UUID, DataUUID, D
     }
 
     class Immutable(uuid: UUID) : AbstractImmutableSingleData<UUID, Immutable, DataUUID>(uuid, key) {
-        private val immutableValue: ImmutableValue<UUID> = Sponge.getRegistry().valueFactory.createValue(key, value).asImmutable()
+        private val immutableValue: ImmutableValue<UUID> =
+            Sponge.getRegistry().valueFactory.createValue(key, value).asImmutable()
 
         override fun getContentVersion() = 1
         override fun asMutable() = DataUUID(value)
@@ -56,7 +57,8 @@ class DataUUID(uuid: UUID = randomUUID()) : AbstractSingleData<UUID, DataUUID, D
         override fun toContainer(): DataContainer = super.toContainer().set(key, value)
     }
 
-    class Builder : AbstractDataBuilder<DataUUID>(DataUUID::class.java, 1), DataManipulatorBuilder<DataUUID, Immutable> {
+    class Builder : AbstractDataBuilder<DataUUID>(DataUUID::class.java, 1),
+        DataManipulatorBuilder<DataUUID, Immutable> {
         override fun createFrom(dataHolder: DataHolder): Optional<DataUUID> = create().fill(dataHolder)
         override fun create() = DataUUID(randomUUID())
         override fun buildContent(container: DataView) = create().from(container.copy())

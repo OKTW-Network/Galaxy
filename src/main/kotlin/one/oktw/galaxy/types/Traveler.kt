@@ -6,10 +6,10 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 data class Traveler(
-        val uuid: UUID? = null,
-        var position: Position = Position(),
-        var armor: Armor = Armor(),
-        var item: ArrayList<IItem> = ArrayList()
+    val uuid: UUID? = null,
+    var position: Position = Position(),
+    var armor: Armor = Armor(),
+    var item: ArrayList<IItem> = ArrayList()
 ) {
     fun save() {
         travelerManager.saveTraveler(this)

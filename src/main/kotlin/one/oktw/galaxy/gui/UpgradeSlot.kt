@@ -16,10 +16,10 @@ import org.spongepowered.api.text.Text
 class UpgradeSlot(private var upgrade: List<Upgrade>, private vararg val acceptUpgradeType: UpgradeType) {
     private lateinit var closeListener: (List<Upgrade>) -> Unit
     private val inventory: Inventory = Inventory.builder()
-            .of(InventoryArchetypes.HOPPER)
-            .property(InventoryTitle.of(Text.of("Upgrade")))
-            .listener(InteractInventoryEvent::class.java, this::eventListener)
-            .build(main)
+        .of(InventoryArchetypes.HOPPER)
+        .property(InventoryTitle.of(Text.of("Upgrade")))
+        .listener(InteractInventoryEvent::class.java, this::eventListener)
+        .build(main)
 
     init {
         upgrade.forEach { ItemHelper.getItem(it).ifPresent { inventory.offer(it) } }
@@ -27,9 +27,9 @@ class UpgradeSlot(private var upgrade: List<Upgrade>, private vararg val acceptU
 
     private fun eventListener(event: InteractInventoryEvent) {
         val item = inventory.slots<Slot>()
-                .mapNotNull { it.peek().orElse(null) }
-                .map { it[DataUpgrade::class.java].orElse(null) }
-                .sortedBy { it?.level }
+            .mapNotNull { it.peek().orElse(null) }
+            .map { it[DataUpgrade::class.java].orElse(null) }
+            .sortedBy { it?.level }
 
         if (item.contains(null)) {
             event.isCancelled = true

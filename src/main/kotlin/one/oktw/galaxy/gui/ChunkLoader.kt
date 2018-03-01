@@ -36,26 +36,26 @@ class ChunkLoader(val entity: Entity) {
     private val upgradeButton = UUID.randomUUID()
     private val removeButton = UUID.randomUUID()
     private val inventory: Inventory = Inventory.builder()
-            .of(InventoryArchetypes.HOPPER)
-            .property(InventoryTitle.of(Text.of("ChunkLoader")))
-            .listener(InteractInventoryEvent.Close::class.java, this::closeEventListener)
-            .listener(ClickInventoryEvent::class.java, this::clickEventListener)
-            .build(main)
+        .of(InventoryArchetypes.HOPPER)
+        .property(InventoryTitle.of(Text.of("ChunkLoader")))
+        .listener(InteractInventoryEvent.Close::class.java, this::closeEventListener)
+        .listener(ClickInventoryEvent::class.java, this::clickEventListener)
+        .build(main)
 
     init {
         launch { chunkLoader = chunkLoaderManager.get(uuid).await() ?: return@launch }
 
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
         val upgradeItem = ItemStack.builder()
-                .itemType(ItemTypes.ENCHANTED_BOOK)
-                .itemData(DataUUID(upgradeButton))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Upgrade"))
-                .build()
+            .itemType(ItemTypes.ENCHANTED_BOOK)
+            .itemData(DataUUID(upgradeButton))
+            .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Upgrade"))
+            .build()
         val removeItem = ItemStack.builder()
-                .itemType(ItemTypes.ENCHANTED_BOOK)
-                .itemData(DataUUID(removeButton))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "Remove"))
-                .build()
+            .itemType(ItemTypes.ENCHANTED_BOOK)
+            .itemData(DataUUID(removeButton))
+            .add(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "Remove"))
+            .build()
 
         inventory.set(1, 0, upgradeItem)
         inventory.set(3, 0, removeItem)
@@ -82,21 +82,21 @@ class ChunkLoader(val entity: Entity) {
         if (!this::chunkLoader.isInitialized) return
 
         UpgradeSlot(chunkLoader.upgrade, UpgradeType.RANGE)
-                .onClose {
-                    SampleLock.unlock(uuid)
+            .onClose {
+                SampleLock.unlock(uuid)
 
-                    val originLevel = chunkLoader.upgrade.maxBy { it.level }?.level ?: 0
-                    val newLevel = it.maxBy { it.level }?.level ?: 0
+                val originLevel = chunkLoader.upgrade.maxBy { it.level }?.level ?: 0
+                val newLevel = it.maxBy { it.level }?.level ?: 0
 
-                    chunkLoader.upgrade = it as ArrayList<Upgrade>
+                chunkLoader.upgrade = it as ArrayList<Upgrade>
 
-                    if (newLevel != originLevel) {
-                        launch { chunkLoaderManager.updateChunkLoader(chunkLoader, true) }
-                    } else {
-                        launch { chunkLoaderManager.updateChunkLoader(chunkLoader) }
-                    }
+                if (newLevel != originLevel) {
+                    launch { chunkLoaderManager.updateChunkLoader(chunkLoader, true) }
+                } else {
+                    launch { chunkLoaderManager.updateChunkLoader(chunkLoader) }
                 }
-                .open(player)
+            }
+            .open(player)
     }
 
     private fun clickRemove() {
@@ -104,9 +104,9 @@ class ChunkLoader(val entity: Entity) {
 
         val location = entity.location
         val itemEntities = arrayListOf(
-                location.createEntity(EntityTypes.ITEM).also {
-                    it.offer(Keys.REPRESENTED_ITEM, ItemStack.of(ItemTypes.END_CRYSTAL, 1).createSnapshot())
-                }
+            location.createEntity(EntityTypes.ITEM).also {
+                it.offer(Keys.REPRESENTED_ITEM, ItemStack.of(ItemTypes.END_CRYSTAL, 1).createSnapshot())
+            }
         )
 
         launch { chunkLoaderManager.delete(uuid) }

@@ -10,10 +10,10 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 data class Galaxy(
-        val uuid: UUID = UUID.randomUUID(),
-        var name: String? = null,
-        var members: ArrayList<Member> = ArrayList(),
-        var planets: ArrayList<Planet> = ArrayList()
+    val uuid: UUID = UUID.randomUUID(),
+    var name: String? = null,
+    var members: ArrayList<Member> = ArrayList(),
+    var planets: ArrayList<Planet> = ArrayList()
 ) {
     fun save() {
         galaxyManager.saveGalaxy(this)

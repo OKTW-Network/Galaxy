@@ -17,21 +17,21 @@ import org.spongepowered.api.util.blockray.BlockRay
 class Sign : CommandBase {
     override val spec: CommandSpec
         get() = CommandSpec.builder()
-                .executor(this)
-                .permission("oktw.command.sign")
-                .arguments(
-                        GenericArguments.onlyOne(GenericArguments.integer(Text.of("Line"))),
-                        GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("Text")))
-                )
-                .build()
+            .executor(this)
+            .permission("oktw.command.sign")
+            .arguments(
+                GenericArguments.onlyOne(GenericArguments.integer(Text.of("Line"))),
+                GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("Text")))
+            )
+            .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src !is Player) return CommandResult.empty()
 
         val blockRay = BlockRay.from(src)
-                .distanceLimit(7.0)
-                .skipFilter { it.location.blockType == STANDING_SIGN || it.location.blockType == WALL_SIGN }
-                .build()
+            .distanceLimit(7.0)
+            .skipFilter { it.location.blockType == STANDING_SIGN || it.location.blockType == WALL_SIGN }
+            .build()
 
         if (blockRay.hasNext()) {
             val block = blockRay.next().location.tileEntity.orElse(null) ?: return CommandResult.empty()

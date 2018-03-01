@@ -10,9 +10,9 @@ import org.spongepowered.api.entity.living.player.Player
 
 class Spawn : CommandBase {
     override val spec: CommandSpec = CommandSpec.builder()
-            .executor(this)
-            .permission("oktw.command.spawn")
-            .build()
+        .executor(this)
+        .permission("oktw.command.spawn")
+        .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src !is Player) return CommandResult.empty()

@@ -33,6 +33,20 @@
       </configuration>
     </facet>
   </component>
+  <component name="McpModuleSettings">
+    <option name="mappingFiles">
+      <set>
+        <option value="$USER_HOME$/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/20180223/1.12.2/srgs/mcp-notch.srg" />
+        <option value="$USER_HOME$/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/20180223/1.12.2/srgs/mcp-srg.srg" />
+        <option value="$USER_HOME$/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/20180223/1.12.2/srgs/mcp.exc" />
+        <option value="$USER_HOME$/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/20180223/1.12.2/srgs/notch-mcp.srg" />
+        <option value="$USER_HOME$/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/20180223/1.12.2/srgs/notch-srg.srg" />
+        <option value="$USER_HOME$/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/20180223/1.12.2/srgs/srg.exc" />
+      </set>
+    </option>
+    <option name="mcpVersion" value="snapshot_20180223" />
+    <option name="minecraftVersion" value="1.12.2" />
+  </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../src/test">
@@ -87,7 +101,7 @@
     <orderEntry type="library" name="Gradle: com.google.guava:guava:21.0" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.5" level="project" />
     <orderEntry type="library" name="Gradle: commons-io:commons-io:2.5" level="project" />
-    <orderEntry type="library" name="Gradle: com.mojang:realms:1.10.18" level="project" />
+    <orderEntry type="library" name="Gradle: com.mojang:realms:1.10.19" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpclient:4.3.3" level="project" />
     <orderEntry type="library" name="Gradle: commons-codec:commons-codec:1.10" level="project" />
     <orderEntry type="library" name="Gradle: net.java.jutils:jutils:1.0.0" level="project" />

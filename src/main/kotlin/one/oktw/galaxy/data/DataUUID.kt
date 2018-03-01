@@ -31,7 +31,7 @@ class DataUUID(uuid: UUID = randomUUID()) : AbstractSingleData<UUID, DataUUID, D
     override fun asImmutable() = Immutable(value)
     override fun copy() = DataUUID(value)
     override fun getValueGetter(): Value<UUID> = Sponge.getRegistry().valueFactory.createValue(key, value)
-    override fun toContainer(): DataContainer = super.toContainer().set(key, value)
+    override fun fillContainer(dataContainer: DataContainer): DataContainer = dataContainer.set(key, value)
 
     override fun from(container: DataContainer): Optional<DataUUID> {
         return if (container[key.query].isPresent) {

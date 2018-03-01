@@ -38,24 +38,8 @@ class ChunkLoader(val entity: Entity) {
     private val inventory: Inventory = Inventory.builder()
             .of(InventoryArchetypes.HOPPER)
             .property(InventoryTitle.of(Text.of("ChunkLoader")))
-            .listener(InteractInventoryEvent::class.java) {
-                if (it is InteractInventoryEvent.Open || it is InteractInventoryEvent.Close) {
-                    if (it is InteractInventoryEvent.Close) SampleLock.unlock(uuid)
-
-                    it.cursorTransaction.setCustom(ItemStackSnapshot.NONE)
-                    it.cursorTransaction.isValid = true
-                }
-            }
-            .listener(ClickInventoryEvent::class.java) {
-                it.isCancelled = true
-
-                val itemUUID = it.cursorTransaction.default[DataUUID.key].orElse(null) ?: return@listener
-
-                when (itemUUID) {
-                    upgradeButton -> clickUpgrade()
-                    removeButton -> clickRemove()
-                }
-            }
+            .listener(InteractInventoryEvent.Close::class.java, this::closeEventListener)
+            .listener(ClickInventoryEvent::class.java, this::clickEventListener)
             .build(main)
 
     init {
@@ -77,11 +61,21 @@ class ChunkLoader(val entity: Entity) {
         inventory.set(3, 0, removeItem)
     }
 
-    fun open(player: Player) {
-        if (!SampleLock.lock(uuid)) return
-        this@ChunkLoader.player = player
+    private fun closeEventListener(event: InteractInventoryEvent.Close) {
+        SampleLock.unlock(uuid)
+        event.cursorTransaction.setCustom(ItemStackSnapshot.NONE)
+        event.cursorTransaction.isValid = true
+    }
 
-        player.openInventory(this.inventory)
+    private fun clickEventListener(event: ClickInventoryEvent) {
+        event.isCancelled = true
+
+        val itemUUID = event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return
+
+        when (itemUUID) {
+            upgradeButton -> clickUpgrade()
+            removeButton -> clickRemove()
+        }
     }
 
     private fun clickUpgrade() {
@@ -128,5 +122,12 @@ class ChunkLoader(val entity: Entity) {
         location.spawnEntities(itemEntities)
         entity.remove()
         Task.builder().execute { _ -> player.closeInventory() }.submit(main)
+    }
+
+    fun open(player: Player) {
+        if (!SampleLock.lock(uuid)) return
+        this@ChunkLoader.player = player
+
+        player.openInventory(this.inventory)
     }
 }

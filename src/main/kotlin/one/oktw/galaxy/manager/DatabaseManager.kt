@@ -108,8 +108,6 @@ class DatabaseManager {
                             .int64Converter { value, writer -> writer.writeString(value.toString()) }
                             .build()).pipe(reader)
 
-                        main.logger.info(json.toString())
-
                         @Suppress("UNCHECKED_CAST")
                         return Sponge.getDataManager().deserialize(
                             clazz as Class<out DataSerializable>,

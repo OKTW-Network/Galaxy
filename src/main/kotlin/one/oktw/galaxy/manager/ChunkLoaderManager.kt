@@ -75,8 +75,10 @@ class ChunkLoaderManager {
 
     suspend fun addChunkLoader(location: Location<World>): ChunkLoader {
         val chunkLoader = ChunkLoader(
-            position = Position(planet = galaxyManager.getPlanetFromWorld(location.extent.uniqueId).await()?.uuid)
-                .fromPosition(location.position)
+            position = Position(
+                location.position,
+                galaxyManager.getPlanetFromWorld(location.extent.uniqueId).await()?.uuid
+            )
         )
         launch { collection.insertOne(chunkLoader) }
 

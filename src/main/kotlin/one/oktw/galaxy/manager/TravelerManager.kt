@@ -16,7 +16,7 @@ class TravelerManager {
     private val cache = ConcurrentHashMap<UUID, Traveler>()
 
     private fun createTraveler(player: Player): Traveler {
-        val traveler = Traveler(player.uniqueId, position = Position().fromPosition(player.location.position))
+        val traveler = Traveler(player.uniqueId, position = Position(player.location.position))
         traveler.save()
         return traveler
     }
@@ -35,7 +35,7 @@ class TravelerManager {
     suspend fun updateTraveler(player: Player) {
         val traveler = getTraveler(player)
 
-        traveler.position.fromPosition(player.location.position)
+        traveler.position.setFromVector3d(player.location.position)
         traveler.position.planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId).await()?.uuid
 
         traveler.save()

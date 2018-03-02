@@ -56,10 +56,11 @@ class Gun : CommandBase {
                     maxTemp = args.getOne<Int>("Max Heat").get(),
                     cooling = args.getOne<Int>("Cooling").get(),
                     range = args.getOne<Double>("Range").get(),
-                    damage = args.getOne<Double>("Damage").get()
+                    damage = args.getOne<Double>("Damage").get(),
+                    heat = 10
                 )
 
-                args.getOne<Int>("Through").ifPresent { gun.upgrade.add(Upgrade(type = THROUGH, level = it)) }
+                args.getOne<Int>("Through").ifPresent { gun.upgrade.add(Upgrade(THROUGH, it)) }
 
                 traveler.item.add(gun)
                 traveler.save()

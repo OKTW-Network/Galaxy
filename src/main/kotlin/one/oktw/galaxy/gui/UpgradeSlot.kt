@@ -50,7 +50,7 @@ class UpgradeSlot(private var upgrade: List<Upgrade>, private vararg val acceptU
         }
 
         if (filter) {
-            this@UpgradeSlot.upgrade = item.map { Upgrade(type = it.type, level = it.level) }
+            this@UpgradeSlot.upgrade = item.map { Upgrade(it.type, it.level) }
         } else {
             event.isCancelled = true
         }

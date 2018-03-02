@@ -20,7 +20,7 @@ class GalaxyManager {
     fun createGalaxy(name: String, creator: Player, vararg members: UUID): Galaxy {
         val memberList = ArrayList<Member>(members.size + 1)
         memberList += Member(creator.uniqueId, OWNER)
-        memberList += members.map { Member(it, MEMBER) }
+        memberList += members.map { Member(it) }
 
         val galaxy = Galaxy(name = name, members = memberList)
 
@@ -33,7 +33,7 @@ class GalaxyManager {
     suspend fun deleteGalaxy(uuid: UUID) {
         getGalaxy(uuid).await().ifPresent {
             it.planets.forEach {
-                it.world?.let { PlanetHelper.removePlanet(it) }
+                it.world.let { PlanetHelper.removePlanet(it) }
             }
         }
 

@@ -62,7 +62,7 @@ class PlanetHelper {
         }
 
         fun loadPlanet(planet: Planet): Optional<World> {
-            val world = planet.world ?: return Optional.empty()
+            val world = planet.world
 
             return if (server.getWorldProperties(world).isPresent) {
                 planet.lastTime = Date()
@@ -77,9 +77,7 @@ class PlanetHelper {
         }
 
         fun updatePlanet(planet: Planet) {
-            planet.world?.let {
-                server.getWorldProperties(it).ifPresent { it.worldBorderDiameter = (planet.size * 16).toDouble() }
-            }
+            server.getWorldProperties(planet.world).ifPresent { it.worldBorderDiameter = (planet.size * 16).toDouble() }
         }
     }
 }

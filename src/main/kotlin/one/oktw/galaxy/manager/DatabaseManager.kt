@@ -59,7 +59,6 @@ class DatabaseManager {
                 SpongeDataCodecProvider(),
                 PojoCodecProvider.builder()
                     .register("one.oktw.galaxy.types", "one.oktw.galaxy.types.item")
-//                                .automatic(true)
                     .conventions(
                         asList(
                             SET_PRIVATE_FIELDS_CONVENTION,

@@ -1,6 +1,7 @@
 package one.oktw.galaxy.types
 
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.annotation.Document
 import one.oktw.galaxy.enums.AccessLevel
 import one.oktw.galaxy.enums.AccessLevel.*
 import one.oktw.galaxy.enums.Group
@@ -11,10 +12,11 @@ import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.world.World
 import java.util.*
 
+@Document
 data class Planet(
     val uuid: UUID = UUID.randomUUID(),
-    var world: UUID? = null,
-    var name: String? = null,
+    var world: UUID,
+    var name: String,
     var size: Int = 32,
     var security: SecurityLevel = VISIT,
     var lastTime: Date = Date()

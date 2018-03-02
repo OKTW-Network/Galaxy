@@ -1,11 +1,12 @@
 package one.oktw.galaxy.types.item
 
+import one.oktw.galaxy.annotation.Document
 import one.oktw.galaxy.enums.UpgradeType
-import one.oktw.galaxy.enums.UpgradeType.EMPTY
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
 
+@Document
 @BsonDiscriminator
 data class Upgrade(
-    val type: UpgradeType = EMPTY,
-    var level: Int = 1
+    val type: UpgradeType,
+    var level: Int
 ) : IItem

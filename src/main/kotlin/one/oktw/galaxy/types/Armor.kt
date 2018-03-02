@@ -1,5 +1,8 @@
 package one.oktw.galaxy.types
 
+import one.oktw.galaxy.annotation.Document
+
+@Document
 data class Armor(
     var shield: Int = 0,
     var quick: Int = 0,

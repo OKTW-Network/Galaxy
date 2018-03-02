@@ -1,6 +1,7 @@
 package one.oktw.galaxy.types
 
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.annotation.Document
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.enums.Group.MEMBER
 import one.oktw.galaxy.enums.Group.VISITOR
@@ -9,9 +10,10 @@ import org.spongepowered.api.entity.living.player.Player
 import java.util.*
 import kotlin.collections.ArrayList
 
+@Document
 data class Galaxy(
     val uuid: UUID = UUID.randomUUID(),
-    var name: String? = null,
+    var name: String,
     var members: ArrayList<Member> = ArrayList(),
     var planets: ArrayList<Planet> = ArrayList()
 ) {
@@ -30,7 +32,7 @@ data class Galaxy(
     fun removePlanet(uuid: UUID) {
         val planet = planets.firstOrNull { it.uuid == uuid } ?: return
 
-        PlanetHelper.removePlanet(planet.world!!).thenAccept {
+        PlanetHelper.removePlanet(planet.world).thenAccept {
             if (it) planets.remove(planet)
             save()
         }

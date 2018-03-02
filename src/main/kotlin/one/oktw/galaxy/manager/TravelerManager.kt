@@ -35,7 +35,7 @@ class TravelerManager {
     suspend fun updateTraveler(player: Player) {
         val traveler = getTraveler(player)
 
-        traveler.position.setFromVector3d(player.location.position)
+        traveler.position.fromVector3d(player.location.position)
         traveler.position.planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId).await()?.uuid
 
         traveler.save()

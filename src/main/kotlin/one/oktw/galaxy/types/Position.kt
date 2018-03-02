@@ -2,7 +2,6 @@ package one.oktw.galaxy.types
 
 import com.flowpowered.math.vector.Vector3d
 import one.oktw.galaxy.annotation.Document
-import org.bson.codecs.pojo.annotations.BsonIgnore
 import java.util.*
 
 @Document
@@ -14,8 +13,7 @@ data class Position(
 ) {
     constructor(vector3d: Vector3d, planet: UUID? = null) : this(vector3d.x, vector3d.y, vector3d.z, planet)
 
-    @BsonIgnore
-    fun setFromVector3d(vector3d: Vector3d): Position {
+    fun fromVector3d(vector3d: Vector3d): Position {
         x = vector3d.x
         y = vector3d.y
         z = vector3d.z

@@ -28,7 +28,7 @@ data class Galaxy(
     }
 
     fun removePlanet(uuid: UUID) {
-        val planet = planets.find { it.uuid === uuid } ?: return
+        val planet = planets.firstOrNull { it.uuid == uuid } ?: return
 
         PlanetHelper.removePlanet(planet.world!!).thenAccept {
             if (it) planets.remove(planet)
@@ -44,16 +44,16 @@ data class Galaxy(
     }
 
     fun delMember(uuid: UUID) {
-        members.remove(members.find { it.uuid == uuid } ?: return)
+        members.remove(members.firstOrNull { it.uuid == uuid } ?: return)
         save()
     }
 
-    fun setMemberGroup(uuid: UUID, group: Group) {
-        members.forEach { if (it.uuid == uuid) it.group = group }
+    fun setGroup(uuid: UUID, group: Group) {
+        members.first { it.uuid == uuid }.group = group
         save()
     }
 
     fun getGroup(player: Player): Group {
-        return members.find { it.uuid == player.uniqueId }?.group ?: return VISITOR
+        return members.firstOrNull { it.uuid == player.uniqueId }?.group ?: return VISITOR
     }
 }

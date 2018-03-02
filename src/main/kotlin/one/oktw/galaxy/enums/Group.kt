@@ -1,7 +1,8 @@
 package one.oktw.galaxy.enums
 
 enum class Group {
-    VISITOR,
+    OWNER,
+    ADMIN,
     MEMBER,
-    ADMIN;
+    VISITOR
 }

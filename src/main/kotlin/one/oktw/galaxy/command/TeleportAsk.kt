@@ -100,7 +100,6 @@ class TeleportAsk : CommandBase {
             } else {
                 player.sendMessage(Text.of(TextColors.RED, "傳送失敗，或許是對方或是你的權限不足").toText())
             }
-
         } else {
             player.sendMessage(Text.of(TextColors.RED, "位置移動，傳送取消").toText())
         }

@@ -19,8 +19,8 @@ data class Planet(
     var security: SecurityLevel = VISIT,
     var lastTime: Date = Date()
 ) {
-    fun checkPermission(player: Player): AccessLevel {
-        val group = galaxyManager.getGalaxy(this).getGroup(player)
+    suspend fun checkPermission(player: Player): AccessLevel {
+        val group = galaxyManager.getGalaxy(this).await().getGroup(player)
 
         return when (security) {
             MEMBER -> if (group !== Group.VISITOR) MODIFY else DENY

@@ -28,7 +28,8 @@ class CoolDownHelper {
 
         init {
             Task.builder().intervalTicks(1).name("CoolDown").async().execute { _ ->
-                coolDown.filter { it -> it.now > 0 }.forEach { it -> it.now -= it.cooling }
+                coolDown.filter { it -> it.now > 0 }
+                    .forEach { it.now = if (it.now - it.cooling < 0) 0 else it.now - it.cooling }
             }.submit(main)
         }
 

@@ -2,7 +2,9 @@ package one.oktw.galaxy.command
 
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
+import one.oktw.galaxy.helper.SampleLock.Companion.checkLocked
+import one.oktw.galaxy.helper.SampleLock.Companion.lock
+import one.oktw.galaxy.helper.SampleLock.Companion.unlock
 import one.oktw.galaxy.helper.TeleportHelper
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
@@ -20,8 +22,6 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class TeleportHereAsk : CommandBase {
-    private var callbackLimit = HashMap<UUID, Player>()
-
     override val spec: CommandSpec
         get() = CommandSpec.builder()
             .executor(this)
@@ -34,13 +34,11 @@ class TeleportHereAsk : CommandBase {
             if (args.getOne<Player>("Player").isPresent) {
                 val uuid = UUID.randomUUID()
                 val target = args.getOne<Player>("Player").get()
-                callbackLimit[uuid] = target
+                lock(uuid)
 
                 launch {
                     delay(5, TimeUnit.MINUTES)
-                    if (callbackLimit.containsKey(uuid)) {
-                        callbackLimit.remove(uuid)
-                    }
+                    unlock(uuid)
                 }
 
                 val teleportMsg =
@@ -50,11 +48,13 @@ class TeleportHereAsk : CommandBase {
                             Text.of(
                                 TextActions.showText(Text.of(TextColors.RED, "請勿輕易接受其他人的邀請")),
                                 TextActions.executeCallback {
-                                    if (callbackLimit.containsKey(uuid)) {
+                                    if (!checkLocked(uuid)) {
                                         src.sendMessage(Text.of(TextColors.GREEN, "對方已接受傳送請求"))
                                         target.sendMessage(Text.of(TextColors.GREEN, "已接受傳送請求"))
-                                        runBlocking { teleport(target, src.location) }
-                                        callbackLimit.remove(uuid)
+                                        launch {
+                                            teleport(target, src.location)
+                                            unlock(uuid)
+                                        }
                                     }
                                 },
                                 TextColors.GREEN,
@@ -63,10 +63,10 @@ class TeleportHereAsk : CommandBase {
                                 TextStyles.RESET,
                                 " ",
                                 TextActions.executeCallback {
-                                    if (callbackLimit.containsKey(uuid)) {
+                                    if (checkLocked(uuid)) {
                                         src.sendMessage(Text.of(TextColors.RED, "對方已拒絕傳送請求"))
                                         target.sendMessage(Text.of(TextColors.RED, "已拒絕傳送請求"))
-                                        callbackLimit.remove(uuid)
+                                        unlock(uuid)
                                     }
                                 },
                                 TextColors.RED,

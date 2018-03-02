@@ -18,7 +18,6 @@ import org.bson.codecs.configuration.CodecRegistries.fromRegistries
 import org.bson.codecs.configuration.CodecRegistry
 import org.bson.codecs.pojo.Conventions.*
 import org.bson.codecs.pojo.PojoCodecProvider
-import org.bson.json.JsonMode
 import org.bson.json.JsonReader
 import org.bson.json.JsonWriter
 import org.bson.json.JsonWriterSettings
@@ -103,7 +102,11 @@ class DatabaseManager {
 
                     override fun decode(reader: BsonReader, decoderContext: DecoderContext): T {
                         val json = StringWriter()
-                        JsonWriter(json, JsonWriterSettings.builder().outputMode(JsonMode.RELAXED).build()).pipe(reader)
+                        JsonWriter(json, JsonWriterSettings.builder()
+                            // workaround https://github.com/SpongePowered/SpongeCommon/issues/1821
+                            .doubleConverter { value, writer -> writer.writeString(value.toString()) }
+                            .int64Converter { value, writer -> writer.writeString(value.toString()) }
+                            .build()).pipe(reader)
 
                         main.logger.info(json.toString())
 

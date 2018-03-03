@@ -9,4 +9,4 @@ import org.bson.codecs.pojo.annotations.BsonDiscriminator
 data class Upgrade(
     val type: UpgradeType,
     var level: Int
-) : IItem
+) : Item

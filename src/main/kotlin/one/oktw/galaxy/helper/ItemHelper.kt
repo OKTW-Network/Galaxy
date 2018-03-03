@@ -9,7 +9,7 @@ import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.data.DataUpgrade
 import one.oktw.galaxy.enums.UpgradeType
 import one.oktw.galaxy.types.item.Gun
-import one.oktw.galaxy.types.item.IItem
+import one.oktw.galaxy.types.item.Item
 import one.oktw.galaxy.types.item.Upgrade
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.item.ItemTypes
@@ -23,7 +23,7 @@ import java.util.*
 
 class ItemHelper {
     companion object {
-        fun getItem(item: IItem): Optional<ItemStack> {
+        fun getItem(item: Item): Optional<ItemStack> {
             return when (item) {
                 is Gun -> Optional.of(removeCoolDown(getGun(item)))
                 is Upgrade -> Optional.of(getItemUpgrade(item))

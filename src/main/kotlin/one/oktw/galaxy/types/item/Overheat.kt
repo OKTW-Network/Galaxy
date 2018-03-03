@@ -4,7 +4,7 @@ import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import java.util.*
 
 @BsonDiscriminator
-interface ICoolable {
+interface Overheat {
     val uuid: UUID
     var maxTemp: Int
     var heat: Int

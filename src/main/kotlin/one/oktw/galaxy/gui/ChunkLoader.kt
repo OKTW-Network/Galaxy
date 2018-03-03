@@ -31,18 +31,20 @@ import java.util.*
 
 class ChunkLoader(val entity: Entity) {
     private val uuid = entity[DataUUID.key].orElse(null)
+    val hash: String = uuid.toString()
+    val inventory: Inventory
     private lateinit var chunkLoader: ChunkLoader
     private lateinit var player: Player
     private val upgradeButton = UUID.randomUUID()
     private val removeButton = UUID.randomUUID()
-    private val inventory: Inventory = Inventory.builder()
-        .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of("ChunkLoader")))
-        .listener(InteractInventoryEvent.Close::class.java, this::closeEventListener)
-        .listener(ClickInventoryEvent::class.java, this::clickEventListener)
-        .build(main)
 
     init {
+        inventory =
+                Inventory.builder().of(InventoryArchetypes.HOPPER).property(InventoryTitle.of(Text.of("ChunkLoader")))
+                    .listener(InteractInventoryEvent.Close::class.java, this::closeEventListener)
+                    .listener(ClickInventoryEvent::class.java, this::clickEventListener)
+                    .build(main)
+
         launch { chunkLoader = chunkLoaderManager.get(uuid).await() ?: return@launch }
 
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))

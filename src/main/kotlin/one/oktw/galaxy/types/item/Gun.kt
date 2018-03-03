@@ -30,4 +30,4 @@ data class Gun(
     var damage: Double,
     var through: Int = 1,
     var upgrade: ArrayList<Upgrade> = ArrayList()
-) : IItem, ICoolable
+) : Item, Overheat

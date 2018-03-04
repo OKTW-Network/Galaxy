@@ -10,6 +10,7 @@ import org.spongepowered.api.item.recipe.crafting.Ingredient.NONE
 import org.spongepowered.api.item.recipe.crafting.Ingredient.of
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe
 import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.format.TextColors
 
 class RecipeRegister {
     init {
@@ -19,7 +20,12 @@ class RecipeRegister {
             .row(ironIngot, NONE, ironIngot)
             .row(NONE, of(ItemStack.of(ItemTypes.STICK, 1)), NONE)
             .row(NONE, ironIngot, NONE)
-            .result(ItemStack.of(ItemTypes.STICK, 1).apply { offer(Keys.DISPLAY_NAME, Text.of("Hello World")) }) // TODO
+            .result(ItemStack.of(ItemTypes.STICK, 1).apply {
+                offer(
+                    Keys.DISPLAY_NAME,
+                    Text.of(TextColors.GOLD, "Wrench")
+                )
+            }) // TODO
             .build("stick", Main.main)
 
         Sponge.getRegistry().craftingRecipeRegistry.apply {

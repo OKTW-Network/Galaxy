@@ -30,6 +30,23 @@ class ChunkLoaderManager {
             tickets.forEach { it.release() }
             runBlocking { reloadChunkLoader(world) }
         }
+
+        logger.info("Loading world has ChunkLoader...")
+
+        runBlocking {
+            launch {
+                collection.find().forEach {
+                    val planet = galaxyManager.getPlanet(
+                        it.position.planet ?: return@launch
+                    ).await() ?: return@launch
+                    val range = (it.upgrade.maxBy { it.level }?.level ?: 0) * 2 + 1
+                    val world = withContext(this@runBlocking.coroutineContext) { planet.loadWorld().orElse(null) }
+                            ?: return@launch
+
+                    worldTickets[it.uuid] = loadChunk(world.getLocation(it.position.toVector3d()), range)
+                }
+            }
+        }
     }
 
     private fun loadChunk(location: Location<World>, range: Int): ChunkTicketManager.LoadingTicket {
@@ -108,23 +125,6 @@ class ChunkLoaderManager {
             PlanetHelper.loadPlanet(planet).ifPresent {
                 worldTickets[chunkLoader.uuid] =
                         loadChunk(it.getLocation(chunkLoader.position.toVector3d()), range * 2 + 1)
-            }
-        }
-    }
-
-    fun loadForcedWorld() = runBlocking {
-        logger.info("Loading world has ChunkLoader...")
-
-        collection.find().forEach {
-            launch {
-                val planet = galaxyManager.getPlanet(
-                    it.position.planet ?: return@launch
-                ).await() ?: return@launch
-                val range = (it.upgrade.maxBy { it.level }?.level ?: 0) * 2 + 1
-                val world = withContext(this@runBlocking.coroutineContext) { planet.loadWorld().orElse(null) }
-                        ?: return@launch
-
-                worldTickets[it.uuid] = loadChunk(world.getLocation(it.position.toVector3d()), range)
             }
         }
     }

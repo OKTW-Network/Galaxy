@@ -3,15 +3,10 @@ package one.oktw.galaxy
 import com.google.inject.Inject
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
-import one.oktw.galaxy.data.DataOverheat
-import one.oktw.galaxy.data.DataScope
-import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.data.DataUpgrade
 import one.oktw.galaxy.manager.*
-import one.oktw.galaxy.task.CoolingStatus
+import one.oktw.galaxy.register.*
 import org.slf4j.Logger
 import org.spongepowered.api.config.DefaultConfig
-import org.spongepowered.api.data.DataRegistration
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.GameReloadEvent
 import org.spongepowered.api.event.game.state.GameConstructionEvent
@@ -20,7 +15,6 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent
 import org.spongepowered.api.event.game.state.GameStartingServerEvent
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
-import org.spongepowered.api.scheduler.Task
 
 @Suppress("unused", "UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
 @Plugin(
@@ -32,7 +26,7 @@ import org.spongepowered.api.scheduler.Task
 class Main {
     companion object {
         lateinit var main: Main
-
+            private set
         lateinit var chunkLoaderManager: ChunkLoaderManager
             private set
         lateinit var commandManager: CommandRegister
@@ -68,28 +62,8 @@ class Main {
 
     @Listener
     fun onPreInit(event: GamePreInitializationEvent) {
-        DataRegistration.builder()
-            .dataName("UUID").manipulatorId("uuid")
-            .dataClass(DataUUID::class.java).immutableClass(DataUUID.Immutable::class.java)
-            .builder(DataUUID.Builder())
-            .buildAndRegister(plugin)
-
-        DataRegistration.builder()
-            .dataName("Overheat").manipulatorId("overheat")
-            .dataClass(DataOverheat::class.java).immutableClass(DataOverheat.Immutable::class.java)
-            .builder(DataOverheat.Builder())
-            .buildAndRegister(plugin)
-        DataRegistration.builder()
-            .dataName("Scoping").manipulatorId("scoping")
-            .dataClass(DataScope::class.java).immutableClass(DataScope.Immutable::class.java)
-            .builder(DataScope.Builder())
-            .buildAndRegister(plugin)
-
-        DataRegistration.builder()
-            .dataName("Upgrade").manipulatorId("upgrade")
-            .dataClass(DataUpgrade::class.java).immutableClass(DataUpgrade.Immutable::class.java)
-            .builder(DataUpgrade.Builder())
-            .buildAndRegister(plugin)
+        DataRegister()
+        RecipeRegister()
     }
 
     @Listener
@@ -99,22 +73,17 @@ class Main {
         databaseManager = DatabaseManager()
         galaxyManager = GalaxyManager()
         travelerManager = TravelerManager()
-        chunkLoaderManager = ChunkLoaderManager()
         eventRegister = EventRegister()
         logger.info("Plugin initialized!")
     }
 
     @Listener
     fun onStarting(event: GameStartingServerEvent) {
-        commandManager = CommandRegister()
         viewerManager = ViewerManager()
-        chunkLoaderManager.loadForcedWorld()
+        chunkLoaderManager = ChunkLoaderManager()
 
-        Task.builder()
-            .name("CoolingStatus")
-            .intervalTicks(1)
-            .execute(CoolingStatus())
-            .submit(this)
+        CommandRegister()
+        TaskRegister()
     }
 
     @Listener

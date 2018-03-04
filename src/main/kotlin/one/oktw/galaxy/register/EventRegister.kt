@@ -1,10 +1,7 @@
-package one.oktw.galaxy
+package one.oktw.galaxy.register
 
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.event.ChunkLoader
-import one.oktw.galaxy.event.Gun
-import one.oktw.galaxy.event.TravelerWatcher
-import one.oktw.galaxy.event.Viewer
+import one.oktw.galaxy.event.*
 import org.spongepowered.api.Sponge
 
 class EventRegister {
@@ -16,6 +13,8 @@ class EventRegister {
 //            registerListeners(main, Stardust())
             registerListeners(main, Gun())
             registerListeners(main, ChunkLoader())
+//            registerListeners(main, EnderChest())
+            registerListeners(main, ShulkerBox())
         }
     }
 }

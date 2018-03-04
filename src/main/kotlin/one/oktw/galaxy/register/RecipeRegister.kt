@@ -26,7 +26,7 @@ class RecipeRegister {
                     Text.of(TextColors.GOLD, "Wrench")
                 )
             }) // TODO
-            .build("stick", Main.main)
+            .build("wrench", Main.main)
 
         Sponge.getRegistry().craftingRecipeRegistry.apply {
             register(wrench)

@@ -5,9 +5,11 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
 import one.oktw.galaxy.manager.*
 import one.oktw.galaxy.register.*
+import one.oktw.galaxy.world.Planet
 import org.slf4j.Logger
 import org.spongepowered.api.config.DefaultConfig
 import org.spongepowered.api.event.Listener
+import org.spongepowered.api.event.game.GameRegistryEvent
 import org.spongepowered.api.event.game.GameReloadEvent
 import org.spongepowered.api.event.game.state.GameConstructionEvent
 import org.spongepowered.api.event.game.state.GameInitializationEvent
@@ -15,6 +17,7 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent
 import org.spongepowered.api.event.game.state.GameStartingServerEvent
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.api.world.gen.WorldGeneratorModifier
 
 @Suppress("unused", "UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
 @Plugin(
@@ -58,6 +61,11 @@ class Main {
     @Listener
     fun construct(event: GameConstructionEvent) {
         main = this
+    }
+
+    @Listener
+    fun onRegister(event: GameRegistryEvent.Register<WorldGeneratorModifier>) {
+        event.register(Planet())
     }
 
     @Listener

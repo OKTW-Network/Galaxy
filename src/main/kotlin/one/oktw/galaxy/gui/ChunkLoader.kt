@@ -115,7 +115,7 @@ class ChunkLoader(val entity: Entity) {
 
         chunkLoader.upgrade.forEach {
             val entity = location.createEntity(EntityTypes.ITEM)
-            val upgrade = ItemHelper.getItem(it).orElse(null) ?: return@forEach
+            val upgrade = ItemHelper.getItem(it) ?: return@forEach
 
             entity.offer(Keys.REPRESENTED_ITEM, upgrade.createSnapshot())
             itemEntities += entity

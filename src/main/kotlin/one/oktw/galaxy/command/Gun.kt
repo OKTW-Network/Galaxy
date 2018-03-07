@@ -65,7 +65,7 @@ class Gun : CommandBase {
                 traveler.item.add(gun)
                 traveler.save()
 
-                src.setItemInHand(HandTypes.MAIN_HAND, ItemHelper.getItem(gun).get())
+                ItemHelper.getItem(gun)?.let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
                 src.sendMessage(Text.of(gun.uuid.toString()))
             }
             return CommandResult.success()
@@ -105,7 +105,7 @@ class Gun : CommandBase {
                 val traveler = travelerManager.getTraveler(src)
                 val gun = traveler.item[args.getOne<Int>("Gun").get()] as? Gun ?: return CommandResult.empty()
 
-                src.setItemInHand(HandTypes.MAIN_HAND, ItemHelper.getItem(gun).get())
+                ItemHelper.getItem(gun)?.let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
                 src.sendMessage(Text.of(gun.uuid.toString()))
             }
             return CommandResult.success()

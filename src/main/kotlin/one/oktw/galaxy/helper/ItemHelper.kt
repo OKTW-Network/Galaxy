@@ -19,15 +19,14 @@ import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
-import java.util.*
 
 class ItemHelper {
     companion object {
-        fun getItem(item: Item): Optional<ItemStack> {
+        fun getItem(item: Item): ItemStack? {
             return when (item) {
-                is Gun -> Optional.of(removeCoolDown(getGun(item)))
-                is Upgrade -> Optional.of(getItemUpgrade(item))
-                else -> Optional.empty()
+                is Gun -> removeCoolDown(getGun(item))
+                is Upgrade -> getItemUpgrade(item)
+                else -> null
             }
         }
 

@@ -22,7 +22,7 @@ class UpgradeSlot(private var upgrade: List<Upgrade>, private vararg val acceptU
         .build(main)
 
     init {
-        upgrade.forEach { ItemHelper.getItem(it).ifPresent { inventory.offer(it) } }
+        upgrade.forEach { ItemHelper.getItem(it)?.let { inventory.offer(it) } }
     }
 
     private fun eventListener(event: InteractInventoryEvent) {

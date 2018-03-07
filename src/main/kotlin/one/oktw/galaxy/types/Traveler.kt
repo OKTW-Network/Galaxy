@@ -10,7 +10,7 @@ import kotlin.collections.ArrayList
 data class Traveler(
     val uuid: UUID,
     var position: Position,
-    var armor: Armor = Armor(),
+    var armor: TravelerArmor = TravelerArmor(),
     var item: ArrayList<Item> = ArrayList()
 ) {
     fun save() {

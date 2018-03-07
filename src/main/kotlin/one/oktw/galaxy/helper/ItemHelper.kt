@@ -7,7 +7,9 @@ import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataScope
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.data.DataUpgrade
+import one.oktw.galaxy.enums.ArmorPart.*
 import one.oktw.galaxy.enums.UpgradeType
+import one.oktw.galaxy.types.item.Armor
 import one.oktw.galaxy.types.item.Gun
 import one.oktw.galaxy.types.item.Item
 import one.oktw.galaxy.types.item.Upgrade
@@ -26,6 +28,7 @@ class ItemHelper {
             return when (item) {
                 is Gun -> removeCoolDown(getGun(item))
                 is Upgrade -> getItemUpgrade(item)
+                is Armor -> null // TODO
                 else -> null
             }
         }
@@ -86,6 +89,26 @@ class ItemHelper {
                 .itemData(DataUpgrade(upgrade.type, upgrade.level))
                 .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, color, "$name Upgrade Lv.${upgrade.level}"))
                 .build()
+        }
+
+        private fun getArmor(armor: Armor): ItemStack? {
+            val builder = ItemStack.builder()
+                .itemData(DataUUID().asImmutable())
+                .add(Keys.DISPLAY_NAME, armor.name)
+                .add(Keys.ITEM_LORE, armor.lore)
+                .add(Keys.UNBREAKABLE, true)
+                .add(Keys.HIDE_UNBREAKABLE, true)
+                .add(Keys.HIDE_MISCELLANEOUS, true)
+                .add(Keys.HIDE_ATTRIBUTES, true)
+                .add(Keys.HIDE_ENCHANTMENTS, true)
+                .quantity(1)
+
+            return when (armor.part) {
+                HELMET -> builder.itemType(ItemTypes.DIAMOND_HELMET).build()
+                CHESTPLATE -> builder.itemType(ItemTypes.DIAMOND_CHESTPLATE).build()
+                LEGGINGS -> builder.itemType(ItemTypes.DIAMOND_LEGGINGS).build()
+                BOOST -> builder.itemType(ItemTypes.DIAMOND_BOOTS).build()
+            }
         }
     }
 }

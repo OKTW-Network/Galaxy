@@ -53,7 +53,7 @@ class GalaxyManager {
     fun searchGalaxy(keyword: String) = async {
         val galaxyList = ArrayList<Galaxy>()
         galaxyCollection.find(text(keyword)).forEach { galaxyList += it }
-        return@async galaxyList
+        galaxyList
     }
 
     fun getPlanet(uuid: UUID) = async {

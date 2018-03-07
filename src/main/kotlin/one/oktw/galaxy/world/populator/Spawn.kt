@@ -92,13 +92,10 @@ class Spawn : Populator {
 
         // top
         for (i in 0..1) {
-            volume.setBlock(start.add(-i, 3, 1), north.with(Keys.PORTION_TYPE, PortionTypes.TOP).get()) // x,z 0,1 -1,1
-            volume.setBlock(start.add(i, 3, -1), south.with(Keys.PORTION_TYPE, PortionTypes.TOP).get()) // x,z 0,-1 1,-1
-            volume.setBlock(start.add(1, 3, i), west.with(Keys.PORTION_TYPE, PortionTypes.TOP).get()) // x,z 1,0 1,1
-            volume.setBlock(
-                start.add(-1, 3, -i),
-                east.with(Keys.PORTION_TYPE, PortionTypes.TOP).get()
-            ) // x,z -1,0, -1,-1
+            volume.setBlock(start.add(-i, 3, 1), north.with(Keys.PORTION_TYPE, PortionTypes.TOP).get()) // 0,1 -1,1
+            volume.setBlock(start.add(i, 3, -1), south.with(Keys.PORTION_TYPE, PortionTypes.TOP).get()) // 0,-1 1,-1
+            volume.setBlock(start.add(1, 3, i), west.with(Keys.PORTION_TYPE, PortionTypes.TOP).get()) // 1,0 1,1
+            volume.setBlock(start.add(-1, 3, -i), east.with(Keys.PORTION_TYPE, PortionTypes.TOP).get()) // -1,0, -1,-1
         }
         volume.setBlockType(start.add(0, 3, 0), BlockTypes.GLASS)
 

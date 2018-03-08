@@ -36,6 +36,7 @@ class Gun : CommandBase {
                 .executor(this)
                 .permission("oktw.command.gun.add")
                 .arguments(
+                    GenericArguments.integer(Text.of("Heat")),
                     GenericArguments.integer(Text.of("Max Heat")),
                     GenericArguments.doubleNum(Text.of("Range")),
                     GenericArguments.doubleNum(Text.of("Damage")),
@@ -57,7 +58,7 @@ class Gun : CommandBase {
                     cooling = args.getOne<Int>("Cooling").get(),
                     range = args.getOne<Double>("Range").get(),
                     damage = args.getOne<Double>("Damage").get(),
-                    heat = 10
+                    heat = args.getOne<Int>("Heat").get()
                 )
 
                 args.getOne<Int>("Through").ifPresent { gun.upgrade.add(Upgrade(THROUGH, it)) }

@@ -4,7 +4,10 @@ import com.google.inject.Inject
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
 import one.oktw.galaxy.manager.*
-import one.oktw.galaxy.register.*
+import one.oktw.galaxy.register.CommandRegister
+import one.oktw.galaxy.register.DataRegister
+import one.oktw.galaxy.register.EventRegister
+import one.oktw.galaxy.register.RecipeRegister
 import one.oktw.galaxy.world.Planet
 import org.slf4j.Logger
 import org.spongepowered.api.config.DefaultConfig
@@ -45,6 +48,8 @@ class Main {
         lateinit var travelerManager: TravelerManager
             private set
         lateinit var viewerManager: ViewerManager
+            private set
+        lateinit var taskManager: TaskManager
             private set
     }
 
@@ -91,7 +96,7 @@ class Main {
         chunkLoaderManager = ChunkLoaderManager()
 
         CommandRegister()
-        TaskRegister()
+        taskManager = TaskManager()
     }
 
     @Listener

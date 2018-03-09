@@ -37,4 +37,4 @@ jobs:
 
       - store_artifacts:
           path: build/libs
-          destination:
+          destination: .

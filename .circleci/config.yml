@@ -22,9 +22,9 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - dependencies-v1-{{ .Branch }}-{{ .Revision }}
+            - dependencies-v1-{{ .Branch }}-
+            - dependencies-v1-
 
       - run: gradle setupCiWorkspace
 
@@ -33,7 +33,8 @@ jobs:
 
       - save_cache:
           paths: [~/.gradle]
-          key: v1-dependencies-{{ checksum "build.gradle" }}
+          key: dependencies-v1-{{ .Branch }}-{{ .Revision }}
 
       - store_artifacts:
-          path: build/lib
+          path: build/libs
+          destination:

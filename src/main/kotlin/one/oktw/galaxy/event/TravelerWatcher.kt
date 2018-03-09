@@ -5,6 +5,7 @@ import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.Main.Companion.viewerManager
 import one.oktw.galaxy.enums.AccessLevel.*
+import one.oktw.galaxy.helper.ArmorHelper
 import one.oktw.galaxy.helper.CoolDownHelper.Companion.getCoolDown
 import one.oktw.galaxy.helper.CoolDownHelper.Companion.removeCoolDown
 import one.oktw.galaxy.types.item.Overheat
@@ -18,17 +19,19 @@ import org.spongepowered.api.event.network.ClientConnectionEvent
 class TravelerWatcher {
     @Listener
     fun onJoin(event: ClientConnectionEvent.Join, @Getter("getTargetEntity") player: Player) {
+        ArmorHelper.offerArmor(player)
+
         launch {
             val planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId).await() ?: return@launch
             when (planet.checkPermission(player)) {
-                MODIFY -> return@launch
+                MODIFY -> Unit
                 VIEW -> viewerManager.setViewer(player.uniqueId)
                 DENY -> Sponge.getServer().defaultWorld.ifPresent {
                     player.transferToWorld(
                         it.uniqueId,
                         it.spawnPosition.toDouble()
                     )
-                } // TODO
+                }
             }
         }
     }

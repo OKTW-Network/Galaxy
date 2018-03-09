@@ -1,10 +1,23 @@
 package one.oktw.galaxy.enums
 
 enum class UpgradeType {
+    // General
     EMPTY,
-    DAMAGE,
     RANGE,
+    SPEED,
+
+    // Weapon or Tool
+    DAMAGE,
     COOLING,
     HEAT,
-    THROUGH
+    THROUGH,
+
+    // Armor
+    SHIELD,
+    FLEXIBLE,
+    ADAPT,
+    FLY,
+    NIGHT_VISION,
+    GPS,
+    DETECTOR
 }

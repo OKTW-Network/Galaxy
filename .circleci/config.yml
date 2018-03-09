@@ -34,3 +34,6 @@ jobs:
       - save_cache:
           paths: [~/.gradle]
           key: v1-dependencies-{{ checksum "build.gradle" }}
+
+      - store_artifacts:
+          path: build/lib

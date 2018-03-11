@@ -1,7 +1,7 @@
 buildscript {
     ext.kotlin_version = '1.2.30'
     ext.sponge_version = "8.0.0-SNAPSHOT"
-    ext.Coroutines_version = "0.22.3"
+    ext.Coroutines_version = "0.22.5"
 
     repositories {
         mavenCentral()

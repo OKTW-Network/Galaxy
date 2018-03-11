@@ -59,8 +59,8 @@ class DataUUID(uuid: UUID = randomUUID()) : AbstractSingleData<UUID, DataUUID, D
 
     class Builder : AbstractDataBuilder<DataUUID>(DataUUID::class.java, 1),
         DataManipulatorBuilder<DataUUID, Immutable> {
-        override fun createFrom(dataHolder: DataHolder): Optional<DataUUID> = create().fill(dataHolder)
         override fun create() = DataUUID()
+        override fun createFrom(dataHolder: DataHolder): Optional<DataUUID> = create().fill(dataHolder)
         override fun buildContent(container: DataView) = create().from(container.copy())
     }
 }

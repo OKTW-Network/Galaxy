@@ -92,8 +92,8 @@ class DataUpgrade(type: UpgradeType = EMPTY, level: Int = 0) : AbstractData<Data
 
     class Builder : AbstractDataBuilder<DataUpgrade>(DataUpgrade::class.java, 1),
         DataManipulatorBuilder<DataUpgrade, Immutable> {
-        override fun createFrom(dataHolder: DataHolder): Optional<DataUpgrade> = create().fill(dataHolder)
         override fun create() = DataUpgrade()
+        override fun createFrom(dataHolder: DataHolder): Optional<DataUpgrade> = create().fill(dataHolder)
         override fun buildContent(container: DataView) = create().from(container.copy())
     }
 }

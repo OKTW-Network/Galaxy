@@ -51,8 +51,8 @@ class DataOverheat(overheat: Boolean = false) :
 
     class Builder : AbstractDataBuilder<DataOverheat>(DataOverheat::class.java, 1),
         DataManipulatorBuilder<DataOverheat, Immutable> {
-        override fun createFrom(dataHolder: DataHolder): Optional<DataOverheat> = create().fill(dataHolder)
         override fun create() = DataOverheat()
+        override fun createFrom(dataHolder: DataHolder): Optional<DataOverheat> = create().fill(dataHolder)
         override fun buildContent(container: DataView) = create().from(container.copy())
     }
 }

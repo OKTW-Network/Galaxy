@@ -1,10 +1,7 @@
 package one.oktw.galaxy.register
 
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.data.DataOverheat
-import one.oktw.galaxy.data.DataScope
-import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.data.DataUpgrade
+import one.oktw.galaxy.data.*
 import org.spongepowered.api.data.DataRegistration
 
 class DataRegister {
@@ -28,8 +25,8 @@ class DataRegister {
         // Scoping
         DataRegistration.builder()
             .dataName("Scoping").manipulatorId("scoping")
-            .dataClass(DataScope::class.java).immutableClass(DataScope.Immutable::class.java)
-            .builder(DataScope.Builder())
+            .dataClass(DataEnable::class.java).immutableClass(DataEnable.Immutable::class.java)
+            .builder(DataEnable.Builder())
             .buildAndRegister(plugin)
 
         // Upgrade
@@ -37,6 +34,13 @@ class DataRegister {
             .dataName("Upgrade").manipulatorId("upgrade")
             .dataClass(DataUpgrade::class.java).immutableClass(DataUpgrade.Immutable::class.java)
             .builder(DataUpgrade.Builder())
+            .buildAndRegister(plugin)
+
+        // Item Type
+        DataRegistration.builder()
+            .dataName("Type").manipulatorId("type")
+            .dataClass(DataType::class.java).immutableClass(DataType.Immutable::class.java)
+            .builder(DataType.Builder())
             .buildAndRegister(plugin)
     }
 }

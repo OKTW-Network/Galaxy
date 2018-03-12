@@ -14,7 +14,8 @@ import org.spongepowered.api.data.value.mutable.Value
 import org.spongepowered.api.util.TypeTokens
 import java.util.*
 
-class DataScope(scoping: Boolean = false) : AbstractBooleanData<DataScope, DataScope.Immutable>(scoping, key, false) {
+class DataEnable(scoping: Boolean = false) :
+    AbstractBooleanData<DataEnable, DataEnable.Immutable>(scoping, key, false) {
     companion object {
         val key: Key<Value<Boolean>> = Key.builder()
             .type(TypeTokens.BOOLEAN_VALUE_TOKEN)
@@ -26,9 +27,9 @@ class DataScope(scoping: Boolean = false) : AbstractBooleanData<DataScope, DataS
 
     override fun getContentVersion() = 1
     override fun asImmutable() = Immutable(value)
-    override fun copy() = DataScope(value)
+    override fun copy() = DataEnable(value)
 
-    override fun from(container: DataContainer): Optional<DataScope> {
+    override fun from(container: DataContainer): Optional<DataEnable> {
         return if (container[key.query].isPresent) {
             value = container.getBoolean(key.query).get()
             Optional.of(this)
@@ -37,21 +38,21 @@ class DataScope(scoping: Boolean = false) : AbstractBooleanData<DataScope, DataS
         }
     }
 
-    override fun fill(dataHolder: DataHolder, overlap: MergeFunction): Optional<DataScope> {
-        value = overlap.merge(this, dataHolder[DataScope::class.java].orElse(null)).value
+    override fun fill(dataHolder: DataHolder, overlap: MergeFunction): Optional<DataEnable> {
+        value = overlap.merge(this, dataHolder[DataEnable::class.java].orElse(null)).value
         return Optional.of(this)
     }
 
     class Immutable(scoping: Boolean = false) :
-        AbstractImmutableBooleanData<Immutable, DataScope>(scoping, key, false) {
+        AbstractImmutableBooleanData<Immutable, DataEnable>(scoping, key, false) {
         override fun getContentVersion() = 1
-        override fun asMutable() = DataScope(value)
+        override fun asMutable() = DataEnable(value)
     }
 
-    class Builder : AbstractDataBuilder<DataScope>(DataScope::class.java, 1),
-        DataManipulatorBuilder<DataScope, Immutable> {
-        override fun create() = DataScope()
-        override fun createFrom(dataHolder: DataHolder): Optional<DataScope> = create().fill(dataHolder)
+    class Builder : AbstractDataBuilder<DataEnable>(DataEnable::class.java, 1),
+        DataManipulatorBuilder<DataEnable, Immutable> {
+        override fun create() = DataEnable()
+        override fun createFrom(dataHolder: DataHolder): Optional<DataEnable> = create().fill(dataHolder)
         override fun buildContent(container: DataView) = create().from(container.copy())
     }
 }

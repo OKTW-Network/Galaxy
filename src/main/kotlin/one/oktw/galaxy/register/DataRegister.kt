@@ -24,7 +24,7 @@ class DataRegister {
 
         // Scoping
         DataRegistration.builder()
-            .dataName("Scoping").manipulatorId("scoping")
+            .dataName("Enable").manipulatorId("enable")
             .dataClass(DataEnable::class.java).immutableClass(DataEnable.Immutable::class.java)
             .builder(DataEnable.Builder())
             .buildAndRegister(plugin)

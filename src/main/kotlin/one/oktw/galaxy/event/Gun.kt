@@ -9,7 +9,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.EntityDamageSource
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.travelerManager
-import one.oktw.galaxy.data.DataScope
+import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.UpgradeType.*
 import one.oktw.galaxy.helper.CoolDownHelper
@@ -106,11 +106,11 @@ class Gun {
     @Listener
     @Suppress("unused", "UNUSED_PARAMETER")
     fun onChangeDataHolder(event: ChangeDataHolderEvent.ValueChange, @Getter("getTargetHolder") @Has(SneakingData::class) player: Player) {
-        player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataScope.key].isPresent }.ifPresent {
+        player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataEnable.key].isPresent }.ifPresent {
             val sneak: Boolean =
                 event.endResult.successfulData.firstOrNull { it.key == Keys.IS_SNEAKING }?.get() as Boolean?
                         ?: player[Keys.IS_SNEAKING].get()
-            if (it[DataScope.key].get() != sneak) {
+            if (it[DataEnable.key].get() != sneak) {
                 player.setItemInHand(HandTypes.MAIN_HAND, toggleScope(it))
             }
 
@@ -122,10 +122,10 @@ class Gun {
     @Include(ChangeInventoryEvent.Held::class, ChangeInventoryEvent.SwapHand::class)
     @Suppress("unused", "UNUSED_PARAMETER")
     fun onChangeInventory(event: ChangeInventoryEvent, @Getter("getSource") player: Player) {
-        val mainHand = player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataScope.key].isPresent }.orElse(null)
+        val mainHand = player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataEnable.key].isPresent }.orElse(null)
         mainHand?.let {
             val sneak = player[Keys.IS_SNEAKING].get()
-            if (it[DataScope.key].get() != sneak) {
+            if (it[DataEnable.key].get() != sneak) {
                 player.setItemInHand(HandTypes.MAIN_HAND, toggleScope(it))
             }
 
@@ -134,8 +134,8 @@ class Gun {
 
         if (mainHand == null) player.offer(Keys.WALKING_SPEED, 0.1)
 
-        player.getItemInHand(HandTypes.OFF_HAND).filter { it[DataScope.key].isPresent }.ifPresent {
-            if (it[DataScope.key].get()) player.setItemInHand(HandTypes.OFF_HAND, toggleScope(it))
+        player.getItemInHand(HandTypes.OFF_HAND).filter { it[DataEnable.key].isPresent }.ifPresent {
+            if (it[DataEnable.key].get()) player.setItemInHand(HandTypes.OFF_HAND, toggleScope(it))
         }
     }
 
@@ -292,9 +292,9 @@ class Gun {
 
     private fun toggleScope(item: ItemStack): ItemStack {
         item.transform(Keys.ITEM_DURABILITY) {
-            if (item[DataScope.key].get()) it - 1 else it + 1
+            if (item[DataEnable.key].get()) it - 1 else it + 1
         }
-        item.transform(DataScope.key) { !it }
+        item.transform(DataEnable.key) { !it }
 
         return item
     }

@@ -9,10 +9,12 @@ import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.enums.ItemType.ARMOR
 import one.oktw.galaxy.enums.UpgradeType.FLEXIBLE
 import org.spongepowered.api.data.key.Keys
-import org.spongepowered.api.effect.potion.PotionEffectTypes
+import org.spongepowered.api.effect.potion.PotionEffectTypes.JUMP_BOOST
+import org.spongepowered.api.effect.potion.PotionEffectTypes.NIGHT_VISION
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.filter.cause.First
+import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.ItemTypes.*
 import org.spongepowered.api.item.inventory.ItemStack
@@ -24,29 +26,40 @@ class Armor {
     fun onClickInventory(event: ClickInventoryEvent, @First player: Player) {
         val item = event.cursorTransaction.default.createStack()
         val armor = travelerManager.getTraveler(player).armor
-        val task = taskManager.armor
+        val effect = taskManager.effect
 
         if (item[DataType.key].orElse(null) != ARMOR) return
 
-        event.cursorTransaction.apply {
-            setCustom(ItemStackSnapshot.NONE)
-            isValid = true
+        if (item[DataEnable.key].isPresent) {
+            event.cursorTransaction.apply {
+                setCustom(ItemStackSnapshot.NONE)
+                isValid = true
+            }
+        } else {
+            event.isCancelled = true
+            return
         }
 
         when (item.type) {
             DIAMOND_HELMET -> {
-                if (task.nightVision.remove(player.uniqueId)) {
-                    player.transform(Keys.POTION_EFFECTS) { it.apply { removeIf { it.type == PotionEffectTypes.NIGHT_VISION } } }
+                if (item[DataEnable.key].get()) {
+                    effect.removeEffect(player, NIGHT_VISION)
                 } else {
-                    task.nightVision += player.uniqueId
+                    effect.addEffect(player, NIGHT_VISION)
                 }
 
                 player.setHelmet(switch(item))
             }
-            DIAMOND_CHESTPLATE -> event.isCancelled = true
+            DIAMOND_CHESTPLATE -> Unit
             DIAMOND_LEGGINGS -> {
-                if (task.jump.remove(player.uniqueId) == null) {
-                    task.jump[player.uniqueId] = armor.first { it.type == FLEXIBLE }.level - 1
+                if (item[DataEnable.key].get()) {
+                    effect.removeEffect(player, JUMP_BOOST)
+                } else {
+                    effect.addEffect(
+                        player,
+                        JUMP_BOOST,
+                        armor.first { it.type == FLEXIBLE }.level - 1
+                    ) // TODO switch jump level
                 }
 
                 player.setLeggings(switch(item))
@@ -76,6 +89,11 @@ class Armor {
             }
             else -> Unit
         }
+    }
+
+    @Listener
+    fun onChangeInventory(event: ChangeInventoryEvent) {
+        if (event.transactions.any { it.default[DataType.key].orElse(null) == ARMOR }) event.isCancelled = true
     }
 
     private fun switch(item: ItemStack): ItemStack {

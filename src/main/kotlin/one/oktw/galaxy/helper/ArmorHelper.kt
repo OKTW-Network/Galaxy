@@ -10,6 +10,7 @@ import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.ItemType.ARMOR
 import one.oktw.galaxy.enums.UpgradeType.*
 import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.effect.potion.PotionEffectTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.ItemTypes
@@ -26,7 +27,7 @@ class ArmorHelper {
     companion object {
         fun offerArmor(player: Player) {
             val upgrade = travelerManager.getTraveler(player).armor
-            val armor = taskManager.armor
+            val effect = taskManager.effect
 
             val helmet: ItemStack = itemHelper(ItemTypes.DIAMOND_HELMET)
             val chestplate: ItemStack = itemHelper(ItemTypes.DIAMOND_CHESTPLATE)
@@ -36,7 +37,7 @@ class ArmorHelper {
             upgrade.firstOrNull { it.type == NIGHT_VISION }?.apply {
                 helmet.apply {
                     offer(DataEnable())
-                    offer(Keys.ITEM_LORE, asList(Text.of(TextColors.RED, "點擊切換夜視").toText()))
+                    offer(Keys.ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, "夜視鏡").toText()))
                 }
             }
 
@@ -50,7 +51,7 @@ class ArmorHelper {
                     )
                 }
 
-                if (level == 5) armor.protect += player.uniqueId
+                if (level == 5) effect.addEffect(player, PotionEffectTypes.RESISTANCE, 2)
             }
 
             upgrade.firstOrNull { it.type == ADAPT }?.apply {
@@ -58,23 +59,23 @@ class ArmorHelper {
                     Keys.ITEM_ENCHANTMENTS,
                     asList(Enchantment.of(AQUA_AFFINITY, level))
                 ) else {
-                    armor.water += player.uniqueId
+                    effect.addEffect(player, PotionEffectTypes.WATER_BREATHING)
                 }
 
                 if (level in 2..3) chestplate.offer(
                     Keys.ITEM_ENCHANTMENTS,
                     asList(Enchantment.of(FIRE_PROTECTION, level))
                 ) else if (level > 3) {
-                    armor.fire += player.uniqueId
+                    effect.addEffect(player, PotionEffectTypes.FIRE_RESISTANCE)
                 }
 
                 leggings.apply {
                     offer(DataEnable())
-                    offer(Keys.ITEM_LORE, asList(Text.of(TextColors.RED, "點擊切換跳躍").toText()))
+                    offer(Keys.ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, "跳躍增強").toText()))
                 }
                 boots.apply {
                     offer(DataEnable())
-                    offer(Keys.ITEM_LORE, asList(Text.of(TextColors.RED, "點擊切換速度").toText()))
+                    offer(Keys.ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, "速度增強").toText()))
                 }
             }
 

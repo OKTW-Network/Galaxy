@@ -2,6 +2,7 @@ package one.oktw.galaxy.event
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.Main.Companion.taskManager
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.Main.Companion.viewerManager
 import one.oktw.galaxy.enums.AccessLevel.*
@@ -44,6 +45,7 @@ class TravelerWatcher {
                 .forEach { getCoolDown((it as Overheat).uuid)?.let { removeCoolDown(it) } }
             travelerManager.updateTraveler(player)
             viewerManager.removeViewer(player.uniqueId)
+            taskManager.effect.removeAllEffect(player)
         }
     }
 }

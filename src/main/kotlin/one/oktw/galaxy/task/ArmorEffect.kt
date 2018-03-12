@@ -3,10 +3,11 @@ package one.oktw.galaxy.task
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.effect.potion.PotionEffect
-import org.spongepowered.api.effect.potion.PotionEffectTypes
+import org.spongepowered.api.effect.potion.PotionEffectTypes.*
 import org.spongepowered.api.scheduler.Task
 import java.util.*
 import java.util.function.Consumer
+import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 
 class ArmorEffect : Consumer<Task> {
@@ -27,70 +28,59 @@ class ArmorEffect : Consumer<Task> {
 
         players.forEach {
             val uuid = it.uniqueId
+            val effect = it[Keys.POTION_EFFECTS].orElse(ArrayList())
+
             if (nightVision.contains(uuid)) {
-                it.transform(Keys.POTION_EFFECTS) {
-                    it.apply {
-                        this += PotionEffect.builder()
-                            .potionType(PotionEffectTypes.NIGHT_VISION)
-                            .duration(30)
-                            .amplifier(1)
-                            .particles(false)
-                            .build()
-                    }
-                }
+                effect.removeIf { it.type == NIGHT_VISION }
+                effect += PotionEffect.builder()
+                    .potionType(NIGHT_VISION)
+                    .duration(210)
+                    .amplifier(1)
+                    .particles(false)
+                    .build()
             }
 
             if (fire.contains(uuid)) {
-                it.transform(Keys.POTION_EFFECTS) {
-                    it.apply {
-                        this += PotionEffect.builder()
-                            .potionType(PotionEffectTypes.FIRE_RESISTANCE)
-                            .duration(30)
-                            .amplifier(1)
-                            .particles(false)
-                            .build()
-                    }
-                }
+                effect.removeIf { it.type == FIRE_RESISTANCE }
+                effect += PotionEffect.builder()
+                    .potionType(FIRE_RESISTANCE)
+                    .duration(30)
+                    .amplifier(1)
+                    .particles(false)
+                    .build()
             }
 
             if (water.contains(uuid)) {
-                it.transform(Keys.POTION_EFFECTS) {
-                    it.apply {
-                        this += PotionEffect.builder()
-                            .potionType(PotionEffectTypes.WATER_BREATHING)
-                            .duration(30)
-                            .amplifier(1)
-                            .particles(false)
-                            .build()
-                    }
-                }
+                effect.removeIf { it.type == WATER_BREATHING }
+                effect += PotionEffect.builder()
+                    .potionType(WATER_BREATHING)
+                    .duration(30)
+                    .amplifier(1)
+                    .particles(false)
+                    .build()
             }
 
             if (protect.contains(uuid)) {
-                it.transform(Keys.POTION_EFFECTS) {
-                    it.apply {
-                        this += PotionEffect.builder()
-                            .potionType(PotionEffectTypes.RESISTANCE)
-                            .duration(30)
-                            .amplifier(3)
-                            .particles(false)
-                            .build()
-                    }
-                }
+                effect.removeIf { it.type == RESISTANCE }
+                effect += PotionEffect.builder()
+                    .potionType(RESISTANCE)
+                    .duration(30)
+                    .amplifier(3)
+                    .particles(false)
+                    .build()
             }
 
             if (jump.contains(uuid)) {
-                it.transform(Keys.POTION_EFFECTS) {
-                    it.apply {
-                        this += PotionEffect.builder()
-                            .potionType(PotionEffectTypes.JUMP_BOOST)
-                            .duration(30)
-                            .amplifier(jump[uuid]!!)
-                            .particles(false)
-                            .build()
-                    }
-                }
+                effect.removeIf { it.type == JUMP_BOOST }
+                effect += PotionEffect.builder()
+                    .potionType(JUMP_BOOST)
+                    .duration(30)
+                    .amplifier(jump[uuid]!!)
+                    .particles(false)
+                    .build()
             }
+
+            it.offer(Keys.POTION_EFFECTS, effect)
         }
     }
 }

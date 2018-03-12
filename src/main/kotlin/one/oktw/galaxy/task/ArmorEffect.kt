@@ -34,8 +34,8 @@ class ArmorEffect : Consumer<Task> {
                 effect.removeIf { it.type == NIGHT_VISION }
                 effect += PotionEffect.builder()
                     .potionType(NIGHT_VISION)
-                    .duration(210)
-                    .amplifier(1)
+                    .duration(300)
+                    .amplifier(0)
                     .particles(false)
                     .build()
             }
@@ -45,7 +45,7 @@ class ArmorEffect : Consumer<Task> {
                 effect += PotionEffect.builder()
                     .potionType(FIRE_RESISTANCE)
                     .duration(30)
-                    .amplifier(1)
+                    .amplifier(0)
                     .particles(false)
                     .build()
             }
@@ -55,7 +55,7 @@ class ArmorEffect : Consumer<Task> {
                 effect += PotionEffect.builder()
                     .potionType(WATER_BREATHING)
                     .duration(30)
-                    .amplifier(1)
+                    .amplifier(0)
                     .particles(false)
                     .build()
             }
@@ -65,7 +65,7 @@ class ArmorEffect : Consumer<Task> {
                 effect += PotionEffect.builder()
                     .potionType(RESISTANCE)
                     .duration(30)
-                    .amplifier(3)
+                    .amplifier(2)
                     .particles(false)
                     .build()
             }

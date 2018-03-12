@@ -46,7 +46,7 @@ class Armor {
             DIAMOND_CHESTPLATE -> event.isCancelled = true
             DIAMOND_LEGGINGS -> {
                 if (task.jump.remove(player.uniqueId) == null) {
-                    task.jump[player.uniqueId] = armor.first { it.type == FLEXIBLE }.level
+                    task.jump[player.uniqueId] = armor.first { it.type == FLEXIBLE }.level - 1
                 }
 
                 player.setLeggings(switch(item))
@@ -62,7 +62,7 @@ class Armor {
                     itemStack.setTagInfo("AttributeModifiers", nbt)
                 } else {
                     val speed =
-                        MOVEMENT_SPEED.defaultValue * (1 + armor.first { it.type == FLEXIBLE }.level / 5)
+                        MOVEMENT_SPEED.defaultValue * (1 + armor.first { it.type == FLEXIBLE }.level / 10)
 
                     @Suppress("CAST_NEVER_SUCCEEDS")
                     (item as net.minecraft.item.ItemStack).addAttributeModifier(

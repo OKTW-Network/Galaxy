@@ -2,8 +2,8 @@ package one.oktw.galaxy.helper
 
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.ai.attributes.AttributeModifier
+import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataOverheat
-import one.oktw.galaxy.data.DataScope
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.data.DataUpgrade
 import one.oktw.galaxy.enums.UpgradeType
@@ -56,7 +56,7 @@ class ItemHelper {
                 WOODEN_SWORD -> item.add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.AQUA, "Laser Gun"))
 
                 IRON_SWORD -> {
-                    item.itemData(DataScope())
+                    item.itemData(DataEnable())
                     item.add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.GOLD, "Sniper"))
                 }
             }

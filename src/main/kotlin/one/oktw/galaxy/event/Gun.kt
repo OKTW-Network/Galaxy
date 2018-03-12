@@ -11,6 +11,8 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.enums.ItemType
+import one.oktw.galaxy.enums.ItemType.*
 import one.oktw.galaxy.enums.UpgradeType.*
 import one.oktw.galaxy.helper.CoolDownHelper
 import one.oktw.galaxy.types.item.Gun
@@ -253,8 +255,8 @@ class Gun {
         }
     }
 
-    private fun playShotSound(world: World, position: Vector3d, type: one.oktw.galaxy.enums.ItemType) = async {
-        if (type == one.oktw.galaxy.enums.ItemType.GUN) {
+    private fun playShotSound(world: World, position: Vector3d, type: ItemType) = async {
+        if (type == GUN) {
             world.playSound(
                 SoundType.of("gun.shot"),
                 SoundCategories.PLAYER,
@@ -262,7 +264,7 @@ class Gun {
                 1.0,
                 1 + random() / 10 - random() / 10
             )
-        } else if (type == one.oktw.galaxy.enums.ItemType.SNIPER) {
+        } else if (type == SNIPER) {
             world.playSound(
                 SoundType.of("entity.blaze.hurt"),
                 SoundCategories.PLAYER,

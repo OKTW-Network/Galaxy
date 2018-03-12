@@ -2,7 +2,7 @@ package one.oktw.galaxy.enums
 
 import one.oktw.galaxy.enums.ItemType.*
 
-enum class GunType( val type: ItemType,val id: Short) {
+enum class GunType(val type: ItemType, val id: Short) {
     // Pistol
     PISTOL_ORIGIN(GUN,5),
     PISTOL_GRAY(GUN,6),

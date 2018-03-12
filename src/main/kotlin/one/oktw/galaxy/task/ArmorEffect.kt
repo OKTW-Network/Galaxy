@@ -18,15 +18,15 @@ class ArmorEffect : Consumer<Task> {
     val jump = HashMap<UUID, Int>()
 
     override fun accept(task: Task) {
-        val players = Sponge.getServer().onlinePlayers
+        val server = Sponge.getServer()
 
-        nightVision.removeIf { !Sponge.getServer().getPlayer(it).isPresent }
-        fire.removeIf { !Sponge.getServer().getPlayer(it).isPresent }
-        water.removeIf { !Sponge.getServer().getPlayer(it).isPresent }
-        protect.removeIf { !Sponge.getServer().getPlayer(it).isPresent }
-        jump.keys.filter { !Sponge.getServer().getPlayer(it).isPresent }.forEach { jump.remove(it) }
+        nightVision.removeIf { !server.getPlayer(it).isPresent }
+        fire.removeIf { !server.getPlayer(it).isPresent }
+        water.removeIf { !server.getPlayer(it).isPresent }
+        protect.removeIf { !server.getPlayer(it).isPresent }
+        jump.keys.filter { !server.getPlayer(it).isPresent }.forEach { jump.remove(it) }
 
-        players.forEach {
+        server.onlinePlayers.forEach {
             val uuid = it.uniqueId
             val effect = it[Keys.POTION_EFFECTS].orElse(ArrayList())
 

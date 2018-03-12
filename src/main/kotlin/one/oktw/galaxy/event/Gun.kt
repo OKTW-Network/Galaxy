@@ -11,6 +11,8 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.enums.ItemType
+import one.oktw.galaxy.enums.ItemType.*
 import one.oktw.galaxy.enums.UpgradeType.*
 import one.oktw.galaxy.helper.CoolDownHelper
 import one.oktw.galaxy.types.item.Gun
@@ -36,16 +38,13 @@ import org.spongepowered.api.event.filter.data.Has
 import org.spongepowered.api.event.filter.type.Include
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
-import org.spongepowered.api.item.ItemType
-import org.spongepowered.api.item.ItemTypes.IRON_SWORD
-import org.spongepowered.api.item.ItemTypes.WOODEN_SWORD
+import org.spongepowered.api.item.ItemTypes.DIAMOND_SWORD
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.util.blockray.BlockRay
 import org.spongepowered.api.world.World
 import org.spongepowered.api.world.extent.EntityUniverse.EntityHit
 import java.lang.Math.random
-import java.util.Arrays.asList
 import kotlin.math.roundToInt
 
 class Gun {
@@ -53,7 +52,7 @@ class Gun {
     @Suppress("unused")
     fun onInteractItem(event: InteractItemEvent.Secondary.MainHand, @Getter("getSource") player: Player) {
         val itemStack = event.itemStack
-        if (itemStack.type !in asList(WOODEN_SWORD, IRON_SWORD) || !itemStack[DataUUID.key].isPresent) return
+        if (itemStack.type != DIAMOND_SWORD || !itemStack[DataUUID.key].isPresent) return
 
         val world = player.world
         var direction =
@@ -99,7 +98,7 @@ class Gun {
                 }
             )
 
-            playShotSound(world, source, itemStack.type)
+            playShotSound(world, source, gun.type.type)
         }
     }
 
@@ -257,7 +256,7 @@ class Gun {
     }
 
     private fun playShotSound(world: World, position: Vector3d, type: ItemType) = async {
-        if (type == WOODEN_SWORD) {
+        if (type == GUN) {
             world.playSound(
                 SoundType.of("gun.shot"),
                 SoundCategories.PLAYER,
@@ -265,7 +264,7 @@ class Gun {
                 1.0,
                 1 + random() / 10 - random() / 10
             )
-        } else if (type == IRON_SWORD) {
+        } else if (type == SNIPER) {
             world.playSound(
                 SoundType.of("entity.blaze.hurt"),
                 SoundCategories.PLAYER,

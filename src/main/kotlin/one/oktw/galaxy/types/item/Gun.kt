@@ -1,7 +1,9 @@
 package one.oktw.galaxy.types.item
 
 import one.oktw.galaxy.annotation.Document
-import one.oktw.galaxy.enums.GunType
+import one.oktw.galaxy.enums.GunStyle
+import one.oktw.galaxy.enums.ItemType
+import one.oktw.galaxy.enums.ItemType.PISTOL
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import java.util.*
 
@@ -9,7 +11,8 @@ import java.util.*
  * Gun data class
  *
  * @property uuid UUID
- * @property type Gun type
+ * @property itemType Item type
+ * @property style Gun style
  * @property maxTemp Max temp
  * @property heat heat pre use
  * @property cooling cooling pre tick
@@ -22,10 +25,11 @@ import java.util.*
 @BsonDiscriminator
 data class Gun(
     override val uuid: UUID = UUID.randomUUID(),
-    var type: GunType,
+    override val itemType: ItemType = PISTOL,
     override var maxTemp: Int,
     override var heat: Int,
     override var cooling: Int = 1,
+    var style: GunStyle,
     var range: Double,
     var damage: Double,
     var through: Int = 1,

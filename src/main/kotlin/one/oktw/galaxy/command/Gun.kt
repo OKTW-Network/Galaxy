@@ -1,7 +1,11 @@
 package one.oktw.galaxy.command
 
 import one.oktw.galaxy.Main.Companion.travelerManager
-import one.oktw.galaxy.enums.GunType
+import one.oktw.galaxy.enums.GunStyle
+import one.oktw.galaxy.enums.GunStyle.PISTOL_ORIGIN
+import one.oktw.galaxy.enums.GunStyle.SNIPER_SIGHT
+import one.oktw.galaxy.enums.ItemType.PISTOL
+import one.oktw.galaxy.enums.ItemType.SNIPER
 import one.oktw.galaxy.enums.UpgradeType.THROUGH
 import one.oktw.galaxy.helper.CoolDownHelper
 import one.oktw.galaxy.helper.ItemHelper
@@ -43,8 +47,8 @@ class Gun : CommandBase {
                     GenericArguments.optional(GenericArguments.integer(Text.of("Cooling")), 1),
                     GenericArguments.optional(GenericArguments.integer(Text.of("Through"))),
                     GenericArguments.optional(
-                        GenericArguments.enumValue(Text.of("Type"), GunType::class.java),
-                        GunType.PISTOL_ORIGIN
+                        GenericArguments.enumValue(Text.of("Type"), GunStyle::class.java),
+                        PISTOL_ORIGIN
                     )
                 )
                 .build()
@@ -52,8 +56,10 @@ class Gun : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
                 val traveler = travelerManager.getTraveler(src)
+                val type = if (args.getOne<GunStyle>("Type").get() == SNIPER_SIGHT) SNIPER else PISTOL
                 val gun = Gun(
-                    type = args.getOne<GunType>("Type").get(),
+                    itemType = type,
+                    style = args.getOne<GunStyle>("Type").get(),
                     maxTemp = args.getOne<Int>("Max Heat").get(),
                     cooling = args.getOne<Int>("Cooling").get(),
                     range = args.getOne<Double>("Range").get(),

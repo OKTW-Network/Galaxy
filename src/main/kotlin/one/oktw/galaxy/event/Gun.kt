@@ -12,7 +12,8 @@ import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.ItemType
-import one.oktw.galaxy.enums.ItemType.*
+import one.oktw.galaxy.enums.ItemType.PISTOL
+import one.oktw.galaxy.enums.ItemType.SNIPER
 import one.oktw.galaxy.enums.UpgradeType.*
 import one.oktw.galaxy.helper.CoolDownHelper
 import one.oktw.galaxy.types.item.Gun
@@ -98,7 +99,7 @@ class Gun {
                 }
             )
 
-            playShotSound(world, source, gun.type.type)
+            playShotSound(world, source, gun.itemType)
         }
     }
 
@@ -256,45 +257,45 @@ class Gun {
     }
 
     private fun playShotSound(world: World, position: Vector3d, type: ItemType) = async {
-        if (type == GUN) {
-            world.playSound(
+        when (type) {
+            PISTOL -> world.playSound(
                 SoundType.of("gun.shot"),
                 SoundCategories.PLAYER,
                 position,
                 1.0,
                 1 + random() / 10 - random() / 10
             )
-        } else if (type == SNIPER) {
-            world.playSound(
-                SoundType.of("entity.blaze.hurt"),
-                SoundCategories.PLAYER,
-                position,
-                1.0,
-                2.0
-            )
-            world.playSound(
-                SoundType.of("entity.firework.blast"),
-                SoundCategories.PLAYER,
-                position,
-                1.0,
-                0.0
-            )
-            world.playSound(
-                SoundType.of("block.piston.extend"),
-                SoundCategories.PLAYER,
-                position,
-                1.0,
-                2.0
-            )
+            SNIPER -> {
+                // TODO new sound
+                world.playSound(
+                    SoundType.of("entity.blaze.hurt"),
+                    SoundCategories.PLAYER,
+                    position,
+                    1.0,
+                    2.0
+                )
+                world.playSound(
+                    SoundType.of("entity.firework.blast"),
+                    SoundCategories.PLAYER,
+                    position,
+                    1.0,
+                    0.0
+                )
+                world.playSound(
+                    SoundType.of("block.piston.extend"),
+                    SoundCategories.PLAYER,
+                    position,
+                    1.0,
+                    2.0
+                )
+            }
+            else -> Unit
         }
     }
 
-    private fun toggleScope(item: ItemStack): ItemStack {
-        item.transform(Keys.ITEM_DURABILITY) {
-            if (item[DataEnable.key].get()) it - 1 else it + 1
-        }
-        item.transform(DataEnable.key) { !it }
+    private fun toggleScope(item: ItemStack) = item.apply {
+        transform(Keys.ITEM_DURABILITY) { if (item[DataEnable.key].get()) it - 1 else it + 1 }
 
-        return item
+        transform(DataEnable.key) { !it }
     }
 }

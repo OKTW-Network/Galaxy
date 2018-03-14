@@ -5,8 +5,8 @@ import one.oktw.galaxy.Main.Companion.chunkLoaderManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.UpgradeType
+import one.oktw.galaxy.helper.GUIHelper
 import one.oktw.galaxy.helper.ItemHelper
-import one.oktw.galaxy.helper.SampleLock
 import one.oktw.galaxy.types.ChunkLoader
 import one.oktw.galaxy.types.item.Upgrade
 import org.spongepowered.api.data.key.Keys
@@ -23,28 +23,24 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
-import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-class ChunkLoader(val entity: Entity) {
+class ChunkLoader(val entity: Entity) : GUI() {
+    override val inventory: Inventory =
+        Inventory.builder().of(InventoryArchetypes.HOPPER).property(InventoryTitle.of(Text.of("ChunkLoader")))
+            .listener(InteractInventoryEvent.Close::class.java, this::closeEventListener)
+            .listener(ClickInventoryEvent::class.java, this::clickEventListener)
+            .build(main)
     private val uuid = entity[DataUUID.key].orElse(null)
-    val hash: String = uuid.toString()
-    val inventory: Inventory
     private lateinit var chunkLoader: ChunkLoader
-    private lateinit var player: Player
+    private lateinit var upgradeGUI: GUI
     private val upgradeButton = UUID.randomUUID()
     private val removeButton = UUID.randomUUID()
 
     init {
-        inventory =
-                Inventory.builder().of(InventoryArchetypes.HOPPER).property(InventoryTitle.of(Text.of("ChunkLoader")))
-                    .listener(InteractInventoryEvent.Close::class.java, this::closeEventListener)
-                    .listener(ClickInventoryEvent::class.java, this::clickEventListener)
-                    .build(main)
-
         launch { chunkLoader = chunkLoaderManager.get(uuid).await() ?: return@launch }
 
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
@@ -63,8 +59,9 @@ class ChunkLoader(val entity: Entity) {
         inventory.set(3, 0, removeItem)
     }
 
+    override fun getToken() = uuid.toString()
+
     private fun closeEventListener(event: InteractInventoryEvent.Close) {
-        SampleLock.unlock(uuid)
         event.cursorTransaction.setCustom(ItemStackSnapshot.NONE)
         event.cursorTransaction.isValid = true
     }
@@ -75,30 +72,29 @@ class ChunkLoader(val entity: Entity) {
         val itemUUID = event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return
 
         when (itemUUID) {
-            upgradeButton -> clickUpgrade()
+            upgradeButton -> clickUpgrade(event.source as Player)
             removeButton -> clickRemove()
         }
     }
 
-    private fun clickUpgrade() {
+    private fun clickUpgrade(player: Player) {
         if (!this::chunkLoader.isInitialized) return
 
-        UpgradeSlot(chunkLoader.upgrade, UpgradeType.RANGE)
-            .onClose {
-                SampleLock.unlock(uuid)
+        upgradeGUI = GUIHelper.open(player) {
+            UpgradeSlot(this, chunkLoader.upgrade, UpgradeType.RANGE)
+                .onClose {
+                    val originLevel = chunkLoader.upgrade.maxBy { it.level }?.level ?: 0
+                    val newLevel = it.maxBy { it.level }?.level ?: 0
 
-                val originLevel = chunkLoader.upgrade.maxBy { it.level }?.level ?: 0
-                val newLevel = it.maxBy { it.level }?.level ?: 0
+                    chunkLoader.upgrade = it as ArrayList<Upgrade>
 
-                chunkLoader.upgrade = it as ArrayList<Upgrade>
-
-                if (newLevel != originLevel) {
-                    launch { chunkLoaderManager.updateChunkLoader(chunkLoader, true) }
-                } else {
-                    launch { chunkLoaderManager.updateChunkLoader(chunkLoader) }
+                    if (newLevel != originLevel) {
+                        launch { chunkLoaderManager.updateChunkLoader(chunkLoader, true) }
+                    } else {
+                        launch { chunkLoaderManager.updateChunkLoader(chunkLoader) }
+                    }
                 }
-            }
-            .open(player)
+        }
     }
 
     private fun clickRemove() {
@@ -123,13 +119,12 @@ class ChunkLoader(val entity: Entity) {
 
         location.spawnEntities(itemEntities)
         entity.remove()
-        Task.builder().execute { _ -> player.closeInventory() }.submit(main)
-    }
-
-    fun open(player: Player) {
-        if (!SampleLock.lock(uuid)) return
-        this@ChunkLoader.player = player
-
-        player.openInventory(this.inventory)
+        GUIHelper.apply {
+            closeAll(getToken())
+            if (this@ChunkLoader::upgradeGUI.isInitialized) {
+                // TODO check why didn't work
+                closeAll(upgradeGUI.getToken())
+            }
+        }
     }
 }

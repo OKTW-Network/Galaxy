@@ -4,6 +4,7 @@ import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.chunkLoaderManager
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.gui.ChunkLoader
+import one.oktw.galaxy.helper.GUIHelper
 import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.entity.EnderCrystal
 import org.spongepowered.api.entity.living.player.Player
@@ -34,7 +35,7 @@ class ChunkLoader {
     @Listener
     @Suppress("UNUSED_PARAMETER")
     fun onInteractEntity(event: InteractEntityEvent.Secondary.MainHand, @First player: Player, @Getter("getTargetEntity") enderCrystal: EnderCrystal) {
-        if (enderCrystal[DataUUID.key].isPresent) ChunkLoader(enderCrystal).open(player)
+        if (enderCrystal[DataUUID.key].isPresent) GUIHelper.open(player) { ChunkLoader(enderCrystal) }
     }
 
     @Listener

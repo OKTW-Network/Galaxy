@@ -7,16 +7,16 @@ typealias Listener = (InteractInventoryEvent) -> Unit
 typealias EventClass = Class<out InteractInventoryEvent>
 
 abstract class GUI {
+    abstract val token: String
     abstract val inventory: Inventory
-    protected val eventListeners = ArrayList<Pair<EventClass, Listener>>()
+    private val eventListeners = ArrayList<Pair<EventClass, Listener>>()
 
-    abstract fun getToken(): String
-
-    fun registerEvent(event: EventClass, listener: Listener) {
-        eventListeners.add(Pair(event, listener))
+    fun <T : InteractInventoryEvent> registerEvent(event: EventClass, listener: (T) -> Unit) {
+        @Suppress("UNCHECKED_CAST") // TODO better code
+        eventListeners.add(Pair(event, listener) as Pair<EventClass, Listener>)
     }
 
     protected fun eventProcess(event: InteractInventoryEvent) {
-        eventListeners.forEach { if (it.first.isInstance(event)) it.second(event) }
+        eventListeners.forEach { if (it.first.isInstance(event)) it.second(it.first.cast(event)) }
     }
 }

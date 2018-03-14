@@ -29,20 +29,21 @@ import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
 class ChunkLoader(val entity: Entity) : GUI() {
-    override val inventory: Inventory =
-        Inventory.builder().of(InventoryArchetypes.HOPPER).property(InventoryTitle.of(Text.of("ChunkLoader")))
-            .listener(InteractInventoryEvent.Close::class.java, this::closeEventListener)
-            .listener(ClickInventoryEvent::class.java, this::clickEventListener)
-            .build(main)
     private val uuid = entity[DataUUID.key].orElse(null)
     private lateinit var chunkLoader: ChunkLoader
     private lateinit var upgradeGUI: GUI
     private val upgradeButton = UUID.randomUUID()
     private val removeButton = UUID.randomUUID()
+    override val token = uuid.toString()
+    override val inventory: Inventory =
+        Inventory.builder().of(InventoryArchetypes.HOPPER).property(InventoryTitle.of(Text.of("ChunkLoader")))
+            .listener(InteractInventoryEvent::class.java, this::eventProcess)
+            .build(main)
 
     init {
         launch { chunkLoader = chunkLoaderManager.get(uuid).await() ?: return@launch }
 
+        // fill inventory
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
         val upgradeItem = ItemStack.builder()
             .itemType(ItemTypes.ENCHANTED_BOOK)
@@ -57,9 +58,11 @@ class ChunkLoader(val entity: Entity) : GUI() {
 
         inventory.set(1, 0, upgradeItem)
         inventory.set(3, 0, removeItem)
-    }
 
-    override fun getToken() = uuid.toString()
+        // register event
+        registerEvent(InteractInventoryEvent.Close::class.java, this::closeEventListener)
+        registerEvent(ClickInventoryEvent::class.java, this::clickEventListener)
+    }
 
     private fun closeEventListener(event: InteractInventoryEvent.Close) {
         event.cursorTransaction.setCustom(ItemStackSnapshot.NONE)
@@ -120,10 +123,10 @@ class ChunkLoader(val entity: Entity) : GUI() {
         location.spawnEntities(itemEntities)
         entity.remove()
         GUIHelper.apply {
-            closeAll(getToken())
+            close(token)
             if (this@ChunkLoader::upgradeGUI.isInitialized) {
                 // TODO check why didn't work
-                closeAll(upgradeGUI.getToken())
+                close(upgradeGUI.token)
             }
         }
     }

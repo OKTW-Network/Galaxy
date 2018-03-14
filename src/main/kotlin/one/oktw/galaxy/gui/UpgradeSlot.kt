@@ -13,12 +13,9 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.text.Text
 import java.util.*
 
-class UpgradeSlot(
-    private val parent: GUI,
-    private var upgrade: List<Upgrade>,
-    private vararg val acceptUpgradeType: UpgradeType
-) : GUI() {
+class UpgradeSlot(parent: GUI, private var upgrade: List<Upgrade>, private vararg val acceptType: UpgradeType) : GUI() {
     private lateinit var closeListener: (List<Upgrade>) -> Unit
+    override val token = parent.token + "-Upgrade"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
         .property(InventoryTitle.of(Text.of("Upgrade")))
@@ -30,8 +27,6 @@ class UpgradeSlot(
 
         registerEvent(InteractInventoryEvent::class.java, this::eventListener)
     }
-
-    override fun getToken() = parent.getToken() + "-Upgrade"
 
     fun onClose(listener: (List<Upgrade>) -> Unit): UpgradeSlot {
         closeListener = listener
@@ -52,7 +47,7 @@ class UpgradeSlot(
         val upgrade = HashMap<UpgradeType, Int>()
 
         val filter = item.all {
-            if (it.type !in acceptUpgradeType) return@all false
+            if (it.type !in acceptType) return@all false
 
             if (upgrade.getOrDefault(it.type, 0) == it.level - 1) {
                 upgrade[it.type] = it.level

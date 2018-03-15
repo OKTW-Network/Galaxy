@@ -1,15 +1,18 @@
 package one.oktw.galaxy.manager
 
-import com.mongodb.client.model.Filters.*
+import com.mongodb.client.model.Filters.eq
+import com.mongodb.client.model.Filters.text
+import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.databaseManager
-import one.oktw.galaxy.enums.Group.*
+import one.oktw.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.helper.PlanetHelper
 import one.oktw.galaxy.types.Galaxy
 import one.oktw.galaxy.types.Member
 import one.oktw.galaxy.types.Planet
 import one.oktw.galaxy.types.Traveler
+import org.bson.conversions.Bson
 import org.spongepowered.api.entity.living.player.Player
 import java.util.*
 import kotlin.collections.ArrayList
@@ -31,23 +34,23 @@ class GalaxyManager {
     fun saveGalaxy(galaxy: Galaxy) = launch { galaxyCollection.replaceOne(eq("uuid", galaxy.uuid), galaxy) }
 
     suspend fun deleteGalaxy(uuid: UUID) {
-        getGalaxy(uuid).await().ifPresent {
-            it.planets.forEach {
-                it.world.let { PlanetHelper.removePlanet(it) }
-            }
+        getGalaxy(uuid).await()?.planets?.forEach {
+            it.world.let { PlanetHelper.removePlanet(it) }
         }
 
         launch { galaxyCollection.deleteOne(eq("uuid", uuid)) }
     }
 
-    fun getGalaxy(uuid: UUID) = async { Optional.ofNullable(galaxyCollection.find(eq("uuid", uuid)).first()) }
+    fun getGalaxy(uuid: UUID): Deferred<Galaxy?> = async { galaxyCollection.find(eq("uuid", uuid)).first() }
 
     fun getGalaxy(planet: Planet) = async { galaxyCollection.find(eq("planets.uuid", planet.uuid)).first() }
 
     fun listGalaxy() = async { galaxyCollection.find().iterator() }
 
-    fun listGalaxyForTraveler(traveler: Traveler) = async {
-        galaxyCollection.find(and(eq("members.uuid", traveler.uuid), `in`("members.group", MEMBER, ADMIN))).iterator()
+    fun listGalaxy(filter: Bson) = async { galaxyCollection.find(filter).iterator() }
+
+    fun listGalaxy(traveler: Traveler) = async {
+        galaxyCollection.find(eq("members.uuid", traveler.uuid)).iterator()
     }
 
     fun searchGalaxy(keyword: String) = async {

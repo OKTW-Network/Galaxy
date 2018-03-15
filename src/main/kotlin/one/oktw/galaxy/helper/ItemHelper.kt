@@ -9,6 +9,7 @@ import one.oktw.galaxy.data.DataUpgrade
 import one.oktw.galaxy.enums.ItemType.PISTOL
 import one.oktw.galaxy.enums.ItemType.SNIPER
 import one.oktw.galaxy.enums.UpgradeType
+import one.oktw.galaxy.types.item.Button
 import one.oktw.galaxy.types.item.Gun
 import one.oktw.galaxy.types.item.Item
 import one.oktw.galaxy.types.item.Upgrade
@@ -26,6 +27,7 @@ class ItemHelper {
             return when (item) {
                 is Gun -> removeCoolDown(getGun(item))
                 is Upgrade -> getItemUpgrade(item)
+                is Button -> getButton(item)
                 else -> null
             }
         }
@@ -85,6 +87,18 @@ class ItemHelper {
                 .itemType(ItemTypes.ENCHANTED_BOOK)
                 .itemData(DataUpgrade(upgrade.type, upgrade.level))
                 .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, color, "$name Upgrade Lv.${upgrade.level}"))
+                .build()
+        }
+
+        private fun getButton(button: Button): ItemStack {
+            return ItemStack.builder()
+                .itemType(ItemTypes.DIAMOND_HOE)
+                .add(Keys.UNBREAKABLE, true)
+                .add(Keys.HIDE_UNBREAKABLE, true)
+                .add(Keys.HIDE_MISCELLANEOUS, true)
+                .add(Keys.HIDE_ATTRIBUTES, true)
+                .add(Keys.HIDE_ENCHANTMENTS, true)
+                .add(Keys.ITEM_DURABILITY, button.type.id)
                 .build()
         }
     }

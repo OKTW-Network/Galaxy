@@ -13,7 +13,7 @@ abstract class GUI {
 
     fun <T : InteractInventoryEvent> registerEvent(event: EventClass, listener: (T) -> Unit) {
         @Suppress("UNCHECKED_CAST") // TODO better code
-        eventListeners.add(Pair(event, listener) as Pair<EventClass, Listener>)
+        eventListeners.add(Pair(event, listener) as Pair<Class<T>, Listener>)
     }
 
     protected fun eventProcess(event: InteractInventoryEvent) {

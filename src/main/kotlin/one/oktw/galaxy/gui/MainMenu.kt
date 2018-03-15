@@ -1,6 +1,7 @@
 package one.oktw.galaxy.gui
 
 import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.helper.GUIHelper
 import org.spongepowered.api.data.key.Keys
@@ -20,7 +21,7 @@ import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
 class MainMenu(val player: Player) : GUI() {
-    override val token = "MainMenu-" + player.uniqueId.toString()
+    override val token = "MainMenu-${player.uniqueId}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
         .property(InventoryTitle.of(Text.of("Main menu")))
@@ -62,7 +63,7 @@ class MainMenu(val player: Player) : GUI() {
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
             buttonID[0] -> GUIHelper.open(player) { BrowserGalaxy() }
             buttonID[1] -> GUIHelper.open(player) { CreateGalaxy() }
-            buttonID[2] -> GUIHelper.open(player) { BrowserGalaxy() }
+            buttonID[2] -> GUIHelper.open(player) { BrowserGalaxy(travelerManager.getTraveler(player)) }
         }
     }
 }

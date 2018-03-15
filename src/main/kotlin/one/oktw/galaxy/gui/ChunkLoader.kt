@@ -34,7 +34,7 @@ class ChunkLoader(val entity: Entity) : GUI() {
     private lateinit var upgradeGUI: GUI
     private val upgradeButton = UUID.randomUUID()
     private val removeButton = UUID.randomUUID()
-    override val token = uuid.toString()
+    override val token = "ChunkLoader-" + uuid.toString()
     override val inventory: Inventory =
         Inventory.builder().of(InventoryArchetypes.HOPPER).property(InventoryTitle.of(Text.of("ChunkLoader")))
             .listener(InteractInventoryEvent::class.java, this::eventProcess)

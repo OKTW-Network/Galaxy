@@ -3,7 +3,10 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.types.Galaxy
+import one.oktw.galaxy.types.Member
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.type.SkullTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
@@ -14,43 +17,41 @@ import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes.INVENTORY_TYPE
 import org.spongepowered.api.item.inventory.type.GridInventory
+import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
-import java.util.Arrays.asList
 
-class BrowserPlanet(uuid: UUID) : GUI() {
-    override val token = "BrowserPlanet-$uuid"
+class InviteManagement(uuid: UUID) : GUI() {
+    override val token = "InviteManagement-$uuid"
     val galaxy: Galaxy = TODO("Galaxy")
     override val inventory: Inventory = Inventory.builder()
             .of(InventoryArchetypes.DOUBLE_CHEST)
-            .property(InventoryTitle.of(Text.of("星球列表")))
+            .property(InventoryTitle.of(Text.of("審核加入申請")))
             .listener(InteractInventoryEvent::class.java, this::eventProcess)
             .build(Main.main)
     private val buttonID = Array(2) { UUID.randomUUID() }
+    private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
 
     init {
         val inventory = inventory.query<GridInventory>(INVENTORY_TYPE.of(GridInventory::class.java))
 
         // member
-        val planets = galaxy.planets
+        val members: ArrayList<Member> = TODO()
         var (x, y) = Pair(0, 0)
 
-        for (planet in planets) {
+        for (member in members) {
             if (y == 5) {
                 break
             }
+            val user = userStorage.get(member.uuid).get()
             val item = ItemStack.builder()
-                    .itemType(ItemTypes.BARRIER)
-                    .itemData(DataUUID.Immutable(planet.uuid))
-                    .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, planet.name))
-                    .add(
-                        Keys.ITEM_LORE, asList(
-                            Text.of(TextColors.AQUA, "Players: ", TextColors.RESET, TODO("Player Count")),
-                            Text.of(TextColors.AQUA, "Security: ", TextColors.RESET, planet.security.toString())
-                        )
-                    )
+                    .itemType(ItemTypes.SKULL)
+                    .itemData(DataUUID.Immutable(member.uuid))
+                    .add(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, user.name))
+                    .add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
+                    .add(Keys.REPRESENTED_PLAYER, user.profile)
                     .build()
 
             inventory.set(x, y, item)
@@ -88,7 +89,7 @@ class BrowserPlanet(uuid: UUID) : GUI() {
         when (itemUUID) {
             buttonID[0] -> TODO()
             buttonID[1] -> TODO()
-            else -> TODO("Join Planet")
+            else -> TODO()
         }
     }
 }

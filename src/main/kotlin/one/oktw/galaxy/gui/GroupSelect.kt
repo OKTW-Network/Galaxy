@@ -17,14 +17,14 @@ import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
+import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-class GalaxyInfo(val uuid: UUID) : GUI() {
-    override val token = "GalaxyInfo-$uuid"
-    val galaxy: Galaxy = TODO("Galaxy")
+class GroupSelect : GUI() {
+    override val token = "GroupSelect-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
             .of(InventoryArchetypes.HOPPER)
-            .property(InventoryTitle.of(Text.of(galaxy.name)))
+            .property(InventoryTitle.of(Text.of("選擇一個身分組")))
             .listener(InteractInventoryEvent::class.java, this::eventProcess)
             .build(main)
     private val buttonID = Array(3) { UUID.randomUUID() }
@@ -33,28 +33,30 @@ class GalaxyInfo(val uuid: UUID) : GUI() {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
         // put button
-        val listMemberButton = ItemStack.builder()
+        val ownerMemberButton = ItemStack.builder()
                 .itemType(ItemTypes.BARRIER)
                 .itemData(DataUUID(buttonID[0]))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "成員列表"))
+                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GOLD, TextStyles.BOLD, "OWNER"))
                 .build()
-        val listPlanetButton = ItemStack.builder()
+        val adminPlanetButton = ItemStack.builder()
                 .itemType(ItemTypes.BARRIER)
                 .itemData(DataUUID(buttonID[1]))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "星球列表"))
+                .add(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "ADMIN"))
                 .build()
-
-        inventory.set(0, 0, listMemberButton)
-        inventory.set(2, 0, listPlanetButton)
-        //TODO Check if is admin or owner
-        if (true) {
-            val manageGalaxyButton = ItemStack.builder()
-                    .itemType(ItemTypes.BARRIER)
-                    .itemData(DataUUID(buttonID[2]))
-                    .add(Keys.DISPLAY_NAME, Text.of(TextColors.RED, "管理星系"))
-                    .build()
-            inventory.set(4, 0, manageGalaxyButton)
-        }
+        val memberMemberButton = ItemStack.builder()
+                .itemType(ItemTypes.BARRIER)
+                .itemData(DataUUID(buttonID[2]))
+                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "MEMBER"))
+                .build()
+        val visitorManagementButton = ItemStack.builder()
+                .itemType(ItemTypes.BARRIER)
+                .itemData(DataUUID(buttonID[3]))
+                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GRAY, TextStyles.BOLD, "VISITOR"))
+                .build()
+        inventory.set(0, 0, ownerMemberButton)
+        inventory.set(1, 0, adminPlanetButton)
+        inventory.set(3, 0, memberMemberButton)
+        inventory.set(4, 0, visitorManagementButton)
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
@@ -64,9 +66,10 @@ class GalaxyInfo(val uuid: UUID) : GUI() {
         event.isCancelled = true
         val player = event.source as? Player ?: return
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
-            buttonID[0] -> GUIHelper.open(player) { BrowserMember(uuid) }
-            buttonID[1] -> GUIHelper.open(player) { BrowserPlanet(uuid) }
-            buttonID[2] -> GUIHelper.open(player) { GalaxyManagement(uuid) } //travelerManager.getTraveler(player)
+            buttonID[0] -> TODO()
+            buttonID[1] -> TODO()
+            buttonID[2] -> TODO()
+            buttonID[3] -> TODO()
         }
     }
 }

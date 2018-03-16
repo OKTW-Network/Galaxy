@@ -2,16 +2,17 @@ package one.oktw.galaxy.gui
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.enums.ButtonType.*
 import one.oktw.galaxy.helper.GUIHelper
+import one.oktw.galaxy.helper.ItemHelper
 import one.oktw.galaxy.types.Galaxy
+import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
-import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
-import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
@@ -32,28 +33,23 @@ class GalaxyInfo(val uuid: UUID) : GUI() {
     init {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
-        // put button
-        val listMemberButton = ItemStack.builder()
-                .itemType(ItemTypes.BARRIER)
-                .itemData(DataUUID(buttonID[0]))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "成員列表"))
-                .build()
-        val listPlanetButton = ItemStack.builder()
-                .itemType(ItemTypes.BARRIER)
-                .itemData(DataUUID(buttonID[1]))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "星球列表"))
-                .build()
+        // button
+        ItemHelper.getItem(Button(MEMBERS))?.apply {
+            offer(DataUUID(buttonID[0]))
+            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "成員列表"))
+        }?.let { inventory.set(0, 0, it) }
 
-        inventory.set(0, 0, listMemberButton)
-        inventory.set(2, 0, listPlanetButton)
+        ItemHelper.getItem(Button(PLANET_O))?.apply {
+            offer(DataUUID(buttonID[1]))
+            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "星球列表"))
+        }?.let { inventory.set(2, 0, it) }
+
         //TODO Check if is admin or owner
         if (true) {
-            val manageGalaxyButton = ItemStack.builder()
-                    .itemType(ItemTypes.BARRIER)
-                    .itemData(DataUUID(buttonID[2]))
-                    .add(Keys.DISPLAY_NAME, Text.of(TextColors.RED, "管理星系"))
-                    .build()
-            inventory.set(4, 0, manageGalaxyButton)
+            ItemHelper.getItem(Button(LIST))?.apply {
+                offer(DataUUID(buttonID[2]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "管理星系"))
+            }?.let { inventory.set(4, 0, it) }
         }
 
         // register event

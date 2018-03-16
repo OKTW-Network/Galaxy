@@ -1,9 +1,9 @@
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
+import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.types.Galaxy
-import one.oktw.galaxy.types.Member
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.SkullTypes
@@ -25,53 +25,57 @@ import java.util.*
 
 class InviteManagement(uuid: UUID) : GUI() {
     override val token = "InviteManagement-$uuid"
-    val galaxy: Galaxy = TODO("Galaxy")
     override val inventory: Inventory = Inventory.builder()
-            .of(InventoryArchetypes.DOUBLE_CHEST)
-            .property(InventoryTitle.of(Text.of("審核加入申請")))
-            .listener(InteractInventoryEvent::class.java, this::eventProcess)
-            .build(Main.main)
+        .of(InventoryArchetypes.DOUBLE_CHEST)
+        .property(InventoryTitle.of(Text.of("審核加入申請")))
+        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .build(Main.main)
     private val buttonID = Array(2) { UUID.randomUUID() }
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
 
     init {
         val inventory = inventory.query<GridInventory>(INVENTORY_TYPE.of(GridInventory::class.java))
 
-        // member
-        val members: ArrayList<Member> = TODO()
-        var (x, y) = Pair(0, 0)
+        launch {
+            val galaxy = galaxyManager.getGalaxy(uuid).await() ?: return@launch
 
-        for (member in members) {
-            if (y == 5) {
-                break
-            }
-            val user = userStorage.get(member.uuid).get()
-            val item = ItemStack.builder()
+            // member
+            val players: ArrayList<UUID> = galaxy.invite
+            var (x, y) = Pair(0, 0)
+
+            for (player in players) {
+                if (y == 5) {
+                    break
+                }
+
+                val user = userStorage.get(player).get()
+                val item = ItemStack.builder()
                     .itemType(ItemTypes.SKULL)
-                    .itemData(DataUUID.Immutable(member.uuid))
+                    .itemData(DataUUID.Immutable(player))
                     .add(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, user.name))
                     .add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
                     .add(Keys.REPRESENTED_PLAYER, user.profile)
                     .build()
 
-            inventory.set(x, y, item)
-            if (x++ == 9) {
-                y++
-                x = 0
+                inventory.set(x, y, item)
+                if (x++ == 9) {
+                    y++
+                    x = 0
+                }
             }
         }
 
         // button
         val nextButton = ItemStack.builder()
-                .itemType(ItemTypes.BARRIER)
-                .itemData(DataUUID(buttonID[0]))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Next"))
-                .build()
+            .itemType(ItemTypes.BARRIER)
+            .itemData(DataUUID(buttonID[0]))
+            .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Next"))
+            .build()
         val previousButton = ItemStack.builder()
-                .itemType(ItemTypes.BARRIER)
-                .itemData(DataUUID(buttonID[1]))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Previous"))
-                .build()
+            .itemType(ItemTypes.BARRIER)
+            .itemData(DataUUID(buttonID[1]))
+            .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Previous"))
+            .build()
 
         inventory.set(0, 5, previousButton)
         inventory.set(8, 5, nextButton)

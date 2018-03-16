@@ -15,7 +15,8 @@ data class Galaxy(
     val uuid: UUID = UUID.randomUUID(),
     var name: String,
     var members: ArrayList<Member> = ArrayList(),
-    var planets: ArrayList<Planet> = ArrayList()
+    var planets: ArrayList<Planet> = ArrayList(),
+    var invite: ArrayList<UUID> = ArrayList()
 ) {
     fun save() {
         galaxyManager.saveGalaxy(this)

@@ -3,6 +3,7 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.ButtonType.OK
+import one.oktw.galaxy.enums.ButtonType.X
 import one.oktw.galaxy.helper.ItemHelper
 import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.data.key.Keys
@@ -36,7 +37,7 @@ class Confirm(content: String) : GUI() {
             offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "是"))
         }?.let { inventory.set(1, 0, it) }
 
-        ItemHelper.getItem(Button(OK))?.apply {
+        ItemHelper.getItem(Button(X))?.apply {
             offer(DataUUID(buttonID[1]))
             offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "否"))
         }?.let { inventory.set(3, 0, it) }

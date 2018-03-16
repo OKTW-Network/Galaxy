@@ -4,10 +4,12 @@ import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.chunkLoaderManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.enums.ButtonType.X
 import one.oktw.galaxy.enums.UpgradeType
 import one.oktw.galaxy.helper.GUIHelper
 import one.oktw.galaxy.helper.ItemHelper
 import one.oktw.galaxy.types.ChunkLoader
+import one.oktw.galaxy.types.item.Button
 import one.oktw.galaxy.types.item.Upgrade
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.Entity
@@ -46,16 +48,17 @@ class ChunkLoader(val entity: Entity) : GUI() {
 
         // fill inventory
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
+
+        // TODO change to ItemHelper
         val upgradeItem = ItemStack.builder()
             .itemType(ItemTypes.ENCHANTED_BOOK)
             .itemData(DataUUID(upgradeButton))
             .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Upgrade"))
             .build()
-        val removeItem = ItemStack.builder()
-            .itemType(ItemTypes.ENCHANTED_BOOK)
-            .itemData(DataUUID(removeButton))
-            .add(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "Remove"))
-            .build()
+        val removeItem = ItemHelper.getItem(Button(X))!!.apply {
+            offer(DataUUID(removeButton))
+            offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "Remove"))
+        }
 
         inventory.set(1, 0, upgradeItem)
         inventory.set(3, 0, removeItem)

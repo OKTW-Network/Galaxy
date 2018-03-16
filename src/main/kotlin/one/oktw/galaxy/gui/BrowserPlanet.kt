@@ -2,7 +2,11 @@ package one.oktw.galaxy.gui
 
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.enums.ButtonType.ARROW_LEFT
+import one.oktw.galaxy.enums.ButtonType.ARROW_RIGHT
+import one.oktw.galaxy.helper.ItemHelper
 import one.oktw.galaxy.types.Galaxy
+import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
@@ -61,19 +65,15 @@ class BrowserPlanet(uuid: UUID) : GUI() {
         }
 
         // button
-        val nextButton = ItemStack.builder()
-                .itemType(ItemTypes.BARRIER)
-                .itemData(DataUUID(buttonID[0]))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Next"))
-                .build()
-        val previousButton = ItemStack.builder()
-                .itemType(ItemTypes.BARRIER)
-                .itemData(DataUUID(buttonID[1]))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Previous"))
-                .build()
+        ItemHelper.getItem(Button(ARROW_RIGHT))?.apply {
+            offer(DataUUID(buttonID[0]))
+            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Next"))
+        }?.let { inventory.set(8, 5, it) }
 
-        inventory.set(0, 5, previousButton)
-        inventory.set(8, 5, nextButton)
+        ItemHelper.getItem(Button(ARROW_LEFT))?.apply {
+            offer(DataUUID(buttonID[1]))
+            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Previous"))
+        }?.let { inventory.set(0, 5, it) }
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)

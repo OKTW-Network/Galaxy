@@ -71,7 +71,7 @@ class GalaxyManagement(val uuid: UUID) : GUI() {
             buttonID[0] -> GUIHelper.open(player) { BrowserMember(uuid, true) }
             buttonID[1] -> GUIHelper.open(player) { CreatePlanet() }
             buttonID[2] -> GUIHelper.open(player) { AddMember() }
-            buttonID[3] -> GUIHelper.open(player) { InviteManagement(uuid) }
+            buttonID[3] -> GUIHelper.open(player) { GalaxyJoinRequest(uuid) }
             buttonID[4] -> GUIHelper.open(player) { RenameGalaxy() }
         }
     }

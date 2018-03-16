@@ -19,13 +19,15 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-class Confirm(content: String) : GUI() {
+private typealias Callback = (Boolean) -> Unit
+
+class Confirm(content: Text, private val callback: Callback) : GUI() {
     override val token = "Confirm-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
-            .of(InventoryArchetypes.HOPPER)
-            .property(InventoryTitle.of(Text.of(content)))
-            .listener(InteractInventoryEvent::class.java, this::eventProcess)
-            .build(main)
+        .of(InventoryArchetypes.HOPPER)
+        .property(InventoryTitle.of(content))
+        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .build(main)
     private val buttonID = Array(3) { UUID.randomUUID() }
 
     init {
@@ -50,8 +52,8 @@ class Confirm(content: String) : GUI() {
         event.isCancelled = true
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
-            buttonID[0] -> TODO()
-            buttonID[1] -> TODO()
+            buttonID[0] -> callback(true)
+            buttonID[1] -> callback(false)
         }
     }
 }

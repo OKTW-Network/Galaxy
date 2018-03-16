@@ -4,6 +4,8 @@ import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.helper.GUIHelper
+import one.oktw.galaxy.types.Galaxy
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.SkullTypes
@@ -24,22 +26,23 @@ import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
 class InviteManagement(uuid: UUID) : GUI() {
+    private val buttonID = Array(2) { UUID.randomUUID() }
+    private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
+    private lateinit var galaxy: Galaxy
     override val token = "InviteManagement-$uuid"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
         .property(InventoryTitle.of(Text.of("審核加入申請")))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
-    private val buttonID = Array(2) { UUID.randomUUID() }
-    private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
 
     init {
         val inventory = inventory.query<GridInventory>(INVENTORY_TYPE.of(GridInventory::class.java))
 
+        // join request
         launch {
-            val galaxy = galaxyManager.getGalaxy(uuid).await() ?: return@launch
+            galaxy = galaxyManager.getGalaxy(uuid).await() ?: return@launch
 
-            // member
             val players: ArrayList<UUID> = galaxy.invite
             var (x, y) = Pair(0, 0)
 
@@ -93,7 +96,7 @@ class InviteManagement(uuid: UUID) : GUI() {
         when (itemUUID) {
             buttonID[0] -> TODO()
             buttonID[1] -> TODO()
-            else -> TODO()
+            else -> GUIHelper.open(player) { Confirm(Text.of("是否要將他加入星系？")) { if (it) galaxy.addMember(itemUUID) } }
         }
     }
 }

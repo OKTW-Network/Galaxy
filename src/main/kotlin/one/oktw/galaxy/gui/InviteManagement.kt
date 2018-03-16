@@ -96,7 +96,12 @@ class InviteManagement(uuid: UUID) : GUI() {
         when (itemUUID) {
             buttonID[0] -> TODO()
             buttonID[1] -> TODO()
-            else -> GUIHelper.open(player) { Confirm(Text.of("是否要將他加入星系？")) { if (it) galaxy.addMember(itemUUID) } }
+            else -> GUIHelper.open(player) {
+                Confirm(Text.of("是否要將他加入星系？")) {
+                    if (it) galaxy.addMember(itemUUID)
+                    galaxy.invite.remove(itemUUID)
+                }
+            }
         }
     }
 }

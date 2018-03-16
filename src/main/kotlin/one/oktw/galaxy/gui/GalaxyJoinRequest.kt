@@ -25,7 +25,7 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-class InviteManagement(uuid: UUID) : GUI() {
+class GalaxyJoinRequest(uuid: UUID) : GUI() {
     private val buttonID = Array(2) { UUID.randomUUID() }
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
     private lateinit var galaxy: Galaxy
@@ -43,7 +43,7 @@ class InviteManagement(uuid: UUID) : GUI() {
         launch {
             galaxy = galaxyManager.getGalaxy(uuid).await() ?: return@launch
 
-            val players: ArrayList<UUID> = galaxy.invite
+            val players: ArrayList<UUID> = galaxy.joinRequest
             var (x, y) = Pair(0, 0)
 
             for (player in players) {
@@ -99,7 +99,7 @@ class InviteManagement(uuid: UUID) : GUI() {
             else -> GUIHelper.open(player) {
                 Confirm(Text.of("是否要將他加入星系？")) {
                     if (it) galaxy.addMember(itemUUID)
-                    galaxy.invite.remove(itemUUID)
+                    galaxy.joinRequest.remove(itemUUID)
                 }
             }
         }

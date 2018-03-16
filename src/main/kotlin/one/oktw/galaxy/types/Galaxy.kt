@@ -16,7 +16,7 @@ data class Galaxy(
     var name: String,
     var members: ArrayList<Member> = ArrayList(),
     var planets: ArrayList<Planet> = ArrayList(),
-    var invite: ArrayList<UUID> = ArrayList()
+    var joinRequest: ArrayList<UUID> = ArrayList()
 ) {
     fun save() {
         galaxyManager.saveGalaxy(this)

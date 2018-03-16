@@ -1,6 +1,5 @@
 package one.oktw.galaxy.gui
 
-import com.flowpowered.noise.module.combiner.Add
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.helper.GUIHelper
@@ -77,7 +76,7 @@ class GalaxyManagement(val uuid: UUID) : GUI() {
             buttonID[0] -> GUIHelper.open(player) { BrowserMember(uuid,true) }
             buttonID[1] -> GUIHelper.open(player) { CreatePlanet() }
             buttonID[2] -> GUIHelper.open(player) { AddMember() }
-            buttonID[3] -> GUIHelper.open(player) { InviteManagement(uuid) }
+            buttonID[3] -> GUIHelper.open(player) { GalaxyJoinRequest(uuid) }
             buttonID[4] -> GUIHelper.open(player) { RenameGalaxy() }
         }
     }

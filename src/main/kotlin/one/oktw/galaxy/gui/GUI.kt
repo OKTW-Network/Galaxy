@@ -3,8 +3,8 @@ package one.oktw.galaxy.gui
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 
-typealias Listener = (InteractInventoryEvent) -> Unit
-typealias EventClass = Class<out InteractInventoryEvent>
+private typealias Listener = (InteractInventoryEvent) -> Unit
+private typealias EventClass = Class<out InteractInventoryEvent>
 
 abstract class GUI {
     abstract val token: String

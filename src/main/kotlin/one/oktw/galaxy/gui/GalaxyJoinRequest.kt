@@ -1,9 +1,11 @@
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
+import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.helper.GUIHelper
 import one.oktw.galaxy.types.Galaxy
-import one.oktw.galaxy.types.Member
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.SkullTypes
@@ -23,55 +25,60 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-class InviteManagement(uuid: UUID) : GUI() {
-    override val token = "InviteManagement-$uuid"
-    val galaxy: Galaxy = TODO("Galaxy")
-    override val inventory: Inventory = Inventory.builder()
-            .of(InventoryArchetypes.DOUBLE_CHEST)
-            .property(InventoryTitle.of(Text.of("審核加入申請")))
-            .listener(InteractInventoryEvent::class.java, this::eventProcess)
-            .build(Main.main)
+class GalaxyJoinRequest(uuid: UUID) : GUI() {
     private val buttonID = Array(2) { UUID.randomUUID() }
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
+    private lateinit var galaxy: Galaxy
+    override val token = "InviteManagement-$uuid"
+    override val inventory: Inventory = Inventory.builder()
+        .of(InventoryArchetypes.DOUBLE_CHEST)
+        .property(InventoryTitle.of(Text.of("審核加入申請")))
+        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .build(Main.main)
 
     init {
         val inventory = inventory.query<GridInventory>(INVENTORY_TYPE.of(GridInventory::class.java))
 
-        // member
-        val members: ArrayList<Member> = TODO()
-        var (x, y) = Pair(0, 0)
+        // join request
+        launch {
+            galaxy = galaxyManager.getGalaxy(uuid).await() ?: return@launch
 
-        for (member in members) {
-            if (y == 5) {
-                break
-            }
-            val user = userStorage.get(member.uuid).get()
-            val item = ItemStack.builder()
+            val players: ArrayList<UUID> = galaxy.joinRequest
+            var (x, y) = Pair(0, 0)
+
+            for (player in players) {
+                if (y == 5) {
+                    break
+                }
+
+                val user = userStorage.get(player).get()
+                val item = ItemStack.builder()
                     .itemType(ItemTypes.SKULL)
-                    .itemData(DataUUID.Immutable(member.uuid))
+                    .itemData(DataUUID.Immutable(player))
                     .add(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, user.name))
                     .add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
                     .add(Keys.REPRESENTED_PLAYER, user.profile)
                     .build()
 
-            inventory.set(x, y, item)
-            if (x++ == 9) {
-                y++
-                x = 0
+                inventory.set(x, y, item)
+                if (x++ == 9) {
+                    y++
+                    x = 0
+                }
             }
         }
 
         // button
         val nextButton = ItemStack.builder()
-                .itemType(ItemTypes.BARRIER)
-                .itemData(DataUUID(buttonID[0]))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Next"))
-                .build()
+            .itemType(ItemTypes.BARRIER)
+            .itemData(DataUUID(buttonID[0]))
+            .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Next"))
+            .build()
         val previousButton = ItemStack.builder()
-                .itemType(ItemTypes.BARRIER)
-                .itemData(DataUUID(buttonID[1]))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Previous"))
-                .build()
+            .itemType(ItemTypes.BARRIER)
+            .itemData(DataUUID(buttonID[1]))
+            .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Previous"))
+            .build()
 
         inventory.set(0, 5, previousButton)
         inventory.set(8, 5, nextButton)
@@ -89,7 +96,12 @@ class InviteManagement(uuid: UUID) : GUI() {
         when (itemUUID) {
             buttonID[0] -> TODO()
             buttonID[1] -> TODO()
-            else -> TODO()
+            else -> GUIHelper.open(player) {
+                Confirm(Text.of("是否要將他加入星系？")) {
+                    if (it) galaxy.addMember(itemUUID)
+                    galaxy.joinRequest.remove(itemUUID)
+                }
+            }
         }
     }
 }

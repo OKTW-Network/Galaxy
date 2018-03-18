@@ -47,8 +47,6 @@ class Main {
             private set
         lateinit var travelerManager: TravelerManager
             private set
-        lateinit var viewerManager: ViewerManager
-            private set
         lateinit var taskManager: TaskManager
             private set
     }
@@ -81,7 +79,7 @@ class Main {
 
     @Listener
     fun onInit(event: GameInitializationEvent) {
-        logger.info("Initialization...")
+        logger.info("Initializing...")
         configManager = ConfigManager(configLoader)
         databaseManager = DatabaseManager()
         galaxyManager = GalaxyManager()
@@ -92,7 +90,6 @@ class Main {
 
     @Listener
     fun onStarting(event: GameStartingServerEvent) {
-        viewerManager = ViewerManager()
         chunkLoaderManager = ChunkLoaderManager()
 
         CommandRegister()

@@ -2,7 +2,6 @@ package one.oktw.galaxy.helper
 
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.travelerManager
-import one.oktw.galaxy.Main.Companion.viewerManager
 import one.oktw.galaxy.enums.AccessLevel.*
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.world.Location
@@ -30,9 +29,9 @@ class TeleportHelper {
 
                 travelerManager.updateTraveler(player)
                 if (it.checkPermission(player) == VIEW) {
-                    viewerManager.setViewer(player.uniqueId)
+                    ViewerHelper.setViewer(player.uniqueId)
                 } else {
-                    viewerManager.removeViewer(player.uniqueId)
+                    ViewerHelper.removeViewer(player.uniqueId)
                 }
             }
 

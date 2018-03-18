@@ -4,11 +4,11 @@ import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.taskManager
 import one.oktw.galaxy.Main.Companion.travelerManager
-import one.oktw.galaxy.Main.Companion.viewerManager
 import one.oktw.galaxy.enums.AccessLevel.*
 import one.oktw.galaxy.helper.ArmorHelper
 import one.oktw.galaxy.helper.CoolDownHelper.Companion.getCoolDown
 import one.oktw.galaxy.helper.CoolDownHelper.Companion.removeCoolDown
+import one.oktw.galaxy.helper.ViewerHelper
 import one.oktw.galaxy.types.item.Overheat
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
@@ -26,7 +26,7 @@ class TravelerWatcher {
             val planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId).await() ?: return@launch
             when (planet.checkPermission(player)) {
                 MODIFY -> Unit
-                VIEW -> viewerManager.setViewer(player.uniqueId)
+                VIEW -> ViewerHelper.setViewer(player.uniqueId)
                 DENY -> Sponge.getServer().defaultWorld.ifPresent {
                     player.transferToWorld(
                         it.uniqueId,
@@ -44,7 +44,7 @@ class TravelerWatcher {
                 .filter { it is Overheat }
                 .forEach { getCoolDown((it as Overheat).uuid)?.let { removeCoolDown(it) } }
             travelerManager.updateTraveler(player)
-            viewerManager.removeViewer(player.uniqueId)
+            ViewerHelper.removeViewer(player.uniqueId)
             taskManager.effect.removeAllEffect(player)
         }
     }

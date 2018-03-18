@@ -1,10 +1,12 @@
 package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.enums.Group.ADMIN
 import one.oktw.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.enums.ItemType.BUTTON
 import one.oktw.galaxy.helper.GUIHelper
@@ -79,7 +81,17 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
         if (item[DataType.key].orElse(null) == BUTTON && !isButton(uuid)) {
-            GUIHelper.open(player) { GalaxyInfo(uuid) }
+            event.isCancelled = true
+
+            runBlocking {
+                galaxyManager.getGalaxy(uuid).await()?.let {
+                    if (it.members.firstOrNull { it.uuid == player.uniqueId }?.group in asList(ADMIN, OWNER)) {
+                        GUIHelper.open(player) { GalaxyInfo(it, true) }
+                    } else {
+                        GUIHelper.open(player) { GalaxyInfo(it) }
+                    }
+                }
+            }
         }
     }
 }

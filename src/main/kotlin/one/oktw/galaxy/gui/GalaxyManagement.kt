@@ -20,45 +20,44 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import java.util.*
 
-class GalaxyManagement(val uuid: UUID) : GUI() {
-    override val token = "GalaxyManagement-$uuid"
-    val galaxy: Galaxy = TODO("Galaxy")
+class GalaxyManagement(val galaxy: Galaxy) : GUI() {
+    override val token = "GalaxyManagement-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
-        .of(InventoryArchetypes.CHEST)
+        .of(InventoryArchetypes.HOPPER)
         .property(InventoryTitle.of(Text.of(galaxy.name)))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
-    private val buttonID = Array(3) { UUID.randomUUID() }
+    private val buttonID = Array(5) { UUID.randomUUID() }
 
     init {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
         // button
-        ItemHelper.getItem(Button(LIST))?.apply {
-            offer(DataUUID(buttonID[0]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "星球列表"))
-        }?.let { inventory.set(0, 0, it) }
-
         ItemHelper.getItem(Button(PLUS))?.apply {
-            offer(DataUUID(buttonID[1]))
+            offer(DataUUID(buttonID[0]))
             offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "新增星球"))
-        }?.let { inventory.set(2, 0, it) }
+        }?.let { inventory.set(1, 0, it) }
+
+        ItemHelper.getItem(Button(LIST))?.apply {
+            offer(DataUUID(buttonID[1]))
+            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "管理成員"))
+        }?.let { inventory.set(0, 0, it) }
 
         ItemHelper.getItem(Button(MEMBER_ADD))?.apply {
             offer(DataUUID(buttonID[2]))
             offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "添加成員"))
-        }?.let { inventory.set(4, 0, it) }
+        }?.let { inventory.set(2, 0, it) }
 
         ItemHelper.getItem(Button(MEMBER_ASK))?.apply {
             offer(DataUUID(buttonID[3]))
             offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "加入申請"))
-        }?.let { inventory.set(6, 0, it) }
+        }?.let { inventory.set(3, 0, it) }
 
         // TODO button icon
         ItemHelper.getItem(Button(BLANK))?.apply {
             offer(DataUUID(buttonID[4]))
             offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "重新命名"))
-        }?.let { inventory.set(8, 0, it) }
+        }?.let { inventory.set(4, 0, it) }
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
@@ -68,10 +67,10 @@ class GalaxyManagement(val uuid: UUID) : GUI() {
         event.isCancelled = true
         val player = event.source as? Player ?: return
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
-            buttonID[0] -> GUIHelper.open(player) { BrowserMember(uuid, true) }
-            buttonID[1] -> GUIHelper.open(player) { CreatePlanet() }
+            buttonID[0] -> GUIHelper.open(player) { CreatePlanet() }
+            buttonID[1] -> GUIHelper.open(player) { BrowserMember(galaxy, true) }
             buttonID[2] -> GUIHelper.open(player) { AddMember() }
-            buttonID[3] -> GUIHelper.open(player) { GalaxyJoinRequest(uuid) }
+            buttonID[3] -> GUIHelper.open(player) { GalaxyJoinRequest(galaxy) }
             buttonID[4] -> GUIHelper.open(player) { RenameGalaxy() }
         }
     }

@@ -58,9 +58,9 @@ class MainMenu(val player: Player) : GUI() {
         event.isCancelled = true
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
-            buttonID[0] -> GUIHelper.open(player) { BrowserGalaxy() }
+            buttonID[0] -> GUIHelper.open(player) { BrowserGalaxy(travelerManager.getTraveler(player)) }
             buttonID[1] -> GUIHelper.open(player) { CreateGalaxy() }
-            buttonID[2] -> GUIHelper.open(player) { BrowserGalaxy(travelerManager.getTraveler(player)) }
+            buttonID[2] -> GUIHelper.open(player) { BrowserGalaxy() }
         }
     }
 }

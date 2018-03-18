@@ -79,7 +79,7 @@ class Main {
 
     @Listener
     fun onInit(event: GameInitializationEvent) {
-        logger.info("Initialization...")
+        logger.info("Initializing...")
         configManager = ConfigManager(configLoader)
         databaseManager = DatabaseManager()
         galaxyManager = GalaxyManager()

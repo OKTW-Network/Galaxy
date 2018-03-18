@@ -2,12 +2,8 @@ package one.oktw.galaxy.helper
 
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.ai.attributes.AttributeModifier
-import one.oktw.galaxy.data.DataEnable
-import one.oktw.galaxy.data.DataOverheat
-import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.data.DataUpgrade
-import one.oktw.galaxy.enums.ItemType.PISTOL
-import one.oktw.galaxy.enums.ItemType.SNIPER
+import one.oktw.galaxy.data.*
+import one.oktw.galaxy.enums.ItemType.*
 import one.oktw.galaxy.enums.UpgradeType
 import one.oktw.galaxy.types.item.Button
 import one.oktw.galaxy.types.item.Gun
@@ -93,6 +89,7 @@ class ItemHelper {
         private fun getButton(button: Button): ItemStack {
             return ItemStack.builder()
                 .itemType(ItemTypes.DIAMOND_HOE)
+                .itemData(DataType(BUTTON))
                 .add(Keys.UNBREAKABLE, true)
                 .add(Keys.HIDE_UNBREAKABLE, true)
                 .add(Keys.HIDE_MISCELLANEOUS, true)

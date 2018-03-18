@@ -12,7 +12,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class TravelerManager {
-    private val travelerCollation = databaseManager.database.getCollection("Traveler", Traveler::class.java)
+    private val collection = databaseManager.database.getCollection("Traveler", Traveler::class.java)
     private val cache = ConcurrentHashMap<UUID, Traveler>()
 
     private fun createTraveler(player: Player): Traveler {
@@ -23,12 +23,12 @@ class TravelerManager {
 
     fun getTraveler(player: Player): Traveler {
         return cache.getOrPut(player.uniqueId) {
-            travelerCollation.find(eq("uuid", player.uniqueId)).first() ?: createTraveler(player)
+            collection.find(eq("uuid", player.uniqueId)).first() ?: createTraveler(player)
         }
     }
 
     fun saveTraveler(traveler: Traveler) {
-        launch { travelerCollation.replaceOne(eq("uuid", traveler.uuid), traveler, UpdateOptions().upsert(true)) }
+        launch { collection.replaceOne(eq("uuid", traveler.uuid), traveler, UpdateOptions().upsert(true)) }
         cache.remove(traveler.uuid)
     }
 

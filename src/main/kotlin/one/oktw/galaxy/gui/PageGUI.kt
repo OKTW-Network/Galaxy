@@ -33,6 +33,8 @@ abstract class PageGUI : GUI() {
         offerButton(pageNumber != 0, pages.drop(pageNumber + 1).firstOrNull() != null)
     }
 
+    protected fun isButton(uuid: UUID) = buttonID.contains(uuid)
+
     private fun offerLine(line: Int, list: List<ItemStack>) {
         list.forEachIndexed { slot, item -> gridInventory.set(slot, line, item) }
     }

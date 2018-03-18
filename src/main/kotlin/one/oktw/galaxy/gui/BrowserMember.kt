@@ -68,7 +68,7 @@ class BrowserMember(uuid: UUID, private val manage: Boolean = false) : PageGUI()
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
-        if (item[DataType.key].orElse(null) == BUTTON && !isButton(uuid)) {
+        if (manage && item[DataType.key].orElse(null) == BUTTON && !isButton(uuid)) {
             GUIHelper.open(player) { ManageMember(uuid) }
         }
     }

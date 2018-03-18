@@ -18,17 +18,15 @@ import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
-import java.util.*
 import java.util.Arrays.asList
 
-class BrowserPlanet(uuid: UUID) : PageGUI() {
-    override val token = "BrowserPlanet-$uuid"
-    val galaxy: Galaxy = TODO("Galaxy")
+class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
+    override val token = "BrowserPlanet-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
-            .of(InventoryArchetypes.DOUBLE_CHEST)
-            .property(InventoryTitle.of(Text.of("星球列表")))
-            .listener(InteractInventoryEvent::class.java, this::eventProcess)
-            .build(Main.main)
+        .of(InventoryArchetypes.DOUBLE_CHEST)
+        .property(InventoryTitle.of(Text.of("星球列表")))
+        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .build(Main.main)
     override val gridInventory: GridInventory = inventory.query(INVENTORY_TYPE.of(GridInventory::class.java))
     override val pages = galaxy.planets.asSequence()
         .map {
@@ -61,6 +59,7 @@ class BrowserPlanet(uuid: UUID) : PageGUI() {
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
         if (item[DataType.key].orElse(null) == BUTTON && !isButton(uuid)) {
+            event.isCancelled = true
             // TODO join planet
         }
     }

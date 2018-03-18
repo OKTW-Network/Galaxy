@@ -23,17 +23,15 @@ import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
-import java.util.*
 import java.util.Arrays.asList
 
-class BrowserMember(uuid: UUID, private val manage: Boolean = false) : PageGUI() {
-    override val token = "BrowserMember-$uuid"
-    val galaxy: Galaxy = TODO("Galaxy")
+class BrowserMember(galaxy: Galaxy, private val manage: Boolean = false) : PageGUI() {
+    override val token = "BrowserMember-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
-            .of(InventoryArchetypes.DOUBLE_CHEST)
-            .property(InventoryTitle.of(Text.of("成員列表")))
-            .listener(InteractInventoryEvent::class.java, this::eventProcess)
-            .build(Main.main)
+        .of(InventoryArchetypes.DOUBLE_CHEST)
+        .property(InventoryTitle.of(Text.of("成員列表")))
+        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .build(Main.main)
     override val gridInventory: GridInventory = inventory.query(INVENTORY_TYPE.of(GridInventory::class.java))
     override val pages = galaxy.members.asSequence()
         .map {
@@ -64,12 +62,13 @@ class BrowserMember(uuid: UUID, private val manage: Boolean = false) : PageGUI()
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
-        val player = event.source as? Player ?: return
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
-        if (manage && item[DataType.key].orElse(null) == BUTTON && !isButton(uuid)) {
-            GUIHelper.open(player) { ManageMember(uuid) }
+        if (item[DataType.key].orElse(null) == BUTTON && !isButton(uuid)) {
+            event.isCancelled = true
+
+            if (manage) GUIHelper.open(event.source as Player) { ManageMember(uuid) }
         }
     }
 }

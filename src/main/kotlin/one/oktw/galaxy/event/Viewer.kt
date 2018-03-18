@@ -1,6 +1,6 @@
 package one.oktw.galaxy.event
 
-import one.oktw.galaxy.Main
+import one.oktw.galaxy.helper.ViewerHelper
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
@@ -25,35 +25,35 @@ class Viewer {
 
     @Listener(order = Order.FIRST)
     fun onTarget(event: SetAITargetEvent, @Getter("getTarget") player: Player) {
-        if (Main.viewerManager.isViewer(player.uniqueId)) event.isCancelled = true
+        if (ViewerHelper.isViewer(player.uniqueId)) event.isCancelled = true
     }
 
     @Listener(order = Order.FIRST)
     fun onDropItem(event: DropItemEvent.Pre, @First player: Player) {
-        if (Main.viewerManager.isViewer(player.uniqueId)) event.isCancelled = true
+        if (ViewerHelper.isViewer(player.uniqueId)) event.isCancelled = true
     }
 
     @Listener(order = Order.FIRST)
     fun onSpawnEntity(event: SpawnEntityEvent) {
-        val source = event.cause.allOf(Player::class.java).any { Main.viewerManager.isViewer(it.uniqueId) }
+        val source = event.cause.allOf(Player::class.java).any { ViewerHelper.isViewer(it.uniqueId) }
 
         if (source) event.isCancelled = true
     }
 
     @Listener(order = Order.FIRST)
     fun onChangeBlock(event: ChangeBlockEvent, @First player: Player) {
-        if (Main.viewerManager.isViewer(player.uniqueId)) event.isCancelled = true
+        if (ViewerHelper.isViewer(player.uniqueId)) event.isCancelled = true
     }
 
     @Listener(order = Order.FIRST)
     fun onInteractBlock(event: InteractBlockEvent, @First player: Player) {
-        if (Main.viewerManager.isViewer(player.uniqueId)) event.isCancelled = true
+        if (ViewerHelper.isViewer(player.uniqueId)) event.isCancelled = true
     }
 
     @Listener(order = Order.FIRST)
     fun onInteractEntity(event: InteractEntityEvent, @Getter("getTargetEntity") entity: Entity) {
-        val target = entity is Player && Main.viewerManager.isViewer(entity.uniqueId)
-        val source = event.cause.allOf(Player::class.java).any { Main.viewerManager.isViewer(it.uniqueId) }
+        val target = entity is Player && ViewerHelper.isViewer(entity.uniqueId)
+        val source = event.cause.allOf(Player::class.java).any { ViewerHelper.isViewer(it.uniqueId) }
 
         if (target || source) event.isCancelled = true
     }
@@ -85,33 +85,33 @@ class Viewer {
             IRON_SWORD
         )
 
-        if (Main.viewerManager.isViewer(player.uniqueId) && event.itemStack.type in blockList) {
+        if (ViewerHelper.isViewer(player.uniqueId) && event.itemStack.type in blockList) {
             event.isCancelled = true
         }
     }
 
     @Listener(order = Order.FIRST)
     fun onDamageEntity(event: DamageEntityEvent) {
-        val target = event.targetEntity is Player && Main.viewerManager.isViewer(event.targetEntity.uniqueId)
-        val source = event.cause.allOf(Player::class.java).any { Main.viewerManager.isViewer(it.uniqueId) }
+        val target = event.targetEntity is Player && ViewerHelper.isViewer(event.targetEntity.uniqueId)
+        val source = event.cause.allOf(Player::class.java).any { ViewerHelper.isViewer(it.uniqueId) }
 
         if (target || source) event.isCancelled = true
     }
 
     @Listener(order = Order.FIRST)
     fun onCollideEntity(event: CollideEntityEvent) {
-        val source = event.cause.filterIsInstance<Player>().any { Main.viewerManager.isViewer(it.uniqueId) }
+        val source = event.cause.filterIsInstance<Player>().any { ViewerHelper.isViewer(it.uniqueId) }
 
         if (source) {
             event.isCancelled = true
         } else {
-            event.filterEntities { !Main.viewerManager.isViewer(it.uniqueId) }
+            event.filterEntities { !ViewerHelper.isViewer(it.uniqueId) }
         }
     }
 
     @Listener(order = Order.FIRST)
     fun onCollideBlock(event: CollideBlockEvent, @First player: Player) {
-        if (Main.viewerManager.isViewer(player.uniqueId)) event.isCancelled = true
+        if (ViewerHelper.isViewer(player.uniqueId)) event.isCancelled = true
     }
 
     // TODO add more Listener

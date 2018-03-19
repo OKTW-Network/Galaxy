@@ -78,11 +78,13 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
 
     private fun clickEvent(event: ClickInventoryEvent) {
         event.isCancelled = true
-        val player = event.source as? Player ?: return
+
+        val player = event.source as Player
+
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
             buttonID[0] -> GUIHelper.open(player) { BrowserMember(galaxy) }
             buttonID[1] -> GUIHelper.open(player) { BrowserPlanet(galaxy) }
-            buttonID[2] -> GUIHelper.open(player) { GalaxyManagement(galaxy) } //travelerManager.getTraveler(player)
+            buttonID[2] -> GUIHelper.open(player) { GalaxyManagement(galaxy) }
             buttonID[3] -> {
                 galaxy.joinRequest.add(player.uniqueId)
                 galaxy.save()

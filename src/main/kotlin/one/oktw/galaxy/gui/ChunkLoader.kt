@@ -107,31 +107,31 @@ class ChunkLoader(val entity: Entity) : GUI() {
     private fun clickRemove() {
         if (!this::chunkLoader.isInitialized) return
 
+        // spawn drop item
         val location = entity.location
         val itemEntities = arrayListOf(
-            location.createEntity(EntityTypes.ITEM).also {
-                it.offer(Keys.REPRESENTED_ITEM, ItemStack.of(ItemTypes.END_CRYSTAL, 1).createSnapshot())
-            }
+            location.createEntity(EntityTypes.ITEM)
+                .apply { offer(Keys.REPRESENTED_ITEM, ItemStack.of(ItemTypes.END_CRYSTAL, 1).createSnapshot()) }
         )
 
-        launch { chunkLoaderManager.delete(uuid) }
-
         chunkLoader.upgrade.forEach {
-            val entity = location.createEntity(EntityTypes.ITEM)
             val upgrade = ItemHelper.getItem(it) ?: return@forEach
 
-            entity.offer(Keys.REPRESENTED_ITEM, upgrade.createSnapshot())
-            itemEntities += entity
+            itemEntities += location.createEntity(EntityTypes.ITEM)
+                .apply { offer(Keys.REPRESENTED_ITEM, upgrade.createSnapshot()) }
         }
 
         location.spawnEntities(itemEntities)
+
+        // remove entity
         entity.remove()
-        GUIHelper.apply {
-            close(token)
-            if (this@ChunkLoader::upgradeGUI.isInitialized) {
-                // TODO check why didn't work
-                close(upgradeGUI.token)
-            }
+
+        // close all GUI
+        GUIHelper.close(token)
+        if (this@ChunkLoader::upgradeGUI.isInitialized) {
+            GUIHelper.close(upgradeGUI.token)
         }
+
+        launch { chunkLoaderManager.delete(uuid) }
     }
 }

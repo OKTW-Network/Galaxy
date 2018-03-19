@@ -18,8 +18,6 @@ import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.InventoryTitle
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes.INVENTORY_TYPE
-import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
@@ -33,7 +31,6 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
         .property(InventoryTitle.of(Text.of("成員列表")))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
-    override val gridInventory: GridInventory = inventory.query(INVENTORY_TYPE.of(GridInventory::class.java))
     override val pages = galaxy.members.asSequence()
         .filter {
             if (manage) it.group != Group.OWNER else true

@@ -11,6 +11,7 @@ import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes.INVENTORY_TYPE
 import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
@@ -19,7 +20,6 @@ import java.util.*
 
 abstract class PageGUI : GUI() {
     abstract val pages: Sequence<List<List<ItemStack>>>
-    abstract val gridInventory: GridInventory
     private var pageNumber = 0
     private val buttonID = Array(2) { UUID.randomUUID() }
 
@@ -28,7 +28,7 @@ abstract class PageGUI : GUI() {
     }
 
     protected fun offerPage(pageNumber: Int) = async {
-        gridInventory.clear()
+        inventory.clear()
         pages.elementAt(pageNumber).forEachIndexed(this@PageGUI::offerLine)
         offerButton(pageNumber != 0, pages.drop(pageNumber + 1).firstOrNull() != null)
     }
@@ -36,22 +36,26 @@ abstract class PageGUI : GUI() {
     protected fun isButton(uuid: UUID) = buttonID.contains(uuid)
 
     private fun offerLine(line: Int, list: List<ItemStack>) {
-        list.forEachIndexed { slot, item -> gridInventory.set(slot, line, item) }
+        val gridInventory: GridInventory = inventory.query(INVENTORY_TYPE.of(GridInventory::class.java))
+
+        list.forEachIndexed { slot, item -> gridInventory[slot, line] = item }
     }
 
     private fun offerButton(previous: Boolean, next: Boolean) {
+        val gridInventory: GridInventory = inventory.query(INVENTORY_TYPE.of(GridInventory::class.java))
+
         if (previous) {
             ItemHelper.getItem(Button(ButtonType.ARROW_LEFT))?.apply {
                 offer(DataUUID(buttonID[0]))
                 offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Previous"))
-            }?.let { gridInventory.set(0, 5, it) }
+            }?.let { gridInventory[0, 5] = it }
         }
 
         if (next) {
             ItemHelper.getItem(Button(ButtonType.ARROW_RIGHT))?.apply {
                 offer(DataUUID(buttonID[1]))
                 offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Next"))
-            }?.let { gridInventory.set(8, 5, it) }
+            }?.let { gridInventory[8, 5] = it }
         }
     }
 

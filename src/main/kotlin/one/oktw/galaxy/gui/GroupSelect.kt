@@ -24,24 +24,24 @@ import java.util.*
 class GroupSelect(private val callback: (Group) -> Unit) : GUI() {
     override val token = "GroupSelect-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
-            .of(InventoryArchetypes.HOPPER)
-            .property(InventoryTitle.of(Text.of("選擇一個身分組")))
-            .listener(InteractInventoryEvent::class.java, this::eventProcess)
-            .build(main)
+        .of(InventoryArchetypes.HOPPER)
+        .property(InventoryTitle.of(Text.of("選擇一個身分組")))
+        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .build(main)
     private val buttonID = Array(3) { UUID.randomUUID() }
 
     init {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
-        // button
+        //  button
         val adminPlanetButton = ItemStack.builder()
-                .itemType(ItemTypes.BARRIER)
+            .itemType(ItemTypes.BARRIER)
             .itemData(DataUUID(buttonID[0]))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "ADMIN"))
-                .build()
+            .add(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "ADMIN"))
+            .build()
         val memberMemberButton = ItemStack.builder()
                 .itemType(ItemTypes.BARRIER)
-            .itemData(DataUUID(buttonID[1]))
+                .itemData(DataUUID(buttonID[1]))
                 .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "MEMBER"))
                 .build()
 

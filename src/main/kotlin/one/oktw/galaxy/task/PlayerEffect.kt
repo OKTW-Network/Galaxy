@@ -50,17 +50,17 @@ class PlayerEffect : Consumer<Task> {
     }
 
     override fun accept(task: Task) {
-        effect.forEach { eff ->
-            val player = server.getPlayer(eff.key).orElse(null)
+        effect.forEach { uuid, eff ->
+            val player = server.getPlayer(uuid).orElse(null)
             if (player == null) {
-                effect -= eff.key
+                effect -= uuid
                 return@forEach
             }
 
             player.transform(Keys.POTION_EFFECTS) {
                 val effectList = it ?: ArrayList()
 
-                eff.value.forEach {
+                eff.forEach {
                     effectList += PotionEffect.builder()
                         .potionType(it.key)
                         .amplifier(it.value)

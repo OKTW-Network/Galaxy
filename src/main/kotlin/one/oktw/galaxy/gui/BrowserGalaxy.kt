@@ -1,12 +1,10 @@
 package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.Group.ADMIN
 import one.oktw.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.enums.ItemType.BUTTON
 import one.oktw.galaxy.helper.GUIHelper
@@ -24,6 +22,7 @@ import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes.INVENTORY_TYPE
 import org.spongepowered.api.item.inventory.type.GridInventory
+import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
@@ -83,13 +82,9 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
         if (item[DataType.key].orElse(null) == BUTTON && !isButton(uuid)) {
             event.isCancelled = true
 
-            runBlocking {
+            launch {
                 galaxyManager.getGalaxy(uuid).await()?.let {
-                    if (it.members.firstOrNull { it.uuid == player.uniqueId }?.group in asList(ADMIN, OWNER)) {
-                        GUIHelper.open(player) { GalaxyInfo(it, true) }
-                    } else {
-                        GUIHelper.open(player) { GalaxyInfo(it) }
-                    }
+                    Task.builder().execute { _ -> GUIHelper.open(player) { GalaxyInfo(it, player) } }.submit(main)
                 }
             }
         }

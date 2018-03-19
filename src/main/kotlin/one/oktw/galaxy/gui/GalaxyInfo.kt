@@ -3,7 +3,9 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.ButtonType.*
-import one.oktw.galaxy.enums.Group.*
+import one.oktw.galaxy.enums.Group
+import one.oktw.galaxy.enums.Group.ADMIN
+import one.oktw.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.helper.GUIHelper
 import one.oktw.galaxy.helper.ItemHelper
 import one.oktw.galaxy.types.Galaxy
@@ -35,7 +37,7 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
     init {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
         val member = galaxy.members.firstOrNull { it.uuid == player.uniqueId }
-        val start = if (member?.group == MEMBER) 1 else 0
+        val start = if (member?.group == Group.MEMBER) 1 else 0
 
         // button
         ItemHelper.getItem(Button(MEMBERS))?.apply {

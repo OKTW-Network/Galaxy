@@ -86,8 +86,8 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
             buttonID[1] -> GUIHelper.open(player) { BrowserPlanet(galaxy) }
             buttonID[2] -> GUIHelper.open(player) { GalaxyManagement(galaxy) }
             buttonID[3] -> {
-                galaxy.joinRequest.add(player.uniqueId)
-                galaxy.save()
+                galaxy.requestJoin(player.uniqueId)
+
                 event.isCancelled = false
                 event.cursorTransaction.setCustom(ItemStackSnapshot.NONE)
                 replaceJoinButton()

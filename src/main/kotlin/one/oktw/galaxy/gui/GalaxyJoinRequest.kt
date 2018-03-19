@@ -61,8 +61,7 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
                 Confirm(Text.of("是否要允許加入星系？")) {
                     if (it) galaxy.addMember(uuid)
 
-                    galaxy.joinRequest.remove(uuid)
-                    galaxy.save()
+                    galaxy.removeJoinRequest(uuid)
 
                     offerPage(0)
                 }

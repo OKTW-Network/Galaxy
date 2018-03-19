@@ -14,9 +14,9 @@ import kotlin.collections.ArrayList
 data class Galaxy(
     val uuid: UUID = UUID.randomUUID(),
     var name: String,
-    var members: ArrayList<Member> = ArrayList(),
-    var planets: ArrayList<Planet> = ArrayList(),
-    var joinRequest: ArrayList<UUID> = ArrayList()
+    val members: ArrayList<Member> = ArrayList(),
+    val planets: ArrayList<Planet> = ArrayList(),
+    val joinRequest: ArrayList<UUID> = ArrayList()
 ) {
     fun save() {
         galaxyManager.saveGalaxy(this)
@@ -37,6 +37,18 @@ data class Galaxy(
             if (it) planets.remove(planet)
             save()
         }
+    }
+
+    fun requestJoin(uuid: UUID) {
+        if (uuid in joinRequest) return
+
+        joinRequest.add(uuid)
+        save()
+    }
+
+    fun removeJoinRequest(uuid: UUID) {
+        joinRequest.remove(uuid)
+        save()
     }
 
     fun addMember(uuid: UUID, group: Group = MEMBER) {

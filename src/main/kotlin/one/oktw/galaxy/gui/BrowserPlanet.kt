@@ -1,11 +1,16 @@
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main
+import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.enums.AccessLevel.DENY
 import one.oktw.galaxy.enums.ItemType.BUTTON
+import one.oktw.galaxy.helper.TeleportHelper
 import one.oktw.galaxy.types.Galaxy
 import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
 import org.spongepowered.api.item.ItemTypes
@@ -52,12 +57,21 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
+        val player = event.source as Player
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
         if (item[DataType.key].orElse(null) == BUTTON && !isButton(uuid)) {
             event.isCancelled = true
-            // TODO join planet
+
+            // TODO async
+            runBlocking {
+                val planet = galaxyManager.getPlanet(uuid).await() ?: return@runBlocking
+
+                if (planet.checkPermission(player) != DENY) {
+                    TeleportHelper.teleport(player, planet.loadWorld().get().spawnLocation)
+                }
+            }
         }
     }
 }

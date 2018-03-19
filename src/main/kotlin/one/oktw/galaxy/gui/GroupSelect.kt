@@ -2,17 +2,19 @@ package one.oktw.galaxy.gui
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.enums.ButtonType
+import one.oktw.galaxy.enums.ButtonType.MANAGER
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.enums.Group.ADMIN
 import one.oktw.galaxy.enums.Group.MEMBER
 import one.oktw.galaxy.helper.GUIHelper
+import one.oktw.galaxy.helper.ItemHelper
+import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
-import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
-import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
@@ -34,19 +36,15 @@ class GroupSelect(private val callback: (Group) -> Unit) : GUI() {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
         //  button
-        val adminPlanetButton = ItemStack.builder()
-            .itemType(ItemTypes.BARRIER)
-            .itemData(DataUUID(buttonID[0]))
-            .add(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "ADMIN"))
-            .build()
-        val memberMemberButton = ItemStack.builder()
-                .itemType(ItemTypes.BARRIER)
-                .itemData(DataUUID(buttonID[1]))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "MEMBER"))
-                .build()
+        ItemHelper.getItem(Button(MANAGER))?.apply {
+            offer(DataUUID(buttonID[0]))
+            offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "ADMIN"))
+        }?.let { inventory.set(1, 0, it) }
 
-        inventory.set(1, 0, adminPlanetButton)
-        inventory.set(3, 0, memberMemberButton)
+        ItemHelper.getItem(Button(ButtonType.MEMBER))?.apply {
+            offer(DataUUID(buttonID[1]))
+            offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "MEMBER"))
+        }?.let { inventory.set(3, 0, it) }
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)

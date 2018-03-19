@@ -6,17 +6,18 @@ import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.AccessLevel.DENY
+import one.oktw.galaxy.enums.ButtonType.PLANET_O
 import one.oktw.galaxy.enums.ItemType.BUTTON
+import one.oktw.galaxy.helper.ItemHelper
 import one.oktw.galaxy.helper.TeleportHelper
 import one.oktw.galaxy.types.Galaxy
+import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
-import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
-import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
@@ -32,19 +33,18 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
         .build(Main.main)
     override val pages = galaxy.planets.asSequence()
         .map {
-            ItemStack.builder()
-                .itemType(ItemTypes.BARRIER)
-                .itemData(DataType(BUTTON))
-                .itemData(DataUUID(it.uuid))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, it.name))
-                .add(
+            // TODO planet type
+            ItemHelper.getItem(Button(PLANET_O))!!.apply {
+                offer(DataUUID(it.uuid))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, it.name))
+                offer(
                     Keys.ITEM_LORE,
                     asList(
                         Text.of(TextColors.AQUA, "Players: ", TextColors.RESET, 0), // TODO
                         Text.of(TextColors.AQUA, "Security: ", TextColors.RESET, it.security.toString())
                     )
                 )
-                .build()
+            }
         }
         .chunked(9)
         .chunked(5)

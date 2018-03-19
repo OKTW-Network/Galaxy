@@ -57,6 +57,8 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
         if (item[DataType.key].orElse(null) == BUTTON && !isButton(uuid)) {
+            event.isCancelled = true
+
             GUIHelper.open(event.source as Player) {
                 Confirm(Text.of("是否要允許加入星系？")) {
                     if (it) galaxy.addMember(uuid)

@@ -27,5 +27,13 @@ enum class ButtonType(val id: Int) {
     GALAXY(24),
     PLANET_O(25),
     PLANET_M(26),
-    PLANET_E(27)
+    PLANET_E(27),
+    GUEST(28),
+    MEMBER(29),
+    MANAGER(30),
+    PERSON(31),
+    UPGRADE(32),
+    POWER_ON(33),
+    POWER_OFF(34),
+    WRITE(35)
 }

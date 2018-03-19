@@ -19,9 +19,7 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-private typealias Callback = (Boolean) -> Unit
-
-class Confirm(content: Text, private val callback: Callback) : GUI() {
+class Confirm(content: Text, private val callback: (Boolean) -> Unit) : GUI() {
     override val token = "Confirm-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)

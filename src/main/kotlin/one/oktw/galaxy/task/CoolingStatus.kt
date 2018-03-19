@@ -48,9 +48,9 @@ class CoolingStatus : Consumer<Task> {
                         .actionBar(
                             Text.of(
                                 TextColors.GRAY, "|".repeat(50 - bar2),
-                                color(heatStatus2), "|".repeat(bar2), " ", heatStatus2?.now ?: 0, "°C",
+                                color(heatStatus2), "${"|".repeat(bar2)} ${heatStatus2?.now ?: 0} °C",
                                 TextColors.RESET, " | ",
-                                color(heatStatus1), heatStatus1?.now ?: 0, "°C ", "|".repeat(bar1),
+                                color(heatStatus1), "${heatStatus1?.now ?: 0}°C ${"|".repeat(bar1)}",
                                 TextColors.GRAY, "|".repeat(50 - bar1)
                             )
                         )
@@ -64,8 +64,8 @@ class CoolingStatus : Consumer<Task> {
                     Title.builder()
                         .actionBar(
                             Text.of(
-                                color(heatStatus1), "|".repeat(bar1), " ", heatStatus1?.now
-                                        ?: 0, "°C ", "|".repeat(bar1)
+                                color(heatStatus1),
+                                "${"|".repeat(bar1)} ${heatStatus1?.now ?: 0}°C ${"|".repeat(bar1)}"
                             )
                         )
                         .build()

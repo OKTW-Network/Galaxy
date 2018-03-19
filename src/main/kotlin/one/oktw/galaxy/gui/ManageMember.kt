@@ -23,28 +23,28 @@ import java.util.*
 
 class ManageMember(uuid: UUID) : GUI() {
     override val token = "ManageMember-$uuid"
-    private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
-    private val user = userStorage.get(uuid).get()
+    private val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(uuid).get()
     override val inventory: Inventory = Inventory.builder()
-            .of(InventoryArchetypes.HOPPER)
-            .property(InventoryTitle.of(Text.of(user.name)))
-            .listener(InteractInventoryEvent::class.java, this::eventProcess)
-            .build(main)
+        .of(InventoryArchetypes.HOPPER)
+        .property(InventoryTitle.of(Text.of(user.name)))
+        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .build(main)
     private val buttonID = Array(3) { UUID.randomUUID() }
 
     init {
-        val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
+        val gridInventory =
+            inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
-        // put button
+        // button
         ItemHelper.getItem(Button(MEMBER_REMOVE))?.apply {
             offer(DataUUID(buttonID[0]))
             offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "移除成員"))
-        }?.let { inventory.set(1, 0, it) }
+        }?.let { gridInventory.set(1, 0, it) }
 
         ItemHelper.getItem(Button(MEMBER_CHANGE))?.apply {
             offer(DataUUID(buttonID[1]))
             offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "更改身分組"))
-        }?.let { inventory.set(3, 0, it) }
+        }?.let { gridInventory.set(3, 0, it) }
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)

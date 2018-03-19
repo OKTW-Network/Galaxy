@@ -17,8 +17,6 @@ import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.InventoryTitle
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes.INVENTORY_TYPE
-import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
@@ -32,7 +30,6 @@ class GalaxyJoinRequest(val galaxy: Galaxy) : PageGUI() {
         .property(InventoryTitle.of(Text.of("審核加入申請")))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
-    override val gridInventory: GridInventory = inventory.query(INVENTORY_TYPE.of(GridInventory::class.java))
     override val pages = galaxy.joinRequest.asSequence()
         .map {
             val user = userStorage.get(it).get()

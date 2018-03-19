@@ -74,8 +74,7 @@ class Armor {
 
                     itemStack.setTagInfo("AttributeModifiers", nbt)
                 } else {
-                    val speed =
-                        MOVEMENT_SPEED.defaultValue * (1 + armor.first { it.type == FLEXIBLE }.level / 10)
+                    val speed = MOVEMENT_SPEED.defaultValue * (1 + armor.first { it.type == FLEXIBLE }.level / 10)
 
                     @Suppress("CAST_NEVER_SUCCEEDS")
                     (item as net.minecraft.item.ItemStack).addAttributeModifier(

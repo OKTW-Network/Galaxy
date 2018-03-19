@@ -65,7 +65,9 @@ class GalaxyManagement(val galaxy: Galaxy) : GUI() {
 
     private fun clickEvent(event: ClickInventoryEvent) {
         event.isCancelled = true
-        val player = event.source as? Player ?: return
+
+        val player = event.source as Player
+
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
             buttonID[0] -> GUIHelper.open(player) { CreatePlanet() }
             buttonID[1] -> GUIHelper.open(player) { BrowserMember(galaxy, true) }

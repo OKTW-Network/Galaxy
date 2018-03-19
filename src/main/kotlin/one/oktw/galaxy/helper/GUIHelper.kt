@@ -18,7 +18,7 @@ class GUIHelper {
             val gui = sync.values.mapNotNull { it.firstOrNull { it.token == new.token } }.firstOrNull() ?: new
 
             sync.getOrPut(player) { ConcurrentLinkedDeque() }.offerLast(gui)
-            player.openInventory(gui.inventory)
+            Task.builder().execute { _ -> player.openInventory(gui.inventory) }.submit(main)
 
             return gui
         }

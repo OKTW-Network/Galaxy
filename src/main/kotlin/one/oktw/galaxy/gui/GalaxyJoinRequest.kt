@@ -22,7 +22,7 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 
-class GalaxyJoinRequest(val galaxy: Galaxy) : PageGUI() {
+class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
     override val token = "InviteManagement-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
@@ -60,7 +60,10 @@ class GalaxyJoinRequest(val galaxy: Galaxy) : PageGUI() {
             GUIHelper.open(event.source as Player) {
                 Confirm(Text.of("是否要允許加入星系？")) {
                     if (it) galaxy.addMember(uuid)
-                    galaxy.joinRequest.remove(uuid)
+
+                    galaxy.removeJoinRequest(uuid)
+
+                    offerPage(0)
                 }
             }
         }

@@ -3,6 +3,7 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.enums.ItemType.BUTTON
 import one.oktw.galaxy.helper.GUIHelper
 import one.oktw.galaxy.types.Galaxy
@@ -23,14 +24,17 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.Arrays.asList
 
-class BrowserMember(galaxy: Galaxy, private val manage: Boolean = false) : PageGUI() {
-    override val token = "BrowserMember-${galaxy.uuid}"
+class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = false) : PageGUI() {
+    override val token = "BrowserMember-${galaxy.uuid}${if (manage) "-manage" else ""}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
         .property(InventoryTitle.of(Text.of("成員列表")))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
     override val pages = galaxy.members.asSequence()
+        .filter {
+            if (manage) it.group != Group.OWNER else true
+        }
         .map {
             val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(it.uuid).get()
             ItemStack.builder()
@@ -65,7 +69,10 @@ class BrowserMember(galaxy: Galaxy, private val manage: Boolean = false) : PageG
         if (item[DataType.key].orElse(null) == BUTTON && !isButton(uuid)) {
             event.isCancelled = true
 
-            if (manage) GUIHelper.open(event.source as Player) { ManageMember(uuid) }
+            if (manage) {
+                GUIHelper.open(event.source as Player) { ManageMember(galaxy, uuid) }
+                    .registerEvent<InteractInventoryEvent.Close>(InteractInventoryEvent.Close::class.java) { offerPage(0) }
+            }
         }
     }
 }

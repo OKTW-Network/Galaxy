@@ -25,8 +25,8 @@ data class Planet(
         val group = galaxyManager.getGalaxy(this).await().getGroup(player)
 
         return when (security) {
-            MEMBER -> if (group !== Group.VISITOR) MODIFY else DENY
-            VISIT -> if (group !== Group.VISITOR) MODIFY else VIEW
+            MEMBER -> if (group != Group.VISITOR) MODIFY else DENY
+            VISIT -> if (group != Group.VISITOR) MODIFY else VIEW
             PUBLIC -> MODIFY
         }
     }

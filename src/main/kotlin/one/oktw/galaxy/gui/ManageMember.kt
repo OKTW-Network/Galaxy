@@ -4,10 +4,13 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.ButtonType.MEMBER_CHANGE
 import one.oktw.galaxy.enums.ButtonType.MEMBER_REMOVE
+import one.oktw.galaxy.helper.GUIHelper
 import one.oktw.galaxy.helper.ItemHelper
+import one.oktw.galaxy.types.Galaxy
 import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
@@ -21,9 +24,9 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-class ManageMember(uuid: UUID) : GUI() {
-    override val token = "ManageMember-$uuid"
-    private val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(uuid).get()
+class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI() {
+    override val token = "ManageMember-${galaxy.uuid}-$member"
+    private val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(member).get()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
         .property(InventoryTitle.of(Text.of(user.name)))
@@ -53,9 +56,18 @@ class ManageMember(uuid: UUID) : GUI() {
     private fun clickEvent(event: ClickInventoryEvent) {
         event.isCancelled = true
 
+        val player = event.source as Player
+
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
-            buttonID[0] -> TODO()
-            buttonID[1] -> TODO()
+            buttonID[0] -> GUIHelper.open(player) {
+                Confirm(Text.of("是否移除成員？")) {
+                    if (it) {
+                        galaxy.delMember(member)
+                        GUIHelper.close(token)
+                    }
+                }
+            }
+            buttonID[1] -> GUIHelper.open(player) { GroupSelect { galaxy.setGroup(member, it) } }
         }
     }
 }

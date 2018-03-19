@@ -4,6 +4,7 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.ButtonType.OK
 import one.oktw.galaxy.enums.ButtonType.X
+import one.oktw.galaxy.helper.GUIHelper
 import one.oktw.galaxy.helper.ItemHelper
 import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.data.key.Keys
@@ -50,8 +51,14 @@ class Confirm(content: Text, private val callback: (Boolean) -> Unit) : GUI() {
         event.isCancelled = true
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
-            buttonID[0] -> callback(true)
-            buttonID[1] -> callback(false)
+            buttonID[0] -> {
+                callback(true)
+                GUIHelper.close(token)
+            }
+            buttonID[1] -> {
+                callback(false)
+                GUIHelper.close(token)
+            }
         }
     }
 }

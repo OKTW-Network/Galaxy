@@ -20,7 +20,7 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import java.util.*
 
-class GalaxyManagement(val galaxy: Galaxy) : GUI() {
+class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
     override val token = "GalaxyManagement-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)

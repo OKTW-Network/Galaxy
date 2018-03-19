@@ -4,6 +4,7 @@ import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.chunkLoaderManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.enums.ButtonType.UPGRADE
 import one.oktw.galaxy.enums.ButtonType.X
 import one.oktw.galaxy.enums.UpgradeType
 import one.oktw.galaxy.helper.GUIHelper
@@ -34,8 +35,7 @@ class ChunkLoader(val entity: Entity) : GUI() {
     private val uuid = entity[DataUUID.key].orElse(null)
     private lateinit var chunkLoader: ChunkLoader
     private lateinit var upgradeGUI: GUI
-    private val upgradeButton = UUID.randomUUID()
-    private val removeButton = UUID.randomUUID()
+    private val buttonID = Array(2) { UUID.randomUUID() }
     override val token = "ChunkLoader-$uuid"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
@@ -50,18 +50,15 @@ class ChunkLoader(val entity: Entity) : GUI() {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
         // TODO change to ItemHelper
-        val upgradeItem = ItemStack.builder()
-            .itemType(ItemTypes.ENCHANTED_BOOK)
-            .itemData(DataUUID(upgradeButton))
-            .add(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Upgrade"))
-            .build()
-        val removeItem = ItemHelper.getItem(Button(X))!!.apply {
-            offer(DataUUID(removeButton))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "Remove"))
-        }
+        ItemHelper.getItem(Button(UPGRADE))?.apply {
+            offer(DataUUID(buttonID[0]))
+            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Upgrade"))
+        }?.let { inventory.set(1, 0, it) }
 
-        inventory.set(1, 0, upgradeItem)
-        inventory.set(3, 0, removeItem)
+        ItemHelper.getItem(Button(X))?.apply {
+            offer(DataUUID(buttonID[1]))
+            offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "Remove"))
+        }?.let { inventory.set(3, 0, it) }
 
         // register event
         registerEvent(InteractInventoryEvent.Close::class.java, this::closeEventListener)
@@ -79,8 +76,8 @@ class ChunkLoader(val entity: Entity) : GUI() {
         val itemUUID = event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return
 
         when (itemUUID) {
-            upgradeButton -> clickUpgrade(event.source as Player)
-            removeButton -> clickRemove()
+            buttonID[0] -> clickUpgrade(event.source as Player)
+            buttonID[1] -> clickRemove()
         }
     }
 

@@ -20,7 +20,6 @@ import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.InventoryTitle
-import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
@@ -81,7 +80,7 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
 
             launch {
                 galaxyManager.getGalaxy(uuid).await()?.let {
-                    Task.builder().execute { _ -> GUIHelper.open(player) { GalaxyInfo(it, player) } }.submit(main)
+                    GUIHelper.open(player) { GalaxyInfo(it, player) }
                 }
             }
         }

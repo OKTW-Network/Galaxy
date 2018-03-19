@@ -13,8 +13,6 @@ import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.InventoryTitle
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes.INVENTORY_TYPE
-import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
@@ -27,7 +25,6 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
         .property(InventoryTitle.of(Text.of("星球列表")))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
-    override val gridInventory: GridInventory = inventory.query(INVENTORY_TYPE.of(GridInventory::class.java))
     override val pages = galaxy.planets.asSequence()
         .map {
             ItemStack.builder()

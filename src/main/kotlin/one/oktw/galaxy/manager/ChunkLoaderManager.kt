@@ -36,12 +36,11 @@ class ChunkLoaderManager {
         runBlocking {
             launch {
                 collection.find().forEach {
-                    val planet = galaxyManager.getPlanet(
-                        it.position.planet ?: return@launch
-                    ).await() ?: return@launch
+                    val planet = galaxyManager.getPlanet(it.position.planet ?: return@launch).await() ?: return@launch
                     val range = (it.upgrade.maxBy { it.level }?.level ?: 0) * 2 + 1
-                    val world = withContext(this@runBlocking.coroutineContext) { planet.loadWorld().orElse(null) }
-                            ?: return@launch
+                    val world = withContext(this@runBlocking.coroutineContext) {
+                        planet.loadWorld().orElse(null)
+                    } ?: return@launch
 
                     worldTickets[it.uuid] = loadChunk(world.getLocation(it.position.toVector3d()), range)
                 }

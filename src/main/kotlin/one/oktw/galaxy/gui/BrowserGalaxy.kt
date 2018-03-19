@@ -22,8 +22,6 @@ import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.InventoryTitle
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes.INVENTORY_TYPE
-import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
@@ -38,7 +36,6 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
         .property(InventoryTitle.of(Text.of("瀏覽星系")))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
-    override val gridInventory: GridInventory = inventory.query(INVENTORY_TYPE.of(GridInventory::class.java))
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
     override lateinit var pages: Sequence<List<List<ItemStack>>>
 
@@ -76,7 +73,7 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
-        val player = event.source as? Player ?: return
+        val player = event.source as Player
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 

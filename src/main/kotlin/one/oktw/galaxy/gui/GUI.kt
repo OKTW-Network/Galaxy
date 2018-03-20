@@ -3,17 +3,14 @@ package one.oktw.galaxy.gui
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 
-private typealias Listener = (InteractInventoryEvent) -> Unit
-private typealias EventClass = Class<out InteractInventoryEvent>
-
 abstract class GUI {
     abstract val token: String
     abstract val inventory: Inventory
-    private val eventListeners = ArrayList<Pair<EventClass, Listener>>()
+    private val eventListeners = ArrayList<Pair<Class<out InteractInventoryEvent>, (InteractInventoryEvent) -> Unit>>()
 
-    fun <T : InteractInventoryEvent> registerEvent(event: EventClass, listener: (T) -> Unit) {
-        @Suppress("UNCHECKED_CAST") // TODO better code
-        eventListeners.add(Pair(event, listener) as Pair<Class<T>, Listener>)
+    fun <T : InteractInventoryEvent> registerEvent(event: Class<T>, listener: (T) -> Unit) {
+        @Suppress("UNCHECKED_CAST")
+        eventListeners.add(Pair(event, listener) as Pair<Class<T>, (InteractInventoryEvent) -> Unit>)
     }
 
     protected fun eventProcess(event: InteractInventoryEvent) {

@@ -7,7 +7,7 @@ import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.DropItemEvent
 import org.spongepowered.api.item.inventory.InventoryArchetypes
 
-class DisableDrop {
+class ItemProtect {
     @Listener(order = Order.FIRST)
     fun onDropItem(event: DropItemEvent.Pre) {
         event.droppedItems.any { it[DataUUID.key].isPresent }.let(event::setCancelled)

@@ -1,10 +1,8 @@
 package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.async
-import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.ButtonType
-import one.oktw.galaxy.enums.ItemType
 import one.oktw.galaxy.helper.ItemHelper
 import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.data.key.Keys
@@ -62,11 +60,10 @@ abstract class PageGUI : GUI() {
     private fun clickEvent(event: ClickInventoryEvent) {
         val item = event.cursorTransaction.default
 
-        if (item[DataType.key].orElse(null) == ItemType.BUTTON) {
-            when (item[DataUUID.key].orElse(null) ?: return) {
+        if (item[DataUUID.key].orElse(null) in buttonID) {
+            when (item[DataUUID.key].get()) {
                 buttonID[0] -> offerPage(--pageNumber)
                 buttonID[1] -> offerPage(++pageNumber)
-                else -> return
             }
 
             event.cursorTransaction.apply {
@@ -74,7 +71,7 @@ abstract class PageGUI : GUI() {
                 isValid = false
             }
         } else {
-            event.isCancelled = true
+            event.transactions.any { it.default[DataUUID.key].orElse(null) in buttonID }.let(event::setCancelled)
         }
     }
 }

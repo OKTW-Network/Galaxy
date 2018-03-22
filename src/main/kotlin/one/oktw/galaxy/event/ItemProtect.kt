@@ -1,6 +1,8 @@
 package one.oktw.galaxy.event
 
+import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.enums.ItemType.BUTTON
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.Order
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
@@ -17,8 +19,13 @@ class ItemProtect {
     fun onChangeInventory(event: ClickInventoryEvent) {
         if (event.targetInventory.archetype == InventoryArchetypes.PLAYER) return
 
-        if (event.cursorTransaction.default[DataUUID.key].isPresent || event.transactions.any { it.default[DataUUID.key].isPresent }) {
-            event.isCancelled = true
+        val cursor = event.cursorTransaction.default.let {
+            it[DataUUID.key].isPresent && it[DataType.key].orElse(null) != BUTTON
         }
+        val move = event.transactions.any {
+            it.default[DataUUID.key].isPresent && it.default[DataType.key].orElse(null) != BUTTON
+        }
+
+        if (cursor || move) event.isCancelled = true
     }
 }

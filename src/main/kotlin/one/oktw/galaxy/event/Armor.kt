@@ -24,21 +24,22 @@ import org.spongepowered.api.text.format.TextColors
 class Armor {
     @Listener
     fun onClickInventory(event: ClickInventoryEvent, @First player: Player) {
-        val item = event.cursorTransaction.default.createStack()
+        val item = event.cursorTransaction.default.createStack().also {
+            if (it[DataType.key].orElse(null) != ARMOR) return
+
+            if (it[DataEnable.key].isPresent) {
+                event.cursorTransaction.apply {
+                    setCustom(ItemStackSnapshot.NONE)
+                    isValid = true
+                }
+            } else {
+                event.isCancelled = true
+                return
+            }
+        }
+
         val armor = travelerManager.getTraveler(player).armor
         val effect = taskManager.effect
-
-        if (item[DataType.key].orElse(null) != ARMOR) return
-
-        if (item[DataEnable.key].isPresent) {
-            event.cursorTransaction.apply {
-                setCustom(ItemStackSnapshot.NONE)
-                isValid = true
-            }
-        } else {
-            event.isCancelled = true
-            return
-        }
 
         when (item.type) {
             DIAMOND_HELMET -> {

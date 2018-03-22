@@ -12,7 +12,7 @@ class EventRegister {
             registerListeners(main, Viewer())
             registerListeners(main, Gun())
             registerListeners(main, ChunkLoader())
-            registerListeners(main, DisableDrop())
+            registerListeners(main, ItemProtect())
             registerListeners(main, Armor())
         }
     }

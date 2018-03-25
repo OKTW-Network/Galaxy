@@ -1,9 +1,11 @@
-package one.oktw.galaxy.event
+package one.oktw.galaxy.armor
 
 import net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED
 import net.minecraft.entity.ai.attributes.AttributeModifier
-import one.oktw.galaxy.Main.Companion.taskManager
 import one.oktw.galaxy.Main.Companion.travelerManager
+import one.oktw.galaxy.armor.ArmorEffect.Companion.offerEffect
+import one.oktw.galaxy.armor.ArmorEffect.Companion.removeAllEffect
+import one.oktw.galaxy.armor.ArmorHelper.Companion.offerArmor
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.enums.ItemType.ARMOR
@@ -13,9 +15,11 @@ import org.spongepowered.api.effect.potion.PotionEffectTypes.JUMP_BOOST
 import org.spongepowered.api.effect.potion.PotionEffectTypes.NIGHT_VISION
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
+import org.spongepowered.api.event.filter.Getter
 import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
+import org.spongepowered.api.event.network.ClientConnectionEvent
 import org.spongepowered.api.item.ItemTypes.*
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
@@ -23,30 +27,36 @@ import org.spongepowered.api.text.format.TextColors
 
 class Armor {
     @Listener
+    fun onPlayerJoin(event: ClientConnectionEvent.Join, @Getter("getTargetEntity") player: Player) {
+        offerArmor(player)
+    }
+
+    @Listener
+    fun onPlayerDisconnect(event: ClientConnectionEvent.Disconnect, @Getter("getTargetEntity") player: Player) {
+        removeAllEffect(player)
+    }
+
+    @Listener
     fun onClickInventory(event: ClickInventoryEvent, @First player: Player) {
-        val item = event.cursorTransaction.default.createStack().also {
-            if (it[DataType.key].orElse(null) != ARMOR) return
+        val item = event.cursorTransaction.default.createStack()
 
-            if (it[DataEnable.key].isPresent) {
-                event.cursorTransaction.apply {
-                    setCustom(ItemStackSnapshot.NONE)
-                    isValid = true
-                }
-            } else {
-                event.isCancelled = true
-                return
+        if (item[DataType.key].orElse(null) != ARMOR) return
+        if (item[DataEnable.key].isPresent) {
+            event.cursorTransaction.apply {
+                setCustom(ItemStackSnapshot.NONE)
+                isValid = true
             }
+        } else {
+            event.isCancelled = true
+            return
         }
-
-        val armor = travelerManager.getTraveler(player).armor
-        val effect = taskManager.effect
 
         when (item.type) {
             DIAMOND_HELMET -> {
                 if (item[DataEnable.key].get()) {
-                    effect.removeEffect(player, NIGHT_VISION)
+                    ArmorEffect.removeEffect(player, NIGHT_VISION)
                 } else {
-                    effect.addEffect(player, NIGHT_VISION)
+                    offerEffect(player, NIGHT_VISION)
                 }
 
                 player.setHelmet(switch(item))
@@ -54,9 +64,11 @@ class Armor {
             DIAMOND_CHESTPLATE -> Unit
             DIAMOND_LEGGINGS -> {
                 if (item[DataEnable.key].get()) {
-                    effect.removeEffect(player, JUMP_BOOST)
+                    ArmorEffect.removeEffect(player, JUMP_BOOST)
                 } else {
-                    effect.addEffect(
+                    val armor = travelerManager.getTraveler(player).armor
+
+                    offerEffect(
                         player,
                         JUMP_BOOST,
                         armor.first { it.type == FLEXIBLE }.level - 1
@@ -75,6 +87,7 @@ class Armor {
 
                     itemStack.setTagInfo("AttributeModifiers", nbt)
                 } else {
+                    val armor = travelerManager.getTraveler(player).armor
                     val speed = MOVEMENT_SPEED.defaultValue * (1 + armor.first { it.type == FLEXIBLE }.level / 10)
 
                     @Suppress("CAST_NEVER_SUCCEEDS")

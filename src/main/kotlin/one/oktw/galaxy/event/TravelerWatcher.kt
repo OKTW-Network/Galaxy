@@ -2,10 +2,8 @@ package one.oktw.galaxy.event
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.Main.Companion.taskManager
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.enums.AccessLevel.*
-import one.oktw.galaxy.helper.ArmorHelper
 import one.oktw.galaxy.helper.CoolDownHelper.Companion.getCoolDown
 import one.oktw.galaxy.helper.CoolDownHelper.Companion.removeCoolDown
 import one.oktw.galaxy.helper.ViewerHelper
@@ -20,8 +18,6 @@ import org.spongepowered.api.event.network.ClientConnectionEvent
 class TravelerWatcher {
     @Listener
     fun onJoin(event: ClientConnectionEvent.Join, @Getter("getTargetEntity") player: Player) {
-        ArmorHelper.offerArmor(player)
-
         launch {
             val planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId).await() ?: return@launch
             when (planet.checkPermission(player)) {
@@ -45,7 +41,6 @@ class TravelerWatcher {
                 .forEach { getCoolDown((it as Overheat).uuid)?.let { removeCoolDown(it) } }
             travelerManager.updateTraveler(player)
             ViewerHelper.removeViewer(player.uniqueId)
-            taskManager.effect.removeAllEffect(player)
         }
     }
 }

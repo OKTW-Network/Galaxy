@@ -1,6 +1,7 @@
 package one.oktw.galaxy.register
 
 import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.armor.Armor
 import one.oktw.galaxy.event.*
 import org.spongepowered.api.Sponge
 

@@ -28,8 +28,7 @@ class ArmorHelper {
             val upgrade = travelerManager.getTraveler(player).armor
 
             val helmet: ItemStack = getArmor(ItemTypes.DIAMOND_HELMET)
-            val chestplate: ItemStack =
-                getArmor(ItemTypes.DIAMOND_CHESTPLATE)
+            val chestplate: ItemStack = getArmor(ItemTypes.DIAMOND_CHESTPLATE)
             val leggings: ItemStack = getArmor(ItemTypes.DIAMOND_LEGGINGS)
             val boots: ItemStack = getArmor(ItemTypes.DIAMOND_BOOTS)
 
@@ -84,6 +83,22 @@ class ArmorHelper {
             player.setChestplate(chestplate)
             player.setLeggings(leggings)
             player.setBoots(boots)
+        }
+
+        fun toggleHelmet(player: Player) {
+            // TODO
+        }
+
+        fun toggleChestplate(player: Player) {
+            // TODO
+        }
+
+        fun toggleLeggings(player: Player) {
+            // TODO
+        }
+
+        fun toggleBoots(player: Player) {
+            // TODO
         }
 
         private fun getArmor(itemType: ItemType): ItemStack {

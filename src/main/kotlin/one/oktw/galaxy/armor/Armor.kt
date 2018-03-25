@@ -1,18 +1,14 @@
 package one.oktw.galaxy.armor
 
-import net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED
-import net.minecraft.entity.ai.attributes.AttributeModifier
-import one.oktw.galaxy.Main.Companion.travelerManager
-import one.oktw.galaxy.armor.ArmorEffect.Companion.offerEffect
 import one.oktw.galaxy.armor.ArmorEffect.Companion.removeAllEffect
 import one.oktw.galaxy.armor.ArmorHelper.Companion.offerArmor
+import one.oktw.galaxy.armor.ArmorHelper.Companion.toggleBoots
+import one.oktw.galaxy.armor.ArmorHelper.Companion.toggleChestplate
+import one.oktw.galaxy.armor.ArmorHelper.Companion.toggleHelmet
+import one.oktw.galaxy.armor.ArmorHelper.Companion.toggleLeggings
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.enums.ItemType.ARMOR
-import one.oktw.galaxy.enums.UpgradeType.FLEXIBLE
-import org.spongepowered.api.data.key.Keys
-import org.spongepowered.api.effect.potion.PotionEffectTypes.JUMP_BOOST
-import org.spongepowered.api.effect.potion.PotionEffectTypes.NIGHT_VISION
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.filter.Getter
@@ -21,9 +17,7 @@ import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.network.ClientConnectionEvent
 import org.spongepowered.api.item.ItemTypes.*
-import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
-import org.spongepowered.api.text.format.TextColors
 
 class Armor {
     @Listener
@@ -52,74 +46,15 @@ class Armor {
         }
 
         when (item.type) {
-            DIAMOND_HELMET -> {
-                if (item[DataEnable.key].get()) {
-                    ArmorEffect.removeEffect(player, NIGHT_VISION)
-                } else {
-                    offerEffect(player, NIGHT_VISION)
-                }
-
-                player.setHelmet(switch(item))
-            }
-            DIAMOND_CHESTPLATE -> Unit
-            DIAMOND_LEGGINGS -> {
-                if (item[DataEnable.key].get()) {
-                    ArmorEffect.removeEffect(player, JUMP_BOOST)
-                } else {
-                    val armor = travelerManager.getTraveler(player).armor
-
-                    offerEffect(
-                        player,
-                        JUMP_BOOST,
-                        armor.first { it.type == FLEXIBLE }.level - 1
-                    ) // TODO switch jump level
-                }
-
-                player.setLeggings(switch(item))
-            }
-            DIAMOND_BOOTS -> {
-                if (item[DataEnable.key].get()) {
-                    @Suppress("CAST_NEVER_SUCCEEDS")
-                    val itemStack = (item as net.minecraft.item.ItemStack)
-                    val nbt = itemStack.tagCompound?.getTagList("AttributeModifiers", 10)!!
-
-                    if (nbt.tagCount() > 1) nbt.removeTag(1)
-
-                    itemStack.setTagInfo("AttributeModifiers", nbt)
-                } else {
-                    val armor = travelerManager.getTraveler(player).armor
-                    val speed = MOVEMENT_SPEED.defaultValue * (1 + armor.first { it.type == FLEXIBLE }.level / 10)
-
-                    @Suppress("CAST_NEVER_SUCCEEDS")
-                    (item as net.minecraft.item.ItemStack).addAttributeModifier(
-                        MOVEMENT_SPEED.name,
-                        AttributeModifier("Armor modifier", speed, 0),
-                        null
-                    )
-                }
-
-                player.setBoots(switch(item))
-            }
-            else -> Unit
+            DIAMOND_HELMET -> toggleHelmet(player)
+            DIAMOND_CHESTPLATE -> toggleChestplate(player)
+            DIAMOND_LEGGINGS -> toggleLeggings(player)
+            DIAMOND_BOOTS -> toggleBoots(player)
         }
     }
 
     @Listener
     fun onChangeInventory(event: ChangeInventoryEvent) {
         if (event.transactions.any { it.default[DataType.key].orElse(null) == ARMOR }) event.isCancelled = true
-    }
-
-    private fun switch(item: ItemStack): ItemStack {
-        item.transform(DataEnable.key) {
-            if (it) {
-                item.transform(Keys.ITEM_LORE) { it[0] = it[0].toBuilder().color(TextColors.RED).build();it }
-            } else {
-                item.transform(Keys.ITEM_LORE) { it[0] = it[0].toBuilder().color(TextColors.GREEN).build();it }
-            }
-
-            !it
-        }
-
-        return item
     }
 }

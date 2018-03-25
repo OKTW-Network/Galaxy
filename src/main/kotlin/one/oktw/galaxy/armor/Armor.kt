@@ -40,16 +40,15 @@ class Armor {
                 setCustom(ItemStackSnapshot.NONE)
                 isValid = true
             }
+
+            when (item.type) {
+                DIAMOND_HELMET -> toggleHelmet(player)
+                DIAMOND_CHESTPLATE -> toggleChestplate(player)
+                DIAMOND_LEGGINGS -> toggleLeggings(player)
+                DIAMOND_BOOTS -> toggleBoots(player)
+            }
         } else {
             event.isCancelled = true
-            return
-        }
-
-        when (item.type) {
-            DIAMOND_HELMET -> toggleHelmet(player)
-            DIAMOND_CHESTPLATE -> toggleChestplate(player)
-            DIAMOND_LEGGINGS -> toggleLeggings(player)
-            DIAMOND_BOOTS -> toggleBoots(player)
         }
     }
 

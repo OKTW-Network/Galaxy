@@ -1,8 +1,11 @@
 package one.oktw.galaxy.armor
 
 import net.minecraft.entity.SharedMonsterAttributes
+import net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED
 import net.minecraft.entity.ai.attributes.AttributeModifier
 import one.oktw.galaxy.Main.Companion.travelerManager
+import one.oktw.galaxy.armor.ArmorEffect.Companion.offerEffect
+import one.oktw.galaxy.armor.ArmorEffect.Companion.removeEffect
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
@@ -86,7 +89,15 @@ class ArmorHelper {
         }
 
         fun toggleHelmet(player: Player) {
-            // TODO
+            val item = player.helmet.get()
+
+            if (item[DataEnable.key].get()) {
+                removeEffect(player, NIGHT_VISION)
+            } else {
+                offerEffect(player, NIGHT_VISION)
+            }
+
+            player.setHelmet(toggleArmorStatus(item))
         }
 
         fun toggleChestplate(player: Player) {
@@ -94,11 +105,42 @@ class ArmorHelper {
         }
 
         fun toggleLeggings(player: Player) {
-            // TODO
+            val item = player.leggings.get()
+            val armor = travelerManager.getTraveler(player).armor
+
+            if (item[DataEnable.key].get()) {
+                removeEffect(player, JUMP_BOOST)
+            } else {
+                offerEffect(player, JUMP_BOOST, armor.first { it.type == FLEXIBLE }.level - 1)
+            }
+
+            player.setLeggings(toggleArmorStatus(item))
         }
 
         fun toggleBoots(player: Player) {
-            // TODO
+            val item = player.boots.get()
+            val armor = travelerManager.getTraveler(player).armor
+
+            if (item[DataEnable.key].get()) {
+                @Suppress("CAST_NEVER_SUCCEEDS")
+                val itemStack = (item as net.minecraft.item.ItemStack)
+                val nbt = itemStack.tagCompound?.getTagList("AttributeModifiers", 10)!!
+
+                if (nbt.tagCount() > 1) nbt.removeTag(1)
+
+                itemStack.setTagInfo("AttributeModifiers", nbt)
+            } else {
+                val speed = MOVEMENT_SPEED.defaultValue * (1 + armor.first { it.type == FLEXIBLE }.level / 10)
+
+                @Suppress("CAST_NEVER_SUCCEEDS")
+                (item as net.minecraft.item.ItemStack).addAttributeModifier(
+                    MOVEMENT_SPEED.name,
+                    AttributeModifier("Armor modifier", speed, 0),
+                    null
+                )
+            }
+
+            player.setBoots(toggleArmorStatus(item))
         }
 
         private fun getArmor(itemType: ItemType): ItemStack {
@@ -120,6 +162,20 @@ class ArmorHelper {
                 AttributeModifier("Armor modifier", 0.0, 0),
                 null
             )
+
+            return item
+        }
+
+        private fun toggleArmorStatus(item: ItemStack): ItemStack {
+            item.transform(DataEnable.key) {
+                if (it) {
+                    item.transform(Keys.ITEM_LORE) { it[0] = it[0].toBuilder().color(TextColors.RED).build();it }
+                } else {
+                    item.transform(Keys.ITEM_LORE) { it[0] = it[0].toBuilder().color(TextColors.GREEN).build();it }
+                }
+
+                !it
+            }
 
             return item
         }

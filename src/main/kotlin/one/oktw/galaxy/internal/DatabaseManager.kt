@@ -57,7 +57,7 @@ class DatabaseManager {
             config.getNode("port").int
         )
 
-        val pojoCodecRegistry = fromRegistries(
+        val codecRegistry = fromRegistries(
             MongoClient.getDefaultCodecRegistry(),
             fromProviders(
                 SpongeDataCodecProvider(),
@@ -77,7 +77,7 @@ class DatabaseManager {
         database = if (config.getNode("Username").string.isEmpty()) {
             MongoClient(serverAddress)
                 .getDatabase(config.getNode("name").string)
-                .withCodecRegistry(pojoCodecRegistry)
+                .withCodecRegistry(codecRegistry)
         } else {
             val credential = MongoCredential.createCredential(
                 config.getNode("Username").string,
@@ -88,7 +88,7 @@ class DatabaseManager {
             MongoClient(
                 serverAddress,
                 credential,
-                MongoClientOptions.builder().codecRegistry(pojoCodecRegistry).build()
+                MongoClientOptions.builder().codecRegistry(codecRegistry).build()
             ).getDatabase(config.getNode("name").string)
         }
     }

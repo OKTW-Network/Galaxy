@@ -6,10 +6,10 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
 import kotlinx.coroutines.experimental.withContext
-import one.oktw.galaxy.Main.Companion.databaseManager
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.helper.PlanetHelper
+import one.oktw.galaxy.internal.DatabaseManager.Companion.database
 import one.oktw.galaxy.types.ChunkLoader
 import one.oktw.galaxy.types.Position
 import org.spongepowered.api.Sponge
@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap
 class ChunkLoaderManager {
     private val logger = main.logger
     private val ticketManager = Sponge.getServer().chunkTicketManager
-    private val collection = databaseManager.database.getCollection("ChunkLoader", ChunkLoader::class.java)
+    private val collection = database.getCollection("ChunkLoader", ChunkLoader::class.java)
     private val worldTickets: ConcurrentHashMap<UUID, ChunkTicketManager.LoadingTicket> = ConcurrentHashMap()
 
     init {

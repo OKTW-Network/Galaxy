@@ -3,8 +3,8 @@ package one.oktw.galaxy.manager
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.UpdateOptions
 import kotlinx.coroutines.experimental.launch
-import one.oktw.galaxy.Main.Companion.databaseManager
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.internal.DatabaseManager.Companion.database
 import one.oktw.galaxy.types.Position
 import one.oktw.galaxy.types.Traveler
 import org.spongepowered.api.entity.living.player.Player
@@ -12,7 +12,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class TravelerManager {
-    private val collection = databaseManager.database.getCollection("Traveler", Traveler::class.java)
+    private val collection = database.getCollection("Traveler", Traveler::class.java)
     private val cache = ConcurrentHashMap<UUID, Traveler>()
 
     private fun createTraveler(player: Player): Traveler {

@@ -5,9 +5,9 @@ import com.mongodb.client.model.Filters.text
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
-import one.oktw.galaxy.Main.Companion.databaseManager
 import one.oktw.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.helper.PlanetHelper
+import one.oktw.galaxy.internal.DatabaseManager.Companion.database
 import one.oktw.galaxy.types.Galaxy
 import one.oktw.galaxy.types.Member
 import one.oktw.galaxy.types.Planet
@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
 
 class GalaxyManager {
-    private val collection = databaseManager.database.getCollection("Galaxy", Galaxy::class.java)
+    private val collection = database.getCollection("Galaxy", Galaxy::class.java)
     private val galaxyCache = ConcurrentHashMap<UUID, Galaxy>()
 
     fun createGalaxy(name: String, creator: Player, vararg members: UUID): Galaxy {

@@ -1,4 +1,4 @@
-package one.oktw.galaxy.manager
+package one.oktw.galaxy.internal
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
@@ -8,12 +8,15 @@ import java.io.IOException
 
 class ConfigManager(private val configLoader: ConfigurationLoader<CommentedConfigurationNode>) {
     private val logger = main.logger
-    lateinit var configNode: CommentedConfigurationNode
-        private set
+
+    companion object {
+        lateinit var config: CommentedConfigurationNode
+            private set
+    }
 
     init {
         try {
-            configNode = configLoader.load()
+            config = configLoader.load()
         } catch (e: IOException) {
             logger.error("Config load error!", e)
         }
@@ -22,7 +25,7 @@ class ConfigManager(private val configLoader: ConfigurationLoader<CommentedConfi
 
     internal fun save() {
         try {
-            configLoader.save(configNode)
+            configLoader.save(config)
         } catch (e: IOException) {
             logger.error("Config save error!", e)
         }

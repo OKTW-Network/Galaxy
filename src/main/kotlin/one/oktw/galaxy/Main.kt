@@ -3,7 +3,11 @@ package one.oktw.galaxy
 import com.google.inject.Inject
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
-import one.oktw.galaxy.manager.*
+import one.oktw.galaxy.internal.ConfigManager
+import one.oktw.galaxy.internal.DatabaseManager
+import one.oktw.galaxy.manager.ChunkLoaderManager
+import one.oktw.galaxy.manager.GalaxyManager
+import one.oktw.galaxy.manager.TravelerManager
 import one.oktw.galaxy.register.CommandRegister
 import one.oktw.galaxy.register.DataRegister
 import one.oktw.galaxy.register.EventRegister
@@ -46,8 +50,6 @@ class Main {
         lateinit var galaxyManager: GalaxyManager
             private set
         lateinit var travelerManager: TravelerManager
-            private set
-        lateinit var taskManager: TaskManager
             private set
     }
 
@@ -93,7 +95,6 @@ class Main {
         chunkLoaderManager = ChunkLoaderManager()
 
         CommandRegister()
-        taskManager = TaskManager()
     }
 
     @Listener

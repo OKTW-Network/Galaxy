@@ -1,4 +1,4 @@
-package one.oktw.galaxy.manager
+package one.oktw.galaxy.internal
 
 import com.mongodb.MongoClient
 import com.mongodb.MongoClientOptions
@@ -7,6 +7,7 @@ import com.mongodb.ServerAddress
 import com.mongodb.client.MongoDatabase
 import one.oktw.galaxy.Main.Companion.configManager
 import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.internal.ConfigManager.Companion.config
 import org.bson.BsonReader
 import org.bson.BsonWriter
 import org.bson.codecs.Codec
@@ -28,10 +29,13 @@ import java.io.StringWriter
 import java.util.Arrays.asList
 
 class DatabaseManager {
-    val database: MongoDatabase
+    companion object {
+        lateinit var database: MongoDatabase
+            private set
+    }
 
     init {
-        val config = configManager.configNode.getNode("database")
+        val config = config.getNode("database")
 
         main.logger.info("Loading Database...")
 
@@ -91,31 +95,30 @@ class DatabaseManager {
 
     class SpongeDataCodecProvider : CodecProvider {
         override fun <T : Any> get(clazz: Class<T>, registry: CodecRegistry): Codec<T>? {
-            if (DataSerializable::class.java.isAssignableFrom(clazz)) {
-                return object : Codec<T> {
-                    override fun getEncoderClass() = clazz
+            if (!DataSerializable::class.java.isAssignableFrom(clazz)) return null
 
-                    override fun encode(writer: BsonWriter, value: T, encoderContext: EncoderContext) {
-                        writer.pipe(JsonReader(DataFormats.JSON.write((value as DataSerializable).toContainer())))
-                    }
+            return object : Codec<T> {
+                override fun getEncoderClass() = clazz
 
-                    override fun decode(reader: BsonReader, decoderContext: DecoderContext): T {
-                        val json = StringWriter()
-                        JsonWriter(json, JsonWriterSettings.builder()
-                            // workaround https://github.com/SpongePowered/SpongeCommon/issues/1821
-                            .doubleConverter { value, writer -> writer.writeString(value.toString()) }
-                            .int64Converter { value, writer -> writer.writeString(value.toString()) }
-                            .build()).pipe(reader)
+                override fun encode(writer: BsonWriter, value: T, encoderContext: EncoderContext) {
+                    writer.pipe(JsonReader(DataFormats.JSON.write((value as DataSerializable).toContainer())))
+                }
 
-                        @Suppress("UNCHECKED_CAST")
-                        return Sponge.getDataManager().deserialize(
-                            clazz as Class<out DataSerializable>,
-                            DataFormats.JSON.read(json.toString())
-                        ).get() as T
-                    }
+                override fun decode(reader: BsonReader, decoderContext: DecoderContext): T {
+                    val json = StringWriter()
+                    JsonWriter(json, JsonWriterSettings.builder()
+                        // workaround https://github.com/SpongePowered/SpongeCommon/issues/1821
+                        .doubleConverter { value, writer -> writer.writeString(value.toString()) }
+                        .int64Converter { value, writer -> writer.writeString(value.toString()) }
+                        .build()).pipe(reader)
+
+                    @Suppress("UNCHECKED_CAST")
+                    return Sponge.getDataManager().deserialize(
+                        clazz as Class<out DataSerializable>,
+                        DataFormats.JSON.read(json.toString())
+                    ).get() as T
                 }
             }
-            return null
         }
     }
 }

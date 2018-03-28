@@ -1,4 +1,4 @@
-package one.oktw.galaxy.manager
+package one.oktw.galaxy.internal
 
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.Filters.text

@@ -5,8 +5,8 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
 import one.oktw.galaxy.internal.ConfigManager
 import one.oktw.galaxy.internal.DatabaseManager
-import one.oktw.galaxy.manager.GalaxyManager
-import one.oktw.galaxy.manager.TravelerManager
+import one.oktw.galaxy.internal.GalaxyManager
+import one.oktw.galaxy.internal.TravelerManager
 import one.oktw.galaxy.register.CommandRegister
 import one.oktw.galaxy.register.DataRegister
 import one.oktw.galaxy.register.EventRegister

@@ -5,7 +5,6 @@ import com.mongodb.MongoClientOptions
 import com.mongodb.MongoCredential
 import com.mongodb.ServerAddress
 import com.mongodb.client.MongoDatabase
-import one.oktw.galaxy.Main.Companion.configManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.internal.ConfigManager.Companion.config
 import org.bson.BsonReader
@@ -48,7 +47,7 @@ class DatabaseManager {
             config.getNode("name").setComment("Database name")
             config.getNode("Username").value = ""
             config.getNode("Password").value = ""
-            configManager.save()
+            ConfigManager.save()
         }
 
         // Init Database connect

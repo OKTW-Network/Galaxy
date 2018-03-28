@@ -3,7 +3,6 @@ package one.oktw.galaxy
 import com.google.inject.Inject
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
-import one.oktw.galaxy.internal.ConfigManager
 import one.oktw.galaxy.internal.DatabaseManager
 import one.oktw.galaxy.internal.GalaxyManager
 import one.oktw.galaxy.internal.TravelerManager
@@ -25,7 +24,7 @@ import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.world.gen.WorldGeneratorModifier
 
-@Suppress("unused", "UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
+@Suppress("UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
 @Plugin(
     id = "galaxy",
     name = "OKTW Galaxy",
@@ -35,14 +34,6 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier
 class Main {
     companion object {
         lateinit var main: Main
-            private set
-        lateinit var commandManager: CommandRegister
-            private set
-        lateinit var configManager: ConfigManager
-            private set
-        lateinit var databaseManager: DatabaseManager
-            private set
-        lateinit var eventRegister: EventRegister
             private set
         lateinit var galaxyManager: GalaxyManager
             private set
@@ -79,11 +70,10 @@ class Main {
     @Listener
     fun onInit(event: GameInitializationEvent) {
         logger.info("Initializing...")
-        configManager = ConfigManager(configLoader)
-        databaseManager = DatabaseManager()
+        DatabaseManager()
         galaxyManager = GalaxyManager()
         travelerManager = TravelerManager()
-        eventRegister = EventRegister()
+        EventRegister()
         logger.info("Plugin initialized!")
     }
 

@@ -2,8 +2,8 @@ package one.oktw.galaxy.machine.chunkloader
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.gui.ChunkLoader
 import one.oktw.galaxy.helper.GUIHelper
+import one.oktw.galaxy.machine.chunkloader.gui.ChunkLoader
 import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.entity.EnderCrystal
 import org.spongepowered.api.entity.living.player.Player
@@ -20,7 +20,10 @@ import org.spongepowered.api.event.world.ExplosionEvent
 
 @Suppress("unused")
 class ChunkLoader {
-    private lateinit var chunkLoaderManager: ChunkLoaderManager
+    companion object {
+        lateinit var chunkLoaderManager: ChunkLoaderManager
+            private set
+    }
 
     @Listener
     fun onStart(event: GameStartingServerEvent) {

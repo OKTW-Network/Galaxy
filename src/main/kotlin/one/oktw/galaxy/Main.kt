@@ -5,7 +5,6 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
 import one.oktw.galaxy.internal.ConfigManager
 import one.oktw.galaxy.internal.DatabaseManager
-import one.oktw.galaxy.manager.ChunkLoaderManager
 import one.oktw.galaxy.manager.GalaxyManager
 import one.oktw.galaxy.manager.TravelerManager
 import one.oktw.galaxy.register.CommandRegister
@@ -36,8 +35,6 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier
 class Main {
     companion object {
         lateinit var main: Main
-            private set
-        lateinit var chunkLoaderManager: ChunkLoaderManager
             private set
         lateinit var commandManager: CommandRegister
             private set
@@ -92,8 +89,6 @@ class Main {
 
     @Listener
     fun onStarting(event: GameStartingServerEvent) {
-        chunkLoaderManager = ChunkLoaderManager()
-
         CommandRegister()
     }
 

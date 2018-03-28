@@ -2,7 +2,11 @@ package one.oktw.galaxy.register
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.armor.Armor
-import one.oktw.galaxy.event.*
+import one.oktw.galaxy.event.Gun
+import one.oktw.galaxy.event.ItemProtect
+import one.oktw.galaxy.event.TravelerWatcher
+import one.oktw.galaxy.event.Viewer
+import one.oktw.galaxy.machine.chunkloader.ChunkLoader
 import org.spongepowered.api.Sponge
 
 class EventRegister {

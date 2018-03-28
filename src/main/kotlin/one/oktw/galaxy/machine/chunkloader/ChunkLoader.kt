@@ -1,7 +1,6 @@
-package one.oktw.galaxy.event
+package one.oktw.galaxy.machine.chunkloader
 
 import kotlinx.coroutines.experimental.launch
-import one.oktw.galaxy.Main.Companion.chunkLoaderManager
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.gui.ChunkLoader
 import one.oktw.galaxy.helper.GUIHelper
@@ -16,10 +15,18 @@ import org.spongepowered.api.event.entity.InteractEntityEvent
 import org.spongepowered.api.event.entity.SpawnEntityEvent
 import org.spongepowered.api.event.filter.Getter
 import org.spongepowered.api.event.filter.cause.First
+import org.spongepowered.api.event.game.state.GameStartingServerEvent
 import org.spongepowered.api.event.world.ExplosionEvent
 
 @Suppress("unused")
 class ChunkLoader {
+    private lateinit var chunkLoaderManager: ChunkLoaderManager
+
+    @Listener
+    fun onStart(event: GameStartingServerEvent) {
+        chunkLoaderManager = ChunkLoaderManager()
+    }
+
     @Listener
     fun onSpawnEntity(event: SpawnEntityEvent, @First player: Player) {
         val enderCrystal = event.entities.firstOrNull { it is EnderCrystal } as? EnderCrystal ?: return

@@ -1,4 +1,4 @@
-package one.oktw.galaxy.manager
+package one.oktw.galaxy.machine.chunkloader
 
 import com.flowpowered.math.vector.Vector3i
 import com.mongodb.client.model.Filters.eq

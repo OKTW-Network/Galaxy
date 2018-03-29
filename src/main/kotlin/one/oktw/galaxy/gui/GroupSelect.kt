@@ -7,8 +7,7 @@ import one.oktw.galaxy.enums.ButtonType.MANAGER
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.enums.Group.ADMIN
 import one.oktw.galaxy.enums.Group.MEMBER
-import one.oktw.galaxy.helper.GUIHelper
-import one.oktw.galaxy.helper.ItemHelper
+import one.oktw.galaxy.item.ItemHelper
 import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent

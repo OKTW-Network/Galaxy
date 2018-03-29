@@ -3,7 +3,7 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUpgrade
 import one.oktw.galaxy.enums.UpgradeType
-import one.oktw.galaxy.helper.ItemHelper
+import one.oktw.galaxy.item.ItemHelper
 import one.oktw.galaxy.types.item.Upgrade
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory

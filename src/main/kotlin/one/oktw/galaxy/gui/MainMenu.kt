@@ -5,8 +5,7 @@ import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.ButtonType.GALAXY
 import one.oktw.galaxy.enums.ButtonType.PLUS
-import one.oktw.galaxy.helper.GUIHelper
-import one.oktw.galaxy.helper.ItemHelper
+import one.oktw.galaxy.item.ItemHelper
 import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player

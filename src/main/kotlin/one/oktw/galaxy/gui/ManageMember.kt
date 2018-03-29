@@ -4,8 +4,7 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.ButtonType.MEMBER_CHANGE
 import one.oktw.galaxy.enums.ButtonType.MEMBER_REMOVE
-import one.oktw.galaxy.helper.GUIHelper
-import one.oktw.galaxy.helper.ItemHelper
+import one.oktw.galaxy.item.ItemHelper
 import one.oktw.galaxy.types.Galaxy
 import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.Sponge

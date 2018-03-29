@@ -7,9 +7,9 @@ import one.oktw.galaxy.enums.ButtonType.UPGRADE
 import one.oktw.galaxy.enums.ButtonType.X
 import one.oktw.galaxy.enums.UpgradeType
 import one.oktw.galaxy.gui.GUI
+import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.UpgradeSlot
-import one.oktw.galaxy.helper.GUIHelper
-import one.oktw.galaxy.helper.ItemHelper
+import one.oktw.galaxy.item.ItemHelper
 import one.oktw.galaxy.machine.chunkloader.ChunkLoader.Companion.chunkLoaderManager
 import one.oktw.galaxy.types.ChunkLoader
 import one.oktw.galaxy.types.item.Button

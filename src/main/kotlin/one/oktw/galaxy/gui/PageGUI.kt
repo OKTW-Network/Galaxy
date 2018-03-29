@@ -4,7 +4,7 @@ import kotlinx.coroutines.experimental.async
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.ButtonType.ARROW_LEFT
 import one.oktw.galaxy.enums.ButtonType.ARROW_RIGHT
-import one.oktw.galaxy.helper.ItemHelper
+import one.oktw.galaxy.item.ItemHelper
 import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent

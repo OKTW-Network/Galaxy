@@ -6,8 +6,7 @@ import one.oktw.galaxy.enums.ButtonType.*
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.enums.Group.ADMIN
 import one.oktw.galaxy.enums.Group.OWNER
-import one.oktw.galaxy.helper.GUIHelper
-import one.oktw.galaxy.helper.ItemHelper
+import one.oktw.galaxy.item.ItemHelper
 import one.oktw.galaxy.types.Galaxy
 import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.data.key.Keys

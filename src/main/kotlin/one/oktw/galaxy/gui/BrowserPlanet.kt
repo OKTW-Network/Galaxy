@@ -8,8 +8,8 @@ import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.AccessLevel.DENY
 import one.oktw.galaxy.enums.ButtonType.PLANET_O
 import one.oktw.galaxy.enums.ItemType.BUTTON
-import one.oktw.galaxy.helper.ItemHelper
 import one.oktw.galaxy.helper.TeleportHelper
+import one.oktw.galaxy.item.ItemHelper
 import one.oktw.galaxy.types.Galaxy
 import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.data.key.Keys

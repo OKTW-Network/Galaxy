@@ -4,7 +4,6 @@ import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.ItemType.BUTTON
-import one.oktw.galaxy.helper.GUIHelper
 import one.oktw.galaxy.types.Galaxy
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys

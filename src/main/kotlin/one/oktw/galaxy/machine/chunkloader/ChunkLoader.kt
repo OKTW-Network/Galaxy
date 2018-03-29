@@ -2,7 +2,7 @@ package one.oktw.galaxy.machine.chunkloader
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.helper.GUIHelper
+import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.machine.chunkloader.gui.ChunkLoader
 import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.entity.EnderCrystal

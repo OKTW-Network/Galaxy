@@ -1,4 +1,4 @@
-package one.oktw.galaxy.event
+package one.oktw.galaxy.item.gun
 
 import com.flowpowered.math.imaginary.Quaterniond
 import com.flowpowered.math.vector.Vector3d
@@ -15,7 +15,7 @@ import one.oktw.galaxy.enums.ItemType
 import one.oktw.galaxy.enums.ItemType.PISTOL
 import one.oktw.galaxy.enums.ItemType.SNIPER
 import one.oktw.galaxy.enums.UpgradeType.*
-import one.oktw.galaxy.helper.CoolDownHelper
+import one.oktw.galaxy.item.CoolDownHelper
 import one.oktw.galaxy.types.item.Gun
 import org.spongepowered.api.block.BlockTypes.*
 import org.spongepowered.api.data.key.Keys

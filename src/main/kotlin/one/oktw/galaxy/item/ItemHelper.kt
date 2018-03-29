@@ -1,4 +1,4 @@
-package one.oktw.galaxy.helper
+package one.oktw.galaxy.item
 
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.ai.attributes.AttributeModifier
@@ -21,7 +21,11 @@ class ItemHelper {
     companion object {
         fun getItem(item: Item): ItemStack? {
             return when (item) {
-                is Gun -> removeCoolDown(getGun(item))
+                is Gun -> removeCoolDown(
+                    getGun(
+                        item
+                    )
+                )
                 is Upgrade -> getItemUpgrade(item)
                 is Button -> getButton(item)
                 else -> null

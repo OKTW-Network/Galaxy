@@ -1,9 +1,9 @@
 package one.oktw.galaxy.types.item
 
 import one.oktw.galaxy.annotation.Document
-import one.oktw.galaxy.enums.GunStyle
 import one.oktw.galaxy.enums.ItemType
 import one.oktw.galaxy.enums.ItemType.PISTOL
+import one.oktw.galaxy.item.gun.GunStyle
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import java.util.*
 

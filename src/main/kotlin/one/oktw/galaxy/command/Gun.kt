@@ -1,14 +1,14 @@
 package one.oktw.galaxy.command
 
 import one.oktw.galaxy.Main.Companion.travelerManager
-import one.oktw.galaxy.enums.GunStyle
-import one.oktw.galaxy.enums.GunStyle.PISTOL_ORIGIN
-import one.oktw.galaxy.enums.GunStyle.SNIPER_SIGHT
 import one.oktw.galaxy.enums.ItemType.PISTOL
 import one.oktw.galaxy.enums.ItemType.SNIPER
 import one.oktw.galaxy.enums.UpgradeType.THROUGH
-import one.oktw.galaxy.helper.CoolDownHelper
-import one.oktw.galaxy.helper.ItemHelper
+import one.oktw.galaxy.item.CoolDownHelper
+import one.oktw.galaxy.item.ItemHelper
+import one.oktw.galaxy.item.gun.GunStyle
+import one.oktw.galaxy.item.gun.GunStyle.PISTOL_ORIGIN
+import one.oktw.galaxy.item.gun.GunStyle.SNIPER_SIGHT
 import one.oktw.galaxy.types.item.Gun
 import one.oktw.galaxy.types.item.Upgrade
 import org.spongepowered.api.command.CommandResult

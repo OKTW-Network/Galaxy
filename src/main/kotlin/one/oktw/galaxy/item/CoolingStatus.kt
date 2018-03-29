@@ -1,9 +1,8 @@
-package one.oktw.galaxy.task
+package one.oktw.galaxy.item
 
 import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.helper.CoolDownHelper
-import one.oktw.galaxy.helper.CoolDownHelper.HeatStatus
+import one.oktw.galaxy.item.CoolDownHelper.HeatStatus
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.type.HandType
 import org.spongepowered.api.data.type.HandTypes

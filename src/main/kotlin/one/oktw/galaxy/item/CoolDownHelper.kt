@@ -1,4 +1,4 @@
-package one.oktw.galaxy.helper
+package one.oktw.galaxy.item
 
 import one.oktw.galaxy.Main.Companion.main
 import org.spongepowered.api.scheduler.Task

@@ -1,15 +1,15 @@
 package one.oktw.galaxy.types
 
 import com.flowpowered.math.vector.Vector3d
-import one.oktw.galaxy.annotation.Document
+import org.bson.codecs.pojo.annotations.BsonCreator
+import org.bson.codecs.pojo.annotations.BsonProperty
 import java.util.*
 
-@Document
-data class Position(
-    var x: Double,
-    var y: Double,
-    var z: Double,
-    var planet: UUID? = null
+data class Position @BsonCreator constructor(
+    @BsonProperty("x") var x: Double,
+    @BsonProperty("y") var y: Double,
+    @BsonProperty("z") var z: Double,
+    @BsonProperty("planet") var planet: UUID? = null
 ) {
     constructor(vector3d: Vector3d, planet: UUID? = null) : this(vector3d.x, vector3d.y, vector3d.z, planet)
 

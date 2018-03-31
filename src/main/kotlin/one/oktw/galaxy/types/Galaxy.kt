@@ -1,22 +1,22 @@
 package one.oktw.galaxy.types
 
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.annotation.Document
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.enums.Group.MEMBER
 import one.oktw.galaxy.enums.Group.VISITOR
 import one.oktw.galaxy.helper.PlanetHelper
+import org.bson.codecs.pojo.annotations.BsonCreator
+import org.bson.codecs.pojo.annotations.BsonProperty
 import org.spongepowered.api.entity.living.player.Player
 import java.util.*
 import kotlin.collections.ArrayList
 
-@Document
-data class Galaxy(
-    val uuid: UUID = UUID.randomUUID(),
-    var name: String,
-    val members: ArrayList<Member> = ArrayList(),
-    val planets: ArrayList<Planet> = ArrayList(),
-    val joinRequest: ArrayList<UUID> = ArrayList()
+data class Galaxy @BsonCreator constructor(
+    @BsonProperty("uuid") val uuid: UUID = UUID.randomUUID(),
+    @BsonProperty("name") var name: String,
+    @BsonProperty("members") val members: ArrayList<Member> = ArrayList(),
+    @BsonProperty("planets") val planets: ArrayList<Planet> = ArrayList(),
+    @BsonProperty("joinRequest") val joinRequest: ArrayList<UUID> = ArrayList()
 ) {
     fun save() {
         galaxyManager.saveGalaxy(this)

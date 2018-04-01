@@ -1,4 +1,4 @@
-package one.oktw.galaxy.machine.chunkloader.type
+package one.oktw.galaxy.machine.chunkloader.data
 
 import one.oktw.galaxy.item.type.Upgrade
 import one.oktw.galaxy.types.Position

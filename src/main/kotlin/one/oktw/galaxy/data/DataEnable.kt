@@ -19,9 +19,9 @@ class DataEnable(scoping: Boolean = false) :
     companion object {
         val key: Key<Value<Boolean>> = Key.builder()
             .type(TypeTokens.BOOLEAN_VALUE_TOKEN)
-            .id("scoping")
-            .name("Scoping")
-            .query(DataQuery.of("scoping"))
+            .id("enable")
+            .name("Enable")
+            .query(DataQuery.of("enable"))
             .build()
     }
 

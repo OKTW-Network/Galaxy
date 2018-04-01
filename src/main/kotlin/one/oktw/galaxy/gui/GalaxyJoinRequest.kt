@@ -3,8 +3,8 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
-import one.oktw.galaxy.types.Galaxy
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.SkullTypes

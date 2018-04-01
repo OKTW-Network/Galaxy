@@ -2,8 +2,8 @@ package one.oktw.galaxy.gui
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.ButtonType.OK
-import one.oktw.galaxy.enums.ButtonType.X
+import one.oktw.galaxy.item.enums.ButtonType.OK
+import one.oktw.galaxy.item.enums.ButtonType.X
 import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent

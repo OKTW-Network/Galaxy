@@ -8,7 +8,7 @@ import one.oktw.galaxy.armor.ArmorHelper.Companion.toggleHelmet
 import one.oktw.galaxy.armor.ArmorHelper.Companion.toggleLeggings
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataType
-import one.oktw.galaxy.enums.ItemType.ARMOR
+import one.oktw.galaxy.item.enums.ItemType.ARMOR
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.filter.Getter

@@ -1,8 +1,8 @@
 package one.oktw.galaxy.item.type
 
 import one.oktw.galaxy.data.DataType
-import one.oktw.galaxy.enums.ButtonType
-import one.oktw.galaxy.enums.ItemType.BUTTON
+import one.oktw.galaxy.item.enums.ButtonType
+import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import org.bson.codecs.pojo.annotations.BsonCreator
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import org.bson.codecs.pojo.annotations.BsonProperty

@@ -11,11 +11,11 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.ItemType
-import one.oktw.galaxy.enums.ItemType.PISTOL
-import one.oktw.galaxy.enums.ItemType.SNIPER
-import one.oktw.galaxy.enums.UpgradeType.*
 import one.oktw.galaxy.item.CoolDownHelper
+import one.oktw.galaxy.item.enums.ItemType
+import one.oktw.galaxy.item.enums.ItemType.PISTOL
+import one.oktw.galaxy.item.enums.ItemType.SNIPER
+import one.oktw.galaxy.item.enums.UpgradeType.*
 import one.oktw.galaxy.item.type.Gun
 import org.spongepowered.api.block.BlockTypes.*
 import org.spongepowered.api.data.key.Keys

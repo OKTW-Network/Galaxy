@@ -2,10 +2,10 @@ package one.oktw.galaxy.gui
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.ButtonType.*
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.enums.Group.ADMIN
 import one.oktw.galaxy.enums.Group.OWNER
+import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.types.Galaxy
 import org.spongepowered.api.data.key.Keys

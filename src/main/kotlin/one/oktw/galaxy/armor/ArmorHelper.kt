@@ -9,8 +9,8 @@ import one.oktw.galaxy.armor.ArmorEffect.Companion.removeEffect
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.ItemType.ARMOR
-import one.oktw.galaxy.enums.UpgradeType.*
+import one.oktw.galaxy.item.enums.ItemType.ARMOR
+import one.oktw.galaxy.item.enums.UpgradeType.*
 import org.spongepowered.api.data.key.Keys.*
 import org.spongepowered.api.effect.potion.PotionEffectTypes.*
 import org.spongepowered.api.entity.living.player.Player

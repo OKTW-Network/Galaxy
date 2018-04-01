@@ -2,7 +2,7 @@ package one.oktw.galaxy.event
 
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.ItemType.BUTTON
+import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.Order
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent

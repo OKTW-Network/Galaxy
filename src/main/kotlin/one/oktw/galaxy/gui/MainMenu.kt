@@ -3,8 +3,8 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.ButtonType.GALAXY
-import one.oktw.galaxy.enums.ButtonType.PLUS
+import one.oktw.galaxy.item.enums.ButtonType.GALAXY
+import one.oktw.galaxy.item.enums.ButtonType.PLUS
 import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player

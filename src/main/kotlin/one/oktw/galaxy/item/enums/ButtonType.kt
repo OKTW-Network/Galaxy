@@ -1,4 +1,4 @@
-package one.oktw.galaxy.enums
+package one.oktw.galaxy.item.enums
 
 enum class ButtonType(val id: Int) {
     BLANK(1),

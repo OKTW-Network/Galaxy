@@ -1,8 +1,8 @@
 package one.oktw.galaxy.data
 
 import com.google.common.reflect.TypeToken
-import one.oktw.galaxy.enums.UpgradeType
-import one.oktw.galaxy.enums.UpgradeType.EMPTY
+import one.oktw.galaxy.item.enums.UpgradeType
+import one.oktw.galaxy.item.enums.UpgradeType.EMPTY
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.DataContainer
 import org.spongepowered.api.data.DataHolder

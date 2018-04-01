@@ -3,11 +3,11 @@ package one.oktw.galaxy.item.type
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.ItemType
-import one.oktw.galaxy.enums.ItemType.PISTOL
-import one.oktw.galaxy.enums.ItemType.SNIPER
 import one.oktw.galaxy.item.ItemUtil.Companion.removeCoolDown
 import one.oktw.galaxy.item.ItemUtil.Companion.removeDamage
+import one.oktw.galaxy.item.enums.ItemType
+import one.oktw.galaxy.item.enums.ItemType.PISTOL
+import one.oktw.galaxy.item.enums.ItemType.SNIPER
 import one.oktw.galaxy.item.gun.GunStyle
 import org.bson.codecs.pojo.annotations.BsonCreator
 import org.bson.codecs.pojo.annotations.BsonDiscriminator

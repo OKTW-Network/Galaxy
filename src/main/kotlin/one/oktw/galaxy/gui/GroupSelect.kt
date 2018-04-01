@@ -2,11 +2,11 @@ package one.oktw.galaxy.gui
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.ButtonType
-import one.oktw.galaxy.enums.ButtonType.MANAGER
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.enums.Group.ADMIN
 import one.oktw.galaxy.enums.Group.MEMBER
+import one.oktw.galaxy.item.enums.ButtonType
+import one.oktw.galaxy.item.enums.ButtonType.MANAGER
 import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent

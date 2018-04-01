@@ -1,10 +1,10 @@
 package one.oktw.galaxy.command
 
 import one.oktw.galaxy.Main.Companion.travelerManager
-import one.oktw.galaxy.enums.ItemType.PISTOL
-import one.oktw.galaxy.enums.ItemType.SNIPER
-import one.oktw.galaxy.enums.UpgradeType.THROUGH
 import one.oktw.galaxy.item.CoolDownHelper
+import one.oktw.galaxy.item.enums.ItemType.PISTOL
+import one.oktw.galaxy.item.enums.ItemType.SNIPER
+import one.oktw.galaxy.item.enums.UpgradeType.THROUGH
 import one.oktw.galaxy.item.gun.GunStyle
 import one.oktw.galaxy.item.gun.GunStyle.PISTOL_ORIGIN
 import one.oktw.galaxy.item.gun.GunStyle.SNIPER_SIGHT

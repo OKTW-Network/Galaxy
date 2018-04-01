@@ -1,9 +1,9 @@
 package one.oktw.galaxy.item.type
 
 import one.oktw.galaxy.data.DataUpgrade
-import one.oktw.galaxy.enums.ItemType
-import one.oktw.galaxy.enums.ItemType.UPGRADE
-import one.oktw.galaxy.enums.UpgradeType
+import one.oktw.galaxy.item.enums.ItemType
+import one.oktw.galaxy.item.enums.ItemType.UPGRADE
+import one.oktw.galaxy.item.enums.UpgradeType
 import org.bson.codecs.pojo.annotations.BsonCreator
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import org.bson.codecs.pojo.annotations.BsonProperty

@@ -3,12 +3,12 @@ package one.oktw.galaxy.gui.machine
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.ButtonType.UPGRADE
-import one.oktw.galaxy.enums.ButtonType.X
-import one.oktw.galaxy.enums.UpgradeType
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.UpgradeSlot
+import one.oktw.galaxy.item.enums.ButtonType.UPGRADE
+import one.oktw.galaxy.item.enums.ButtonType.X
+import one.oktw.galaxy.item.enums.UpgradeType
 import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.item.type.Upgrade
 import one.oktw.galaxy.machine.chunkloader.ChunkLoader.Companion.chunkLoaderManager

@@ -2,8 +2,8 @@ package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.async
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.ButtonType.ARROW_LEFT
-import one.oktw.galaxy.enums.ButtonType.ARROW_RIGHT
+import one.oktw.galaxy.item.enums.ButtonType.ARROW_LEFT
+import one.oktw.galaxy.item.enums.ButtonType.ARROW_RIGHT
 import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent

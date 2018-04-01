@@ -5,12 +5,11 @@ import one.oktw.galaxy.enums.ItemType.PISTOL
 import one.oktw.galaxy.enums.ItemType.SNIPER
 import one.oktw.galaxy.enums.UpgradeType.THROUGH
 import one.oktw.galaxy.item.CoolDownHelper
-import one.oktw.galaxy.item.ItemHelper
 import one.oktw.galaxy.item.gun.GunStyle
 import one.oktw.galaxy.item.gun.GunStyle.PISTOL_ORIGIN
 import one.oktw.galaxy.item.gun.GunStyle.SNIPER_SIGHT
-import one.oktw.galaxy.types.item.Gun
-import one.oktw.galaxy.types.item.Upgrade
+import one.oktw.galaxy.item.type.Gun
+import one.oktw.galaxy.item.type.Upgrade
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -72,7 +71,7 @@ class Gun : CommandBase {
                 traveler.item.add(gun)
                 traveler.save()
 
-                ItemHelper.getItem(gun)?.let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
+                gun.createItemStack().let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
                 src.sendMessage(Text.of(gun.uuid.toString()))
             }
             return CommandResult.success()
@@ -112,7 +111,7 @@ class Gun : CommandBase {
                 val traveler = travelerManager.getTraveler(src)
                 val gun = traveler.item[args.getOne<Int>("Gun").get()] as? Gun ?: return CommandResult.empty()
 
-                ItemHelper.getItem(gun)?.let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
+                gun.createItemStack().let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
                 src.sendMessage(Text.of(gun.uuid.toString()))
             }
             return CommandResult.success()

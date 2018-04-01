@@ -16,7 +16,7 @@ import one.oktw.galaxy.enums.ItemType.PISTOL
 import one.oktw.galaxy.enums.ItemType.SNIPER
 import one.oktw.galaxy.enums.UpgradeType.*
 import one.oktw.galaxy.item.CoolDownHelper
-import one.oktw.galaxy.types.item.Gun
+import one.oktw.galaxy.item.type.Gun
 import org.spongepowered.api.block.BlockTypes.*
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData
@@ -64,7 +64,8 @@ class Gun {
         launch {
             val gun = (travelerManager.getTraveler(player).item
                 .filter { it is Gun }
-                .find { (it as Gun).uuid == itemStack[DataUUID.key].get() } as? Gun ?: return@launch).copy()
+                .find { (it as Gun).uuid == itemStack[DataUUID.key].get() } as? Gun
+                    ?: return@launch).copy()
 
             doUpgrade(gun).await()
 

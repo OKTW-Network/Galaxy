@@ -3,8 +3,7 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUpgrade
 import one.oktw.galaxy.enums.UpgradeType
-import one.oktw.galaxy.item.ItemHelper
-import one.oktw.galaxy.types.item.Upgrade
+import one.oktw.galaxy.item.type.Upgrade
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
@@ -23,7 +22,7 @@ class UpgradeSlot(parent: GUI, private var upgrade: List<Upgrade>, private varar
         .build(main)
 
     init {
-        upgrade.forEach { ItemHelper.getItem(it)?.let { inventory.offer(it) } }
+        upgrade.forEach { it.createItemStack().let { inventory.offer(it) } }
 
         registerEvent(InteractInventoryEvent::class.java, this::eventListener)
     }

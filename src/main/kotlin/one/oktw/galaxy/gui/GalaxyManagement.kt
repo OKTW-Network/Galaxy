@@ -3,9 +3,8 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.ButtonType.*
-import one.oktw.galaxy.item.ItemHelper
+import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.types.Galaxy
-import one.oktw.galaxy.types.item.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
@@ -32,31 +31,41 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
         // button
-        ItemHelper.getItem(Button(PLUS))?.apply {
-            offer(DataUUID(buttonID[0]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "新增星球"))
-        }?.let { inventory.set(1, 0, it) }
+        Button(PLUS).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[0]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "新增星球"))
+            }
+            .let { inventory.set(1, 0, it) }
 
-        ItemHelper.getItem(Button(LIST))?.apply {
-            offer(DataUUID(buttonID[1]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "管理成員"))
-        }?.let { inventory.set(0, 0, it) }
+        Button(LIST).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[1]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "管理成員"))
+            }
+            .let { inventory.set(0, 0, it) }
 
-        ItemHelper.getItem(Button(MEMBER_ADD))?.apply {
-            offer(DataUUID(buttonID[2]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "添加成員"))
-        }?.let { inventory.set(2, 0, it) }
+        Button(MEMBER_ADD).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[2]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "添加成員"))
+            }
+            .let { inventory.set(2, 0, it) }
 
-        ItemHelper.getItem(Button(MEMBER_ASK))?.apply {
-            offer(DataUUID(buttonID[3]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "加入申請"))
-        }?.let { inventory.set(3, 0, it) }
+        Button(MEMBER_ASK).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[3]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "加入申請"))
+            }
+            .let { inventory.set(3, 0, it) }
 
         // TODO button icon
-        ItemHelper.getItem(Button(BLANK))?.apply {
-            offer(DataUUID(buttonID[4]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "重新命名"))
-        }?.let { inventory.set(4, 0, it) }
+        Button(BLANK).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[4]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "重新命名"))
+            }
+            .let { inventory.set(4, 0, it) }
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)

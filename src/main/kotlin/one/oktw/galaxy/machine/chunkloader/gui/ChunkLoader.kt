@@ -9,11 +9,10 @@ import one.oktw.galaxy.enums.UpgradeType
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.UpgradeSlot
-import one.oktw.galaxy.item.ItemHelper
+import one.oktw.galaxy.item.type.Button
+import one.oktw.galaxy.item.type.Upgrade
 import one.oktw.galaxy.machine.chunkloader.ChunkLoader.Companion.chunkLoaderManager
 import one.oktw.galaxy.types.ChunkLoader
-import one.oktw.galaxy.types.item.Button
-import one.oktw.galaxy.types.item.Upgrade
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityTypes
@@ -51,16 +50,19 @@ class ChunkLoader(val entity: Entity) : GUI() {
         // fill inventory
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
-        // TODO change to ItemHelper
-        ItemHelper.getItem(Button(UPGRADE))?.apply {
-            offer(DataUUID(buttonID[0]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Upgrade"))
-        }?.let { inventory.set(1, 0, it) }
+        Button(UPGRADE).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[0]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Upgrade"))
+            }
+            .let { inventory.set(1, 0, it) }
 
-        ItemHelper.getItem(Button(X))?.apply {
-            offer(DataUUID(buttonID[1]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "Remove"))
-        }?.let { inventory.set(3, 0, it) }
+        Button(X).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[1]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "Remove"))
+            }
+            .let { inventory.set(3, 0, it) }
 
         // register event
         registerEvent(InteractInventoryEvent.Close::class.java, this::closeEventListener)
@@ -114,7 +116,7 @@ class ChunkLoader(val entity: Entity) : GUI() {
         )
 
         chunkLoader.upgrade.forEach {
-            val upgrade = ItemHelper.getItem(it) ?: return@forEach
+            val upgrade = it.createItemStack()
 
             itemEntities += location.createEntity(EntityTypes.ITEM)
                 .apply { offer(Keys.REPRESENTED_ITEM, upgrade.createSnapshot()) }

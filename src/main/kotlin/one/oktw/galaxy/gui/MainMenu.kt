@@ -5,8 +5,7 @@ import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.ButtonType.GALAXY
 import one.oktw.galaxy.enums.ButtonType.PLUS
-import one.oktw.galaxy.item.ItemHelper
-import one.oktw.galaxy.types.item.Button
+import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
@@ -34,20 +33,26 @@ class MainMenu(val player: Player) : GUI() {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
         // button
-        ItemHelper.getItem(Button(GALAXY))?.apply {
-            offer(DataUUID(buttonID[0]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "列出已加入星系"))
-        }?.let { inventory.set(0, 0, it) }
+        Button(GALAXY).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[0]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "列出已加入星系"))
+            }
+            .let { inventory.set(0, 0, it) }
 
-        ItemHelper.getItem(Button(PLUS))?.apply {
-            offer(DataUUID(buttonID[1]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "創造星系"))
-        }?.let { inventory.set(2, 0, it) }
+        Button(PLUS).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[1]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "創造星系"))
+            }
+            .let { inventory.set(2, 0, it) }
 
-        ItemHelper.getItem(Button(GALAXY))?.apply {
-            offer(DataUUID(buttonID[2]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "列出所有星系"))
-        }?.let { inventory.set(4, 0, it) }
+        Button(GALAXY).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[2]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "列出所有星系"))
+            }
+            .let { inventory.set(4, 0, it) }
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)

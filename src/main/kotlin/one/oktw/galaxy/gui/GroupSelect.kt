@@ -7,8 +7,7 @@ import one.oktw.galaxy.enums.ButtonType.MANAGER
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.enums.Group.ADMIN
 import one.oktw.galaxy.enums.Group.MEMBER
-import one.oktw.galaxy.item.ItemHelper
-import one.oktw.galaxy.types.item.Button
+import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
@@ -35,15 +34,19 @@ class GroupSelect(private val callback: (Group) -> Unit) : GUI() {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
         //  button
-        ItemHelper.getItem(Button(MANAGER))?.apply {
-            offer(DataUUID(buttonID[0]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "ADMIN"))
-        }?.let { inventory.set(1, 0, it) }
+        Button(MANAGER).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[0]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "ADMIN"))
+            }
+            .let { inventory.set(1, 0, it) }
 
-        ItemHelper.getItem(Button(ButtonType.MEMBER))?.apply {
-            offer(DataUUID(buttonID[1]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "MEMBER"))
-        }?.let { inventory.set(3, 0, it) }
+        Button(ButtonType.MEMBER).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[1]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "MEMBER"))
+            }
+            .let { inventory.set(3, 0, it) }
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)

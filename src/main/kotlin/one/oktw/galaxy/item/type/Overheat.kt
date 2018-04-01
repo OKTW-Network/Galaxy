@@ -1,4 +1,4 @@
-package one.oktw.galaxy.types.item
+package one.oktw.galaxy.item.type
 
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import java.util.*

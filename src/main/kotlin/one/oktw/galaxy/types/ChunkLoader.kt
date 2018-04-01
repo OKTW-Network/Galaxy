@@ -1,6 +1,6 @@
 package one.oktw.galaxy.types
 
-import one.oktw.galaxy.types.item.Upgrade
+import one.oktw.galaxy.item.type.Upgrade
 import org.bson.codecs.pojo.annotations.BsonCreator
 import org.bson.codecs.pojo.annotations.BsonProperty
 import java.util.*

@@ -12,7 +12,7 @@ import one.oktw.galaxy.gui.UpgradeSlot
 import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.item.type.Upgrade
 import one.oktw.galaxy.machine.chunkloader.ChunkLoader.Companion.chunkLoaderManager
-import one.oktw.galaxy.types.ChunkLoader
+import one.oktw.galaxy.machine.chunkloader.type.ChunkLoader
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityTypes

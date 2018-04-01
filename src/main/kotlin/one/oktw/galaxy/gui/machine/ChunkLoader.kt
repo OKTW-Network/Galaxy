@@ -1,4 +1,4 @@
-package one.oktw.galaxy.machine.chunkloader.gui
+package one.oktw.galaxy.gui.machine
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.main

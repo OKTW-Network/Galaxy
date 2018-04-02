@@ -11,11 +11,11 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.item.CoolDownHelper
 import one.oktw.galaxy.item.enums.ItemType
 import one.oktw.galaxy.item.enums.ItemType.PISTOL
 import one.oktw.galaxy.item.enums.ItemType.SNIPER
 import one.oktw.galaxy.item.enums.UpgradeType.*
+import one.oktw.galaxy.item.service.CoolDown
 import one.oktw.galaxy.item.type.Gun
 import org.spongepowered.api.block.BlockTypes.*
 import org.spongepowered.api.data.key.Keys
@@ -160,15 +160,9 @@ class Gun {
     }
 
     private fun checkOverheat(world: World, source: Vector3d, gun: Gun) = async {
-        var heatStatus = CoolDownHelper.getCoolDown(gun.uuid)
-        if (heatStatus == null) {
-            heatStatus = CoolDownHelper.HeatStatus(gun.uuid, max = gun.maxTemp, cooling = gun.cooling)
-            CoolDownHelper.addCoolDown(heatStatus)
-        }
+        if (CoolDown.getTemp(gun).overheated) return@async true
 
-        if (heatStatus.isOverheat()) return@async true
-
-        if (heatStatus.addHeat(gun.heat)) {
+        if (CoolDown.heating(gun).overheated) {
             world.playSound(SoundType.of("gun.overheat"), SoundCategories.PLAYER, source, 1.0)
         }
 

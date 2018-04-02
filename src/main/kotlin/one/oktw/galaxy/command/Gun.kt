@@ -1,7 +1,6 @@
 package one.oktw.galaxy.command
 
 import one.oktw.galaxy.Main.Companion.travelerManager
-import one.oktw.galaxy.item.CoolDownHelper
 import one.oktw.galaxy.item.enums.GunStyle
 import one.oktw.galaxy.item.enums.GunStyle.PISTOL_ORIGIN
 import one.oktw.galaxy.item.enums.GunStyle.SNIPER_SIGHT
@@ -90,8 +89,6 @@ class Gun : CommandBase {
             if (src is Player) {
                 val traveler = travelerManager.getTraveler(src)
 
-                CoolDownHelper.getCoolDown((traveler.item.removeAt(args.getOne<Int>("Gun").get()) as Gun).uuid)
-                    ?.let { CoolDownHelper.removeCoolDown(it) }
                 traveler.save()
             }
             return CommandResult.success()

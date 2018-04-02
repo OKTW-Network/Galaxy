@@ -23,15 +23,16 @@ class CoolDown {
         fun getTemp(overheat: Overheat) = coolDown.getOrDefault(overheat, Temp())
 
         fun heating(overheat: Overheat): Temp {
-            return coolDown.getOrDefault(overheat, Temp()).apply {
-                temp += overheat.heat
-                if (temp > overheat.maxTemp) overheated = true
-            }
+            return coolDown.getOrPut(overheat) { Temp() }
+                .apply {
+                    temp += overheat.heat
+                    if (temp > overheat.maxTemp) overheated = true
+                }
         }
 
         private fun doTick() {
             coolDown.forEachEntry(4) {
-                it.value.temp -= 1
+                it.value.temp -= it.key.cooling
                 if (it.value.temp <= 0) coolDown -= it.key
             }
         }

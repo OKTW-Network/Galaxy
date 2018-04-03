@@ -17,11 +17,13 @@ import one.oktw.galaxy.item.enums.ItemType.SNIPER
 import one.oktw.galaxy.item.enums.UpgradeType.*
 import one.oktw.galaxy.item.service.CoolDown
 import one.oktw.galaxy.item.type.Gun
+import one.oktw.galaxy.traveler.service.ActionBar
 import org.spongepowered.api.block.BlockTypes.*
-import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.key.Keys.*
 import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData
 import org.spongepowered.api.data.property.entity.EyeLocationProperty
-import org.spongepowered.api.data.type.HandTypes
+import org.spongepowered.api.data.type.HandTypes.MAIN_HAND
+import org.spongepowered.api.data.type.HandTypes.OFF_HAND
 import org.spongepowered.api.effect.particle.ParticleEffect
 import org.spongepowered.api.effect.particle.ParticleTypes
 import org.spongepowered.api.effect.sound.SoundCategories
@@ -64,14 +66,15 @@ class Gun {
         launch {
             val gun = (travelerManager.getTraveler(player).item
                 .filter { it is Gun }
-                .find { (it as Gun).uuid == itemStack[DataUUID.key].get() } as? Gun
-                    ?: return@launch).copy()
-
-            doUpgrade(gun).await()
+                .find { (it as Gun).uuid == itemStack[DataUUID.key].get() } as? Gun ?: return@launch)
+                .copy()
+                .run(::doUpgrade)
 
             if (checkOverheat(world, source, gun).await()) return@launch
 
-            if (!player[Keys.IS_SNEAKING].get()) {
+            showActionBar(player)
+
+            if (!player[IS_SNEAKING].get()) {
                 direction = drift(direction)
             }
 
@@ -107,15 +110,15 @@ class Gun {
     @Listener
     @Suppress("unused", "UNUSED_PARAMETER")
     fun onChangeDataHolder(event: ChangeDataHolderEvent.ValueChange, @Getter("getTargetHolder") @Has(SneakingData::class) player: Player) {
-        player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataEnable.key].isPresent }.ifPresent {
+        player.getItemInHand(MAIN_HAND).filter { it[DataEnable.key].isPresent }.ifPresent {
             val sneak: Boolean =
-                event.endResult.successfulData.firstOrNull { it.key == Keys.IS_SNEAKING }?.get() as Boolean?
-                        ?: player[Keys.IS_SNEAKING].get()
+                event.endResult.successfulData.firstOrNull { it.key == IS_SNEAKING }?.get() as Boolean?
+                        ?: player[IS_SNEAKING].get()
             if (it[DataEnable.key].get() != sneak) {
-                player.setItemInHand(HandTypes.MAIN_HAND, toggleScope(it))
+                player.setItemInHand(MAIN_HAND, toggleScope(it))
             }
 
-            if (sneak) player.offer(Keys.WALKING_SPEED, -10.0) else player.offer(Keys.WALKING_SPEED, 0.1)
+            if (sneak) player.offer(WALKING_SPEED, -10.0) else player.offer(WALKING_SPEED, 0.1)
         }
     }
 
@@ -123,21 +126,23 @@ class Gun {
     @Include(ChangeInventoryEvent.Held::class, ChangeInventoryEvent.SwapHand::class)
     @Suppress("unused", "UNUSED_PARAMETER")
     fun onChangeInventory(event: ChangeInventoryEvent, @Getter("getSource") player: Player) {
-        val mainHand = player.getItemInHand(HandTypes.MAIN_HAND).filter { it[DataEnable.key].isPresent }.orElse(null)
+        val mainHand = player.getItemInHand(MAIN_HAND).filter { it[DataEnable.key].isPresent }.orElse(null)
         mainHand?.let {
-            val sneak = player[Keys.IS_SNEAKING].get()
+            val sneak = player[IS_SNEAKING].get()
             if (it[DataEnable.key].get() != sneak) {
-                player.setItemInHand(HandTypes.MAIN_HAND, toggleScope(it))
+                player.setItemInHand(MAIN_HAND, toggleScope(it))
             }
 
-            if (sneak) player.offer(Keys.WALKING_SPEED, -10.0) else player.offer(Keys.WALKING_SPEED, 0.1)
+            if (sneak) player.offer(WALKING_SPEED, -10.0) else player.offer(WALKING_SPEED, 0.1)
         }
 
-        if (mainHand == null) player.offer(Keys.WALKING_SPEED, 0.1)
+        if (mainHand == null) player.offer(WALKING_SPEED, 0.1)
 
-        player.getItemInHand(HandTypes.OFF_HAND).filter { it[DataEnable.key].isPresent }.ifPresent {
-            if (it[DataEnable.key].get()) player.setItemInHand(HandTypes.OFF_HAND, toggleScope(it))
+        player.getItemInHand(OFF_HAND).filter { it[DataEnable.key].isPresent }.ifPresent {
+            if (it[DataEnable.key].get()) player.setItemInHand(OFF_HAND, toggleScope(it))
         }
+
+        showActionBar(player)
     }
 
     private fun drift(direction: Vector3d): Vector3d {
@@ -145,8 +150,8 @@ class Gun {
             .sub(Math.random(), Math.random(), Math.random()).div(10.0)
     }
 
-    private fun doUpgrade(gun: Gun) = async {
-        gun.upgrade.forEach {
+    private fun doUpgrade(gun: Gun) = gun.apply {
+        upgrade.forEach {
             when (it.type) {
                 DAMAGE -> gun.damage += it.level * 3
                 RANGE -> gun.range += it.level * 5
@@ -289,8 +294,22 @@ class Gun {
     }
 
     private fun toggleScope(item: ItemStack) = item.apply {
-        transform(Keys.ITEM_DURABILITY) { if (item[DataEnable.key].get()) it - 1 else it + 1 }
+        transform(ITEM_DURABILITY) { if (item[DataEnable.key].get()) it - 1 else it + 1 }
 
         transform(DataEnable.key) { !it }
+    }
+
+    private fun showActionBar(player: Player) {
+        val traveler = travelerManager.getTraveler(player)
+        val gun1 = player.getItemInHand(MAIN_HAND).orElse(null)?.run {
+            traveler.item.filterIsInstance(Gun::class.java).firstOrNull { it.uuid == get(DataUUID.key).get() }
+        }
+        val gun2 = player.getItemInHand(OFF_HAND).orElse(null)?.run {
+            traveler.item.filterIsInstance(Gun::class.java).firstOrNull { it.uuid == get(DataUUID.key).get() }
+        }
+
+        gun1?.let {
+            ActionBar.add(player) { CoolDown.getActionBar(doUpgrade(gun1.copy()), gun2?.let { doUpgrade(it.copy()) }) }
+        }
     }
 }

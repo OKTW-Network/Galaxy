@@ -5,7 +5,6 @@ import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.enums.AccessLevel.*
 import one.oktw.galaxy.traveler.ViewerHelper
-import one.oktw.galaxy.traveler.service.ActionBar
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
@@ -14,10 +13,6 @@ import org.spongepowered.api.event.network.ClientConnectionEvent
 
 @Suppress("unused", "UNUSED_PARAMETER")
 class Traveler {
-    init {
-        ActionBar() // Init ActionBar service
-    }
-
     @Listener
     fun onJoin(event: ClientConnectionEvent.Join, @Getter("getTargetEntity") player: Player) {
         launch {

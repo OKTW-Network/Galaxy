@@ -14,14 +14,14 @@ import org.spongepowered.api.data.value.mutable.Value
 import org.spongepowered.api.util.TypeTokens
 import java.util.*
 
-class DataEnable(scoping: Boolean = false) :
-    AbstractBooleanData<DataEnable, DataEnable.Immutable>(scoping, key, false) {
+class DataEnable(enable: Boolean = false) :
+    AbstractBooleanData<DataEnable, DataEnable.Immutable>(enable, key, false) {
     companion object {
         val key: Key<Value<Boolean>> = Key.builder()
             .type(TypeTokens.BOOLEAN_VALUE_TOKEN)
-            .id("scoping")
-            .name("Scoping")
-            .query(DataQuery.of("scoping"))
+            .id("enable")
+            .name("Enable")
+            .query(DataQuery.of("enable"))
             .build()
     }
 
@@ -43,8 +43,8 @@ class DataEnable(scoping: Boolean = false) :
         return Optional.of(this)
     }
 
-    class Immutable(scoping: Boolean = false) :
-        AbstractImmutableBooleanData<Immutable, DataEnable>(scoping, key, false) {
+    class Immutable(enable: Boolean = false) :
+        AbstractImmutableBooleanData<Immutable, DataEnable>(enable, key, false) {
         override fun getContentVersion() = 1
         override fun asMutable() = DataEnable(value)
     }

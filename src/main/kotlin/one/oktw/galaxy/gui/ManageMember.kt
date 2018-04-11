@@ -2,12 +2,10 @@ package one.oktw.galaxy.gui
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.ButtonType.MEMBER_CHANGE
-import one.oktw.galaxy.enums.ButtonType.MEMBER_REMOVE
-import one.oktw.galaxy.helper.GUIHelper
-import one.oktw.galaxy.helper.ItemHelper
-import one.oktw.galaxy.types.Galaxy
-import one.oktw.galaxy.types.item.Button
+import one.oktw.galaxy.galaxy.data.Galaxy
+import one.oktw.galaxy.item.enums.ButtonType.MEMBER_CHANGE
+import one.oktw.galaxy.item.enums.ButtonType.MEMBER_REMOVE
+import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
@@ -39,15 +37,19 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
             inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
         // button
-        ItemHelper.getItem(Button(MEMBER_REMOVE))?.apply {
-            offer(DataUUID(buttonID[0]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "移除成員"))
-        }?.let { gridInventory.set(1, 0, it) }
+        Button(MEMBER_REMOVE).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[0]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "移除成員"))
+            }
+            .let { gridInventory.set(1, 0, it) }
 
-        ItemHelper.getItem(Button(MEMBER_CHANGE))?.apply {
-            offer(DataUUID(buttonID[1]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "更改身分組"))
-        }?.let { gridInventory.set(3, 0, it) }
+        Button(MEMBER_CHANGE).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[1]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "更改身分組"))
+            }
+            .let { gridInventory.set(3, 0, it) }
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)

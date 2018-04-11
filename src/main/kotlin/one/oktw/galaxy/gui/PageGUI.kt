@@ -2,10 +2,9 @@ package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.async
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.ButtonType.ARROW_LEFT
-import one.oktw.galaxy.enums.ButtonType.ARROW_RIGHT
-import one.oktw.galaxy.helper.ItemHelper
-import one.oktw.galaxy.types.item.Button
+import one.oktw.galaxy.item.enums.ButtonType.ARROW_LEFT
+import one.oktw.galaxy.item.enums.ButtonType.ARROW_RIGHT
+import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.ItemStack
@@ -44,17 +43,21 @@ abstract class PageGUI : GUI() {
         val gridInventory: GridInventory = inventory.query(INVENTORY_TYPE.of(GridInventory::class.java))
 
         if (previous) {
-            ItemHelper.getItem(Button(ARROW_LEFT))?.apply {
-                offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Previous"))
-            }?.let { gridInventory[0, 5] = it }
+            Button(ARROW_LEFT).createItemStack()
+                .apply {
+                    offer(DataUUID(buttonID[0]))
+                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Previous"))
+                }
+                .let { gridInventory[0, 5] = it }
         }
 
         if (next) {
-            ItemHelper.getItem(Button(ARROW_RIGHT))?.apply {
-                offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Next"))
-            }?.let { gridInventory[8, 5] = it }
+            Button(ARROW_RIGHT).createItemStack()
+                .apply {
+                    offer(DataUUID(buttonID[1]))
+                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Next"))
+                }
+                .let { gridInventory[8, 5] = it }
         }
     }
 

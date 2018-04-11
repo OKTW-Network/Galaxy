@@ -1,16 +1,14 @@
 package one.oktw.galaxy.command
 
 import one.oktw.galaxy.Main.Companion.travelerManager
-import one.oktw.galaxy.enums.GunStyle
-import one.oktw.galaxy.enums.GunStyle.PISTOL_ORIGIN
-import one.oktw.galaxy.enums.GunStyle.SNIPER_SIGHT
-import one.oktw.galaxy.enums.ItemType.PISTOL
-import one.oktw.galaxy.enums.ItemType.SNIPER
-import one.oktw.galaxy.enums.UpgradeType.THROUGH
-import one.oktw.galaxy.helper.CoolDownHelper
-import one.oktw.galaxy.helper.ItemHelper
-import one.oktw.galaxy.types.item.Gun
-import one.oktw.galaxy.types.item.Upgrade
+import one.oktw.galaxy.item.enums.GunStyle
+import one.oktw.galaxy.item.enums.GunStyle.PISTOL_ORIGIN
+import one.oktw.galaxy.item.enums.GunStyle.SNIPER_SIGHT
+import one.oktw.galaxy.item.enums.ItemType.PISTOL
+import one.oktw.galaxy.item.enums.ItemType.SNIPER
+import one.oktw.galaxy.item.enums.UpgradeType.THROUGH
+import one.oktw.galaxy.item.type.Gun
+import one.oktw.galaxy.item.type.Upgrade
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -72,7 +70,7 @@ class Gun : CommandBase {
                 traveler.item.add(gun)
                 traveler.save()
 
-                ItemHelper.getItem(gun)?.let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
+                gun.createItemStack().let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
                 src.sendMessage(Text.of(gun.uuid.toString()))
             }
             return CommandResult.success()
@@ -91,8 +89,6 @@ class Gun : CommandBase {
             if (src is Player) {
                 val traveler = travelerManager.getTraveler(src)
 
-                CoolDownHelper.getCoolDown((traveler.item.removeAt(args.getOne<Int>("Gun").get()) as Gun).uuid)
-                    ?.let { CoolDownHelper.removeCoolDown(it) }
                 traveler.save()
             }
             return CommandResult.success()
@@ -112,7 +108,7 @@ class Gun : CommandBase {
                 val traveler = travelerManager.getTraveler(src)
                 val gun = traveler.item[args.getOne<Int>("Gun").get()] as? Gun ?: return CommandResult.empty()
 
-                ItemHelper.getItem(gun)?.let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
+                gun.createItemStack().let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
                 src.sendMessage(Text.of(gun.uuid.toString()))
             }
             return CommandResult.success()

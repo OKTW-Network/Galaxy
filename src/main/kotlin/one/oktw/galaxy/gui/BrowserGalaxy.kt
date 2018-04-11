@@ -6,9 +6,8 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.Group.OWNER
-import one.oktw.galaxy.enums.ItemType.BUTTON
-import one.oktw.galaxy.helper.GUIHelper
-import one.oktw.galaxy.types.Traveler
+import one.oktw.galaxy.item.enums.ItemType.BUTTON
+import one.oktw.galaxy.traveler.data.Traveler
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys.*
 import org.spongepowered.api.data.type.SkullTypes

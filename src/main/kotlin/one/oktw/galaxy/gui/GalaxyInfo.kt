@@ -2,14 +2,12 @@ package one.oktw.galaxy.gui
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.ButtonType.*
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.enums.Group.ADMIN
 import one.oktw.galaxy.enums.Group.OWNER
-import one.oktw.galaxy.helper.GUIHelper
-import one.oktw.galaxy.helper.ItemHelper
-import one.oktw.galaxy.types.Galaxy
-import one.oktw.galaxy.types.item.Button
+import one.oktw.galaxy.galaxy.data.Galaxy
+import one.oktw.galaxy.item.enums.ButtonType.*
+import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
@@ -40,30 +38,38 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
         val start = if (member?.group == Group.MEMBER) 1 else 0
 
         // button
-        ItemHelper.getItem(Button(MEMBERS))?.apply {
-            offer(DataUUID(buttonID[0]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "成員列表"))
-        }?.let { inventory.set(start, 0, it) }
+        Button(MEMBERS).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[0]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "成員列表"))
+            }
+            .let { inventory.set(start, 0, it) }
 
-        ItemHelper.getItem(Button(PLANET_O))?.apply {
-            offer(DataUUID(buttonID[1]))
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "星球列表"))
-        }?.let { inventory.set(start + 2, 0, it) }
+        Button(PLANET_O).createItemStack()
+            .apply {
+                offer(DataUUID(buttonID[1]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "星球列表"))
+            }
+            .let { inventory.set(start + 2, 0, it) }
 
         if (member?.group in asList(OWNER, ADMIN)) {
-            ItemHelper.getItem(Button(LIST))?.apply {
-                offer(DataUUID(buttonID[2]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "管理星系"))
-            }?.let { inventory.set(4, 0, it) }
-        } else if (member == null) {
-            ItemHelper.getItem(Button(PLUS))?.apply {
-                if (player.uniqueId in galaxy.joinRequest) {
-                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GRAY, "已申請加入"))
-                } else {
-                    offer(DataUUID(buttonID[3]))
-                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "申請加入"))
+            Button(LIST).createItemStack()
+                .apply {
+                    offer(DataUUID(buttonID[2]))
+                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "管理星系"))
                 }
-            }?.let { inventory.set(4, 0, it) }
+                .let { inventory.set(4, 0, it) }
+        } else if (member == null) {
+            Button(PLUS).createItemStack()
+                .apply {
+                    if (player.uniqueId in galaxy.joinRequest) {
+                        offer(Keys.DISPLAY_NAME, Text.of(TextColors.GRAY, "已申請加入"))
+                    } else {
+                        offer(DataUUID(buttonID[3]))
+                        offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "申請加入"))
+                    }
+                }
+                .let { inventory.set(4, 0, it) }
         }
 
         // register event
@@ -73,9 +79,11 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
     private fun replaceJoinButton() {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
-        ItemHelper.getItem(Button(PLUS))?.apply {
-            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GRAY, "已申請加入"))
-        }?.let { inventory.set(4, 0, it) }
+        Button(PLUS).createItemStack()
+            .apply {
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GRAY, "已申請加入"))
+            }
+            .let { inventory.set(4, 0, it) }
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {

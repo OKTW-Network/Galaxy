@@ -14,29 +14,25 @@ class ActionBar {
         init {
             Task.builder()
                 .name("ActionBar")
-                .intervalTicks(0)
+                .intervalTicks(1)
                 .execute(::tick)
                 .submit(main)
         }
 
         fun setActionBar(player: Player, data: ActionBarData) {
-            if (player in actionBar && actionBar[player]!!.priority > data.priority) return
-
-            // show one time
-            player.sendTitle(buildTitle(data.text))
-
-            if (data.time > 0) actionBar[player] = data
+            if (actionBar[player]?.priority ?: 0 <= data.priority) actionBar[player] = data
         }
 
         private fun tick() {
-            actionBar.forEach { player, data ->
-                if (data.time == 0) {
-                    actionBar -= player
+            actionBar.forEach {
+                it.key.sendTitle(buildTitle(it.value.text))
+
+                if (it.value.time == 0) {
+                    actionBar -= it.key
                     return@forEach
                 }
 
-                data.time--
-                player.sendTitle(buildTitle(data.text))
+                it.value.time--
             }
         }
 

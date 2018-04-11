@@ -17,7 +17,6 @@ import one.oktw.galaxy.item.enums.ItemType.SNIPER
 import one.oktw.galaxy.item.enums.UpgradeType.*
 import one.oktw.galaxy.item.service.CoolDown
 import one.oktw.galaxy.item.type.Gun
-import one.oktw.galaxy.traveler.service.ActionBar
 import org.spongepowered.api.block.BlockTypes.*
 import org.spongepowered.api.data.key.Keys.*
 import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData
@@ -165,7 +164,7 @@ class Gun {
     }
 
     private fun checkOverheat(world: World, source: Vector3d, gun: Gun) = async {
-        if (CoolDown.getTemp(gun).overheated) return@async true
+        if (CoolDown.getHeat(gun).overheated) return@async true
 
         if (CoolDown.heating(gun).overheated) {
             world.playSound(SoundType.of("gun.overheat"), SoundCategories.PLAYER, source, 1.0)
@@ -302,14 +301,12 @@ class Gun {
     private fun showActionBar(player: Player) {
         val traveler = travelerManager.getTraveler(player)
         val gun1 = player.getItemInHand(MAIN_HAND).orElse(null)?.run {
-            traveler.item.filterIsInstance(Gun::class.java).firstOrNull { it.uuid == get(DataUUID.key).get() }
-        }
+            traveler.item.filterIsInstance(Gun::class.java).firstOrNull { it.uuid == get(DataUUID.key).orElse(null) }
+        }?.copy()?.let { doUpgrade(it) }
         val gun2 = player.getItemInHand(OFF_HAND).orElse(null)?.run {
-            traveler.item.filterIsInstance(Gun::class.java).firstOrNull { it.uuid == get(DataUUID.key).get() }
-        }
+            traveler.item.filterIsInstance(Gun::class.java).firstOrNull { it.uuid == get(DataUUID.key).orElse(null) }
+        }?.copy()?.let { doUpgrade(it) }
 
-        gun1?.let {
-            ActionBar.add(player) { CoolDown.getActionBar(doUpgrade(gun1.copy()), gun2?.let { doUpgrade(it.copy()) }) }
-        }
+        gun1?.let { CoolDown.showActionBar(player, gun1, gun2) }
     }
 }

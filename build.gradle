@@ -46,7 +46,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$Coroutines_version"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$Coroutines_version"
-    compile "org.mongodb:mongodb-driver:3.6.3"
+    compile "org.mongodb:mongodb-driver-sync:3.7.0-rc0"
 }
 
 kotlin {

@@ -1,9 +1,8 @@
 package one.oktw.galaxy.internal
 
-import com.mongodb.MongoClient
-import com.mongodb.MongoClientOptions
-import com.mongodb.MongoCredential
-import com.mongodb.ServerAddress
+import com.mongodb.ConnectionString
+import com.mongodb.MongoClientSettings
+import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoDatabase
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.internal.ConfigManager.Companion.config
@@ -34,62 +33,39 @@ class DatabaseManager {
     }
 
     init {
-        val config = config.getNode("database")
+        val config = config.getNode("mongodb")
 
         main.logger.info("Loading Database...")
 
         // Init Config
         if (config.isVirtual) {
-            config.setComment("Mongodb connect setting")
-            config.getNode("host").value = "localhost"
-            config.getNode("port").value = 27017
-            config.getNode("name").value = "oktw"
-            config.getNode("name").setComment("Database name")
-            config.getNode("Username").value = ""
-            config.getNode("Password").value = ""
-            ConfigManager.save()
+            config.setComment(
+                "MongoDB connect string. format:\n" +
+                        "mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database.collection][?options]]"
+            )
+            config.value = "mongodb://localhost/oktw-galaxy"
         }
 
-        // Init Database connect
-        val serverAddress = ServerAddress(
-            config.getNode("host").string,
-            config.getNode("port").int
-        )
-
-        val codecRegistry = fromRegistries(
-            MongoClient.getDefaultCodecRegistry(),
-            fromProviders(
-                SpongeDataCodecProvider(),
-                PojoCodecProvider.builder()
-                    .automatic(true)
-                    .conventions(
-                        asList(
-                            SET_PRIVATE_FIELDS_CONVENTION,
-                            ANNOTATION_CONVENTION,
-                            CLASS_AND_PROPERTY_CONVENTION
-                        )
-                    )
+        database = PojoCodecProvider.builder() // POJO settings
+            .automatic(true)
+            .conventions(asList(SET_PRIVATE_FIELDS_CONVENTION, ANNOTATION_CONVENTION, CLASS_AND_PROPERTY_CONVENTION))
+            .build()
+            .let {
+                // register codec
+                fromRegistries(
+                    MongoClientSettings.getDefaultCodecRegistry(),
+                    fromProviders(SpongeDataCodecProvider(), it)
+                )
+            }
+            .let {
+                // connect settings
+                MongoClientSettings.builder()
+                    .codecRegistry(it)
+                    .applyConnectionString(ConnectionString(config.string))
                     .build()
-            )
-        )
-
-        database = if (config.getNode("Username").string.isEmpty()) {
-            MongoClient(serverAddress)
-                .getDatabase(config.getNode("name").string)
-                .withCodecRegistry(codecRegistry)
-        } else {
-            val credential = MongoCredential.createCredential(
-                config.getNode("Username").string,
-                config.getNode("name").string,
-                config.getNode("Password").string.toCharArray()
-            )
-
-            MongoClient(
-                serverAddress,
-                credential,
-                MongoClientOptions.builder().codecRegistry(codecRegistry).build()
-            ).getDatabase(config.getNode("name").string)
-        }
+            }
+            .let(MongoClients::create) // connect
+            .getDatabase(ConnectionString(config.string).database!!) // get database
     }
 
     class SpongeDataCodecProvider : CodecProvider {

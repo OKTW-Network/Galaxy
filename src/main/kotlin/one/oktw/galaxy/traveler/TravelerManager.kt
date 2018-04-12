@@ -5,8 +5,10 @@ import com.mongodb.client.model.ReplaceOptions
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.galaxy.planet.data.Position
+import one.oktw.galaxy.galaxy.planet.data.extensions.fromVector3d
 import one.oktw.galaxy.internal.DatabaseManager.Companion.database
 import one.oktw.galaxy.traveler.data.Traveler
+import one.oktw.galaxy.traveler.data.extensions.save
 import org.spongepowered.api.entity.living.player.Player
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap

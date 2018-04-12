@@ -10,6 +10,8 @@ import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import one.oktw.galaxy.galaxy.planet.data.Position
+import one.oktw.galaxy.galaxy.planet.data.extensions.loadWorld
+import one.oktw.galaxy.galaxy.planet.data.extensions.toVector3d
 import one.oktw.galaxy.internal.DatabaseManager.Companion.database
 import one.oktw.galaxy.machine.chunkloader.data.ChunkLoader
 import org.spongepowered.api.Sponge

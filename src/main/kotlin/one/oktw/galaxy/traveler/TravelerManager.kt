@@ -1,7 +1,7 @@
 package one.oktw.galaxy.traveler
 
 import com.mongodb.client.model.Filters.eq
-import com.mongodb.client.model.UpdateOptions
+import com.mongodb.client.model.ReplaceOptions
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.galaxy.planet.data.Position
@@ -29,7 +29,7 @@ class TravelerManager {
     }
 
     fun saveTraveler(traveler: Traveler) {
-        launch { collection.replaceOne(eq("uuid", traveler.uuid), traveler, UpdateOptions().upsert(true)) }
+        launch { collection.replaceOne(eq("uuid", traveler.uuid), traveler, ReplaceOptions().upsert(true)) }
         cache.remove(traveler.uuid)
     }
 

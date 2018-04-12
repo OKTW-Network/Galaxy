@@ -26,7 +26,6 @@ plugins {
 apply plugin: 'kotlin'
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-
 group "one.oktw"
 version "1.0-SNAPSHOT"
 

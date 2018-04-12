@@ -70,7 +70,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
 
             if (manage) {
                 GUIHelper.open(event.source as Player) { ManageMember(galaxy, uuid) }
-                    .registerEvent<InteractInventoryEvent.Close>(InteractInventoryEvent.Close::class.java) { offerPage(0) }
+                    .registerEvent(InteractInventoryEvent.Close::class.java) { offerPage(0) }
             }
         }
     }

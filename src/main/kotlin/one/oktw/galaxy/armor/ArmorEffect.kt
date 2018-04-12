@@ -20,12 +20,15 @@ class ArmorEffect {
                 .name("ArmorEffect")
                 .interval(3, SECONDS)
                 .execute { _ ->
-                    effect.forEach { uuid, eff ->
+                    val iterator = effect.iterator()
+
+                    while (iterator.hasNext()) {
+                        val (uuid, eff) = iterator.next()
                         val player = server.getPlayer(uuid).orElse(null)
 
                         if (player == null) {
-                            effect -= uuid
-                            return@forEach
+                            iterator.remove()
+                            continue
                         }
 
                         player.transform(Keys.POTION_EFFECTS) {

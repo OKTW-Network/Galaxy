@@ -24,15 +24,15 @@ class ActionBar {
         }
 
         private fun tick() {
-            actionBar.forEach {
-                it.key.sendTitle(buildTitle(it.value.text))
+            val iterator = actionBar.iterator()
 
-                if (it.value.time == 0) {
-                    actionBar -= it.key
-                    return@forEach
-                }
+            while (iterator.hasNext()) {
+                val (player, data) = iterator.next()
 
-                it.value.time--
+                player.sendTitle(buildTitle(data.text))
+
+                // remove if timeout
+                if (data.time > 0) data.time-- else iterator.remove()
             }
         }
 

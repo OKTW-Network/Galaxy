@@ -6,6 +6,7 @@ import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoDatabase
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.internal.ConfigManager.Companion.config
+import one.oktw.galaxy.internal.ConfigManager.Companion.save
 import org.bson.BsonReader
 import org.bson.BsonWriter
 import org.bson.codecs.Codec
@@ -44,6 +45,7 @@ class DatabaseManager {
                         "mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database.collection][?options]]"
             )
             config.value = "mongodb://localhost/oktw-galaxy"
+            save()
         }
 
         database = PojoCodecProvider.builder() // POJO settings

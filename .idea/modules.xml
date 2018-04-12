@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Galaxy.iml" filepath="$PROJECT_DIR$/Galaxy.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/galaxy.iml" filepath="$PROJECT_DIR$/.idea/modules/galaxy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/galaxy_api.iml" filepath="$PROJECT_DIR$/.idea/modules/galaxy_api.iml" group="galaxy" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/galaxy_main.iml" filepath="$PROJECT_DIR$/.idea/modules/galaxy_main.iml" group="galaxy" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/galaxy_test.iml" filepath="$PROJECT_DIR$/.idea/modules/galaxy_test.iml" group="galaxy" />
     </modules>

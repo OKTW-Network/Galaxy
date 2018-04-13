@@ -4,18 +4,30 @@ import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.ReplaceOptions
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.galaxy.planet.data.Position
 import one.oktw.galaxy.galaxy.planet.data.extensions.fromVector3d
 import one.oktw.galaxy.internal.DatabaseManager.Companion.database
 import one.oktw.galaxy.traveler.data.Traveler
 import one.oktw.galaxy.traveler.data.extensions.save
 import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.scheduler.Task
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 
 class TravelerManager {
     private val collection = database.getCollection("Traveler", Traveler::class.java)
     private val cache = ConcurrentHashMap<UUID, Traveler>()
+
+    init {
+        Task.builder()
+            .name("TravelerManager")
+            .async()
+            .interval(5, TimeUnit.MINUTES)
+            .execute { _ -> cache.forEachValue(10, ::saveTraveler) }
+            .submit(main)
+    }
 
     private fun createTraveler(player: Player): Traveler {
         val traveler =

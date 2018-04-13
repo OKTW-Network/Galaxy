@@ -25,7 +25,7 @@ class TravelerManager {
             .name("TravelerManager")
             .async()
             .interval(5, TimeUnit.MINUTES)
-            .execute { _ -> cache.forEachValue(10, ::saveTraveler) }
+            .execute(::saveAll)
             .submit(main)
     }
 
@@ -54,5 +54,9 @@ class TravelerManager {
         traveler.position.planet = galaxyManager.getPlanetFromWorld(player.world.uniqueId).await()?.uuid
 
         traveler.save()
+    }
+
+    fun saveAll() {
+        cache.forEachValue(10, ::saveTraveler)
     }
 }

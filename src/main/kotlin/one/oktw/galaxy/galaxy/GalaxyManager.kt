@@ -30,7 +30,7 @@ class GalaxyManager {
             .name("GalaxyManager")
             .async()
             .interval(5, TimeUnit.MINUTES)
-            .execute { _ -> cache.forEachValue(10, ::saveGalaxy) }
+            .execute(::saveAll)
             .submit(main)
     }
 
@@ -82,5 +82,9 @@ class GalaxyManager {
 
     fun getPlanetFromWorld(uuid: UUID) = async {
         collection.distinct("planets", eq("planets.world", uuid), Planet::class.java).firstOrNull()
+    }
+
+    fun saveAll() {
+        cache.forEachValue(10, ::saveGalaxy)
     }
 }

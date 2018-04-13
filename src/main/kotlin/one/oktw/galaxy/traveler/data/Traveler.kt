@@ -1,5 +1,6 @@
 package one.oktw.galaxy.traveler.data
 
+import one.oktw.galaxy.economy.StarDustKeeper
 import one.oktw.galaxy.galaxy.planet.data.Position
 import one.oktw.galaxy.item.type.Item
 import one.oktw.galaxy.item.type.Upgrade
@@ -13,4 +14,4 @@ data class Traveler @BsonCreator constructor(
     @BsonProperty("position") var position: Position,
     @BsonProperty("armor") var armor: ArrayList<Upgrade> = ArrayList(),
     @BsonProperty("item") var item: ArrayList<Item> = ArrayList()
-)
+) : StarDustKeeper()

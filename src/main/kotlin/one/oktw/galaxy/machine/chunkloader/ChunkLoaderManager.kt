@@ -79,15 +79,14 @@ class ChunkLoaderManager {
         logger.info("Reloading ChunkLoader in \"{}\" ...", world.name)
 
         val planet = galaxyManager.getPlanetFromWorld(world.uniqueId).await() ?: return
-        collection.find(eq("position.planet", planet.uuid)).forEach {
-            val chunkLoader = it
+        collection.find(eq("position.planet", planet.uuid)).forEach { chunkLoader ->
             planet.loadWorld().ifPresent {
                 val range = (chunkLoader.upgrade.maxBy { it.level }?.level ?: 0) * 2 + 1
 
                 worldTickets[chunkLoader.uuid] = loadChunk(it.getLocation(chunkLoader.position.toVector3d()), range)
             }
 
-            logger.info("Loaded ChunkLoader at {}", it.position.toString())
+            logger.info("Loaded ChunkLoader at {}", chunkLoader.position.toString())
         }
     }
 

@@ -34,14 +34,17 @@ class CoolDown {
                 .name("CoolDownBar")
                 .intervalTicks(1)
                 .execute { _ ->
-                    actionBar.forEach {
-                        val text = actionBarText(it.value.first, it.value.second)
+                    val iterator = actionBar.iterator()
 
-                        if (getHeat(it.value.first).temp + (it.value.second?.let(::getHeat)?.temp ?: 0) == 0) {
-                            actionBar -= it.key
-                            setActionBar(it.key, ActionBarData(text, 1, 60))
+                    while (iterator.hasNext()) {
+                        val (player, items) = iterator.next()
+                        val text = actionBarText(items.first, items.second)
+
+                        if (getHeat(items.first).temp != 0 || (items.second?.let(::getHeat)?.temp ?: 0) != 0) {
+                            setActionBar(player, ActionBarData(text, 1))
                         } else {
-                            setActionBar(it.key, ActionBarData(text, 1))
+                            iterator.remove()
+                            setActionBar(player, ActionBarData(text, 1, 60))
                         }
                     }
                 }

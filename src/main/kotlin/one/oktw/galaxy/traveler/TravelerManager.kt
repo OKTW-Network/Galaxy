@@ -30,8 +30,7 @@ class TravelerManager {
     }
 
     private fun createTraveler(player: Player): Traveler {
-        val traveler =
-            Traveler(player.uniqueId, position = Position(player.location.position))
+        val traveler = Traveler(player.uniqueId, position = Position(player.location.position))
         traveler.save()
         return traveler
     }
@@ -40,6 +39,10 @@ class TravelerManager {
         return cache.getOrPut(player.uniqueId) {
             collection.find(eq("uuid", player.uniqueId)).first() ?: createTraveler(player)
         }
+    }
+
+    fun getTraveler(uuid: UUID): Traveler? {
+        return cache[uuid] ?: collection.find(eq("uuid", uuid)).first()?.also { cache[uuid] = it }
     }
 
     fun saveTraveler(traveler: Traveler) {

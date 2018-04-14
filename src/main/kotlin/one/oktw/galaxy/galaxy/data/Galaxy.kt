@@ -15,6 +15,8 @@ import kotlin.collections.ArrayList
 data class Galaxy @BsonCreator constructor(
     @BsonProperty("uuid") val uuid: UUID = UUID.randomUUID(),
     @BsonProperty("name") var name: String,
+    @BsonProperty("info") var info: String = "",
+    @BsonProperty("notice") var notice: String = "",
     @BsonProperty("members") val members: ArrayList<Member> = ArrayList(),
     @BsonProperty("planets") val planets: ArrayList<Planet> = ArrayList(),
     @BsonProperty("joinRequest") val joinRequest: ArrayList<UUID> = ArrayList()

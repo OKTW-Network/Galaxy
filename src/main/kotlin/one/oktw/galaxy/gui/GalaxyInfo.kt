@@ -2,7 +2,6 @@ package one.oktw.galaxy.gui
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.enums.Group.ADMIN
 import one.oktw.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.data.Galaxy
@@ -20,6 +19,7 @@ import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
+import org.spongepowered.api.text.serializer.TextSerializers
 import java.util.*
 import java.util.Arrays.asList
 
@@ -35,7 +35,6 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
     init {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
         val member = galaxy.members.firstOrNull { it.uuid == player.uniqueId }
-        val start = if (member?.group == Group.MEMBER) 1 else 0
 
         // button
         Button(MEMBERS).createItemStack()
@@ -43,33 +42,47 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
                 offer(DataUUID(buttonID[0]))
                 offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "成員列表"))
             }
-            .let { inventory.set(start, 0, it) }
+            .let { inventory.set(0, 0, it) }
 
         Button(PLANET_O).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
                 offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "星球列表"))
             }
-            .let { inventory.set(start + 2, 0, it) }
+            .let { inventory.set(2, 0, it) }
 
-        if (member?.group in asList(OWNER, ADMIN)) {
-            Button(LIST).createItemStack()
-                .apply {
-                    offer(DataUUID(buttonID[2]))
-                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "管理星系"))
-                }
-                .let { inventory.set(4, 0, it) }
-        } else if (member == null) {
-            Button(PLUS).createItemStack()
-                .apply {
-                    if (player.uniqueId in galaxy.joinRequest) {
-                        offer(Keys.DISPLAY_NAME, Text.of(TextColors.GRAY, "已申請加入"))
-                    } else {
-                        offer(DataUUID(buttonID[3]))
-                        offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "申請加入"))
+        when {
+            member?.group in asList(OWNER, ADMIN) -> {
+                Button(LIST).createItemStack()
+                    .apply {
+                        offer(DataUUID(buttonID[2]))
+                        offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "管理星系"))
                     }
-                }
-                .let { inventory.set(4, 0, it) }
+                    .let { inventory.set(4, 0, it) }
+            }
+            member != null -> {
+                Button(WARNING).createItemStack()
+                    .apply {
+                        offer(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, "星系通知"))
+                        offer(
+                            Keys.ITEM_LORE,
+                            galaxy.notice.split('\n').map(TextSerializers.FORMATTING_CODE::deserialize)
+                        )
+                    }
+                    .let { inventory.set(4, 0, it) }
+            }
+            else -> {
+                Button(PLUS).createItemStack()
+                    .apply {
+                        if (player.uniqueId in galaxy.joinRequest) {
+                            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GRAY, "已申請加入"))
+                        } else {
+                            offer(DataUUID(buttonID[3]))
+                            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, "申請加入"))
+                        }
+                    }
+                    .let { inventory.set(4, 0, it) }
+            }
         }
 
         // register event

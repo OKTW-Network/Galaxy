@@ -2,9 +2,10 @@ package one.oktw.galaxy.galaxy.planet
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.galaxy.planet.data.Planet
+import one.oktw.galaxy.galaxy.planet.gen.PlanetGenModifier
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.world.World
-import org.spongepowered.api.world.WorldArchetypes
+import org.spongepowered.api.world.WorldArchetype
 import org.spongepowered.api.world.storage.WorldProperties
 import java.io.IOException
 import java.io.UncheckedIOException
@@ -23,23 +24,25 @@ class PlanetHelper {
                 throw IllegalArgumentException("Name only allow a~z and 0~9")
 
             val properties: WorldProperties
+            val archetype = Sponge.getRegistry().getType(WorldArchetype::class.java, name).orElse(null)
+                    ?: WorldArchetype.builder()
+                        .generateSpawnOnLoad(false)
+                        .loadsOnStartup(false)
+                        .keepsSpawnLoaded(false)
+                        .generatorModifiers(PlanetGenModifier())
+                        .build(name, name)
+
             logger.info("Create World [{}]", name)
 
             try {
-                properties = server.createWorldProperties(name, WorldArchetypes.OVERWORLD)
-                properties.setKeepSpawnLoaded(false)
-                properties.setGenerateSpawnOnLoad(false)
-                properties.setLoadOnStartup(false)
+                properties = server.createWorldProperties(name, archetype)
                 server.saveWorldProperties(properties)
             } catch (e: IOException) {
                 logger.error("Create world failed!", e)
                 throw UncheckedIOException(e)
             }
 
-            val planet = Planet(world = properties.uniqueId, name = name)
-            updatePlanet(planet)
-
-            return planet
+            return Planet(world = properties.uniqueId, name = name)
         }
 
         fun removePlanet(worldUUID: UUID): CompletableFuture<Boolean> {
@@ -54,13 +57,7 @@ class PlanetHelper {
             if (server.getWorld(worldUUID).isPresent) {
                 val world = server.getWorld(worldUUID).get()
                 world.players.parallelStream()
-                    .forEach {
-                        it.setLocationSafely(
-                            server.getWorld(
-                                server.defaultWorldName
-                            ).get().spawnLocation
-                        )
-                    }
+                    .forEach { it.setLocationSafely(server.getWorld(server.defaultWorldName).get().spawnLocation) }
                 server.unloadWorld(world)
             }
 
@@ -68,18 +65,11 @@ class PlanetHelper {
         }
 
         fun loadPlanet(planet: Planet): Optional<World> {
-            val world = planet.world
-
-            return if (server.getWorldProperties(world).isPresent) {
+            return server.getWorldProperties(planet.world).orElse(null)?.let {
                 planet.lastTime = Date()
-
-                val worldProperties = server.getWorldProperties(world).get()
-                worldProperties.setGenerateSpawnOnLoad(false)
-
-                server.loadWorld(worldProperties)
-            } else {
-                Optional.empty()
-            }
+                it.setGenerateSpawnOnLoad(false)
+                server.loadWorld(it)
+            } ?: Optional.empty()
         }
 
         fun updatePlanet(planet: Planet) {

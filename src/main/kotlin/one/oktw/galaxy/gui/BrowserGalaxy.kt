@@ -52,6 +52,7 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
                         .add(
                             ITEM_LORE,
                             asList(
+                                Text.of(TextColors.GREEN, "Info: ", TextColors.RESET, it.info),
                                 Text.of(TextColors.GREEN, "Owner: ", TextColors.RESET, owner.name),
                                 Text.of(TextColors.GREEN, "Members: ", TextColors.RESET, it.members.size),
                                 Text.of(TextColors.GREEN, "Planets: ", TextColors.RESET, it.planets.size)

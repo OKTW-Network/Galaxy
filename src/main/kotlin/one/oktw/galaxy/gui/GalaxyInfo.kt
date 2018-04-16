@@ -5,6 +5,7 @@ import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.Group.ADMIN
 import one.oktw.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.data.Galaxy
+import one.oktw.galaxy.galaxy.data.extensions.requestJoin
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys

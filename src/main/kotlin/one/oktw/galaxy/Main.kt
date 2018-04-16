@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
 import one.oktw.galaxy.galaxy.GalaxyManager
-import one.oktw.galaxy.galaxy.planet.gen.Planet
+import one.oktw.galaxy.galaxy.planet.gen.PlanetGenModifier
 import one.oktw.galaxy.internal.DatabaseManager
 import one.oktw.galaxy.internal.register.CommandRegister
 import one.oktw.galaxy.internal.register.DataRegister
@@ -58,7 +58,7 @@ class Main {
 
     @Listener
     fun onRegister(event: GameRegistryEvent.Register<WorldGeneratorModifier>) {
-        event.register(Planet())
+        event.register(PlanetGenModifier())
     }
 
     @Listener

@@ -16,10 +16,7 @@ import org.spongepowered.api.config.DefaultConfig
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.GameRegistryEvent
 import org.spongepowered.api.event.game.GameReloadEvent
-import org.spongepowered.api.event.game.state.GameConstructionEvent
-import org.spongepowered.api.event.game.state.GameInitializationEvent
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent
-import org.spongepowered.api.event.game.state.GameStartingServerEvent
+import org.spongepowered.api.event.game.state.*
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.world.gen.WorldGeneratorModifier
@@ -85,5 +82,11 @@ class Main {
     @Listener
     fun onReload(event: GameReloadEvent) {
         //TODO
+    }
+
+    @Listener
+    fun onStop(event: GameStoppedServerEvent) {
+        galaxyManager.saveAll()
+        travelerManager.saveAll()
     }
 }

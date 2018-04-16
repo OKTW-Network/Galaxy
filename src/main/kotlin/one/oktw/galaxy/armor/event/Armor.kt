@@ -11,6 +11,7 @@ import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.item.enums.ItemType.ARMOR
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
+import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent
 import org.spongepowered.api.event.filter.Getter
 import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
@@ -55,5 +56,10 @@ class Armor {
     @Listener
     fun onChangeInventory(event: ChangeInventoryEvent) {
         if (event.transactions.any { it.default[DataType.key].orElse(null) == ARMOR }) event.isCancelled = true
+    }
+
+    @Listener
+    fun onRespawn(event: RespawnPlayerEvent, @Getter("getTargetEntity") player: Player) {
+        if (event.isDeath) offerArmor(player)
     }
 }

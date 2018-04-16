@@ -27,13 +27,16 @@ class GUIHelper {
                 if (stack.peekLast()?.token == token) {
                     stack.pollLast()
                     val gui = stack.peekLast()
-                    if (gui != null) player.openInventory(gui.inventory) else closeInventory(
-                        player
-                    )
+                    if (gui != null) player.openInventory(gui.inventory) else closeInventory(player)
                 }
 
                 stack.removeIf { it.token == token }
             }
+        }
+
+        fun closeAll(player: Player) {
+            closeInventory(player)
+            sync -= player
         }
 
         private fun closeEvent(event: InteractInventoryEvent.Close) {

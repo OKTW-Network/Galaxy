@@ -44,7 +44,12 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
                 ?.let { travelerManager.getTraveler(it).position }
                 ?.run {
                     // output: (planeName x,y,z)
-                    Text.of(RESET, "(${runBlocking { galaxyManager.getPlanet(planet!!).await()!!.name }} $x,$y,$z)")
+                    Text.of(
+                        RESET,
+                        "(${runBlocking { galaxyManager.getPlanet(planet!!).await()!!.name }} ",
+                        GRAY,
+                        "${x.toInt()},${y.toInt()},${z.toInt()})"
+                    )
                 }
 
             ItemStack.builder()

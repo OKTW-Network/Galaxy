@@ -4,6 +4,7 @@ import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.enums.AccessLevel.*
+import one.oktw.galaxy.galaxy.planet.data.extensions.checkPermission
 import one.oktw.galaxy.traveler.ViewerHelper
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player

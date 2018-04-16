@@ -1,6 +1,7 @@
 package one.oktw.galaxy.galaxy.data.extensions
 
 import one.oktw.galaxy.Main
+import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.Member
@@ -61,4 +62,8 @@ fun Galaxy.requestJoin(uuid: UUID) {
 fun Galaxy.removeJoinRequest(uuid: UUID) {
     joinRequest.remove(uuid)
     save()
+}
+
+fun Galaxy.dividends(number: Long) = takeStarDust(number * members.size).also {
+    if (it) members.forEach { travelerManager.getTraveler(it.uuid)!!.giveStarDust(number) }
 }

@@ -3,6 +3,8 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
+import one.oktw.galaxy.galaxy.data.extensions.delMember
+import one.oktw.galaxy.galaxy.data.extensions.setGroup
 import one.oktw.galaxy.item.enums.ButtonType.MEMBER_CHANGE
 import one.oktw.galaxy.item.enums.ButtonType.MEMBER_REMOVE
 import one.oktw.galaxy.item.type.Button

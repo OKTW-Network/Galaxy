@@ -1,6 +1,6 @@
 buildscript {
     ext.kotlin_version = '1.2.31'
-    ext.sponge_version = "8.0.0-SNAPSHOT"
+    ext.sponge_version = "7.1.0-SNAPSHOT"
     ext.Coroutines_version = "0.22.5"
 
     repositories {

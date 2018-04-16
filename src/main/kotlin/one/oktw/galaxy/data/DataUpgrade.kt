@@ -43,8 +43,7 @@ class DataUpgrade(type: UpgradeType = EMPTY, level: Int = 0) : AbstractData<Data
     override fun getContentVersion() = 1
     override fun asImmutable() = Immutable(type, level)
     override fun copy() = DataUpgrade(type, level)
-    override fun fillContainer(dataContainer: DataContainer): DataContainer =
-        dataContainer.set(TYPE.query, type.name).set(LEVEL, level)
+    override fun toContainer(): DataContainer = super.toContainer().set(TYPE.query, type.name).set(LEVEL, level)
 
     override fun from(container: DataContainer): Optional<DataUpgrade> {
         if (!container.contains(TYPE, LEVEL)) return Optional.empty()

@@ -45,10 +45,10 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
                 ?.run {
                     // output: (planeName x,y,z)
                     Text.of(
-                        RESET,
-                        "(${runBlocking { galaxyManager.getPlanet(planet!!).await()!!.name }} ",
-                        GRAY,
-                        "${x.toInt()},${y.toInt()},${z.toInt()})"
+                        RESET,"(",
+                        GOLD,TextStyles.BOLD,"${runBlocking { galaxyManager.getPlanet(planet!!).await()!!.name }} ",TextStyles.RESET,
+                        GRAY,"${x.toInt()},${y.toInt()},${z.toInt()}",
+                        RESET , ")"
                     )
                 }
 

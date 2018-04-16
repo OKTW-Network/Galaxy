@@ -71,6 +71,7 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
 
                 if (planet.checkPermission(player) != DENY) {
                     TeleportHelper.teleport(player, planet.loadWorld().get().spawnLocation)
+                    GUIHelper.closeAll(player)
                 }
             }
         }

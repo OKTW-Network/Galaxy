@@ -1,6 +1,9 @@
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main
+import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.Group
@@ -19,7 +22,7 @@ import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.format.TextColors
+import org.spongepowered.api.text.format.TextColors.*
 import org.spongepowered.api.text.format.TextStyles
 import java.util.Arrays.asList
 
@@ -36,17 +39,31 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
         }
         .map {
             val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(it.uuid).get()
+            val status = if (user.isOnline) Text.of(GREEN, "ONLINE") else Text.of(RED, "OFFLINE")
+            val location = user.player.orElse(null)
+                ?.let { travelerManager.getTraveler(it).position }
+                ?.run {
+                    // output: (planeName x,y,z)
+                    Text.of(
+                        RESET,"(",
+                        GOLD,TextStyles.BOLD,"${runBlocking { galaxyManager.getPlanet(planet!!).await()!!.name }} ",TextStyles.RESET,
+                        GRAY,"${x.toInt()},${y.toInt()},${z.toInt()}",
+                        RESET , ")"
+                    )
+                }
+
             ItemStack.builder()
                 .itemType(ItemTypes.SKULL)
                 .itemData(DataType(BUTTON))
                 .itemData(DataUUID(it.uuid))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, user.name))
+                .add(Keys.DISPLAY_NAME, Text.of(AQUA, TextStyles.BOLD, user.name))
                 .add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
                 .add(Keys.REPRESENTED_PLAYER, user.profile)
                 .add(
                     Keys.ITEM_LORE,
                     asList(
-                        Text.of(TextColors.GREEN, "Group: ", TextColors.RESET, it.group.toString())
+                        Text.of(YELLOW, "Status: ", if (location != null) status.concat(location) else status),
+                        Text.of(YELLOW, "Group: ", RESET, it.group.toString())
                     )
                 )
                 .build()

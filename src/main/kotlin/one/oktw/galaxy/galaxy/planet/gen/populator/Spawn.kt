@@ -34,8 +34,7 @@ class Spawn : Populator {
         val min = volume.blockMin
         val max = volume.blockMax
 
-        val isSpawn = min.x <= spawn.x && spawn.x <= max.x && min.z <= spawn.z && spawn.z <= max.z
-        if (!isSpawn) return
+        if (spawn.x !in min.x..max.x || spawn.z !in min.z..max.z) return
 
         var start = spawn
         for (y in 0..192) {
@@ -47,6 +46,12 @@ class Spawn : Populator {
 
         // fix spawn pos
         world.properties.spawnPosition = start
+
+        // fix world border center
+        world.spawnLocation.run {
+            world.worldBorder.setCenter(x, z)
+            world.properties.setWorldBorderCenter(x, z)
+        }
 
         // clean
         for (x in start.x - 2..start.x + 2) {

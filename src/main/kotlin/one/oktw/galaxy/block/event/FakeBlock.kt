@@ -21,13 +21,14 @@ import org.spongepowered.api.world.World
 class FakeBlock {
     @Listener
     fun onClickBlock(event: InteractBlockEvent.Secondary, @First player: Player) {
+        val location = event.targetBlock.location.orElse(null)?.getRelative(event.targetSide) ?: return
         val block = player.getItemInHand(MAIN_HAND).orElse(null)
                 ?: player.getItemInHand(OFF_HAND).orElse(null)
                 ?: return
 
         if (!isBlock(block)) return
 
-        placeBlock(event.targetBlock.location.get().getRelative(event.targetSide), block)
+        placeBlock(location, block)
         // TODO place sound
     }
 

@@ -46,7 +46,7 @@ class GalaxyManager {
     }
 
     fun saveGalaxy(galaxy: Galaxy) {
-        launch { collection.replaceOne(eq("uuid", galaxy.uuid), galaxy) }
+        collection.replaceOne(eq("uuid", galaxy.uuid), galaxy)
         cache -= galaxy.uuid
     }
 
@@ -68,6 +68,7 @@ class GalaxyManager {
         cache.values.firstOrNull { planet in it.planets } ?: collection.find(eq("planets.uuid", planet.uuid)).first()
     }
 
+    // unsafe write
     fun listGalaxy() = async { collection.find().asSequence() }
 
     fun listGalaxy(filter: Bson) = async { collection.find(filter).asSequence() }
@@ -77,11 +78,11 @@ class GalaxyManager {
     fun searchGalaxy(keyword: String) = async { collection.find(text(keyword)).asSequence() }
 
     fun getPlanet(uuid: UUID) = async {
-        collection.distinct("planets", eq("planets.uuid", uuid), Planet::class.java).firstOrNull()
+        collection.distinct("planets", eq("planets.uuid", uuid), Planet::class.java).firstOrNull { it.uuid == uuid }
     }
 
     fun getPlanetFromWorld(uuid: UUID) = async {
-        collection.distinct("planets", eq("planets.world", uuid), Planet::class.java).firstOrNull()
+        collection.distinct("planets", eq("planets.world", uuid), Planet::class.java).firstOrNull { it.world == uuid }
     }
 
     fun saveAll() {

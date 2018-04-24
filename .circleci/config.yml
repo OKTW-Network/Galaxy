@@ -24,6 +24,7 @@ jobs:
           keys:
             - dependencies-v1-{{ .Branch }}-{{ .Revision }}
             - dependencies-v1-{{ .Branch }}-
+            - dependencies-v1-master-
             - dependencies-v1-
 
       - run: gradle setupCiWorkspace

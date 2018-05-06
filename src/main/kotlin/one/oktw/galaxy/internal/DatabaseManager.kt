@@ -16,7 +16,8 @@ import org.bson.codecs.configuration.CodecProvider
 import org.bson.codecs.configuration.CodecRegistries.fromProviders
 import org.bson.codecs.configuration.CodecRegistries.fromRegistries
 import org.bson.codecs.configuration.CodecRegistry
-import org.bson.codecs.pojo.Conventions.*
+import org.bson.codecs.pojo.Conventions.CLASS_AND_PROPERTY_CONVENTION
+import org.bson.codecs.pojo.Conventions.SET_PRIVATE_FIELDS_CONVENTION
 import org.bson.codecs.pojo.PojoCodecProvider
 import org.bson.json.JsonReader
 import org.bson.json.JsonWriter
@@ -50,7 +51,7 @@ class DatabaseManager {
 
         database = PojoCodecProvider.builder() // POJO settings
             .automatic(true)
-            .conventions(asList(SET_PRIVATE_FIELDS_CONVENTION, ANNOTATION_CONVENTION, CLASS_AND_PROPERTY_CONVENTION))
+            .conventions(asList(SET_PRIVATE_FIELDS_CONVENTION, CLASS_AND_PROPERTY_CONVENTION))
             .build()
             .let {
                 // register codec

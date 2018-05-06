@@ -25,7 +25,7 @@ fun Galaxy.createPlanet(name: String): Planet {
 fun Galaxy.removePlanet(uuid: UUID) {
     val planet = planets.firstOrNull { it.uuid == uuid } ?: return
 
-    PlanetHelper.removePlanet(planet.world).thenAccept {
+    PlanetHelper.removePlanet(planet.world!!).thenAccept {
         if (it) planets.remove(planet)
         save()
     }
@@ -65,5 +65,5 @@ fun Galaxy.removeJoinRequest(uuid: UUID) {
 }
 
 fun Galaxy.dividends(number: Long) = takeStarDust(number * members.size).also {
-    if (it) members.forEach { travelerManager.getTraveler(it.uuid)!!.giveStarDust(number) }
+    if (it) members.forEach { travelerManager.getTraveler(it.uuid!!)!!.giveStarDust(number) }
 }

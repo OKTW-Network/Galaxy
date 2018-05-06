@@ -4,9 +4,7 @@ import one.oktw.galaxy.data.DataUpgrade
 import one.oktw.galaxy.item.enums.ItemType
 import one.oktw.galaxy.item.enums.ItemType.UPGRADE
 import one.oktw.galaxy.item.enums.UpgradeType
-import org.bson.codecs.pojo.annotations.BsonCreator
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
-import org.bson.codecs.pojo.annotations.BsonProperty
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
@@ -15,10 +13,10 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 
 @BsonDiscriminator
-data class Upgrade @BsonCreator constructor(
-    @BsonProperty("type") val type: UpgradeType,
-    @BsonProperty("level") var level: Int,
-    @BsonProperty("itemType") override val itemType: ItemType = UPGRADE
+data class Upgrade(
+    val type: UpgradeType = UpgradeType.EMPTY,
+    var level: Int = 0,
+    override val itemType: ItemType = UPGRADE
 ) : Item {
     override fun createItemStack(): ItemStack {
         val name = type.name.substring(0, 1) + type.name.substring(1).toLowerCase()

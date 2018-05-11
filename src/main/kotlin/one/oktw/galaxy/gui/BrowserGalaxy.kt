@@ -40,7 +40,7 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
         launch {
             pages = galaxyManager.run { traveler?.let { listGalaxy(it) } ?: listGalaxy() }.await()
                 .map {
-                    val owner = userStorage.get(it.members.first { it.group == OWNER }.uuid).get()
+                    val owner = userStorage.get(it.members.first { it.group == OWNER }.uuid!!).get()
 
                     ItemStack.builder()
                         .itemType(ItemTypes.SKULL)

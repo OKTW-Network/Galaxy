@@ -38,17 +38,23 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
             if (manage) it.group != Group.OWNER else true
         }
         .map {
-            val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(it.uuid).get()
+            val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(it.uuid!!).get()
             val status = if (user.isOnline) Text.of(GREEN, "ONLINE") else Text.of(RED, "OFFLINE")
             val location = user.player.orElse(null)
                 ?.let { travelerManager.getTraveler(it).position }
                 ?.run {
                     // output: (planeName x,y,z)
                     Text.of(
-                        RESET,"(",
-                        GOLD,TextStyles.BOLD,"${runBlocking { galaxyManager.getPlanet(planet!!).await()!!.name }} ",TextStyles.RESET,
-                        GRAY,"${x.toInt()},${y.toInt()},${z.toInt()}",
-                        RESET , ")"
+                        RESET,
+                        "(",
+                        GOLD,
+                        TextStyles.BOLD,
+                        "${runBlocking { galaxyManager.getPlanet(planet!!).await()!!.name }} ",
+                        TextStyles.RESET,
+                        GRAY,
+                        "${x.toInt()},${y.toInt()},${z.toInt()}",
+                        RESET,
+                        ")"
                     )
                 }
 

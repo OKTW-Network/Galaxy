@@ -52,7 +52,7 @@ class GalaxyManager {
 
     suspend fun deleteGalaxy(uuid: UUID) {
         getGalaxy(uuid).await()?.planets?.forEach {
-            it.world.let { PlanetHelper.removePlanet(it) }
+            it.world.let { PlanetHelper.removePlanet(it!!) }
         }
 
         cache -= uuid
@@ -73,7 +73,7 @@ class GalaxyManager {
 
     fun listGalaxy(filter: Bson) = async { collection.find(filter).asSequence() }
 
-    fun listGalaxy(traveler: Traveler) = async { collection.find(eq("members.uuid", traveler.uuid)).asSequence() }
+    fun listGalaxy(traveler: Traveler) = async { collection.find(eq("members.uuid", traveler.uuid!!)).asSequence() }
 
     fun searchGalaxy(keyword: String) = async { collection.find(text(keyword)).asSequence() }
 

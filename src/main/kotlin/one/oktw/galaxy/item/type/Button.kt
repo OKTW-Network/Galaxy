@@ -3,16 +3,13 @@ package one.oktw.galaxy.item.type
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
-import org.bson.codecs.pojo.annotations.BsonCreator
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
-import org.bson.codecs.pojo.annotations.BsonProperty
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
 
 @BsonDiscriminator
-data class Button @BsonCreator constructor(@BsonProperty("type") val type: ButtonType) : Item {
-    @BsonProperty("itemType")
+data class Button(val type: ButtonType = ButtonType.BLANK) : Item {
     override val itemType = BUTTON
 
     override fun createItemStack(): ItemStack = ItemStack.builder()

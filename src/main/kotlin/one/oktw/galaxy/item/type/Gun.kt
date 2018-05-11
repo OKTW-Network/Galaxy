@@ -9,9 +9,7 @@ import one.oktw.galaxy.item.enums.GunStyle
 import one.oktw.galaxy.item.enums.ItemType
 import one.oktw.galaxy.item.enums.ItemType.PISTOL
 import one.oktw.galaxy.item.enums.ItemType.SNIPER
-import org.bson.codecs.pojo.annotations.BsonCreator
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
-import org.bson.codecs.pojo.annotations.BsonProperty
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
@@ -35,17 +33,17 @@ import java.util.*
  * @property upgrade Upgrade list
  */
 @BsonDiscriminator
-data class Gun @BsonCreator constructor(
-    @BsonProperty("uuid") override val uuid: UUID = UUID.randomUUID(),
-    @BsonProperty("itemType") override val itemType: ItemType = PISTOL, // TODO split to different class
-    @BsonProperty("maxTemp") override var maxTemp: Int,
-    @BsonProperty("heat") override var heat: Int,
-    @BsonProperty("cooling") override var cooling: Int = 1,
-    @BsonProperty("style") var style: GunStyle,
-    @BsonProperty("range") var range: Double,
-    @BsonProperty("damage") var damage: Double,
-    @BsonProperty("through") var through: Int = 1,
-    @BsonProperty("upgrade") var upgrade: ArrayList<Upgrade> = ArrayList()
+data class Gun(
+    override val uuid: UUID = UUID.randomUUID(),
+    override val itemType: ItemType = PISTOL, // TODO split to different class
+    override var maxTemp: Int = 0,
+    override var heat: Int = 0,
+    override var cooling: Int = 1,
+    var style: GunStyle = GunStyle.PISTOL_ORIGIN,
+    var range: Double = 0.0,
+    var damage: Double = 0.0,
+    var through: Int = 1,
+    var upgrade: ArrayList<Upgrade> = ArrayList()
 ) : Item, Overheat {
     override fun createItemStack(): ItemStack {
         val item = ItemStack.builder()

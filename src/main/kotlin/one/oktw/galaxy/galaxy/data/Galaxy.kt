@@ -2,19 +2,17 @@ package one.oktw.galaxy.galaxy.data
 
 import one.oktw.galaxy.economy.StarDustKeeper
 import one.oktw.galaxy.galaxy.planet.data.Planet
-import org.bson.codecs.pojo.annotations.BsonCreator
-import org.bson.codecs.pojo.annotations.BsonProperty
 import java.util.*
 import kotlin.collections.ArrayList
 
-data class Galaxy @BsonCreator constructor(
-    @BsonProperty("uuid") val uuid: UUID = UUID.randomUUID(),
-    @BsonProperty("name") var name: String,
-    @BsonProperty("info") var info: String = "",
-    @BsonProperty("notice") var notice: String = "",
-    @BsonProperty("members") val members: ArrayList<Member> = ArrayList(),
-    @BsonProperty("planets") val planets: ArrayList<Planet> = ArrayList(),
-    @BsonProperty("joinRequest") val joinRequest: ArrayList<UUID> = ArrayList()
+data class Galaxy(
+    val uuid: UUID = UUID.randomUUID(),
+    var name: String = "",
+    var info: String = "",
+    var notice: String = "",
+    val members: ArrayList<Member> = ArrayList(),
+    val planets: ArrayList<Planet> = ArrayList(),
+    val joinRequest: ArrayList<UUID> = ArrayList()
 ) : StarDustKeeper() {
     init {
         interestRate = 0.03

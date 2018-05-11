@@ -46,7 +46,7 @@ class TravelerManager {
     }
 
     fun saveTraveler(traveler: Traveler) {
-        launch { collection.replaceOne(eq("uuid", traveler.uuid), traveler, ReplaceOptions().upsert(true)) }
+        launch { collection.replaceOne(eq("uuid", traveler.uuid!!), traveler, ReplaceOptions().upsert(true)) }
         cache.remove(traveler.uuid)
     }
 

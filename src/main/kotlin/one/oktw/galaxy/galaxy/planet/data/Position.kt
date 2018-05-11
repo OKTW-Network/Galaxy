@@ -1,10 +1,9 @@
 package one.oktw.galaxy.galaxy.planet.data
 
 import com.flowpowered.math.vector.Vector3d
-import org.bson.codecs.pojo.annotations.BsonCreator
 import java.util.*
 
-data class Position @BsonCreator constructor(
+data class Position(
     var x: Double = 0.0,
     var y: Double = 0.0,
     var z: Double = 0.0,

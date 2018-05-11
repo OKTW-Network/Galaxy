@@ -21,7 +21,7 @@ plugins {
     id "idea"
     id "signing"
     id "org.spongepowered.plugin" version "0.8.1"
-    id "com.github.johnrengelman.shadow" version "2.0.3"
+    id "com.github.johnrengelman.shadow" version "2.0.4"
 }
 apply plugin: 'kotlin'
 apply plugin: 'net.minecraftforge.gradle.forge'
@@ -46,7 +46,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$Coroutines_version"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$Coroutines_version"
-    compile "org.mongodb:mongodb-driver-sync:3.7.0-rc0"
+    compile "org.mongodb:mongodb-driver-sync:3.7.0"
 }
 
 kotlin {

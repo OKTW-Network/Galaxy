@@ -9,6 +9,7 @@ import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.item.ItemTypes.IRON_SWORD
 import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.text.Text
 
 @BsonDiscriminator
 class Tool(val type: ToolType = ToolType.DUMMY) : Item {
@@ -17,6 +18,7 @@ class Tool(val type: ToolType = ToolType.DUMMY) : Item {
     override fun createItemStack(): ItemStack = ItemStack.builder()
         .itemType(IRON_SWORD)
         .itemData(DataType(TOOL))
+        .add(Keys.DISPLAY_NAME, Text.of(type.name))
         .add(Keys.UNBREAKABLE, true)
         .add(Keys.HIDE_UNBREAKABLE, true)
         .add(Keys.HIDE_MISCELLANEOUS, true)

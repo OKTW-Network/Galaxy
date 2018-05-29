@@ -8,6 +8,7 @@ import one.oktw.galaxy.item.enums.MaterialType
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.item.ItemTypes.STONE_SWORD
 import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.text.Text
 
 class Material(val type: MaterialType = MaterialType.DUMMY) : Item {
     override val itemType = MATERIAL
@@ -15,6 +16,7 @@ class Material(val type: MaterialType = MaterialType.DUMMY) : Item {
     override fun createItemStack(): ItemStack = ItemStack.builder()
         .itemType(STONE_SWORD)
         .itemData(DataType(MATERIAL))
+        .add(Keys.DISPLAY_NAME, Text.of(type.name))
         .add(Keys.UNBREAKABLE, true)
         .add(Keys.HIDE_UNBREAKABLE, true)
         .add(Keys.HIDE_MISCELLANEOUS, true)

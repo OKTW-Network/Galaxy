@@ -8,5 +8,7 @@ enum class ItemType {
 
     //Gun
     PISTOL,
-    SNIPER
+    SNIPER,
+    TOOL,
+    MATERIAL
 }

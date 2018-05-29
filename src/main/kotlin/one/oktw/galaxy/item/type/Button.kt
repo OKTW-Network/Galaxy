@@ -1,6 +1,8 @@
 package one.oktw.galaxy.item.type
 
 import one.oktw.galaxy.data.DataType
+import one.oktw.galaxy.item.ItemUtil.Companion.removeCoolDown
+import one.oktw.galaxy.item.ItemUtil.Companion.removeDamage
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
@@ -22,4 +24,6 @@ data class Button(val type: ButtonType = ButtonType.BLANK) : Item {
         .add(Keys.HIDE_ENCHANTMENTS, true)
         .add(Keys.ITEM_DURABILITY, type.id)
         .build()
+        .let(::removeDamage)
+        .let(::removeCoolDown)
 }

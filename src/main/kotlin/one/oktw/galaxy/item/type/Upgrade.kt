@@ -14,7 +14,7 @@ import org.spongepowered.api.text.format.TextStyles
 
 @BsonDiscriminator
 data class Upgrade(
-    val type: UpgradeType = UpgradeType.EMPTY,
+    val type: UpgradeType = UpgradeType.DUMMY,
     var level: Int = 0,
     override val itemType: ItemType = UPGRADE
 ) : Item {

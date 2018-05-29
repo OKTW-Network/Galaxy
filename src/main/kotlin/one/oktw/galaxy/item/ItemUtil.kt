@@ -22,7 +22,7 @@ class ItemUtil {
                 @Suppress("CAST_NEVER_SUCCEEDS")
                 (it as net.minecraft.item.ItemStack).addAttributeModifier(
                     SharedMonsterAttributes.ATTACK_DAMAGE.name,
-                    AttributeModifier("Weapon modifier", 1.0, 0),
+                    AttributeModifier("Weapon modifier", 0.0, 0),
                     null
                 )
             }

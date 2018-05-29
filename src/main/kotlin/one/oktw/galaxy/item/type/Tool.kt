@@ -3,20 +3,20 @@ package one.oktw.galaxy.item.type
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.item.ItemUtil.Companion.removeCoolDown
 import one.oktw.galaxy.item.ItemUtil.Companion.removeDamage
-import one.oktw.galaxy.item.enums.ButtonType
-import one.oktw.galaxy.item.enums.ItemType.BUTTON
+import one.oktw.galaxy.item.enums.ItemType.TOOL
+import one.oktw.galaxy.item.enums.ToolType
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import org.spongepowered.api.data.key.Keys
-import org.spongepowered.api.item.ItemTypes
+import org.spongepowered.api.item.ItemTypes.IRON_SWORD
 import org.spongepowered.api.item.inventory.ItemStack
 
 @BsonDiscriminator
-data class Button(val type: ButtonType = ButtonType.BLANK) : Item {
-    override val itemType = BUTTON
+class Tool(val type: ToolType = ToolType.DUMMY) : Item {
+    override val itemType = TOOL
 
     override fun createItemStack(): ItemStack = ItemStack.builder()
-        .itemType(ItemTypes.DIAMOND_HOE)
-        .itemData(DataType(BUTTON))
+        .itemType(IRON_SWORD)
+        .itemData(DataType(TOOL))
         .add(Keys.UNBREAKABLE, true)
         .add(Keys.HIDE_UNBREAKABLE, true)
         .add(Keys.HIDE_MISCELLANEOUS, true)

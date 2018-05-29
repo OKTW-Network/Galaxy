@@ -2,7 +2,7 @@ package one.oktw.galaxy.data
 
 import com.google.common.reflect.TypeToken
 import one.oktw.galaxy.item.enums.UpgradeType
-import one.oktw.galaxy.item.enums.UpgradeType.EMPTY
+import one.oktw.galaxy.item.enums.UpgradeType.DUMMY
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.DataContainer
 import org.spongepowered.api.data.DataHolder
@@ -18,7 +18,7 @@ import org.spongepowered.api.data.value.mutable.Value
 import org.spongepowered.api.util.TypeTokens
 import java.util.*
 
-class DataUpgrade(type: UpgradeType = EMPTY, level: Int = 0) : AbstractData<DataUpgrade, DataUpgrade.Immutable>() {
+class DataUpgrade(type: UpgradeType = DUMMY, level: Int = 0) : AbstractData<DataUpgrade, DataUpgrade.Immutable>() {
     companion object {
         val TYPE: Key<Value<UpgradeType>> = Key.builder()
             .type(object : TypeToken<Value<UpgradeType>>() {})
@@ -74,7 +74,7 @@ class DataUpgrade(type: UpgradeType = EMPTY, level: Int = 0) : AbstractData<Data
         registerFieldSetter(LEVEL) { level = it }
     }
 
-    class Immutable(private val type: UpgradeType = EMPTY, private val level: Int = 0) :
+    class Immutable(private val type: UpgradeType = DUMMY, private val level: Int = 0) :
         AbstractImmutableData<Immutable, DataUpgrade>() {
         override fun getContentVersion() = 1
         override fun asMutable() = DataUpgrade(type, level)

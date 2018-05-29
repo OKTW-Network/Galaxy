@@ -2,7 +2,7 @@ package one.oktw.galaxy.data
 
 import com.google.common.reflect.TypeToken
 import one.oktw.galaxy.item.enums.ItemType
-import one.oktw.galaxy.item.enums.ItemType.EMPTY
+import one.oktw.galaxy.item.enums.ItemType.DUMMY
 import org.spongepowered.api.data.DataContainer
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataQuery
@@ -16,8 +16,8 @@ import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.value.mutable.Value
 import java.util.*
 
-class DataType(type: ItemType = EMPTY) :
-    AbstractSingleEnumData<ItemType, DataType, DataType.Immutable>(type, key, EMPTY) {
+class DataType(type: ItemType = DUMMY) :
+    AbstractSingleEnumData<ItemType, DataType, DataType.Immutable>(type, key, DUMMY) {
     companion object {
         val key: Key<Value<ItemType>> = Key.builder()
             .type(object : TypeToken<Value<ItemType>>() {})
@@ -46,8 +46,8 @@ class DataType(type: ItemType = EMPTY) :
     }
 
 
-    class Immutable(type: ItemType = EMPTY) :
-        AbstractImmutableSingleEnumData<ItemType, Immutable, DataType>(type, EMPTY, key) {
+    class Immutable(type: ItemType = DUMMY) :
+        AbstractImmutableSingleEnumData<ItemType, Immutable, DataType>(type, DUMMY, key) {
         override fun getContentVersion() = 1
         override fun asMutable() = DataType((value))
     }

@@ -10,7 +10,6 @@ import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.DyeColors
 import org.spongepowered.api.item.ItemTypes.*
 import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.recipe.crafting.Ingredient.NONE
 import org.spongepowered.api.item.recipe.crafting.Ingredient.of
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe
@@ -45,7 +44,7 @@ class RecipeRegister {
                     .row(redstone, diamond, lapis)
                     .row(ironIngot, craftingTable, ironIngot)
                     .row(lapis, obsidian, redstone)
-                    .result(ItemStackSnapshot.NONE) // TODO custom block
+                    .result(ItemStack.of(CRAFTING_TABLE, 1)) // TODO custom block
                     .build("advance_crafting_system", main)
             )
 

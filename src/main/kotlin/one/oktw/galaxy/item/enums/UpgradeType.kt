@@ -2,7 +2,7 @@ package one.oktw.galaxy.item.enums
 
 enum class UpgradeType {
     // General
-    DUMMY,
+    BASE,
     RANGE,
     SPEED,
 

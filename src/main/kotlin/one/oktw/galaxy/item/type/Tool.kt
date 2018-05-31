@@ -10,6 +10,8 @@ import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.item.ItemTypes.IRON_SWORD
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.format.TextColors
+import org.spongepowered.api.text.format.TextStyles
 
 @BsonDiscriminator
 class Tool(val type: ToolType = ToolType.DUMMY) : Item {
@@ -18,7 +20,7 @@ class Tool(val type: ToolType = ToolType.DUMMY) : Item {
     override fun createItemStack(): ItemStack = ItemStack.builder()
         .itemType(IRON_SWORD)
         .itemData(DataType(TOOL))
-        .add(Keys.DISPLAY_NAME, Text.of(type.name))
+        .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.YELLOW, type.name))
         .add(Keys.UNBREAKABLE, true)
         .add(Keys.HIDE_UNBREAKABLE, true)
         .add(Keys.HIDE_MISCELLANEOUS, true)

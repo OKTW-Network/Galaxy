@@ -58,10 +58,10 @@ data class Gun(
             .add(Keys.ITEM_DURABILITY, style.id.toInt())
 
         when (itemType) {
-            PISTOL -> item.add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.AQUA, "Laser Gun"))
+            PISTOL -> item.add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.GREEN, "Laser Gun"))
             SNIPER -> {
                 item.itemData(DataEnable())
-                item.add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.GOLD, "Sniper"))
+                item.add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.GREEN, "Sniper"))
             }
             else -> Unit
         }

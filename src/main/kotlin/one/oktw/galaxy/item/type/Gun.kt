@@ -48,7 +48,7 @@ data class Gun(
 ) : Item, Overheat {
     override fun createItemStack(): ItemStack {
         //Todo check player lang
-        val lang = LangSys().rootNode.getNode("item","Gun")
+        val lang = LangSys()
         val item = ItemStack.builder()
             .itemType(ItemTypes.DIAMOND_SWORD)
             .itemData(DataUUID.Immutable(uuid))
@@ -62,11 +62,11 @@ data class Gun(
 
         when (itemType) {
             PISTOL -> item.add(Keys.DISPLAY_NAME,
-                Text.of(TextStyles.BOLD, TextColors.GREEN, lang.getNode("PISTOL").string))
+                Text.of(TextStyles.BOLD, TextColors.GREEN, lang.getLangString("item.Gun.PISTOL")))
             SNIPER -> {
                 item.itemData(DataEnable())
                 item.add(Keys.DISPLAY_NAME,
-                    Text.of(TextStyles.BOLD, TextColors.GREEN, lang.getNode("SNIPER").string))
+                    Text.of(TextStyles.BOLD, TextColors.GREEN, lang.getLangString("item.Gun.SNIPER")))
             }
             else -> Unit
         }

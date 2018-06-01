@@ -22,13 +22,14 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class GroupSelect(private val callback: (Group) -> Unit) : GUI() {
     override val token = "GroupSelect-${UUID.randomUUID()}"
     //Todo check player lang
-    val lang = LangSys().rootNode.getNode("ui","GroupSelect")!!
+    val lang = LangSys()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(lang.getNode("Title").string)))
+        .property(InventoryTitle.of(Text.of(lang.getLangString("ui.GroupSelect.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
     private val buttonID = Array(3) { UUID.randomUUID() }

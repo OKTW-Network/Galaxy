@@ -42,14 +42,14 @@ abstract class PageGUI : GUI() {
 
     private fun offerButton(previous: Boolean, next: Boolean) {
         //Todo check player lang
-        val lang = LangSys().rootNode.getNode("ui","Page")!!
+        val lang = LangSys()
         val gridInventory: GridInventory = inventory.query(INVENTORY_TYPE.of(GridInventory::class.java))
 
         if (previous) {
             Button(ARROW_LEFT).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[0]))
-                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getNode("previous_page").string))
+                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getLangString("ui.Page.previous_page")))
                 }
                 .let { gridInventory[0, 5] = it }
         }
@@ -58,7 +58,7 @@ abstract class PageGUI : GUI() {
             Button(ARROW_RIGHT).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[1]))
-                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getNode("next_page").string))
+                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getLangString("ui.Page.next_page")))
                 }
                 .let { gridInventory[8, 5] = it }
         }

@@ -24,14 +24,15 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
     override val token = "InviteManagement-${galaxy.uuid}"
     //Todo check player lang
-    val lang = LangSys().rootNode.getNode("ui","GalaxyJoinRequest")!!
+    val lang = LangSys()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang.getNode("Title").string)))
+        .property(InventoryTitle.of(Text.of(lang.getLangString("ui.GalaxyJoinRequest.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
     override val pages = galaxy.joinRequest.asSequence()
@@ -64,7 +65,7 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
             event.isCancelled = true
 
             GUIHelper.open(event.source as Player) {
-                Confirm(Text.of(lang.getNode("Conform_join").string)) {
+                Confirm(Text.of(lang.getLangString("ui.GalaxyJoinRequest.Conform_join"))) {
                     if (it) galaxy.addMember(uuid)
 
                     galaxy.removeJoinRequest(uuid)

@@ -17,13 +17,13 @@ import org.spongepowered.api.text.format.TextStyles
 @BsonDiscriminator
 class Tool(val type: ToolType = ToolType.DUMMY) : Item {
     //Todo check player lang
-    val lang = LangSys().rootNode.getNode("item","Tool")
+    val lang = LangSys()
     override val itemType = TOOL
 
     override fun createItemStack(): ItemStack = ItemStack.builder()
         .itemType(IRON_SWORD)
         .itemData(DataType(TOOL))
-        .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.YELLOW, lang.getNode(type.name).string))
+        .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.YELLOW, lang.getLangString("item.Tool.${type.name}")))
         .add(Keys.UNBREAKABLE, true)
         .add(Keys.HIDE_UNBREAKABLE, true)
         .add(Keys.HIDE_MISCELLANEOUS, true)

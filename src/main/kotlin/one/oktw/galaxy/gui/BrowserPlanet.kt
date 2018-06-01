@@ -26,13 +26,14 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.Arrays.asList
 
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
     override val token = "BrowserPlanet-${galaxy.uuid}"
     //Todo check player lang
-    val lang = LangSys().rootNode.getNode("ui","BrowserPlanet")!!
+    val lang = LangSys()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang.setValue("Title").string)))
+        .property(InventoryTitle.of(Text.of(lang.getLangString("ui.BrowserPlanet.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
     override val pages = galaxy.planets.asSequence()
@@ -44,8 +45,8 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
                 offer(
                     Keys.ITEM_LORE,
                     asList(
-                        Text.of(TextColors.AQUA, "${lang.setValue("Players").string}: ", TextColors.RESET, 0), // TODO
-                        Text.of(TextColors.AQUA, "${lang.setValue("Security").string}: ", TextColors.RESET, it.security.toString())
+                        Text.of(TextColors.AQUA, "${lang.getLangString("ui.BrowserPlanet.Details.Players")}: ", TextColors.RESET, 0), // TODO
+                        Text.of(TextColors.AQUA, "${lang.getLangString("ui.BrowserPlanet.Details.Security")}: ", TextColors.RESET, it.security.toString())
                     )
                 )
             }

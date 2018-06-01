@@ -22,8 +22,8 @@ data class Upgrade(
 ) : Item {
     override fun createItemStack(): ItemStack {
         //Todo check player lang
-        val lang = LangSys().rootNode.getNode("item","Upgrade")
-        val name = lang.getNode(type.name).string
+        val lang = LangSys()
+        val name = lang.getLangString("item.Upgrade.${type.name}")
         val color = when (type) {
         // TODO more color
             UpgradeType.RANGE -> TextColors.GREEN
@@ -34,7 +34,7 @@ data class Upgrade(
             .itemType(ItemTypes.ENCHANTED_BOOK)
             .itemData(DataType(UPGRADE))
             .itemData(DataUpgrade(type, level))
-            .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, color, "${lang.getNode("Item").string} Lv.$level".format(name)))
+            .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, color, "${lang.getLangString("item.Upgrade.Item")} Lv.$level".format(name)))
             .build()
     }
 }

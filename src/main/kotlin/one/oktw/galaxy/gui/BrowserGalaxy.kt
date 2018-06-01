@@ -27,13 +27,14 @@ import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 import java.util.Arrays.asList
 
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
     override val token = "BrowserGalaxy-${UUID.randomUUID()}"
     //Todo check player lang
-    val lang = LangSys().rootNode.getNode("ui","BrowserGalaxy")!!
+    val lang = LangSys()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang.getNode("Title").string)))
+        .property(InventoryTitle.of(Text.of(lang.getLangString("ui.BrowserGalaxy.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
@@ -55,10 +56,10 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
                         .add(
                             ITEM_LORE,
                             asList(
-                                Text.of(TextColors.GREEN, "${lang.getNode("Details","Info")}: ", TextColors.RESET, it.info),
-                                Text.of(TextColors.GREEN, "${lang.getNode("Details","Owner")}: ", TextColors.RESET, owner.name),
-                                Text.of(TextColors.GREEN, "${lang.getNode("Details","Members")}: ", TextColors.RESET, it.members.size),
-                                Text.of(TextColors.GREEN, "${lang.getNode("Details","Planets")}: ", TextColors.RESET, it.planets.size)
+                                Text.of(TextColors.GREEN, "${lang.getLangString("ui.BrowserGalaxy.Details.Info")}: ", TextColors.RESET, it.info),
+                                Text.of(TextColors.GREEN, "${lang.getLangString("ui.BrowserGalaxy.Details.Owner")}: ", TextColors.RESET, owner.name),
+                                Text.of(TextColors.GREEN, "${lang.getLangString("ui.BrowserGalaxy.Details.Members")}: ", TextColors.RESET, it.members.size),
+                                Text.of(TextColors.GREEN, "${lang.getLangString("ui.BrowserGalaxy.Details.Planets")}: ", TextColors.RESET, it.planets.size)
                             )
                         )
                         .build()

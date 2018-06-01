@@ -36,11 +36,11 @@ class ArmorHelper {
             val leggings: ItemStack = getArmor(DIAMOND_LEGGINGS)
             val boots: ItemStack = getArmor(DIAMOND_BOOTS)
             //Todo check player lang
-            val lang = LangSys().rootNode.getNode("armor","effect")
+            val lang = LangSys() //.rootNode.getNode("armor","effect")
             upgrade.firstOrNull { it.type == NIGHT_VISION }?.apply {
                 helmet.apply {
                     offer(DataEnable())
-                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getNode("night_vision").string).toText()))
+                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getLangString("armor.effect.night_vision")).toText()))
                 }
             }
 
@@ -70,11 +70,11 @@ class ArmorHelper {
 
                 leggings.apply {
                     offer(DataEnable())
-                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getNode("jump_boost").string).toText()))
+                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getLangString("armor.effect.jump_boost")).toText()))
                 }
                 boots.apply {
                     offer(DataEnable())
-                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getNode("speed_boost").string).toText()))
+                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getLangString("armor.effect.speed_boost")).toText()))
                 }
             }
 
@@ -143,12 +143,12 @@ class ArmorHelper {
 
         private fun getArmor(itemType: ItemType): ItemStack {
             //Todo check player lang
-            val lang = LangSys().rootNode.getNode("armor","item","name")
+            val lang = LangSys().getLangString("armor.item.name")
             val item = ItemStack.builder()
                 .itemType(itemType)
                 .itemData(DataType.Immutable(ARMOR))
                 .itemData(DataUUID.Immutable())
-                .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, lang.string))
+                .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, lang))
                 .add(UNBREAKABLE, true)
                 .add(HIDE_UNBREAKABLE, true)
                 .add(HIDE_MISCELLANEOUS, true)

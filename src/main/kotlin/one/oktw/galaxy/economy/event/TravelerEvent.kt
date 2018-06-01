@@ -15,10 +15,10 @@ class TravelerEvent {
     fun onPickupExp(event: PlayerPickupXpEvent) {
         val player = event.entityPlayer as Player
         //Todo check player lang
-        val lang = LangSys().rootNode.getNode("traveler","event","get_dust")
+        val lang = LangSys()
 
         travelerManager.getTraveler(player).giveStarDust(event.orb.xpValue)
 
-        ActionBar.setActionBar(player, ActionBarData(Text.of(TextColors.AQUA, lang.string.format(event.orb.xpValue)), 2, 10))
+        ActionBar.setActionBar(player, ActionBarData(Text.of(TextColors.AQUA, lang.getLangString("traveler.event.get_dust")!!.format(event.orb.xpValue)), 2, 10))
     }
 }

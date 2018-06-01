@@ -22,7 +22,7 @@ import java.util.*
 class Confirm(content: Text, private val callback: (Boolean) -> Unit) : GUI() {
     override val token = "Confirm-${UUID.randomUUID()}"
     //Todo check player lang
-    val lang = LangSys().rootNode.getNode("ui","Conform")!!
+    val lang = LangSys()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
         .property(InventoryTitle.of(content))
@@ -37,14 +37,14 @@ class Confirm(content: Text, private val callback: (Boolean) -> Unit) : GUI() {
         Button(OK).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getNode("Yes").string))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getLangString("ui.Conform.Yes")))
             }
             .let { inventory.set(1, 0, it) }
 
         Button(X).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getNode("No").string))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getLangString("ui.Conform.No")))
             }
             .let { inventory.set(3, 0, it) }
 

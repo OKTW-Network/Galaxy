@@ -28,7 +28,7 @@ class UnStuck : CommandBase {
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src is Player) {
             //Todo check player lang
-            val lang = LangSys().rootNode.getNode("command","Unstuck")
+            val lang = LangSys()
             val random = UUID.randomUUID()
             val retryButton = Text.of(
                 TextColors.AQUA,
@@ -37,19 +37,19 @@ class UnStuck : CommandBase {
                     if (random in callbackLimit) {
                         callbackLimit.remove(random)
                         if (src.setLocationSafely(src.location.add(0.0, 2.0, 0.0))) {
-                            src.sendMessage(Text.of(TextColors.GREEN, lang.getNode("success").string))
+                            src.sendMessage(Text.of(TextColors.GREEN, lang.getLangString("command.Unstuck.success")))
                         } else {
-                            src.sendMessage(Text.of(TextColors.RED, lang.getNode("failed").string))
+                            src.sendMessage(Text.of(TextColors.RED, lang.getLangString("command.Unstuck.failed")))
                         }
                     }
                 },
-                lang.getNode("get_higher").string
+                lang.getLangString("command.Unstuck.get_higher")
             )
 
             if (src.setLocationSafely(src.location)) {
                 callbackLimit.add(random)
-                src.sendMessage(Text.of(TextColors.GREEN, "${lang.getNode("success").string}\n",
-                    TextColors.GOLD, lang.getNode("does_not_unstuck").string, retryButton))
+                src.sendMessage(Text.of(TextColors.GREEN, "${lang.getLangString("command.Unstuck.success")}\n",
+                    TextColors.GOLD, lang.getLangString("command.Unstuck.does_not_unstuck"), retryButton))
                 launch {
                     delay(5, TimeUnit.MINUTES)
                     if (random in callbackLimit) {
@@ -60,8 +60,8 @@ class UnStuck : CommandBase {
                 return CommandResult.affectedEntities(1)
             } else if (src.setLocationSafely(src.location.add(0.0, 2.0, 0.0))) {
                 callbackLimit.add(random)
-                src.sendMessage(Text.of(TextColors.GREEN, "${lang.getNode("success").string}\n",
-                    TextColors.GOLD, lang.getNode("does_not_unstuck").string, retryButton))
+                src.sendMessage(Text.of(TextColors.GREEN, "${lang.getLangString("command.Unstuck.success")}\n",
+                    TextColors.GOLD, lang.getLangString("command.Unstuck.does_not_unstuck"), retryButton))
                 launch {
                     delay(5, TimeUnit.MINUTES)
                     if (random in callbackLimit) {
@@ -72,7 +72,7 @@ class UnStuck : CommandBase {
                 return CommandResult.affectedEntities(1)
             }
 
-            src.sendMessage(Text.of(TextColors.RED, lang.getNode("failed").string))
+            src.sendMessage(Text.of(TextColors.RED, lang.getLangString("command.Unstuck.failed")))
         }
 
         return CommandResult.empty()

@@ -13,14 +13,15 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.text.Text
 import java.util.*
 
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class UpgradeSlot(parent: GUI, private var upgrade: List<Upgrade>, private vararg val acceptType: UpgradeType) : GUI() {
     private lateinit var closeListener: (List<Upgrade>) -> Unit
     //Todo check player lang
-    val lang = LangSys().rootNode.getNode("ui","ChunkLoader")!!
+    val lang = LangSys()
     override val token = parent.token + "-Upgrade"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(lang.getNode("Upgrade").string)))
+        .property(InventoryTitle.of(Text.of(lang.getLangString("ui.ChunkLoader.Upgrade"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
 

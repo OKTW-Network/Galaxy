@@ -29,7 +29,7 @@ class Sign : CommandBase {
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src !is Player) return CommandResult.empty()
         //Todo check player lang
-        val lang = LangSys().rootNode.getNode("command","Sign")
+        val lang = LangSys()
 
         val blockRay = BlockRay.from(src)
             .distanceLimit(7.0)
@@ -44,20 +44,20 @@ class Sign : CommandBase {
             val lines = block[Keys.SIGN_LINES].orElse(ArrayList<Text>())
 
             if (line < 1 || line > 4) {
-                src.sendMessage(Text.of(TextColors.RED, lang.getNode("line_invalid").string))
+                src.sendMessage(Text.of(TextColors.RED, lang.getLangString("command.Sign.line_invalid")))
                 return CommandResult.empty()
             }
 
             if (text.toPlain().length > 16) {
-                src.sendMessage(Text.of(TextColors.RED, lang.getNode("too_many_words").string))
+                src.sendMessage(Text.of(TextColors.RED, lang.getLangString("command.Sign.too_many_words")))
                 return CommandResult.empty()
             }
 
             lines[line - 1] = text
             block.offer(Keys.SIGN_LINES, lines)
-            src.sendMessage(Text.of(TextColors.GREEN, lang.getNode("success").string))
+            src.sendMessage(Text.of(TextColors.GREEN, lang.getLangString("command.Sign.success")))
         } else {
-            src.sendMessage(Text.of(TextColors.RED, lang.getNode("not_sign").string))
+            src.sendMessage(Text.of(TextColors.RED, lang.getLangString("command.Sign.not_sign")))
         }
 
         return CommandResult.success()

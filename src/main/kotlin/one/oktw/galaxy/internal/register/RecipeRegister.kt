@@ -177,7 +177,7 @@ class RecipeRegister {
             // Cooling upgrade
             register(
                 ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
-                    .where('a', of(POTION))
+                    .where('a', builder().with { it.type == POTION && !it[POTION_EFFECTS].isPresent }.build())
                     .where('b', of(LEAVES, LEAVES2))
                     .where('u', Upgrade())
                     .result(Upgrade(COOLING, 1).createItemStack())

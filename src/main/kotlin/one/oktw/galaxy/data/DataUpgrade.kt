@@ -74,7 +74,7 @@ class DataUpgrade(type: UpgradeType = BASE, level: Int = 0) : AbstractData<DataU
         registerFieldSetter(LEVEL) { level = it }
     }
 
-    class Immutable(private val type: UpgradeType = BASE, private val level: Int = 0) :
+    class Immutable(val type: UpgradeType = BASE, val level: Int = 0) :
         AbstractImmutableData<Immutable, DataUpgrade>() {
         override fun getContentVersion() = 1
         override fun asMutable() = DataUpgrade(type, level)

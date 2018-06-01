@@ -2,15 +2,17 @@ package one.oktw.galaxy.internal.register
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.item.enums.ToolType.WRENCH
-import one.oktw.galaxy.item.enums.UpgradeType
 import one.oktw.galaxy.item.enums.UpgradeType.*
 import one.oktw.galaxy.item.type.Tool
 import one.oktw.galaxy.item.type.Upgrade
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.key.Keys.POTION_EFFECTS
 import org.spongepowered.api.data.type.DyeColors
+import org.spongepowered.api.effect.potion.PotionEffectTypes
 import org.spongepowered.api.item.ItemTypes.*
 import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.item.recipe.crafting.Ingredient.builder
 import org.spongepowered.api.item.recipe.crafting.Ingredient.of
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe
 
@@ -115,6 +117,7 @@ class RecipeRegister {
                     .build("upgrade_range_5", main)
             )
 
+            // Flexible upgrade
             register(
                 ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
                     .where('a', of(FEATHER))
@@ -137,7 +140,9 @@ class RecipeRegister {
 
             register(
                 ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
-                    .where('a', of()) //TODO potion
+                    .where('a', builder().with {
+                        it.type == POTION && it[POTION_EFFECTS].orElse(null)?.first()?.type == PotionEffectTypes.SPEED
+                    }.build())
                     .where('b', of(GLOWSTONE_DUST))
                     .where('u', Upgrade(FLEXIBLE, 2))
                     .result(Upgrade(FLEXIBLE, 3).createItemStack())
@@ -147,7 +152,9 @@ class RecipeRegister {
 
             register(
                 ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
-                    .where('a', of()) //TODO potion
+                    .where('a', builder().with {
+                        it.type == SPLASH_POTION && it[POTION_EFFECTS].orElse(null)?.first()?.type == PotionEffectTypes.SPEED
+                    }.build())
                     .where('b', of(NETHER_WART))
                     .where('u', Upgrade(FLEXIBLE, 3))
                     .result(Upgrade(FLEXIBLE, 4).createItemStack())
@@ -157,7 +164,9 @@ class RecipeRegister {
 
             register(
                 ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
-                    .where('a', of()) //TODO potion
+                    .where('a', builder().with {
+                        it.type == LINGERING_POTION && it[POTION_EFFECTS].orElse(null)?.first()?.type == PotionEffectTypes.SPEED
+                    }.build())
                     .where('b', of(CHORUS_FRUIT_POPPED))
                     .where('u', Upgrade(FLEXIBLE, 4))
                     .result(Upgrade(FLEXIBLE, 5).createItemStack())
@@ -165,6 +174,7 @@ class RecipeRegister {
                     .build("upgrade_flexible_5", main)
             )
 
+            // Cooling upgrade
             register(
                 ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
                     .where('a', of(POTION))
@@ -215,6 +225,7 @@ class RecipeRegister {
                     .build("upgrade_cooling_5", main)
             )
 
+            // Damage upgrade
             register(
                 ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
                     .where('a', of(WATER_BUCKET))

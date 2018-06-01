@@ -9,9 +9,9 @@ import java.nio.file.Paths
 
 
 class LanguageService(lang: String = "zh_TW") {
-    private val langBuild: ConfigurationLoader<CommentedConfigurationNode> = HoconConfigurationLoader.builder()
+    private val langBUIld: ConfigurationLoader<CommentedConfigurationNode> = HoconConfigurationLoader.builder()
         .setPath(Paths.get(main.configDir.toString(), "$lang.cfg")).build()
-    private val rootNode: ConfigurationNode = langBuild.load()
+    private val rootNode: ConfigurationNode = langBUIld.load()
 
     fun getString(key: String): String {
         return if (rootNode.getNode(key).string == null) key else rootNode.getNode(key).string
@@ -142,138 +142,138 @@ class LanguageService(lang: String = "zh_TW") {
         rootNode.getNode("item.Upgrade.Item").let {
             if (it.isVirtual) {it.value= if (isChinese) "%s升級" else "%s Upgrade"}
         }
-        rootNode.getNode("ui.ChunkLoader.Title").let{
+        rootNode.getNode("UI.ChunkLoader.Title").let{
             if (it.isVirtual) {it.value= if (isChinese) "ChunkLoader" else "ChunkLoader"}
         }
-        rootNode.getNode("ui.ChunkLoader.Upgrade").let{
+        rootNode.getNode("UI.ChunkLoader.Upgrade").let{
             if (it.isVirtual) {it.value= if (isChinese) "升級" else "Upgrade"}
         }
-        rootNode.getNode("ui.ChunkLoader.Remove").let{
+        rootNode.getNode("UI.ChunkLoader.Remove").let{
             if (it.isVirtual) {it.value= if (isChinese) "移除" else "Remove"}
         }
-        rootNode.getNode("ui.BrowserGalaxy.Title").let{
+        rootNode.getNode("UI.BrowserGalaxy.Title").let{
             if (it.isVirtual) {it.value= if (isChinese) "瀏覽星系" else "Browse Galaxy"}
         }
-        rootNode.getNode("ui.BrowserGalaxy.Details.Info").let{
+        rootNode.getNode("UI.BrowserGalaxy.Details.Info").let{
             if (it.isVirtual) {it.value= if (isChinese) "資訊" else "Info"}
         }
-        rootNode.getNode("ui.BrowserGalaxy.Details.Owner").let{
+        rootNode.getNode("UI.BrowserGalaxy.Details.Owner").let{
             if (it.isVirtual) {it.value= if (isChinese) "擁有者" else "Owner"}
         }
-        rootNode.getNode("ui.BrowserGalaxy.Details.Members").let{
+        rootNode.getNode("UI.BrowserGalaxy.Details.Members").let{
             if (it.isVirtual) {it.value= if (isChinese) "成員數量" else "Members"}
         }
-        rootNode.getNode("ui.BrowserGalaxy.Details.Planets").let{
+        rootNode.getNode("UI.BrowserGalaxy.Details.Planets").let{
             if (it.isVirtual) {it.value= if (isChinese) "星球數量" else "Planets"}
         }
-        rootNode.getNode("ui.BrowserMember.Title").let{
+        rootNode.getNode("UI.BrowserMember.Title").let{
             if (it.isVirtual) {it.value= if (isChinese) "成員列表" else "Member List"}
         }
-        rootNode.getNode("ui.BrowserMember.Details.Online").let{
+        rootNode.getNode("UI.BrowserMember.Details.Online").let{
             if (it.isVirtual) {it.value= if (isChinese) "上線中" else "ONLINE"}
         }
-        rootNode.getNode("ui.BrowserMember.Details.Offline").let{
+        rootNode.getNode("UI.BrowserMember.Details.Offline").let{
             if (it.isVirtual) {it.value= if (isChinese) "離線" else "OFFLINE"}
         }
-        rootNode.getNode("ui.BrowserMember.Details.Status").let{
+        rootNode.getNode("UI.BrowserMember.Details.Status").let{
             if (it.isVirtual) {it.value= if (isChinese) "目前狀態" else "Status"}
         }
-        rootNode.getNode("ui.BrowserMember.Details.Group").let{
+        rootNode.getNode("UI.BrowserMember.Details.Group").let{
             if (it.isVirtual) {it.value= if (isChinese) "身份組" else "Role"}
         }
-        rootNode.getNode("ui.BrowserPlanet.Title").let{
+        rootNode.getNode("UI.BrowserPlanet.Title").let{
             if (it.isVirtual) {it.value= if (isChinese) "星球列表" else "Planet List"}
         }
-        rootNode.getNode("ui.BrowserPlanet.Details.Players").let{
+        rootNode.getNode("UI.BrowserPlanet.Details.Players").let{
             if (it.isVirtual) {it.value= if (isChinese) "玩家數" else "Players"}
         }
-        rootNode.getNode("ui.BrowserPlanet.Details.Security").let{
+        rootNode.getNode("UI.BrowserPlanet.Details.Security").let{
             if (it.isVirtual) {it.value= if (isChinese) "安全等級" else "Security"}
         }
-        rootNode.getNode("ui.Conform.Yes").let{
+        rootNode.getNode("UI.Conform.Yes").let{
             if (it.isVirtual) {it.value= if (isChinese) "是" else "Yes"}
         }
-        rootNode.getNode("ui.Conform.No").let{
+        rootNode.getNode("UI.Conform.No").let{
             if (it.isVirtual) {it.value= if (isChinese) "否" else "No"}
         }
-        rootNode.getNode("ui.GalaxyInfo.member_list").let{
+        rootNode.getNode("UI.GalaxyInfo.member_list").let{
             if (it.isVirtual) {it.value= if (isChinese) "成員列表" else "Member List"}
         }
-        rootNode.getNode("ui.GalaxyInfo.planet_list").let{
+        rootNode.getNode("UI.GalaxyInfo.planet_list").let{
             if (it.isVirtual) {it.value= if (isChinese) "星球列表" else "Planet List"}
         }
-        rootNode.getNode("ui.GalaxyInfo.manage_galaxy").let{
+        rootNode.getNode("UI.GalaxyInfo.manage_galaxy").let{
             if (it.isVirtual) {it.value= if (isChinese) "管理星系" else "Manage Galaxy"}
         }
-        rootNode.getNode("ui.GalaxyInfo.notice").let{
+        rootNode.getNode("UI.GalaxyInfo.notice").let{
             if (it.isVirtual) {it.value= if (isChinese) "星系通知" else "Notifications"}
         }
-        rootNode.getNode("ui.GalaxyInfo.join_req_sent").let{
+        rootNode.getNode("UI.GalaxyInfo.join_req_sent").let{
             if (it.isVirtual) {it.value= if (isChinese) "已申請加入" else "Join request sent"}
         }
-        rootNode.getNode("ui.GalaxyInfo.join_req").let{
+        rootNode.getNode("UI.GalaxyInfo.join_req").let{
             if (it.isVirtual) {it.value= if (isChinese) "申請加入" else "Join request"}
         }
-        rootNode.getNode("ui.GalaxyJoinRequest.Title").let{
+        rootNode.getNode("UI.GalaxyJoinRequest.Title").let{
             if (it.isVirtual) {it.value= if (isChinese) "審核加入邀請" else "Review Join request"}
         }
-        rootNode.getNode("ui.GalaxyJoinRequest.Conform_join").let{
+        rootNode.getNode("UI.GalaxyJoinRequest.Conform_join").let{
             if (it.isVirtual) {it.value= if (isChinese) "是否要允許加入星系？" else "Do you allow him/her to join your galaxy?"}
         }
-        rootNode.getNode("ui.GalaxyManagement.new_planet").let{
+        rootNode.getNode("UI.GalaxyManagement.new_planet").let{
             if (it.isVirtual) {it.value= if (isChinese) "新增星球" else "Create planet"}
         }
-        rootNode.getNode("ui.GalaxyManagement.manage_member").let{
+        rootNode.getNode("UI.GalaxyManagement.manage_member").let{
             if (it.isVirtual) {it.value= if (isChinese) "管理成員" else "Manage member"}
         }
-        rootNode.getNode("ui.GalaxyManagement.add_member").let{
+        rootNode.getNode("UI.GalaxyManagement.add_member").let{
             if (it.isVirtual) {it.value= if (isChinese) "添加成員" else "Add member"}
         }
-        rootNode.getNode("ui.GalaxyManagement.join_application").let{
+        rootNode.getNode("UI.GalaxyManagement.join_application").let{
             if (it.isVirtual) {it.value= if (isChinese) "加入申請" else "Join application"}
         }
-        rootNode.getNode("ui.GalaxyManagement.rename").let{
+        rootNode.getNode("UI.GalaxyManagement.rename").let{
             if (it.isVirtual) {it.value= if (isChinese) "重新命名" else "Rename"}
         }
-        rootNode.getNode("ui.GalaxyManagement.change_info").let{
+        rootNode.getNode("UI.GalaxyManagement.change_info").let{
             if (it.isVirtual) {it.value= if (isChinese) "更改簡介" else "Change info"}
         }
-        rootNode.getNode("ui.GalaxyManagement.change_notification").let{
+        rootNode.getNode("UI.GalaxyManagement.change_notification").let{
             if (it.isVirtual) {it.value= if (isChinese) "更改通知" else "Change Notification"}
         }
-        rootNode.getNode("ui.GroupSelect.Title").let{
+        rootNode.getNode("UI.GroupSelect.Title").let{
             if (it.isVirtual) {it.value= if (isChinese) "選擇一個身分組" else "Select a role"}
         }
-        rootNode.getNode("ui.MainMenu.Title").let{
+        rootNode.getNode("UI.MainMenu.Title").let{
             if (it.isVirtual) {it.value= if (isChinese) "Main Menu" else "Main Menu"}
         }
-        rootNode.getNode("ui.MainMenu.list_joined_galaxy").let{
+        rootNode.getNode("UI.MainMenu.list_joined_galaxy").let{
             if (it.isVirtual) {it.value= if (isChinese) "列出已加入星系" else "List joined galaxy"}
         }
-        rootNode.getNode("ui.MainMenu.create_galaxy").let{
+        rootNode.getNode("UI.MainMenu.create_galaxy").let{
             if (it.isVirtual) {it.value= if (isChinese) "創造星系" else "Create galaxy"}
         }
-        rootNode.getNode("ui.MainMenu.list_all_galaxy").let{
+        rootNode.getNode("UI.MainMenu.list_all_galaxy").let{
             if (it.isVirtual) {it.value= if (isChinese) "列出所有星系" else "List all galaxy"}
         }
-        rootNode.getNode("ui.ManageMember.remove_member").let{
+        rootNode.getNode("UI.ManageMember.remove_member").let{
             if (it.isVirtual) {it.value= if (isChinese) "移除成員" else "Remove member"}
         }
-        rootNode.getNode("ui.ManageMember.change_group").let{
+        rootNode.getNode("UI.ManageMember.change_group").let{
             if (it.isVirtual) {it.value= if (isChinese) "更改身份組" else "Change role"}
         }
-        rootNode.getNode("ui.ManageMember.confirm_remove").let{
+        rootNode.getNode("UI.ManageMember.confirm_remove").let{
             if (it.isVirtual) {it.value= if (isChinese) "確定要移除成員？" else "Are you sure you want to remove this member?"}
         }
-        rootNode.getNode("ui.Page.previous_page").let{
+        rootNode.getNode("UI.Page.previous_page").let{
             if (it.isVirtual) {it.value= if (isChinese) "上一頁" else "Previous"}
         }
-        rootNode.getNode("ui.Page.next_page").let{
+        rootNode.getNode("UI.Page.next_page").let{
             if (it.isVirtual) {it.value= if (isChinese) "下一頁" else "Next"}
         }
 
         saveLang()
     }
-    private fun saveLang() {langBuild.save(rootNode)}
+    private fun saveLang() {langBUIld.save(rootNode)}
 
 }

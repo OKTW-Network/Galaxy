@@ -49,7 +49,7 @@ abstract class PageGUI : GUI() {
             Button(ARROW_LEFT).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[0]))
-                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("ui.Page.previous_page")))
+                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("UI.Page.previous_page")))
                 }
                 .let { gridInventory[0, 5] = it }
         }
@@ -58,7 +58,7 @@ abstract class PageGUI : GUI() {
             Button(ARROW_RIGHT).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[1]))
-                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("ui.Page.next_page")))
+                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("UI.Page.next_page")))
                 }
                 .let { gridInventory[8, 5] = it }
         }

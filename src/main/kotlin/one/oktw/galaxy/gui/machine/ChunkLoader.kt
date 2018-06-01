@@ -44,7 +44,7 @@ class ChunkLoader(val entity: Entity) : GUI() {
     val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(lang.getString("ui.ChunkLoader.Title"))))
+        .property(InventoryTitle.of(Text.of(lang.getString("UI.ChunkLoader.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
 
@@ -57,14 +57,14 @@ class ChunkLoader(val entity: Entity) : GUI() {
         Button(UPGRADE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("ui.ChunkLoader.Upgrade")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("UI.ChunkLoader.Upgrade")))
             }
             .let { inventory.set(1, 0, it) }
 
         Button(X).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, lang.getString("ui.ChunkLoader.Remove")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, lang.getString("UI.ChunkLoader.Remove")))
             }
             .let { inventory.set(3, 0, it) }
 

@@ -45,14 +45,14 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
         Button(MEMBER_REMOVE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("ui.ManageMember.remove_member")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("UI.ManageMember.remove_member")))
             }
             .let { gridInventory.set(1, 0, it) }
 
         Button(MEMBER_CHANGE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("ui.ManageMember.change_group")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("UI.ManageMember.change_group")))
             }
             .let { gridInventory.set(3, 0, it) }
 
@@ -67,7 +67,7 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
             buttonID[0] -> GUIHelper.open(player) {
-                Confirm(Text.of(lang.getString("ui.ManageMember.confirm_remove"))) {
+                Confirm(Text.of(lang.getString("UI.ManageMember.confirm_remove"))) {
                     if (it) {
                         galaxy.delMember(member)
                         GUIHelper.close(token)

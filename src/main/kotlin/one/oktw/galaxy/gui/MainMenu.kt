@@ -27,7 +27,7 @@ class MainMenu(val player: Player) : GUI() {
     val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(lang.getString("ui.MainMenu.Title"))))
+        .property(InventoryTitle.of(Text.of(lang.getString("UI.MainMenu.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
     private val buttonID = Array(3) { UUID.randomUUID() }
@@ -39,21 +39,21 @@ class MainMenu(val player: Player) : GUI() {
         Button(GALAXY).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("ui.MainMenu.list_joined_galaxy")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("UI.MainMenu.list_joined_galaxy")))
             }
             .let { inventory.set(0, 0, it) }
 
         Button(PLUS).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("ui.MainMenu.create_galaxy")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("UI.MainMenu.create_galaxy")))
             }
             .let { inventory.set(2, 0, it) }
 
         Button(GALAXY).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[2]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("ui.MainMenu.list_all_galaxy")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("UI.MainMenu.list_all_galaxy")))
             }
             .let { inventory.set(4, 0, it) }
 

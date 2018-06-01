@@ -33,7 +33,7 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
     val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang.getString("ui.BrowserGalaxy.Title"))))
+        .property(InventoryTitle.of(Text.of(lang.getString("UI.BrowserGalaxy.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
@@ -55,10 +55,10 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
                         .add(
                             ITEM_LORE,
                             asList(
-                                Text.of(TextColors.GREEN, "${lang.getString("ui.BrowserGalaxy.Details.Info")}: ", TextColors.RESET, it.info),
-                                Text.of(TextColors.GREEN, "${lang.getString("ui.BrowserGalaxy.Details.Owner")}: ", TextColors.RESET, owner.name),
-                                Text.of(TextColors.GREEN, "${lang.getString("ui.BrowserGalaxy.Details.Members")}: ", TextColors.RESET, it.members.size),
-                                Text.of(TextColors.GREEN, "${lang.getString("ui.BrowserGalaxy.Details.Planets")}: ", TextColors.RESET, it.planets.size)
+                                Text.of(TextColors.GREEN, "${lang.getString("UI.BrowserGalaxy.Details.Info")}: ", TextColors.RESET, it.info),
+                                Text.of(TextColors.GREEN, "${lang.getString("UI.BrowserGalaxy.Details.Owner")}: ", TextColors.RESET, owner.name),
+                                Text.of(TextColors.GREEN, "${lang.getString("UI.BrowserGalaxy.Details.Members")}: ", TextColors.RESET, it.members.size),
+                                Text.of(TextColors.GREEN, "${lang.getString("UI.BrowserGalaxy.Details.Planets")}: ", TextColors.RESET, it.planets.size)
                             )
                         )
                         .build()

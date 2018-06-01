@@ -19,7 +19,7 @@ class UpgradeSlot(parent: GUI, private var upgrade: List<Upgrade>, private varar
     override val token = parent.token + "-Upgrade"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(LanguageService().getString("ui.ChunkLoader.Upgrade"))))
+        .property(InventoryTitle.of(Text.of(LanguageService().getString("UI.ChunkLoader.Upgrade"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
 

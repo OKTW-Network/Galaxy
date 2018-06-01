@@ -32,7 +32,7 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
     val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang.getString("ui.BrowserPlanet.Title"))))
+        .property(InventoryTitle.of(Text.of(lang.getString("UI.BrowserPlanet.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
     override val pages = galaxy.planets.asSequence()
@@ -44,8 +44,8 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
                 offer(
                     Keys.ITEM_LORE,
                     asList(
-                        Text.of(TextColors.AQUA, "${lang.getString("ui.BrowserPlanet.Details.Players")}: ", TextColors.RESET, 0), // TODO
-                        Text.of(TextColors.AQUA, "${lang.getString("ui.BrowserPlanet.Details.Security")}: ", TextColors.RESET, it.security.toString())
+                        Text.of(TextColors.AQUA, "${lang.getString("UI.BrowserPlanet.Details.Players")}: ", TextColors.RESET, 0), // TODO
+                        Text.of(TextColors.AQUA, "${lang.getString("UI.BrowserPlanet.Details.Security")}: ", TextColors.RESET, it.security.toString())
                     )
                 )
             }

@@ -31,7 +31,7 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
     val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang.getString("ui.GalaxyJoinRequest.Title"))))
+        .property(InventoryTitle.of(Text.of(lang.getString("UI.GalaxyJoinRequest.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
     override val pages = galaxy.joinRequest.asSequence()
@@ -64,7 +64,7 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
             event.isCancelled = true
 
             GUIHelper.open(event.source as Player) {
-                Confirm(Text.of(lang.getString("ui.GalaxyJoinRequest.Conform_join"))) {
+                Confirm(Text.of(lang.getString("UI.GalaxyJoinRequest.Conform_join"))) {
                     if (it) galaxy.addMember(uuid)
 
                     galaxy.removeJoinRequest(uuid)

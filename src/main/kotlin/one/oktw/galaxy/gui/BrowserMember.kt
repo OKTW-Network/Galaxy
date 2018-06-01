@@ -33,7 +33,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
     val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang.getString("ui.BrowserMember.Title"))))
+        .property(InventoryTitle.of(Text.of(lang.getString("UI.BrowserMember.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
     override val pages = galaxy.members.asSequence()
@@ -42,8 +42,8 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
         }
         .map {
             val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(it.uuid!!).get()
-            val status = if (user.isOnline) Text.of(GREEN, lang.getString("ui.BrowserMember.Details.Online"))
-                else Text.of(RED, lang.getString("ui.BrowserMember.Details.Offline"))
+            val status = if (user.isOnline) Text.of(GREEN, lang.getString("UI.BrowserMember.Details.Online"))
+                else Text.of(RED, lang.getString("UI.BrowserMember.Details.Offline"))
             val location = user.player.orElse(null)
                 ?.let { travelerManager.getTraveler(it).position }
                 ?.run {
@@ -72,8 +72,8 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
                 .add(
                     Keys.ITEM_LORE,
                     asList(
-                        Text.of(YELLOW, "${lang.getString("ui.BrowserMember.Details.Status")}: ", if (location != null) status.concat(location) else status),
-                        Text.of(YELLOW, "${lang.getString("ui.BrowserMember.Details.Group")}: ", RESET, it.group.toString())
+                        Text.of(YELLOW, "${lang.getString("UI.BrowserMember.Details.Status")}: ", if (location != null) status.concat(location) else status),
+                        Text.of(YELLOW, "${lang.getString("UI.BrowserMember.Details.Group")}: ", RESET, it.group.toString())
                     )
                 )
                 .build()

@@ -1,5 +1,6 @@
 package one.oktw.galaxy.item.type
 
+import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUpgrade
 import one.oktw.galaxy.item.enums.ItemType
 import one.oktw.galaxy.item.enums.ItemType.UPGRADE
@@ -28,6 +29,7 @@ data class Upgrade(
 
         return ItemStack.builder()
             .itemType(ItemTypes.ENCHANTED_BOOK)
+            .itemData(DataType(UPGRADE))
             .itemData(DataUpgrade(type, level))
             .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, color, "$name Upgrade Lv.$level"))
             .build()

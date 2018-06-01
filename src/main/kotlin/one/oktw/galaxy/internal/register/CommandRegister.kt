@@ -14,9 +14,6 @@ class CommandRegister {
             register(main, TPX().spec, "tpx")
             register(main, Sign().spec, "sign")
             register(main, Gun().spec, "gun")
-            register(main, Test().spec, "test")
-            register(main, Test1().spec, "test1")
-            register(main, Test2().spec, "test2")
         }
     }
 }

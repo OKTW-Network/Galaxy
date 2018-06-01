@@ -228,8 +228,8 @@ class RecipeRegister {
             // Damage upgrade
             register(
                 ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
-                    .where('a', of(WATER_BUCKET))
-                    .where('b', of(REDSTONE_BLOCK))
+                    .where('a', of(PLANKS))
+                    .where('b', of(CLAY))
                     .where('u', Upgrade())
                     .result(Upgrade(DAMAGE, 1).createItemStack())
                     .group("upgrade")

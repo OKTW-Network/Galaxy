@@ -10,7 +10,7 @@ import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.galaxy.planet.data.extensions.checkPermission
 import one.oktw.galaxy.galaxy.planet.data.extensions.loadWorld
-import one.oktw.galaxy.internal.LangSys
+import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ButtonType.PLANET_O
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import one.oktw.galaxy.item.type.Button
@@ -26,14 +26,13 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.Arrays.asList
 
-@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
     override val token = "BrowserPlanet-${galaxy.uuid}"
     //Todo check player lang
-    val lang = LangSys()
+    val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang.getLangString("ui.BrowserPlanet.Title"))))
+        .property(InventoryTitle.of(Text.of(lang.getString("ui.BrowserPlanet.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
     override val pages = galaxy.planets.asSequence()
@@ -45,8 +44,8 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
                 offer(
                     Keys.ITEM_LORE,
                     asList(
-                        Text.of(TextColors.AQUA, "${lang.getLangString("ui.BrowserPlanet.Details.Players")}: ", TextColors.RESET, 0), // TODO
-                        Text.of(TextColors.AQUA, "${lang.getLangString("ui.BrowserPlanet.Details.Security")}: ", TextColors.RESET, it.security.toString())
+                        Text.of(TextColors.AQUA, "${lang.getString("ui.BrowserPlanet.Details.Players")}: ", TextColors.RESET, 0), // TODO
+                        Text.of(TextColors.AQUA, "${lang.getString("ui.BrowserPlanet.Details.Security")}: ", TextColors.RESET, it.security.toString())
                     )
                 )
             }

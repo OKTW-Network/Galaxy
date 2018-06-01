@@ -8,15 +8,19 @@ import one.oktw.galaxy.Main.Companion.main
 import java.nio.file.Paths
 
 
-class LangSys(lang: String = "zh_TW") {
+class LanguageService(lang: String = "zh_TW") {
     private val langBuild: ConfigurationLoader<CommentedConfigurationNode> = HoconConfigurationLoader.builder()
         .setPath(
             Paths.get(main.configDir.toString(), "$lang.cfg")
         ).build()
     private val rootNode: ConfigurationNode = langBuild.load()
 
-    fun getLangString(node: Any): String? {
-        return rootNode.getNode(node).string
+    fun getString(node: String): String {
+        return if (rootNode.getNode(node).string == null){
+            String.toString()
+        }else{
+            rootNode.getNode(node).string
+        }
     }
 
     init {

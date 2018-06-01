@@ -2,7 +2,7 @@ package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.async
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.internal.LangSys
+import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ButtonType.ARROW_LEFT
 import one.oktw.galaxy.item.enums.ButtonType.ARROW_RIGHT
 import one.oktw.galaxy.item.type.Button
@@ -42,14 +42,14 @@ abstract class PageGUI : GUI() {
 
     private fun offerButton(previous: Boolean, next: Boolean) {
         //Todo check player lang
-        val lang = LangSys()
+        val lang = LanguageService()
         val gridInventory: GridInventory = inventory.query(INVENTORY_TYPE.of(GridInventory::class.java))
 
         if (previous) {
             Button(ARROW_LEFT).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[0]))
-                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getLangString("ui.Page.previous_page")))
+                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("ui.Page.previous_page")))
                 }
                 .let { gridInventory[0, 5] = it }
         }
@@ -58,7 +58,7 @@ abstract class PageGUI : GUI() {
             Button(ARROW_RIGHT).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[1]))
-                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getLangString("ui.Page.next_page")))
+                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("ui.Page.next_page")))
                 }
                 .let { gridInventory[8, 5] = it }
         }

@@ -6,7 +6,7 @@ import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.UpgradeSlot
-import one.oktw.galaxy.internal.LangSys
+import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ButtonType.UPGRADE
 import one.oktw.galaxy.item.enums.ButtonType.X
 import one.oktw.galaxy.item.enums.UpgradeType
@@ -33,7 +33,6 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class ChunkLoader(val entity: Entity) : GUI() {
 
     private val uuid = entity[DataUUID.key].orElse(null)
@@ -42,10 +41,10 @@ class ChunkLoader(val entity: Entity) : GUI() {
     private val buttonID = Array(2) { UUID.randomUUID() }
     override val token = "ChunkLoader-$uuid"
     //Todo check player lang
-    val lang = LangSys()
+    val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(lang.getLangString("ui.ChunkLoader.Title"))))
+        .property(InventoryTitle.of(Text.of(lang.getString("ui.ChunkLoader.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
 
@@ -58,14 +57,14 @@ class ChunkLoader(val entity: Entity) : GUI() {
         Button(UPGRADE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getLangString("ui.ChunkLoader.Upgrade")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("ui.ChunkLoader.Upgrade")))
             }
             .let { inventory.set(1, 0, it) }
 
         Button(X).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, lang.getLangString("ui.ChunkLoader.Remove")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, lang.getString("ui.ChunkLoader.Remove")))
             }
             .let { inventory.set(3, 0, it) }
 

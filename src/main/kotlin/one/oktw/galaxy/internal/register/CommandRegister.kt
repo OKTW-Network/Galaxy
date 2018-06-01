@@ -1,10 +1,7 @@
 package one.oktw.galaxy.internal.register
 
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.command.Gun
-import one.oktw.galaxy.command.Sign
-import one.oktw.galaxy.command.TPX
-import one.oktw.galaxy.command.UnStuck
+import one.oktw.galaxy.command.*
 import org.spongepowered.api.Sponge
 
 class CommandRegister {
@@ -17,6 +14,9 @@ class CommandRegister {
             register(main, TPX().spec, "tpx")
             register(main, Sign().spec, "sign")
             register(main, Gun().spec, "gun")
+            register(main, Test().spec, "test")
+            register(main, Test1().spec, "test1")
+            register(main, Test2().spec, "test2")
         }
     }
 }

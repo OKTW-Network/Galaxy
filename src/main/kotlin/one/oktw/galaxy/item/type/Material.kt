@@ -1,7 +1,7 @@
 package one.oktw.galaxy.item.type
 
 import one.oktw.galaxy.data.DataType
-import one.oktw.galaxy.internal.LangSys
+import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.ItemUtil.Companion.removeCoolDown
 import one.oktw.galaxy.item.ItemUtil.Companion.removeDamage
 import one.oktw.galaxy.item.enums.ItemType.MATERIAL
@@ -17,13 +17,13 @@ import org.spongepowered.api.text.format.TextStyles
 @BsonDiscriminator
 class Material(val type: MaterialType = MaterialType.DUMMY) : Item {
     //Todo check player lang
-    val lang = LangSys()
+    val lang = LanguageService()
     override val itemType = MATERIAL
 
     override fun createItemStack(): ItemStack = ItemStack.builder()
         .itemType(STONE_SWORD)
         .itemData(DataType(MATERIAL))
-        .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.WHITE, lang.getLangString("item.Material.${type.name}")))
+        .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.WHITE, lang.getString("item.Material.${type.name}")))
         .add(Keys.UNBREAKABLE, true)
         .add(Keys.HIDE_UNBREAKABLE, true)
         .add(Keys.HIDE_MISCELLANEOUS, true)

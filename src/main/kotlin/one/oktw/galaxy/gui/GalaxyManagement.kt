@@ -3,7 +3,7 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
-import one.oktw.galaxy.internal.LangSys
+import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys
@@ -22,7 +22,7 @@ import java.util.*
 class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
     override val token = "GalaxyManagement-${galaxy.uuid}"
     //Todo check player lang
-    val lang = LangSys()
+    val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.CHEST)
         .property(InventoryTitle.of(Text.of(galaxy.name)))
@@ -37,49 +37,49 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
         Button(PLUS).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang.getLangString("ui.GalaxyManagement.new_planet")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang.getString("ui.GalaxyManagement.new_planet")))
             }
             .let { inventory.set(1, 1, it) }
 
         Button(LIST).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang.getLangString("ui.GalaxyManagement.manage_member")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang.getString("ui.GalaxyManagement.manage_member")))
             }
             .let { inventory.set(2, 1, it) }
 
         Button(MEMBER_ADD).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[2]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang.getLangString("ui.GalaxyManagement.add_member")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang.getString("ui.GalaxyManagement.add_member")))
             }
             .let { inventory.set(3, 1, it) }
 
         Button(MEMBER_ASK).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[3]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang.getLangString("ui.GalaxyManagement.join_application")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang.getString("ui.GalaxyManagement.join_application")))
             }
             .let { inventory.set(4, 1, it) }
 
         Button(WRITE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[4]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang.getLangString("ui.GalaxyManagement.rename")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang.getString("ui.GalaxyManagement.rename")))
             }
             .let { inventory.set(5, 1, it) }
 
         Button(WRITE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[4]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang.getLangString("ui.GalaxyManagement.change_info")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang.getString("ui.GalaxyManagement.change_info")))
             }
             .let { inventory.set(6, 1, it) }
 
         Button(WRITE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[4]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang.getLangString("ui.GalaxyManagement.change_notification")))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang.getString("ui.GalaxyManagement.change_notification")))
             }
             .let { inventory.set(7, 1, it) }
 

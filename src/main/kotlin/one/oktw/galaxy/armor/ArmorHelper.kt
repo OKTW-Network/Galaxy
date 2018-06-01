@@ -9,7 +9,7 @@ import one.oktw.galaxy.armor.ArmorEffect.Companion.removeEffect
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.internal.LangSys
+import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ItemType.ARMOR
 import one.oktw.galaxy.item.enums.UpgradeType.*
 import org.spongepowered.api.data.key.Keys.*
@@ -36,11 +36,11 @@ class ArmorHelper {
             val leggings: ItemStack = getArmor(DIAMOND_LEGGINGS)
             val boots: ItemStack = getArmor(DIAMOND_BOOTS)
             //Todo check player lang
-            val lang = LangSys() //.rootNode.getNode("armor","effect")
+            val lang = LanguageService()
             upgrade.firstOrNull { it.type == NIGHT_VISION }?.apply {
                 helmet.apply {
                     offer(DataEnable())
-                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getLangString("armor.effect.night_vision")).toText()))
+                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getString("armor.effect.night_vision")).toText()))
                 }
             }
 
@@ -70,11 +70,11 @@ class ArmorHelper {
 
                 leggings.apply {
                     offer(DataEnable())
-                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getLangString("armor.effect.jump_boost")).toText()))
+                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getString("armor.effect.jump_boost")).toText()))
                 }
                 boots.apply {
                     offer(DataEnable())
-                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getLangString("armor.effect.speed_boost")).toText()))
+                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getString("armor.effect.speed_boost")).toText()))
                 }
             }
 
@@ -143,12 +143,11 @@ class ArmorHelper {
 
         private fun getArmor(itemType: ItemType): ItemStack {
             //Todo check player lang
-            val lang = LangSys().getLangString("armor.item.name")
             val item = ItemStack.builder()
                 .itemType(itemType)
                 .itemData(DataType.Immutable(ARMOR))
                 .itemData(DataUUID.Immutable())
-                .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, lang))
+                .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, LanguageService().getString("armor.item.name")))
                 .add(UNBREAKABLE, true)
                 .add(HIDE_UNBREAKABLE, true)
                 .add(HIDE_MISCELLANEOUS, true)

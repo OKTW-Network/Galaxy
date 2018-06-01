@@ -8,7 +8,7 @@ import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.galaxy.data.Galaxy
-import one.oktw.galaxy.internal.LangSys
+import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
@@ -27,14 +27,13 @@ import org.spongepowered.api.text.format.TextColors.*
 import org.spongepowered.api.text.format.TextStyles
 import java.util.Arrays.asList
 
-@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = false) : PageGUI() {
     override val token = "BrowserMember-${galaxy.uuid}${if (manage) "-manage" else ""}"
     //Todo check player lang
-    val lang = LangSys()
+    val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang.getLangString("ui.BrowserMember.Title"))))
+        .property(InventoryTitle.of(Text.of(lang.getString("ui.BrowserMember.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
     override val pages = galaxy.members.asSequence()
@@ -43,8 +42,8 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
         }
         .map {
             val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(it.uuid!!).get()
-            val status = if (user.isOnline) Text.of(GREEN, lang.getLangString("ui.BrowserMember.Details.Online"))
-                else Text.of(RED, lang.getLangString("ui.BrowserMember.Details.Offline"))
+            val status = if (user.isOnline) Text.of(GREEN, lang.getString("ui.BrowserMember.Details.Online"))
+                else Text.of(RED, lang.getString("ui.BrowserMember.Details.Offline"))
             val location = user.player.orElse(null)
                 ?.let { travelerManager.getTraveler(it).position }
                 ?.run {
@@ -73,8 +72,8 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
                 .add(
                     Keys.ITEM_LORE,
                     asList(
-                        Text.of(YELLOW, "${lang.getLangString("ui.BrowserMember.Details.Status")}: ", if (location != null) status.concat(location) else status),
-                        Text.of(YELLOW, "${lang.getLangString("ui.BrowserMember.Details.Group")}: ", RESET, it.group.toString())
+                        Text.of(YELLOW, "${lang.getString("ui.BrowserMember.Details.Status")}: ", if (location != null) status.concat(location) else status),
+                        Text.of(YELLOW, "${lang.getString("ui.BrowserMember.Details.Group")}: ", RESET, it.group.toString())
                     )
                 )
                 .build()

@@ -6,7 +6,7 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.Group.OWNER
-import one.oktw.galaxy.internal.LangSys
+import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import one.oktw.galaxy.traveler.data.Traveler
 import org.spongepowered.api.Sponge
@@ -27,14 +27,13 @@ import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 import java.util.Arrays.asList
 
-@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
     override val token = "BrowserGalaxy-${UUID.randomUUID()}"
     //Todo check player lang
-    val lang = LangSys()
+    val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang.getLangString("ui.BrowserGalaxy.Title"))))
+        .property(InventoryTitle.of(Text.of(lang.getString("ui.BrowserGalaxy.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
@@ -56,10 +55,10 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
                         .add(
                             ITEM_LORE,
                             asList(
-                                Text.of(TextColors.GREEN, "${lang.getLangString("ui.BrowserGalaxy.Details.Info")}: ", TextColors.RESET, it.info),
-                                Text.of(TextColors.GREEN, "${lang.getLangString("ui.BrowserGalaxy.Details.Owner")}: ", TextColors.RESET, owner.name),
-                                Text.of(TextColors.GREEN, "${lang.getLangString("ui.BrowserGalaxy.Details.Members")}: ", TextColors.RESET, it.members.size),
-                                Text.of(TextColors.GREEN, "${lang.getLangString("ui.BrowserGalaxy.Details.Planets")}: ", TextColors.RESET, it.planets.size)
+                                Text.of(TextColors.GREEN, "${lang.getString("ui.BrowserGalaxy.Details.Info")}: ", TextColors.RESET, it.info),
+                                Text.of(TextColors.GREEN, "${lang.getString("ui.BrowserGalaxy.Details.Owner")}: ", TextColors.RESET, owner.name),
+                                Text.of(TextColors.GREEN, "${lang.getString("ui.BrowserGalaxy.Details.Members")}: ", TextColors.RESET, it.members.size),
+                                Text.of(TextColors.GREEN, "${lang.getString("ui.BrowserGalaxy.Details.Planets")}: ", TextColors.RESET, it.planets.size)
                             )
                         )
                         .build()

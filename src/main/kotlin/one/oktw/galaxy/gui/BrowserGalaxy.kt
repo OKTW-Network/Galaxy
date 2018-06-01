@@ -6,6 +6,7 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.Group.OWNER
+import one.oktw.galaxy.internal.LangSys
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import one.oktw.galaxy.traveler.data.Traveler
 import org.spongepowered.api.Sponge
@@ -28,9 +29,11 @@ import java.util.Arrays.asList
 
 class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
     override val token = "BrowserGalaxy-${UUID.randomUUID()}"
+    //Todo check player lang
+    val lang = LangSys().rootNode.getNode("ui","BrowserGalaxy")!!
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of("瀏覽星系")))
+        .property(InventoryTitle.of(Text.of(lang.getNode("Title").string)))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
@@ -52,10 +55,10 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
                         .add(
                             ITEM_LORE,
                             asList(
-                                Text.of(TextColors.GREEN, "Info: ", TextColors.RESET, it.info),
-                                Text.of(TextColors.GREEN, "Owner: ", TextColors.RESET, owner.name),
-                                Text.of(TextColors.GREEN, "Members: ", TextColors.RESET, it.members.size),
-                                Text.of(TextColors.GREEN, "Planets: ", TextColors.RESET, it.planets.size)
+                                Text.of(TextColors.GREEN, "${lang.getNode("Details","Info")}: ", TextColors.RESET, it.info),
+                                Text.of(TextColors.GREEN, "${lang.getNode("Details","Owner")}: ", TextColors.RESET, owner.name),
+                                Text.of(TextColors.GREEN, "${lang.getNode("Details","Members")}: ", TextColors.RESET, it.members.size),
+                                Text.of(TextColors.GREEN, "${lang.getNode("Details","Planets")}: ", TextColors.RESET, it.planets.size)
                             )
                         )
                         .build()

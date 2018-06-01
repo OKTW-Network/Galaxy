@@ -8,6 +8,7 @@ import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.galaxy.data.Galaxy
+import one.oktw.galaxy.internal.LangSys
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
@@ -28,9 +29,11 @@ import java.util.Arrays.asList
 
 class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = false) : PageGUI() {
     override val token = "BrowserMember-${galaxy.uuid}${if (manage) "-manage" else ""}"
+    //Todo check player lang
+    val lang = LangSys().rootNode.getNode("ui","BrowserMember")!!
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of("成員列表")))
+        .property(InventoryTitle.of(Text.of(lang.getNode("Title").string)))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
     override val pages = galaxy.members.asSequence()
@@ -39,7 +42,8 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
         }
         .map {
             val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(it.uuid!!).get()
-            val status = if (user.isOnline) Text.of(GREEN, "ONLINE") else Text.of(RED, "OFFLINE")
+            val status = if (user.isOnline) Text.of(GREEN, lang.getNode("Online").string)
+                else Text.of(RED, lang.getNode("Offline").string)
             val location = user.player.orElse(null)
                 ?.let { travelerManager.getTraveler(it).position }
                 ?.run {
@@ -68,8 +72,8 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
                 .add(
                     Keys.ITEM_LORE,
                     asList(
-                        Text.of(YELLOW, "Status: ", if (location != null) status.concat(location) else status),
-                        Text.of(YELLOW, "Group: ", RESET, it.group.toString())
+                        Text.of(YELLOW, "${lang.getNode("Status").string}: ", if (location != null) status.concat(location) else status),
+                        Text.of(YELLOW, "${lang.getNode("Group").string}: ", RESET, it.group.toString())
                     )
                 )
                 .build()

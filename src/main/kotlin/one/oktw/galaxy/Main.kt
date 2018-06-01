@@ -20,6 +20,9 @@ import org.spongepowered.api.event.game.state.*
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.world.gen.WorldGeneratorModifier
+import org.spongepowered.api.config.ConfigDir
+import java.nio.file.Path
+
 
 @Suppress("UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
 @Plugin(
@@ -44,6 +47,10 @@ class Main {
     @Inject
     @DefaultConfig(sharedRoot = false)
     lateinit var configLoader: ConfigurationLoader<CommentedConfigurationNode>
+
+    @Inject
+    @ConfigDir(sharedRoot = false)
+    lateinit var configDir: Path
 
     @Inject
     lateinit var plugin: PluginContainer

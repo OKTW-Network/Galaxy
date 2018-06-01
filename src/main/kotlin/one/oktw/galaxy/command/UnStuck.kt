@@ -2,6 +2,7 @@ package one.oktw.galaxy.command
 
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
+import one.oktw.galaxy.internal.LangSys
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -20,12 +21,14 @@ class UnStuck : CommandBase {
     override val spec: CommandSpec
         get() = CommandSpec.builder()
             .executor(this)
-            .description(Text.of("卡點自救"))
+            .description(Text.of("Unstuck"))
             .permission("oktw.command.unstuck")
             .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src is Player) {
+            //Todo check player lang
+            val lang = LangSys().rootNode.getNode("command","Unstuck")
             val random = UUID.randomUUID()
             val retryButton = Text.of(
                 TextColors.AQUA,
@@ -34,18 +37,19 @@ class UnStuck : CommandBase {
                     if (random in callbackLimit) {
                         callbackLimit.remove(random)
                         if (src.setLocationSafely(src.location.add(0.0, 2.0, 0.0))) {
-                            src.sendMessage(Text.of(TextColors.GREEN, "已嘗試自救"))
+                            src.sendMessage(Text.of(TextColors.GREEN, lang.getNode("success").string))
                         } else {
-                            src.sendMessage(Text.of(TextColors.RED, "自救失敗，找不到安全位置"))
+                            src.sendMessage(Text.of(TextColors.RED, lang.getNode("failed").string))
                         }
                     }
                 },
-                "高度提高一點試試"
+                lang.getNode("get_higher").string
             )
 
             if (src.setLocationSafely(src.location)) {
                 callbackLimit.add(random)
-                src.sendMessage(Text.of(TextColors.GREEN, "已嘗試自救\n", TextColors.GOLD, "覺得沒被救到嗎?", retryButton))
+                src.sendMessage(Text.of(TextColors.GREEN, "${lang.getNode("success").string}\n",
+                    TextColors.GOLD, lang.getNode("does_not_unstuck").string, retryButton))
                 launch {
                     delay(5, TimeUnit.MINUTES)
                     if (random in callbackLimit) {
@@ -56,7 +60,8 @@ class UnStuck : CommandBase {
                 return CommandResult.affectedEntities(1)
             } else if (src.setLocationSafely(src.location.add(0.0, 2.0, 0.0))) {
                 callbackLimit.add(random)
-                src.sendMessage(Text.of(TextColors.GREEN, "已嘗試自救\n", TextColors.GOLD, "覺得沒被救到嗎?", retryButton))
+                src.sendMessage(Text.of(TextColors.GREEN, "${lang.getNode("success").string}\n",
+                    TextColors.GOLD, lang.getNode("does_not_unstuck").string, retryButton))
                 launch {
                     delay(5, TimeUnit.MINUTES)
                     if (random in callbackLimit) {
@@ -67,7 +72,7 @@ class UnStuck : CommandBase {
                 return CommandResult.affectedEntities(1)
             }
 
-            src.sendMessage(Text.of(TextColors.RED, "自救失敗，找不到安全位置"))
+            src.sendMessage(Text.of(TextColors.RED, lang.getNode("failed").string))
         }
 
         return CommandResult.empty()

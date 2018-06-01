@@ -2,6 +2,7 @@ package one.oktw.galaxy.item.type
 
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUpgrade
+import one.oktw.galaxy.internal.LangSys
 import one.oktw.galaxy.item.enums.ItemType
 import one.oktw.galaxy.item.enums.ItemType.UPGRADE
 import one.oktw.galaxy.item.enums.UpgradeType
@@ -20,7 +21,9 @@ data class Upgrade(
     override val itemType: ItemType = UPGRADE
 ) : Item {
     override fun createItemStack(): ItemStack {
-        val name = type.name.substring(0, 1) + type.name.substring(1).toLowerCase()
+        //Todo check player lang
+        val lang = LangSys().rootNode.getNode("item","Upgrade")
+        val name = lang.getNode(type.name).string
         val color = when (type) {
         // TODO more color
             UpgradeType.RANGE -> TextColors.GREEN
@@ -31,7 +34,7 @@ data class Upgrade(
             .itemType(ItemTypes.ENCHANTED_BOOK)
             .itemData(DataType(UPGRADE))
             .itemData(DataUpgrade(type, level))
-            .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, color, "$name Upgrade Lv.$level"))
+            .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, color, "${lang.getNode("Item").string} Lv.$level".format(name)))
             .build()
     }
 }

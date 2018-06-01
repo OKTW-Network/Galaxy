@@ -9,6 +9,7 @@ import one.oktw.galaxy.armor.ArmorEffect.Companion.removeEffect
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.internal.LangSys
 import one.oktw.galaxy.item.enums.ItemType.ARMOR
 import one.oktw.galaxy.item.enums.UpgradeType.*
 import org.spongepowered.api.data.key.Keys.*
@@ -34,11 +35,12 @@ class ArmorHelper {
             val chestplate: ItemStack = getArmor(DIAMOND_CHESTPLATE)
             val leggings: ItemStack = getArmor(DIAMOND_LEGGINGS)
             val boots: ItemStack = getArmor(DIAMOND_BOOTS)
-
+            //Todo check player lang
+            val lang = LangSys().rootNode.getNode("armor","effect")
             upgrade.firstOrNull { it.type == NIGHT_VISION }?.apply {
                 helmet.apply {
                     offer(DataEnable())
-                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, "夜視鏡").toText()))
+                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getNode("night_vision").string).toText()))
                 }
             }
 
@@ -68,11 +70,11 @@ class ArmorHelper {
 
                 leggings.apply {
                     offer(DataEnable())
-                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, "跳躍增強").toText()))
+                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getNode("jump_boost").string).toText()))
                 }
                 boots.apply {
                     offer(DataEnable())
-                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, "速度增強").toText()))
+                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getNode("speed_boost").string).toText()))
                 }
             }
 
@@ -140,11 +142,13 @@ class ArmorHelper {
         }
 
         private fun getArmor(itemType: ItemType): ItemStack {
+            //Todo check player lang
+            val lang = LangSys().rootNode.getNode("armor","item","name")
             val item = ItemStack.builder()
                 .itemType(itemType)
                 .itemData(DataType.Immutable(ARMOR))
                 .itemData(DataUUID.Immutable())
-                .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, "科技裝甲"))
+                .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, lang.string))
                 .add(UNBREAKABLE, true)
                 .add(HIDE_UNBREAKABLE, true)
                 .add(HIDE_MISCELLANEOUS, true)

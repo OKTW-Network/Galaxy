@@ -3,6 +3,7 @@ package one.oktw.galaxy.item.type
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.internal.LangSys
 import one.oktw.galaxy.item.ItemUtil.Companion.removeCoolDown
 import one.oktw.galaxy.item.ItemUtil.Companion.removeDamage
 import one.oktw.galaxy.item.enums.GunStyle
@@ -46,6 +47,8 @@ data class Gun(
     var upgrade: ArrayList<Upgrade> = ArrayList()
 ) : Item, Overheat {
     override fun createItemStack(): ItemStack {
+        //Todo check player lang
+        val lang = LangSys().rootNode.getNode("item","Gun")
         val item = ItemStack.builder()
             .itemType(ItemTypes.DIAMOND_SWORD)
             .itemData(DataUUID.Immutable(uuid))
@@ -58,10 +61,12 @@ data class Gun(
             .add(Keys.ITEM_DURABILITY, style.id.toInt())
 
         when (itemType) {
-            PISTOL -> item.add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.GREEN, "Laser Gun"))
+            PISTOL -> item.add(Keys.DISPLAY_NAME,
+                Text.of(TextStyles.BOLD, TextColors.GREEN, lang.getNode("PISTOL").string))
             SNIPER -> {
                 item.itemData(DataEnable())
-                item.add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, TextColors.GREEN, "Sniper"))
+                item.add(Keys.DISPLAY_NAME,
+                    Text.of(TextStyles.BOLD, TextColors.GREEN, lang.getNode("SNIPER").string))
             }
             else -> Unit
         }

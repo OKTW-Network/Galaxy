@@ -6,6 +6,7 @@ import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.UpgradeSlot
+import one.oktw.galaxy.internal.LangSys
 import one.oktw.galaxy.item.enums.ButtonType.UPGRADE
 import one.oktw.galaxy.item.enums.ButtonType.X
 import one.oktw.galaxy.item.enums.UpgradeType
@@ -33,14 +34,17 @@ import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
 class ChunkLoader(val entity: Entity) : GUI() {
+
     private val uuid = entity[DataUUID.key].orElse(null)
     private lateinit var chunkLoader: ChunkLoader
     private lateinit var upgradeGUI: GUI
     private val buttonID = Array(2) { UUID.randomUUID() }
     override val token = "ChunkLoader-$uuid"
+    //Todo check player lang
+    val lang = LangSys().rootNode.getNode("ui","ChunkLoader")!!
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of("ChunkLoader")))
+        .property(InventoryTitle.of(Text.of(lang.getNode("Title").string)))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
 
@@ -53,14 +57,14 @@ class ChunkLoader(val entity: Entity) : GUI() {
         Button(UPGRADE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "Upgrade"))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getNode("Upgrade").string))
             }
             .let { inventory.set(1, 0, it) }
 
         Button(X).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, "Remove"))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, lang.getNode("Remove").string))
             }
             .let { inventory.set(3, 0, it) }
 

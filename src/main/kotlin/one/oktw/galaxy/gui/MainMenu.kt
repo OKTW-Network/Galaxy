@@ -3,6 +3,7 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.internal.LangSys
 import one.oktw.galaxy.item.enums.ButtonType.GALAXY
 import one.oktw.galaxy.item.enums.ButtonType.PLUS
 import one.oktw.galaxy.item.type.Button
@@ -22,9 +23,11 @@ import java.util.*
 
 class MainMenu(val player: Player) : GUI() {
     override val token = "MainMenu-${player.uniqueId}"
+    //Todo check player lang
+    val lang = LangSys().rootNode.getNode("ui","MainMenu")!!
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of("Main menu")))
+        .property(InventoryTitle.of(Text.of(lang.getNode("Title").string)))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
     private val buttonID = Array(3) { UUID.randomUUID() }
@@ -36,21 +39,21 @@ class MainMenu(val player: Player) : GUI() {
         Button(GALAXY).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "列出已加入星系"))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getNode("list_joined_galaxy").string))
             }
             .let { inventory.set(0, 0, it) }
 
         Button(PLUS).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "創造星系"))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getNode("create_galaxy").string))
             }
             .let { inventory.set(2, 0, it) }
 
         Button(GALAXY).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[2]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "列出所有星系"))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getNode("list_all_galaxy").string))
             }
             .let { inventory.set(4, 0, it) }
 

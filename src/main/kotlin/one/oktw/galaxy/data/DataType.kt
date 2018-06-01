@@ -33,7 +33,7 @@ class DataType(type: ItemType = DUMMY) :
 
     override fun from(container: DataContainer): Optional<DataType> {
         return if (container[key.query].isPresent) {
-            value = container.getObject(key.query, ItemType::class.java).get()
+            value = ItemType.valueOf(container.getString(key.query).get())
             Optional.of(this)
         } else {
             Optional.empty()

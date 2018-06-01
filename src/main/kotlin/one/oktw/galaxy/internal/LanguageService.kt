@@ -9,9 +9,9 @@ import java.nio.file.Paths
 
 
 class LanguageService(lang: String = "zh_TW") {
-    private val langBUIld: ConfigurationLoader<CommentedConfigurationNode> = HoconConfigurationLoader.builder()
+    private val langBuild: ConfigurationLoader<CommentedConfigurationNode> = HoconConfigurationLoader.builder()
         .setPath(Paths.get(main.configDir.toString(), "$lang.cfg")).build()
-    private val rootNode: ConfigurationNode = langBUIld.load()
+    private val rootNode: ConfigurationNode = langBuild.load()
 
     fun getString(key: String): String {
         return if (rootNode.getNode(key).string == null) key else rootNode.getNode(key).string
@@ -274,6 +274,6 @@ class LanguageService(lang: String = "zh_TW") {
 
         saveLang()
     }
-    private fun saveLang() {langBUIld.save(rootNode)}
+    private fun saveLang() {langBuild.save(rootNode)}
 
 }

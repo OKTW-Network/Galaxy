@@ -2,8 +2,8 @@ package one.oktw.galaxy.internal.register
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.item.enums.ToolType.WRENCH
-import one.oktw.galaxy.item.enums.UpgradeType.BASE
-import one.oktw.galaxy.item.enums.UpgradeType.RANGE
+import one.oktw.galaxy.item.enums.UpgradeType
+import one.oktw.galaxy.item.enums.UpgradeType.*
 import one.oktw.galaxy.item.type.Tool
 import one.oktw.galaxy.item.type.Upgrade
 import org.spongepowered.api.Sponge
@@ -17,6 +17,7 @@ import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe
 class RecipeRegister {
     init {
         val lapis = of(ItemStack.of(DYE, 1).apply { offer(Keys.DYE_COLOR, DyeColors.BLUE) })
+        val boneMeal = of(ItemStack.of(DYE, 1).apply { offer(Keys.DYE_COLOR, DyeColors.WHITE) })
 
         Sponge.getRegistry().craftingRecipeRegistry.apply {
             // Wrench
@@ -113,7 +114,156 @@ class RecipeRegister {
                     .group("upgrade")
                     .build("upgrade_range_5", main)
             )
-            // TODO upgrade
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of(FEATHER))
+                    .where('b', of(SUGAR))
+                    .where('u', Upgrade())
+                    .result(Upgrade(FLEXIBLE, 1).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_flexible_1", main)
+            )
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of(FIREWORKS))
+                    .where('b', boneMeal)
+                    .where('u', Upgrade(FLEXIBLE, 1))
+                    .result(Upgrade(FLEXIBLE, 2).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_flexible_2", main)
+            )
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of()) //TODO potion
+                    .where('b', of(GLOWSTONE_DUST))
+                    .where('u', Upgrade(FLEXIBLE, 2))
+                    .result(Upgrade(FLEXIBLE, 3).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_flexible_3", main)
+            )
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of()) //TODO potion
+                    .where('b', of(NETHER_WART))
+                    .where('u', Upgrade(FLEXIBLE, 3))
+                    .result(Upgrade(FLEXIBLE, 4).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_flexible_4", main)
+            )
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of()) //TODO potion
+                    .where('b', of(CHORUS_FRUIT_POPPED))
+                    .where('u', Upgrade(FLEXIBLE, 4))
+                    .result(Upgrade(FLEXIBLE, 5).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_flexible_5", main)
+            )
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of(POTION))
+                    .where('b', of(LEAVES, LEAVES2))
+                    .where('u', Upgrade())
+                    .result(Upgrade(COOLING, 1).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_cooling_1", main)
+            )
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of(WATER_BUCKET))
+                    .where('b', of(REDSTONE_BLOCK))
+                    .where('u', Upgrade(COOLING, 1))
+                    .result(Upgrade(COOLING, 2).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_cooling_2", main)
+            )
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of(SNOW))
+                    .where('b', of(GLOWSTONE))
+                    .where('u', Upgrade(COOLING, 2))
+                    .result(Upgrade(COOLING, 3).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_cooling_3", main)
+            )
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of(PACKED_ICE))
+                    .where('b', of(DIAMOND_BLOCK))
+                    .where('u', Upgrade(COOLING, 3))
+                    .result(Upgrade(COOLING, 4).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_cooling_4", main)
+            )
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of(NETHER_STAR))
+                    .where('b', of(EMERALD_BLOCK))
+                    .where('u', Upgrade(COOLING, 4))
+                    .result(Upgrade(COOLING, 5).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_cooling_5", main)
+            )
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of(WATER_BUCKET))
+                    .where('b', of(REDSTONE_BLOCK))
+                    .where('u', Upgrade())
+                    .result(Upgrade(DAMAGE, 1).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_damage_1", main)
+            )
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of(OBSIDIAN))
+                    .where('b', of(CONCRETE))
+                    .where('u', Upgrade(DAMAGE, 1))
+                    .result(Upgrade(DAMAGE, 2).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_damage_2", main)
+            )
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of(PRISMARINE))
+                    .where('b', of(SEA_LANTERN))
+                    .where('u', Upgrade(DAMAGE, 2))
+                    .result(Upgrade(DAMAGE, 3).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_damage_3", main)
+            )
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of(RED_NETHER_BRICK))
+                    .where('b', of(NETHER_WART_BLOCK))
+                    .where('u', Upgrade(DAMAGE, 3))
+                    .result(Upgrade(DAMAGE, 4).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_damage_4", main)
+            )
+
+            register(
+                ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
+                    .where('a', of(PURPUR_BLOCK))
+                    .where('b', of(END_BRICKS))
+                    .where('u', Upgrade(DAMAGE, 4))
+                    .result(Upgrade(DAMAGE, 5).createItemStack())
+                    .group("upgrade")
+                    .build("upgrade_damage_5", main)
+            )
         }
     }
 }

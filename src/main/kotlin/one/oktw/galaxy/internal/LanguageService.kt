@@ -10,17 +10,11 @@ import java.nio.file.Paths
 
 class LanguageService(lang: String = "zh_TW") {
     private val langBuild: ConfigurationLoader<CommentedConfigurationNode> = HoconConfigurationLoader.builder()
-        .setPath(
-            Paths.get(main.configDir.toString(), "$lang.cfg")
-        ).build()
+        .setPath(Paths.get(main.configDir.toString(), "$lang.cfg")).build()
     private val rootNode: ConfigurationNode = langBuild.load()
 
-    fun getString(node: String): String {
-        return if (rootNode.getNode(node).string == null){
-            String.toString()
-        }else{
-            rootNode.getNode(node).string
-        }
+    fun getString(key: String): String {
+        return if (rootNode.getNode(key).string == null) key else rootNode.getNode(key).string
     }
 
     init {
@@ -32,7 +26,7 @@ class LanguageService(lang: String = "zh_TW") {
             if (it.isVirtual) {it.value= if (isChinese) "跳躍增強" else "Jump Boost"}
         }
         rootNode.getNode("armor.effect.speed_boost").let {
-            if (it.isVirtual) {it.value= if (isChinese) "速度增強" else it.value="Speed Boost"}
+            if (it.isVirtual) {it.value= if (isChinese) "速度增強" else "Speed Boost"}
         }
         rootNode.getNode("armor.item.name").let {
             if (it.isVirtual) {it.value= if (isChinese) "科技裝甲" else "Technology armor"}

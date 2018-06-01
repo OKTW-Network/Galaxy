@@ -23,7 +23,6 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier
 import org.spongepowered.api.config.ConfigDir
 import java.nio.file.Path
 
-
 @Suppress("UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
 @Plugin(
     id = "galaxy",

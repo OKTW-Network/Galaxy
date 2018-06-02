@@ -6,6 +6,7 @@ import ninja.leaping.configurate.loader.ConfigurationLoader
 import one.oktw.galaxy.galaxy.GalaxyManager
 import one.oktw.galaxy.galaxy.planet.gen.PlanetGenModifier
 import one.oktw.galaxy.internal.DatabaseManager
+import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.internal.register.CommandRegister
 import one.oktw.galaxy.internal.register.DataRegister
 import one.oktw.galaxy.internal.register.EventRegister
@@ -83,6 +84,8 @@ class Main {
     @Listener
     fun onStarting(event: GameStartingServerEvent) {
         CommandRegister()
+        logger.info("Init default languages...")
+        LanguageService()
     }
 
     @Listener

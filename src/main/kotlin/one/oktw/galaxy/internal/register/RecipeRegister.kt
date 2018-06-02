@@ -1,8 +1,8 @@
 package one.oktw.galaxy.internal.register
 
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.item.enums.MaterialType.強化陶版
-import one.oktw.galaxy.item.enums.MaterialType.未成形的強化陶版
+import one.oktw.galaxy.item.enums.MaterialType.PART_BASE
+import one.oktw.galaxy.item.enums.MaterialType.PART_RAW_BASE
 import one.oktw.galaxy.item.enums.ToolType.WRENCH
 import one.oktw.galaxy.item.enums.UpgradeType.*
 import one.oktw.galaxy.item.type.Material
@@ -286,10 +286,10 @@ class RecipeRegister {
             register(
                 SmeltingRecipe.builder()
                     .ingredient(
-                        { Material(未成形的強化陶版).test(it.createStack()) },
-                        Material(未成形的強化陶版).displayedItems().first()
+                        { Material(PART_RAW_BASE).test(it.createStack()) },
+                        Material(PART_RAW_BASE).displayedItems().first()
                     )
-                    .result(Material(強化陶版).createItemStack())
+                    .result(Material(PART_BASE).createItemStack())
                     .build()
             )
         }

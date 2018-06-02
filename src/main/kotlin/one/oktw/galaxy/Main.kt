@@ -78,14 +78,14 @@ class Main {
         galaxyManager = GalaxyManager()
         travelerManager = TravelerManager()
         EventRegister()
+        logger.info("Init default languages...")
+        LanguageService()
         logger.info("Plugin initialized!")
     }
 
     @Listener
     fun onStarting(event: GameStartingServerEvent) {
         CommandRegister()
-        logger.info("Init default languages...")
-        LanguageService()
     }
 
     @Listener

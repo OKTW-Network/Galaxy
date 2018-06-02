@@ -1,11 +1,8 @@
 package one.oktw.galaxy.internal.register
 
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.item.enums.MaterialType.PART_BASE
-import one.oktw.galaxy.item.enums.MaterialType.PART_RAW_BASE
 import one.oktw.galaxy.item.enums.ToolType.WRENCH
 import one.oktw.galaxy.item.enums.UpgradeType.*
-import one.oktw.galaxy.item.type.Material
 import one.oktw.galaxy.item.type.Tool
 import one.oktw.galaxy.item.type.Upgrade
 import org.spongepowered.api.Sponge
@@ -18,15 +15,13 @@ import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.recipe.crafting.Ingredient.builder
 import org.spongepowered.api.item.recipe.crafting.Ingredient.of
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe
-import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe
 
 class RecipeRegister {
     init {
-        val registry = Sponge.getRegistry()
         val lapis = of(ItemStack.of(DYE, 1).apply { offer(Keys.DYE_COLOR, DyeColors.BLUE) })
         val boneMeal = of(ItemStack.of(DYE, 1).apply { offer(Keys.DYE_COLOR, DyeColors.WHITE) })
 
-        registry.craftingRecipeRegistry.apply {
+        Sponge.getRegistry().craftingRecipeRegistry.apply {
             // Wrench
             register(
                 ShapedCraftingRecipe.builder().aisle("i i", " s ", " i ")
@@ -279,18 +274,6 @@ class RecipeRegister {
                     .result(Upgrade(DAMAGE, 5).createItemStack())
                     .group("upgrade")
                     .build("upgrade_damage_5", main)
-            )
-        }
-
-        registry.smeltingRecipeRegistry.apply {
-            register(
-                SmeltingRecipe.builder()
-                    .ingredient(
-                        { Material(PART_RAW_BASE).test(it.createStack()) },
-                        Material(PART_RAW_BASE).displayedItems().first()
-                    )
-                    .result(Material(PART_BASE).createItemStack())
-                    .build()
             )
         }
     }

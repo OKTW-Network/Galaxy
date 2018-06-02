@@ -5,33 +5,40 @@ import one.oktw.galaxy.data.DataUpgrade
 import one.oktw.galaxy.item.enums.ItemType
 import one.oktw.galaxy.item.enums.ItemType.UPGRADE
 import one.oktw.galaxy.item.enums.UpgradeType
+import one.oktw.galaxy.item.enums.UpgradeType.BASE
+import one.oktw.galaxy.item.enums.UpgradeType.RANGE
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
-import org.spongepowered.api.data.key.Keys
-import org.spongepowered.api.item.ItemTypes
+import org.spongepowered.api.data.key.Keys.DISPLAY_NAME
+import org.spongepowered.api.item.ItemTypes.ENCHANTED_BOOK
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
-import org.spongepowered.api.text.format.TextStyles
+import org.spongepowered.api.text.format.TextStyles.BOLD
 
 @BsonDiscriminator
-data class Upgrade(
-    val type: UpgradeType = UpgradeType.DUMMY,
-    var level: Int = 0,
+data class Upgrade(val type: UpgradeType = BASE, var level: Int = 0) : Item {
     override val itemType: ItemType = UPGRADE
-) : Item {
+
     override fun createItemStack(): ItemStack {
         val name = type.name.substring(0, 1) + type.name.substring(1).toLowerCase()
         val color = when (type) {
         // TODO more color
-            UpgradeType.RANGE -> TextColors.GREEN
+            RANGE -> TextColors.GREEN
             else -> TextColors.NONE
         }
 
         return ItemStack.builder()
-            .itemType(ItemTypes.ENCHANTED_BOOK)
+            .itemType(ENCHANTED_BOOK)
             .itemData(DataType(UPGRADE))
             .itemData(DataUpgrade(type, level))
-            .add(Keys.DISPLAY_NAME, Text.of(TextStyles.BOLD, color, "$name Upgrade Lv.$level"))
+            .add(DISPLAY_NAME, Text.of(BOLD, color, "$name Upgrade Lv.$level"))
             .build()
     }
+
+    override fun test(item: ItemStack): Boolean {
+        return item[DataType.key].orElse(null) == UPGRADE &&
+                item[DataUpgrade::class.java].orElse(null).let { it?.type == type && it.level == level }
+    }
+
+    override fun displayedItems() = listOfNotNull(createItemStack().createSnapshot())
 }

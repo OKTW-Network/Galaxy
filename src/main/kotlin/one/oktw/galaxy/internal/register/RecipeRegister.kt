@@ -12,14 +12,15 @@ import org.spongepowered.api.data.type.DyeColors
 import org.spongepowered.api.effect.potion.PotionEffectTypes
 import org.spongepowered.api.item.ItemTypes.*
 import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.item.recipe.crafting.Ingredient
 import org.spongepowered.api.item.recipe.crafting.Ingredient.builder
 import org.spongepowered.api.item.recipe.crafting.Ingredient.of
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe
+import java.util.Arrays.asList
 
 class RecipeRegister {
     init {
         val lapis = of(ItemStack.of(DYE, 1).apply { offer(Keys.DYE_COLOR, DyeColors.BLUE) })
-        val boneMeal = of(ItemStack.of(DYE, 1).apply { offer(Keys.DYE_COLOR, DyeColors.WHITE) })
 
         Sponge.getRegistry().craftingRecipeRegistry.apply {
             // Wrench
@@ -131,7 +132,7 @@ class RecipeRegister {
             register(
                 ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
                     .where('a', of(FIREWORKS))
-                    .where('b', boneMeal)
+                    .where('b', of(ItemStack.of(DYE, 1).apply { offer(Keys.DYE_COLOR, DyeColors.WHITE) }))
                     .where('u', Upgrade(FLEXIBLE, 1))
                     .result(Upgrade(FLEXIBLE, 2).createItemStack())
                     .group("upgrade")
@@ -178,7 +179,7 @@ class RecipeRegister {
             register(
                 ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
                     .where('a', builder().with { it.type == POTION && !it[POTION_EFFECTS].isPresent }.build())
-                    .where('b', of(LEAVES, LEAVES2))
+                    .where('b', Ingredient.builder().with { it.type in asList(LEAVES, LEAVES2) }.build())
                     .where('u', Upgrade())
                     .result(Upgrade(COOLING, 1).createItemStack())
                     .group("upgrade")
@@ -228,7 +229,7 @@ class RecipeRegister {
             // Damage upgrade
             register(
                 ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
-                    .where('a', of(PLANKS))
+                    .where('a', Ingredient.builder().with { it.type == PLANKS }.build())
                     .where('b', of(CLAY))
                     .where('u', Upgrade())
                     .result(Upgrade(DAMAGE, 1).createItemStack())
@@ -239,7 +240,7 @@ class RecipeRegister {
             register(
                 ShapedCraftingRecipe.builder().aisle("aba", "bub", "aba")
                     .where('a', of(OBSIDIAN))
-                    .where('b', of(CONCRETE))
+                    .where('b', Ingredient.builder().with { it.type == CONCRETE }.build())
                     .where('u', Upgrade(DAMAGE, 1))
                     .result(Upgrade(DAMAGE, 2).createItemStack())
                     .group("upgrade")

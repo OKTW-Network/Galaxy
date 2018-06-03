@@ -7,7 +7,7 @@ import one.oktw.galaxy.armor.ArmorHelper.Companion.toggleChestplate
 import one.oktw.galaxy.armor.ArmorHelper.Companion.toggleHelmet
 import one.oktw.galaxy.armor.ArmorHelper.Companion.toggleLeggings
 import one.oktw.galaxy.data.DataEnable
-import one.oktw.galaxy.data.DataType
+import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.item.enums.ItemType.ARMOR
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
@@ -35,7 +35,7 @@ class Armor {
     fun onClickInventory(event: ClickInventoryEvent, @First player: Player) {
         val item = event.cursorTransaction.default.createStack()
 
-        if (item[DataType.key].orElse(null) != ARMOR) return
+        if (item[DataItemType.key].orElse(null) != ARMOR) return
         if (item[DataEnable.key].isPresent) {
             event.cursorTransaction.apply {
                 setCustom(ItemStackSnapshot.NONE)
@@ -55,7 +55,7 @@ class Armor {
 
     @Listener
     fun onChangeInventory(event: ChangeInventoryEvent) {
-        if (event.transactions.any { it.default[DataType.key].orElse(null) == ARMOR }) event.isCancelled = true
+        if (event.transactions.any { it.default[DataItemType.key].orElse(null) == ARMOR }) event.isCancelled = true
     }
 
     @Listener

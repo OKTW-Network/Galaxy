@@ -7,7 +7,7 @@ import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.armor.ArmorEffect.Companion.offerEffect
 import one.oktw.galaxy.armor.ArmorEffect.Companion.removeEffect
 import one.oktw.galaxy.data.DataEnable
-import one.oktw.galaxy.data.DataType
+import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ItemType.ARMOR
@@ -145,7 +145,7 @@ class ArmorHelper {
             //Todo check player lang
             val item = ItemStack.builder()
                 .itemType(itemType)
-                .itemData(DataType.Immutable(ARMOR))
+                .itemData(DataItemType.Immutable(ARMOR))
                 .itemData(DataUUID.Immutable())
                 .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, LanguageService().getString("armor.item.name")))
                 .add(UNBREAKABLE, true)

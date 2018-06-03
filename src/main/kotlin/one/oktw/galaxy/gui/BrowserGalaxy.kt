@@ -3,7 +3,7 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.data.DataType
+import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.internal.LanguageService
@@ -47,7 +47,7 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
 
                     ItemStack.builder()
                         .itemType(ItemTypes.SKULL)
-                        .itemData(DataType(BUTTON))
+                        .itemData(DataItemType(BUTTON))
                         .itemData(DataUUID(it.uuid))
                         .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, it.name))
                         .add(SKULL_TYPE, SkullTypes.PLAYER)
@@ -78,7 +78,7 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
-        if (item[DataType.key].orElse(null) == BUTTON && !isButton(uuid)) {
+        if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
             event.isCancelled = true
 
             launch {

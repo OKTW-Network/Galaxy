@@ -1,6 +1,6 @@
 package one.oktw.galaxy.item.type
 
-import one.oktw.galaxy.data.DataType
+import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.item.ItemUtil.Companion.removeCoolDown
 import one.oktw.galaxy.item.ItemUtil.Companion.removeDamage
 import one.oktw.galaxy.item.enums.ButtonType
@@ -17,7 +17,7 @@ data class Button(val type: ButtonType = BLANK) : Item {
 
     override fun createItemStack(): ItemStack = ItemStack.builder()
         .itemType(DIAMOND_HOE)
-        .itemData(DataType(BUTTON))
+        .itemData(DataItemType(BUTTON))
         .add(UNBREAKABLE, true)
         .add(HIDE_UNBREAKABLE, true)
         .add(HIDE_MISCELLANEOUS, true)
@@ -29,7 +29,7 @@ data class Button(val type: ButtonType = BLANK) : Item {
         .let(::removeCoolDown)
 
     override fun test(item: ItemStack): Boolean {
-        return item[DataType.key].orElse(null) == type && item[ITEM_DURABILITY].orElse(null) == type.id
+        return item[DataItemType.key].orElse(null) == type && item[ITEM_DURABILITY].orElse(null) == type.id
     }
 
     override fun displayedItems() = listOfNotNull(createItemStack().createSnapshot())

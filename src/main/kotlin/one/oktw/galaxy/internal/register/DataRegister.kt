@@ -38,9 +38,9 @@ class DataRegister {
 
         // Item Type
         DataRegistration.builder()
-            .dataName("Type").manipulatorId("type")
-            .dataClass(DataType::class.java).immutableClass(DataType.Immutable::class.java)
-            .builder(DataType.Builder())
+            .dataName("ItemType").manipulatorId("itemType")
+            .dataClass(DataItemType::class.java).immutableClass(DataItemType.Immutable::class.java)
+            .builder(DataItemType.Builder())
             .buildAndRegister(plugin)
     }
 }

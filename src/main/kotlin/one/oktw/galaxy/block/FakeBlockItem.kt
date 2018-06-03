@@ -1,7 +1,7 @@
 package one.oktw.galaxy.block
 
 import one.oktw.galaxy.data.DataBlockType
-import one.oktw.galaxy.data.DataType
+import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.item.enums.ItemType.BLOCK
 import one.oktw.galaxy.item.type.Item
 import org.spongepowered.api.data.key.Keys.ITEM_DURABILITY
@@ -14,7 +14,7 @@ data class FakeBlockItem(private val block: FakeBlocks) : Item {
 
     override fun createItemStack(): ItemStack = ItemStack.builder()
         .itemType(WOODEN_SWORD)
-        .itemData(DataType(BLOCK))
+        .itemData(DataItemType(BLOCK))
         .itemData(DataBlockType(block))
         .add(UNBREAKABLE, true)
         .add(ITEM_DURABILITY, block.id)
@@ -23,6 +23,6 @@ data class FakeBlockItem(private val block: FakeBlocks) : Item {
     override fun displayedItems() = listOfNotNull(createItemStack().createSnapshot())
 
     override fun test(itemStack: ItemStack): Boolean {
-        return itemStack[DataType.key].orElse(null) == BLOCK && itemStack[ITEM_DURABILITY].orElse(null) == block.id
+        return itemStack[DataItemType.key].orElse(null) == BLOCK && itemStack[ITEM_DURABILITY].orElse(null) == block.id
     }
 }

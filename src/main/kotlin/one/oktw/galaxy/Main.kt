@@ -6,6 +6,7 @@ import ninja.leaping.configurate.loader.ConfigurationLoader
 import one.oktw.galaxy.galaxy.GalaxyManager
 import one.oktw.galaxy.galaxy.planet.gen.PlanetGenModifier
 import one.oktw.galaxy.internal.DatabaseManager
+import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.internal.register.CommandRegister
 import one.oktw.galaxy.internal.register.DataRegister
 import one.oktw.galaxy.internal.register.EventRegister
@@ -20,6 +21,8 @@ import org.spongepowered.api.event.game.state.*
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.world.gen.WorldGeneratorModifier
+import org.spongepowered.api.config.ConfigDir
+import java.nio.file.Path
 
 @Suppress("UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
 @Plugin(
@@ -44,6 +47,10 @@ class Main {
     @Inject
     @DefaultConfig(sharedRoot = false)
     lateinit var configLoader: ConfigurationLoader<CommentedConfigurationNode>
+
+    @Inject
+    @ConfigDir(sharedRoot = false)
+    lateinit var configDir: Path
 
     @Inject
     lateinit var plugin: PluginContainer
@@ -71,6 +78,8 @@ class Main {
         galaxyManager = GalaxyManager()
         travelerManager = TravelerManager()
         EventRegister()
+        logger.info("Init default languages...")
+        LanguageService()
         logger.info("Plugin initialized!")
     }
 

@@ -10,6 +10,7 @@ import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.galaxy.planet.data.extensions.checkPermission
 import one.oktw.galaxy.galaxy.planet.data.extensions.loadWorld
+import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ButtonType.PLANET_O
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import one.oktw.galaxy.item.type.Button
@@ -27,9 +28,11 @@ import java.util.Arrays.asList
 
 class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
     override val token = "BrowserPlanet-${galaxy.uuid}"
+    //Todo check player lang
+    val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of("星球列表")))
+        .property(InventoryTitle.of(Text.of(lang.getString("UI.BrowserPlanet.Title"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
     override val pages = galaxy.planets.asSequence()
@@ -41,8 +44,8 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
                 offer(
                     Keys.ITEM_LORE,
                     asList(
-                        Text.of(TextColors.AQUA, "Players: ", TextColors.RESET, 0), // TODO
-                        Text.of(TextColors.AQUA, "Security: ", TextColors.RESET, it.security.toString())
+                        Text.of(TextColors.AQUA, "${lang.getString("UI.BrowserPlanet.Details.Players")}: ", TextColors.RESET, 0), // TODO
+                        Text.of(TextColors.AQUA, "${lang.getString("UI.BrowserPlanet.Details.Security")}: ", TextColors.RESET, it.security.toString())
                     )
                 )
             }

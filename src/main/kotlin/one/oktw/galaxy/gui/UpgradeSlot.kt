@@ -2,6 +2,7 @@ package one.oktw.galaxy.gui
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUpgrade
+import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.UpgradeType
 import one.oktw.galaxy.item.type.Upgrade
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
@@ -14,10 +15,11 @@ import java.util.*
 
 class UpgradeSlot(parent: GUI, private var upgrade: List<Upgrade>, private vararg val acceptType: UpgradeType) : GUI() {
     private lateinit var closeListener: (List<Upgrade>) -> Unit
+    //Todo check player lang
     override val token = parent.token + "-Upgrade"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of("Upgrade")))
+        .property(InventoryTitle.of(Text.of(LanguageService().getString("UI.ChunkLoader.Upgrade"))))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
 

@@ -5,6 +5,7 @@ import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.delMember
 import one.oktw.galaxy.galaxy.data.extensions.setGroup
+import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ButtonType.MEMBER_CHANGE
 import one.oktw.galaxy.item.enums.ButtonType.MEMBER_REMOVE
 import one.oktw.galaxy.item.type.Button
@@ -26,6 +27,8 @@ import java.util.*
 
 class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI() {
     override val token = "ManageMember-${galaxy.uuid}-$member"
+    //Todo check player lang
+    val lang = LanguageService()
     private val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(member).get()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
@@ -42,14 +45,14 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
         Button(MEMBER_REMOVE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "移除成員"))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("UI.ManageMember.remove_member")))
             }
             .let { gridInventory.set(1, 0, it) }
 
         Button(MEMBER_CHANGE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, "更改身分組"))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang.getString("UI.ManageMember.change_group")))
             }
             .let { gridInventory.set(3, 0, it) }
 
@@ -64,7 +67,7 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
             buttonID[0] -> GUIHelper.open(player) {
-                Confirm(Text.of("是否移除成員？")) {
+                Confirm(Text.of(lang.getString("UI.ManageMember.confirm_remove"))) {
                     if (it) {
                         galaxy.delMember(member)
                         GUIHelper.close(token)

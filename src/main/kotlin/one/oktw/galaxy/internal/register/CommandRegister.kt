@@ -1,10 +1,7 @@
 package one.oktw.galaxy.internal.register
 
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.command.Gun
-import one.oktw.galaxy.command.Sign
-import one.oktw.galaxy.command.TPX
-import one.oktw.galaxy.command.UnStuck
+import one.oktw.galaxy.command.*
 import org.spongepowered.api.Sponge
 
 class CommandRegister {

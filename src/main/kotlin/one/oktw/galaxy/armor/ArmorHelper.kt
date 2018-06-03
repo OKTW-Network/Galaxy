@@ -9,6 +9,7 @@ import one.oktw.galaxy.armor.ArmorEffect.Companion.removeEffect
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ItemType.ARMOR
 import one.oktw.galaxy.item.enums.UpgradeType.*
 import org.spongepowered.api.data.key.Keys.*
@@ -34,11 +35,12 @@ class ArmorHelper {
             val chestplate: ItemStack = getArmor(DIAMOND_CHESTPLATE)
             val leggings: ItemStack = getArmor(DIAMOND_LEGGINGS)
             val boots: ItemStack = getArmor(DIAMOND_BOOTS)
-
+            //Todo check player lang
+            val lang = LanguageService()
             upgrade.firstOrNull { it.type == NIGHT_VISION }?.apply {
                 helmet.apply {
                     offer(DataEnable())
-                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, "夜視鏡").toText()))
+                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getString("armor.effect.night_vision")).toText()))
                 }
             }
 
@@ -68,11 +70,11 @@ class ArmorHelper {
 
                 leggings.apply {
                     offer(DataEnable())
-                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, "跳躍增強").toText()))
+                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getString("armor.effect.jump_boost")).toText()))
                 }
                 boots.apply {
                     offer(DataEnable())
-                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, "速度增強").toText()))
+                    offer(ITEM_LORE, asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang.getString("armor.effect.speed_boost")).toText()))
                 }
             }
 
@@ -140,11 +142,12 @@ class ArmorHelper {
         }
 
         private fun getArmor(itemType: ItemType): ItemStack {
+            //Todo check player lang
             val item = ItemStack.builder()
                 .itemType(itemType)
                 .itemData(DataItemType.Immutable(ARMOR))
                 .itemData(DataUUID.Immutable())
-                .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, "科技裝甲"))
+                .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, LanguageService().getString("armor.item.name")))
                 .add(UNBREAKABLE, true)
                 .add(HIDE_UNBREAKABLE, true)
                 .add(HIDE_MISCELLANEOUS, true)

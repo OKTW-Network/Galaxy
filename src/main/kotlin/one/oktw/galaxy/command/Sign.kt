@@ -1,5 +1,6 @@
 package one.oktw.galaxy.command
 
+import one.oktw.galaxy.internal.LanguageService
 import org.spongepowered.api.block.BlockTypes.STANDING_SIGN
 import org.spongepowered.api.block.BlockTypes.WALL_SIGN
 import org.spongepowered.api.command.CommandResult
@@ -27,6 +28,8 @@ class Sign : CommandBase {
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src !is Player) return CommandResult.empty()
+        //Todo check player lang
+        val lang = LanguageService()
 
         val blockRay = BlockRay.from(src)
             .distanceLimit(7.0)
@@ -41,20 +44,20 @@ class Sign : CommandBase {
             val lines = block[Keys.SIGN_LINES].orElse(ArrayList<Text>())
 
             if (line < 1 || line > 4) {
-                src.sendMessage(Text.of(TextColors.RED, "請輸入行數 1-4"))
+                src.sendMessage(Text.of(TextColors.RED, lang.getString("command.Sign.line_invalid")))
                 return CommandResult.empty()
             }
 
             if (text.toPlain().length > 16) {
-                src.sendMessage(Text.of(TextColors.RED, "內容超過16字元"))
+                src.sendMessage(Text.of(TextColors.RED, lang.getString("command.Sign.too_many_words")))
                 return CommandResult.empty()
             }
 
             lines[line - 1] = text
             block.offer(Keys.SIGN_LINES, lines)
-            src.sendMessage(Text.of(TextColors.GREEN, "修改成功"))
+            src.sendMessage(Text.of(TextColors.GREEN, lang.getString("command.Sign.success")))
         } else {
-            src.sendMessage(Text.of(TextColors.RED, "請把準心對準告示牌"))
+            src.sendMessage(Text.of(TextColors.RED, lang.getString("command.Sign.not_sign")))
         }
 
         return CommandResult.success()

@@ -16,22 +16,22 @@ import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.value.mutable.Value
 import java.util.*
 
-class DataType(type: ItemType = DUMMY) :
-    AbstractSingleEnumData<ItemType, DataType, DataType.Immutable>(type, key, DUMMY) {
+class DataItemType(type: ItemType = DUMMY) :
+    AbstractSingleEnumData<ItemType, DataItemType, DataItemType.Immutable>(type, key, DUMMY) {
     companion object {
         val key: Key<Value<ItemType>> = Key.builder()
             .type(object : TypeToken<Value<ItemType>>() {})
-            .id("type")
-            .name("Type")
+            .id("item_type")
+            .name("Item Type")
             .query(DataQuery.of("type"))
             .build()
     }
 
     override fun getContentVersion() = 1
     override fun asImmutable() = Immutable(value)
-    override fun copy() = DataType(value)
+    override fun copy() = DataItemType(value)
 
-    override fun from(container: DataContainer): Optional<DataType> {
+    override fun from(container: DataContainer): Optional<DataItemType> {
         return if (container[key.query].isPresent) {
             value = ItemType.valueOf(container.getString(key.query).get())
             Optional.of(this)
@@ -40,22 +40,22 @@ class DataType(type: ItemType = DUMMY) :
         }
     }
 
-    override fun fill(dataHolder: DataHolder, overlap: MergeFunction): Optional<DataType> {
-        value = overlap.merge(this, dataHolder[DataType::class.java].orElse(null)).value
+    override fun fill(dataHolder: DataHolder, overlap: MergeFunction): Optional<DataItemType> {
+        value = overlap.merge(this, dataHolder[DataItemType::class.java].orElse(null)).value
         return Optional.of(this)
     }
 
 
     class Immutable(type: ItemType = DUMMY) :
-        AbstractImmutableSingleEnumData<ItemType, Immutable, DataType>(type, DUMMY, key) {
+        AbstractImmutableSingleEnumData<ItemType, Immutable, DataItemType>(type, DUMMY, key) {
         override fun getContentVersion() = 1
-        override fun asMutable() = DataType((value))
+        override fun asMutable() = DataItemType((value))
     }
 
-    class Builder : AbstractDataBuilder<DataType>(DataType::class.java, 1),
-        DataManipulatorBuilder<DataType, Immutable> {
-        override fun create() = DataType()
-        override fun createFrom(dataHolder: DataHolder): Optional<DataType> = create().fill(dataHolder)
+    class Builder : AbstractDataBuilder<DataItemType>(DataItemType::class.java, 1),
+        DataManipulatorBuilder<DataItemType, Immutable> {
+        override fun create() = DataItemType()
+        override fun createFrom(dataHolder: DataHolder): Optional<DataItemType> = create().fill(dataHolder)
         override fun buildContent(container: DataView) = create().from(container.copy())
     }
 }

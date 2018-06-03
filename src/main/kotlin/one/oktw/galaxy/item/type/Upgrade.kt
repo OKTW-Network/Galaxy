@@ -1,6 +1,6 @@
 package one.oktw.galaxy.item.type
 
-import one.oktw.galaxy.data.DataType
+import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUpgrade
 import one.oktw.galaxy.item.enums.ItemType
 import one.oktw.galaxy.item.enums.ItemType.UPGRADE
@@ -29,14 +29,14 @@ data class Upgrade(val type: UpgradeType = BASE, var level: Int = 0) : Item {
 
         return ItemStack.builder()
             .itemType(ENCHANTED_BOOK)
-            .itemData(DataType(UPGRADE))
+            .itemData(DataItemType(UPGRADE))
             .itemData(DataUpgrade(type, level))
             .add(DISPLAY_NAME, Text.of(BOLD, color, "$name Upgrade Lv.$level"))
             .build()
     }
 
     override fun test(item: ItemStack): Boolean {
-        return item[DataType.key].orElse(null) == UPGRADE &&
+        return item[DataItemType.key].orElse(null) == UPGRADE &&
                 item[DataUpgrade::class.java].orElse(null).let { it?.type == type && it.level == level }
     }
 

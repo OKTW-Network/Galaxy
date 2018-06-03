@@ -1,6 +1,6 @@
 package one.oktw.galaxy.item.type
 
-import one.oktw.galaxy.data.DataType
+import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.item.ItemUtil.Companion.removeCoolDown
 import one.oktw.galaxy.item.ItemUtil.Companion.removeDamage
 import one.oktw.galaxy.item.enums.ItemType.MATERIAL
@@ -20,7 +20,7 @@ data class Material(val type: MaterialType = DUMMY) : Item {
 
     override fun createItemStack(): ItemStack = ItemStack.builder()
         .itemType(STONE_SWORD)
-        .itemData(DataType(MATERIAL))
+        .itemData(DataItemType(MATERIAL))
         .add(DISPLAY_NAME, Text.of(BOLD, WHITE, type.name))
         .add(UNBREAKABLE, true)
         .add(HIDE_UNBREAKABLE, true)
@@ -33,7 +33,7 @@ data class Material(val type: MaterialType = DUMMY) : Item {
         .let(::removeCoolDown)
 
     override fun test(item: ItemStack): Boolean {
-        return item[DataType.key].orElse(null) == MATERIAL && item[ITEM_DURABILITY].orElse(null) == type.id
+        return item[DataItemType.key].orElse(null) == MATERIAL && item[ITEM_DURABILITY].orElse(null) == type.id
     }
 
     override fun displayedItems() = listOfNotNull(createItemStack().createSnapshot())

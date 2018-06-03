@@ -3,7 +3,7 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.data.DataType
+import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.AccessLevel.DENY
 import one.oktw.galaxy.galaxy.data.Galaxy
@@ -62,7 +62,7 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
-        if (item[DataType.key].orElse(null) == BUTTON && !isButton(uuid)) {
+        if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
             event.isCancelled = true
 
             // TODO async

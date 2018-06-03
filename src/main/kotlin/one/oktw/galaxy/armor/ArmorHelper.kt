@@ -7,7 +7,7 @@ import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.armor.ArmorEffect.Companion.offerEffect
 import one.oktw.galaxy.armor.ArmorEffect.Companion.removeEffect
 import one.oktw.galaxy.data.DataEnable
-import one.oktw.galaxy.data.DataType
+import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.item.enums.ItemType.ARMOR
 import one.oktw.galaxy.item.enums.UpgradeType.*
@@ -142,7 +142,7 @@ class ArmorHelper {
         private fun getArmor(itemType: ItemType): ItemStack {
             val item = ItemStack.builder()
                 .itemType(itemType)
-                .itemData(DataType.Immutable(ARMOR))
+                .itemData(DataItemType.Immutable(ARMOR))
                 .itemData(DataUUID.Immutable())
                 .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, "科技裝甲"))
                 .add(UNBREAKABLE, true)

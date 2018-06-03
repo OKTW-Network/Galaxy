@@ -34,7 +34,6 @@ import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
 class ChunkLoader(val entity: Entity) : GUI() {
-
     private val uuid = entity[DataUUID.key].orElse(null)
     private lateinit var chunkLoader: ChunkLoader
     private lateinit var upgradeGUI: GUI

@@ -16,7 +16,6 @@ import org.spongepowered.api.text.format.TextColors.YELLOW
 import org.spongepowered.api.text.format.TextStyles.BOLD
 
 @BsonDiscriminator
-
 data class Tool(val type: ToolType = DUMMY) : Item {
     //Todo check player lang
     val lang = LanguageService()

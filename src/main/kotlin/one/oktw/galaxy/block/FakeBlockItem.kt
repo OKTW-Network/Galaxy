@@ -1,5 +1,6 @@
 package one.oktw.galaxy.block
 
+import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.data.DataType
 import one.oktw.galaxy.item.enums.ItemType.BLOCK
 import one.oktw.galaxy.item.type.Item
@@ -13,6 +14,8 @@ data class FakeBlockItem(private val block: FakeBlocks) : Item {
 
     override fun createItemStack(): ItemStack = ItemStack.builder()
         .itemType(WOODEN_SWORD)
+        .itemData(DataType(BLOCK))
+        .itemData(DataBlockType(block))
         .add(UNBREAKABLE, true)
         .add(ITEM_DURABILITY, block.id)
         .build()

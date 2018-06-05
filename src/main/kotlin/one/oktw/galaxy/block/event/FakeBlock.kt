@@ -1,5 +1,7 @@
 package one.oktw.galaxy.block.event
 
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.WorldServer
 import one.oktw.galaxy.block.FakeBlockItem
 import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.data.DataItemType
@@ -43,7 +45,13 @@ class FakeBlock {
 
     @Listener
     fun onBreakBlock(event: InteractBlockEvent.Primary) {
-        if (event.targetBlock[DataBlockType.key].isPresent) event.isCancelled = true
+        if (event.targetBlock[DataBlockType.key].isPresent) {
+            event.isCancelled = true
+
+            event.targetBlock.location.ifPresent {
+                (it.extent as WorldServer).playerChunkMap.markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))
+            }
+        }
     }
 
     @Listener

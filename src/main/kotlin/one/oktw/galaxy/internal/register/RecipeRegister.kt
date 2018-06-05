@@ -1,6 +1,8 @@
 package one.oktw.galaxy.internal.register
 
 import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.block.FakeBlockItem
+import one.oktw.galaxy.block.FakeBlocks.HT_CRAFTING_TABLE
 import one.oktw.galaxy.item.enums.ToolType.WRENCH
 import one.oktw.galaxy.item.enums.UpgradeType.*
 import one.oktw.galaxy.item.type.Tool
@@ -32,7 +34,7 @@ class RecipeRegister {
                     .build("wrench", main)
             )
 
-            // Advance Crafting System
+            // High Tech Crafting Table
             register(
                 ShapedCraftingRecipe.builder().aisle("rdl", "ici", "lor")
                     .where('r', of(REDSTONE))
@@ -41,7 +43,7 @@ class RecipeRegister {
                     .where('i', of(IRON_INGOT))
                     .where('c', of(CRAFTING_TABLE))
                     .where('o', of(OBSIDIAN))
-                    .result(ItemStack.of(CRAFTING_TABLE, 1)) // TODO custom block
+                    .result(FakeBlockItem(HT_CRAFTING_TABLE).createItemStack())
                     .build("advance_crafting_system", main)
             )
 

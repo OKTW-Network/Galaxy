@@ -22,6 +22,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.block.InteractBlockEvent
 import org.spongepowered.api.event.filter.cause.First
+import org.spongepowered.api.event.world.ExplosionEvent
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.util.AABB
 import org.spongepowered.api.world.Location
@@ -52,6 +53,11 @@ class FakeBlock {
                 (it.extent as WorldServer).playerChunkMap.markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))
             }
         }
+    }
+
+    @Listener
+    fun onExplosion(event: ExplosionEvent.Detonate) {
+        event.affectedLocations.removeIf { it[DataBlockType::class.java].isPresent }
     }
 
     @Listener

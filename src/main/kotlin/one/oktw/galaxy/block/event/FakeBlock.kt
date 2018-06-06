@@ -63,7 +63,7 @@ class FakeBlock {
     @Listener
     fun onUseWrench(event: InteractBlockEvent.Secondary, @First player: Player) {
         if (player[IS_SNEAKING].orElse(false) == false) return
-        if (player.getItemInHand(event.handType).orElse(null)?.run(Tool(WRENCH)::test) == false) return
+        if (player.getItemInHand(event.handType).orElse(null)?.run(Tool(WRENCH)::test) != true) return
 
         val location = event.targetBlock.location.orElse(null) ?: return
         val entity = location.createEntity(EntityTypes.ITEM)

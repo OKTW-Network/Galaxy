@@ -36,7 +36,7 @@ data class Tool(val type: ToolType = DUMMY) : Item {
         .let(::removeCoolDown)
 
     override fun test(item: ItemStack): Boolean {
-        return item[DataItemType.key].orElse(null) == type && item[ITEM_DURABILITY].orElse(null) == type.id
+        return item[DataItemType.key].orElse(null) == TOOL && item[ITEM_DURABILITY].orElse(null) == type.id
     }
 
     override fun displayedItems() = listOfNotNull(createItemStack().createSnapshot())

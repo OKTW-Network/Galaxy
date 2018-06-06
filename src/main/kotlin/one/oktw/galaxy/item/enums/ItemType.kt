@@ -5,6 +5,7 @@ enum class ItemType {
     UPGRADE,
     ARMOR,
     BUTTON,
+    BLOCK,
 
     //Gun
     PISTOL,

@@ -2,6 +2,7 @@ package one.oktw.galaxy.internal.register
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.armor.event.Armor
+import one.oktw.galaxy.block.event.FakeBlock
 import one.oktw.galaxy.economy.event.EconomyEvent
 import one.oktw.galaxy.item.event.Gun
 import one.oktw.galaxy.item.event.ItemProtect
@@ -21,6 +22,7 @@ class EventRegister {
             registerListeners(main, ItemProtect())
             registerListeners(main, Armor())
             registerListeners(main, EconomyEvent())
+            registerListeners(main, FakeBlock())
         }
     }
 }

@@ -42,5 +42,12 @@ class DataRegister {
             .dataClass(DataItemType::class.java).immutableClass(DataItemType.Immutable::class.java)
             .builder(DataItemType.Builder())
             .buildAndRegister(plugin)
+
+        // Fake Block Type
+        DataRegistration.builder()
+            .dataName("BlockType").manipulatorId("block_type")
+            .dataClass(DataBlockType::class.java).immutableClass(DataBlockType.Immutable::class.java)
+            .builder(DataBlockType.Builder())
+            .buildAndRegister(plugin)
     }
 }

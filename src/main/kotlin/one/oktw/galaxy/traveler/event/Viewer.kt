@@ -1,5 +1,7 @@
 package one.oktw.galaxy.traveler.event
 
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.WorldServer
 import one.oktw.galaxy.traveler.ViewerHelper
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.living.player.Player
@@ -46,12 +48,25 @@ class Viewer {
 
     @Listener(order = Order.FIRST)
     fun onChangeBlock(event: ChangeBlockEvent, @First player: Player) {
-        if (ViewerHelper.isViewer(player.uniqueId)) event.isCancelled = true
+        if (ViewerHelper.isViewer(player.uniqueId)) {
+            event.isCancelled = true
+            event.transactions.forEach {
+                it.original.location.ifPresent {
+                    (it.extent as WorldServer).playerChunkMap
+                        .markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))
+                }
+            }
+        }
     }
 
     @Listener(order = Order.FIRST)
     fun onInteractBlock(event: InteractBlockEvent, @First player: Player) {
-        if (ViewerHelper.isViewer(player.uniqueId)) event.isCancelled = true
+        if (ViewerHelper.isViewer(player.uniqueId)) {
+            event.isCancelled = true
+            event.targetBlock.location.ifPresent {
+                (it.extent as WorldServer).playerChunkMap.markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))
+            }
+        }
     }
 
     @Listener(order = Order.FIRST)

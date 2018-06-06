@@ -101,7 +101,7 @@ class FakeBlock {
     }
 
     private fun playPlaceSound(player: Player) {
-        player.playSound(BLOCK_STONE_PLACE, BLOCK, player.position, 1.0)
+        player.world.playSound(BLOCK_STONE_PLACE, BLOCK, player.position, 1.0)
     }
 
     private fun consumeItem(player: Player, hand: HandType) {

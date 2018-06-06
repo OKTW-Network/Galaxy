@@ -3,12 +3,12 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.galaxy.data.Galaxy
-import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
@@ -28,12 +28,12 @@ import org.spongepowered.api.text.format.TextStyles
 import java.util.Arrays.asList
 
 class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = false) : PageGUI() {
+    // Todo get player lang
+    private val lang = languageService.getDefaultLanguage()
     override val token = "BrowserMember-${galaxy.uuid}${if (manage) "-manage" else ""}"
-    //Todo check player lang
-    val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang.getString("UI.BrowserMember.Title"))))
+        .property(InventoryTitle.of(Text.of(lang["UI.BrowserMember.Title"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
     override val pages = galaxy.members.asSequence()
@@ -42,8 +42,8 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
         }
         .map {
             val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(it.uuid!!).get()
-            val status = if (user.isOnline) Text.of(GREEN, lang.getString("UI.BrowserMember.Details.Online"))
-                else Text.of(RED, lang.getString("UI.BrowserMember.Details.Offline"))
+            val status = if (user.isOnline) Text.of(GREEN, lang["UI.BrowserMember.Details.Online"])
+            else Text.of(RED, lang["UI.BrowserMember.Details.Offline"])
             val location = user.player.orElse(null)
                 ?.let { travelerManager.getTraveler(it).position }
                 ?.run {
@@ -72,8 +72,12 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
                 .add(
                     Keys.ITEM_LORE,
                     asList(
-                        Text.of(YELLOW, "${lang.getString("UI.BrowserMember.Details.Status")}: ", if (location != null) status.concat(location) else status),
-                        Text.of(YELLOW, "${lang.getString("UI.BrowserMember.Details.Group")}: ", RESET, it.group.toString())
+                        Text.of(
+                            YELLOW,
+                            "${lang["UI.BrowserMember.Details.Status"]}: ",
+                            if (location != null) status.concat(location) else status
+                        ),
+                        Text.of(YELLOW, "${lang["UI.BrowserMember.Details.Group"]}: ", RESET, it.group.toString())
                     )
                 )
                 .build()

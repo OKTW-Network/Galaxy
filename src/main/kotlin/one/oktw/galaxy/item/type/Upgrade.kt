@@ -1,8 +1,8 @@
 package one.oktw.galaxy.item.type
 
+import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUpgrade
-import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ItemType
 import one.oktw.galaxy.item.enums.ItemType.UPGRADE
 import one.oktw.galaxy.item.enums.UpgradeType
@@ -21,9 +21,8 @@ data class Upgrade(val type: UpgradeType = BASE, var level: Int = 0) : Item {
     override val itemType: ItemType = UPGRADE
 
     override fun createItemStack(): ItemStack {
-        //Todo check player lang
-        val lang = LanguageService()
-        val name = lang.getString("item.Upgrade.${type.name}")
+        val lang = languageService.getDefaultLanguage() // TODO set language
+        val name = lang["item.Upgrade.${type.name}"]
         val color = when (type) {
         // TODO more color
             RANGE -> TextColors.GREEN
@@ -34,7 +33,7 @@ data class Upgrade(val type: UpgradeType = BASE, var level: Int = 0) : Item {
             .itemType(ENCHANTED_BOOK)
             .itemData(DataItemType(UPGRADE))
             .itemData(DataUpgrade(type, level))
-            .add(DISPLAY_NAME, Text.of(BOLD, color, "${lang.getString("item.Upgrade.Item")} Lv.$level".format(name)))
+            .add(DISPLAY_NAME, Text.of(BOLD, color, "${lang["item.Upgrade.Item"]} Lv.$level".format(name)))
             .build()
     }
 

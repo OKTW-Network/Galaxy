@@ -13,6 +13,7 @@ import one.oktw.galaxy.internal.register.EventRegister
 import one.oktw.galaxy.internal.register.RecipeRegister
 import one.oktw.galaxy.traveler.TravelerManager
 import org.slf4j.Logger
+import org.spongepowered.api.config.ConfigDir
 import org.spongepowered.api.config.DefaultConfig
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.GameRegistryEvent
@@ -21,7 +22,6 @@ import org.spongepowered.api.event.game.state.*
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.world.gen.WorldGeneratorModifier
-import org.spongepowered.api.config.ConfigDir
 import java.nio.file.Path
 
 @Suppress("UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
@@ -38,6 +38,8 @@ class Main {
         lateinit var galaxyManager: GalaxyManager
             private set
         lateinit var travelerManager: TravelerManager
+            private set
+        lateinit var languageService: LanguageService
             private set
     }
 
@@ -77,9 +79,8 @@ class Main {
         DatabaseManager()
         galaxyManager = GalaxyManager()
         travelerManager = TravelerManager()
+        languageService = LanguageService()
         EventRegister()
-        logger.info("Init default languages...")
-        LanguageService()
         logger.info("Plugin initialized!")
     }
 

@@ -1,6 +1,6 @@
 package one.oktw.galaxy.command
 
-import one.oktw.galaxy.internal.LanguageService
+import one.oktw.galaxy.Main.Companion.languageService
 import org.spongepowered.api.block.BlockTypes.STANDING_SIGN
 import org.spongepowered.api.block.BlockTypes.WALL_SIGN
 import org.spongepowered.api.command.CommandResult
@@ -28,8 +28,7 @@ class Sign : CommandBase {
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src !is Player) return CommandResult.empty()
-        //Todo check player lang
-        val lang = LanguageService()
+        val lang = languageService.getDefaultLanguage() // Todo get player lang
 
         val blockRay = BlockRay.from(src)
             .distanceLimit(7.0)
@@ -44,20 +43,20 @@ class Sign : CommandBase {
             val lines = block[Keys.SIGN_LINES].orElse(ArrayList<Text>())
 
             if (line < 1 || line > 4) {
-                src.sendMessage(Text.of(TextColors.RED, lang.getString("command.Sign.line_invalid")))
+                src.sendMessage(Text.of(TextColors.RED, lang["command.Sign.line_invalid"]))
                 return CommandResult.empty()
             }
 
             if (text.toPlain().length > 16) {
-                src.sendMessage(Text.of(TextColors.RED, lang.getString("command.Sign.too_many_words")))
+                src.sendMessage(Text.of(TextColors.RED, lang["command.Sign.too_many_words"]))
                 return CommandResult.empty()
             }
 
             lines[line - 1] = text
             block.offer(Keys.SIGN_LINES, lines)
-            src.sendMessage(Text.of(TextColors.GREEN, lang.getString("command.Sign.success")))
+            src.sendMessage(Text.of(TextColors.GREEN, lang["command.Sign.success"]))
         } else {
-            src.sendMessage(Text.of(TextColors.RED, lang.getString("command.Sign.not_sign")))
+            src.sendMessage(Text.of(TextColors.RED, lang["command.Sign.not_sign"]))
         }
 
         return CommandResult.success()

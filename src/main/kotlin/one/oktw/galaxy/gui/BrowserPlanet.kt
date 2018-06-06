@@ -3,6 +3,7 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.AccessLevel.DENY
@@ -10,7 +11,6 @@ import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.galaxy.planet.data.extensions.checkPermission
 import one.oktw.galaxy.galaxy.planet.data.extensions.loadWorld
-import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ButtonType.PLANET_O
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import one.oktw.galaxy.item.type.Button
@@ -27,12 +27,12 @@ import org.spongepowered.api.text.format.TextStyles
 import java.util.Arrays.asList
 
 class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
+    // Todo get player lang
+    private val lang = languageService.getDefaultLanguage()
     override val token = "BrowserPlanet-${galaxy.uuid}"
-    //Todo check player lang
-    val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang.getString("UI.BrowserPlanet.Title"))))
+        .property(InventoryTitle.of(Text.of(lang["UI.BrowserPlanet.Title"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
     override val pages = galaxy.planets.asSequence()
@@ -44,8 +44,18 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
                 offer(
                     Keys.ITEM_LORE,
                     asList(
-                        Text.of(TextColors.AQUA, "${lang.getString("UI.BrowserPlanet.Details.Players")}: ", TextColors.RESET, 0), // TODO
-                        Text.of(TextColors.AQUA, "${lang.getString("UI.BrowserPlanet.Details.Security")}: ", TextColors.RESET, it.security.toString())
+                        Text.of(
+                            TextColors.AQUA,
+                            "${lang["UI.BrowserPlanet.Details.Players"]}: ",
+                            TextColors.RESET,
+                            0
+                        ), // TODO
+                        Text.of(
+                            TextColors.AQUA,
+                            "${lang["UI.BrowserPlanet.Details.Security"]}: ",
+                            TextColors.RESET,
+                            it.security.toString()
+                        )
                     )
                 )
             }

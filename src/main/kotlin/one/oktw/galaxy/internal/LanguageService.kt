@@ -24,7 +24,7 @@ class LanguageService {
         Paths.get(main.configDir.toString(), "lang").let { if (notExists(it)) createDirectory(it) }
 
         Locale.getAvailableLocales().forEach { locale: Locale ->
-            val asset = plugin.getAsset(locale.toLanguageTag()).orElse(null) ?: return@forEach
+            val asset = plugin.getAsset("lang/${locale.toLanguageTag()}.cfg").orElse(null) ?: return@forEach
 
             HoconConfigurationLoader.builder()
                 .setPath(Paths.get(main.configDir.toString(), "lang/${locale.toLanguageTag()}.cfg"))

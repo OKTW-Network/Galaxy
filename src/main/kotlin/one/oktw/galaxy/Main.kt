@@ -69,6 +69,7 @@ class Main {
 
     @Listener
     fun onPreInit(event: GamePreInitializationEvent) {
+        languageService = LanguageService()
         DataRegister()
         RecipeRegister()
     }
@@ -79,7 +80,6 @@ class Main {
         DatabaseManager()
         galaxyManager = GalaxyManager()
         travelerManager = TravelerManager()
-        languageService = LanguageService()
         EventRegister()
         logger.info("Plugin initialized!")
     }

@@ -1,11 +1,11 @@
 package one.oktw.galaxy.gui
 
+import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.enums.Group.ADMIN
 import one.oktw.galaxy.enums.Group.MEMBER
-import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.enums.ButtonType.MANAGER
 import one.oktw.galaxy.item.type.Button
@@ -24,10 +24,9 @@ import java.util.*
 
 class GroupSelect(private val callback: (Group) -> Unit) : GUI() {
     override val token = "GroupSelect-${UUID.randomUUID()}"
-    //Todo check player lang
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(LanguageService().getString("UI.GroupSelect.Title"))))
+        .property(InventoryTitle.of(Text.of(languageService.getDefaultLanguage()["UI.GroupSelect.Title"]))) // TODO get player language
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
     private val buttonID = Array(3) { UUID.randomUUID() }

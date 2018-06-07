@@ -1,35 +1,44 @@
 package one.oktw.galaxy.internal
 
 import ninja.leaping.configurate.ConfigurationNode
-import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader
-import ninja.leaping.configurate.loader.ConfigurationLoader
 import one.oktw.galaxy.Main.Companion.main
-import java.nio.file.Files
+import one.oktw.galaxy.internal.ConfigManager.Companion.config
+import java.nio.file.Files.createDirectory
+import java.nio.file.Files.notExists
 import java.nio.file.Paths
+import java.util.*
 
-class LanguageService(lang: String = "zh_TW") {
-    private val langBuild: ConfigurationLoader<CommentedConfigurationNode> = HoconConfigurationLoader.builder()
-        .setPath(Paths.get(main.configDir.toString(), "lang/$lang.cfg")).build()
-    private val rootNode: ConfigurationNode = langBuild.load()
+class LanguageService {
+    private val translationStorage = HashMap<String, ConfigurationNode>()
 
-    fun getString(key: String): String {
-        return rootNode.getNode(key).string ?: key
-    }
+    fun getDefaultLanguage() = Translation(Locale.forLanguageTag(config.getNode("language").string))
 
     init {
-        //Init Dir
-        if (Files.notExists(Paths.get(main.configDir.toString(), "lang/"))) Files.createDirectory(Paths.get(main.configDir.toString(), "lang/"))
-        //Init default languages
-        if (Files.notExists(Paths.get(main.configDir.toString(), "lang/zh_TW.cfg"))) {
-            main.plugin.getAsset("lang/zh_TW.cfg").get().copyToFile(Paths.get(main.configDir.toString(),"lang/zh_TW.cfg"))
+        // Init config
+        config.getNode("language").let { if (it.isVirtual) it.value = "zh-TW" }
+
+        //Init files
+        Paths.get(main.configDir.toString(), "lang").let { if (notExists(it)) createDirectory(it) }
+
+        Locale.getAvailableLocales().forEach { locale: Locale ->
+            val asset = main.plugin.getAsset("lang/${locale.toLanguageTag()}.cfg").orElse(null) ?: return@forEach
+
+            HoconConfigurationLoader.builder()
+                .setPath(Paths.get(main.configDir.toString(), "lang/${locale.toLanguageTag()}.cfg"))
+                .build().run {
+                    val node = if (canLoad()) load() else createEmptyNode()
+
+                    save(node.mergeValuesFrom(HoconConfigurationLoader.builder().setURL(asset.url).build().load()))
+
+                    translationStorage[locale.toLanguageTag()] = node
+                }
         }
-        if (Files.notExists(Paths.get(main.configDir.toString(), "lang/en_US.cfg"))) {
-            main.plugin.getAsset("lang/en_US.cfg").get().copyToFile(Paths.get(main.configDir.toString(),"lang/en_US.cfg"))
-        }
-        //Init other languages base on English
-        if (lang != "zh_TW" && lang != "en_US" && Files.notExists(Paths.get(main.configDir.toString(), "lang/$lang.cfg"))) {
-            main.plugin.getAsset("lang/en_US.cfg").get().copyToFile(Paths.get(main.configDir.toString(),"lang/$lang.cfg"))
+    }
+
+    inner class Translation(private val lang: Locale) {
+        operator fun get(key: String, default: String? = null): String {
+            return translationStorage[lang.toLanguageTag()]?.getNode(key)?.string ?: default ?: key
         }
     }
 }

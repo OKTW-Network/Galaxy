@@ -1,8 +1,8 @@
 package one.oktw.galaxy.block
 
+import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.data.DataItemType
-import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.ItemUtil.Companion.removeCoolDown
 import one.oktw.galaxy.item.ItemUtil.Companion.removeDamage
 import one.oktw.galaxy.item.enums.ItemType.BLOCK
@@ -21,7 +21,7 @@ data class FakeBlockItem(private val block: FakeBlocks) : Item {
         .itemType(WOODEN_SWORD)
         .itemData(DataItemType(BLOCK))
         .itemData(DataBlockType(block))
-        .add(DISPLAY_NAME, Text.of(BOLD, BLUE, LanguageService().getString("block.${block.name}")))
+        .add(DISPLAY_NAME, Text.of(BOLD, BLUE, languageService.getDefaultLanguage()["block.${block.name}"]))
         .add(UNBREAKABLE, true)
         .add(HIDE_UNBREAKABLE, true)
         .add(HIDE_MISCELLANEOUS, true)

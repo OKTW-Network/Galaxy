@@ -2,11 +2,11 @@ package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.Group.OWNER
-import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import one.oktw.galaxy.traveler.data.Traveler
 import org.spongepowered.api.Sponge
@@ -28,15 +28,15 @@ import java.util.*
 import java.util.Arrays.asList
 
 class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
+    // Todo get player language
+    private val lang = languageService.getDefaultLanguage()
+    private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
     override val token = "BrowserGalaxy-${UUID.randomUUID()}"
-    //Todo check player lang
-    val lang = LanguageService()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang.getString("UI.BrowserGalaxy.Title"))))
+        .property(InventoryTitle.of(Text.of(lang["UI.BrowserGalaxy.Title"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
-    private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
     override lateinit var pages: Sequence<List<List<ItemStack>>>
 
     init {
@@ -55,10 +55,30 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
                         .add(
                             ITEM_LORE,
                             asList(
-                                Text.of(TextColors.GREEN, "${lang.getString("UI.BrowserGalaxy.Details.Info")}: ", TextColors.RESET, it.info),
-                                Text.of(TextColors.GREEN, "${lang.getString("UI.BrowserGalaxy.Details.Owner")}: ", TextColors.RESET, owner.name),
-                                Text.of(TextColors.GREEN, "${lang.getString("UI.BrowserGalaxy.Details.Members")}: ", TextColors.RESET, it.members.size),
-                                Text.of(TextColors.GREEN, "${lang.getString("UI.BrowserGalaxy.Details.Planets")}: ", TextColors.RESET, it.planets.size)
+                                Text.of(
+                                    TextColors.GREEN,
+                                    "${lang["UI.BrowserGalaxy.Details.Info"]}: ",
+                                    TextColors.RESET,
+                                    it.info
+                                ),
+                                Text.of(
+                                    TextColors.GREEN,
+                                    "${lang["UI.BrowserGalaxy.Details.Owner"]}: ",
+                                    TextColors.RESET,
+                                    owner.name
+                                ),
+                                Text.of(
+                                    TextColors.GREEN,
+                                    "${lang["UI.BrowserGalaxy.Details.Members"]}: ",
+                                    TextColors.RESET,
+                                    it.members.size
+                                ),
+                                Text.of(
+                                    TextColors.GREEN,
+                                    "${lang["UI.BrowserGalaxy.Details.Planets"]}: ",
+                                    TextColors.RESET,
+                                    it.planets.size
+                                )
                             )
                         )
                         .build()

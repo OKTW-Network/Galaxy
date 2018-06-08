@@ -15,7 +15,7 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors.BLUE
 import org.spongepowered.api.text.format.TextStyles.BOLD
 
-data class FakeBlockItem(private val block: FakeBlocks) : Item {
+data class FakeBlockItem(private val block: CustomBlocks) : Item {
     override val itemType = BLOCK
 
     override fun createItemStack(): ItemStack = ItemStack.builder()
@@ -28,7 +28,7 @@ data class FakeBlockItem(private val block: FakeBlocks) : Item {
         .add(HIDE_MISCELLANEOUS, true)
         .add(HIDE_ATTRIBUTES, true)
         .add(HIDE_ENCHANTMENTS, true)
-        .add(ITEM_DURABILITY, block.id)
+        .add(ITEM_DURABILITY, block.id!!)
         .build()
         .let(::removeDamage)
         .let(::removeCoolDown)

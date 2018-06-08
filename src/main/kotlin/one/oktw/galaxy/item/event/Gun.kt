@@ -69,7 +69,7 @@ class Gun {
                 .copy()
                 .run(::doUpgrade)
 
-            if (checkOverheat(world, source, gun).await()) return@launch
+            if (checkOverheat(world, source, gun)) return@launch
 
             showActionBar(player)
 
@@ -157,20 +157,19 @@ class Gun {
                 COOLING -> gun.cooling += it.level * 2
                 THROUGH -> gun.through += it.level
                 HEAT -> gun.maxTemp += it.level * 5
-                else -> {
-                }
+                else -> Unit
             }
         }
     }
 
-    private fun checkOverheat(world: World, source: Vector3d, gun: Gun) = async {
-        if (CoolDown.getHeat(gun).overheated) return@async true
+    private fun checkOverheat(world: World, source: Vector3d, gun: Gun): Boolean {
+        if (CoolDown.getHeat(gun).overheated) return true
 
         if (CoolDown.heating(gun).overheated) {
             world.playSound(SoundType.of("gun.overheat"), SoundCategories.PLAYER, source, 1.0)
         }
 
-        return@async false
+        return false
     }
 
     private fun getTarget(world: World, source: Vector3d, direction: Vector3d, range: Double) = async {

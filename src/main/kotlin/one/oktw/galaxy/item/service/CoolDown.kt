@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap
 class CoolDown {
     companion object {
         private val coolDown = ConcurrentHashMap<Overheat, Heat>()
-        private val actionBar = HashMap<Player, Pair<Overheat, Overheat?>>()
+        private val actionBar = ConcurrentHashMap<Player, Pair<Overheat, Overheat?>>()
 
         init {
             Task.builder()

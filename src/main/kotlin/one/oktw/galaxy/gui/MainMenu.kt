@@ -21,7 +21,7 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-class MainMenu(val player: Player) : GUI() {
+class MainMenu(private val player: Player) : GUI() {
     // Todo get player lang
     private val lang = languageService.getDefaultLanguage()
     override val token = "MainMenu-${player.uniqueId}"

@@ -1,8 +1,11 @@
 package one.oktw.galaxy.block.event
 
+import kotlinx.coroutines.experimental.launch
+import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.block.CustomBlocks.*
 import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.gui.GUIHelper
+import one.oktw.galaxy.gui.machine.ECS
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
@@ -15,10 +18,13 @@ class BlockGUI {
         if (player[Keys.IS_SNEAKING].orElse(false) == true) return
 
         val type = event.targetBlock[DataBlockType.key].orElse(null) ?: return
+        val worldUUID = player.world.uniqueId
 
         when (type) {
             DUMMY -> Unit
-            OXY_MACHINE -> GUIHelper.open(player) { TODO() }
+            OXY_MACHINE -> launch {
+                galaxyManager.getPlanetFromWorld(worldUUID).await()?.let { GUIHelper.open(player) { ECS(it) } }
+            }
             HT_CRAFTING_TABLE -> GUIHelper.open(player) { TODO() }
         }
     }

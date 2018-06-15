@@ -1,7 +1,7 @@
 package one.oktw.galaxy.galaxy.planet.gen.populator
 
 import one.oktw.galaxy.Main
-import one.oktw.galaxy.block.CustomBlocks.OXY_MACHINE
+import one.oktw.galaxy.block.CustomBlocks.ECS
 import one.oktw.galaxy.data.DataBlockType
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
@@ -113,7 +113,7 @@ class Spawn : Populator {
         volume.setBlockType(start, BlockTypes.BEACON)
         launch(serverThread) {
             galaxyManager.get(world).await()?.getPlanet(world)?.uuid?.apply {
-                volume.offer(start, DataBlockType(OXY_MACHINE))
+                volume.offer(start, DataBlockType(ECS))
                 volume.offer(start, DataUUID(this))
                 volume.addScheduledUpdate(start, 0, 0)
             }

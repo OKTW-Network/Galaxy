@@ -22,7 +22,7 @@ class BlockGUI {
 
         when (type) {
             DUMMY -> Unit
-            OXY_MACHINE -> launch {
+            ECS -> launch {
                 galaxyManager.getPlanetFromWorld(worldUUID).await()?.let { GUIHelper.open(player) { ECS(it) } }
             }
             HT_CRAFTING_TABLE -> GUIHelper.open(player) { TODO() }

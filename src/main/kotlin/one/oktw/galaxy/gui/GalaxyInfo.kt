@@ -90,6 +90,8 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
             }
         }
 
+        GUIHelper.fillEmptySlot(inventory)
+
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
     }

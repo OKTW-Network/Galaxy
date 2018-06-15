@@ -63,6 +63,8 @@ class MainMenu(private val player: Player) : GUI() {
             }
             .let { inventory.set(4, 0, it) }
 
+        GUIHelper.fillEmptySlot(inventory)
+
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
     }

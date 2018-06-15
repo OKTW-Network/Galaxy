@@ -3,8 +3,14 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.serverThread
+import one.oktw.galaxy.item.enums.ButtonType.GUI_CENTER
+import one.oktw.galaxy.item.type.Button
+import org.spongepowered.api.data.key.Keys.DISPLAY_NAME
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
+import org.spongepowered.api.item.inventory.Inventory
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult
+import org.spongepowered.api.text.Text
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedDeque
 
@@ -47,6 +53,14 @@ class GUIHelper {
         fun closeAll(player: Player) {
             launch(serverThread) { player.closeInventory() }
             sync -= player
+        }
+
+        fun fillEmptySlot(inventory: Inventory) {
+            val item = Button(GUI_CENTER).createItemStack().apply { offer(DISPLAY_NAME, Text.of("")) }
+
+            while (inventory.size() < inventory.capacity()) {
+                if (inventory.offer(item.copy()).type != InventoryTransactionResult.Type.SUCCESS) break
+            }
         }
 
         private fun closeEvent(event: InteractInventoryEvent.Close) {

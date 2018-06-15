@@ -66,6 +66,8 @@ class ChunkLoader(private val entity: Entity) : GUI() {
             }
             .let { inventory.set(3, 0, it) }
 
+        GUIHelper.fillEmptySlot(inventory)
+
         // register event
         registerEvent(InteractInventoryEvent.Close::class.java, this::closeEventListener)
         registerEvent(ClickInventoryEvent::class.java, this::clickEventListener)

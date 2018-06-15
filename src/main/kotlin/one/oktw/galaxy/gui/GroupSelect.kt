@@ -49,6 +49,8 @@ class GroupSelect(private val callback: (Group) -> Unit) : GUI() {
             }
             .let { inventory.set(3, 0, it) }
 
+        GUIHelper.fillEmptySlot(inventory)
+
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
     }

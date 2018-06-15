@@ -48,6 +48,8 @@ class Confirm(content: Text, private val callback: (Boolean) -> Unit) : GUI() {
             }
             .let { inventory.set(3, 0, it) }
 
+        GUIHelper.fillEmptySlot(inventory)
+
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
     }

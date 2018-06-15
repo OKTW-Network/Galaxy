@@ -83,6 +83,8 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
             }
             .let { inventory.set(7, 1, it) }
 
+        GUIHelper.fillEmptySlot(inventory)
+
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
     }

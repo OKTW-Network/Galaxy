@@ -31,6 +31,7 @@ abstract class PageGUI : GUI() {
         inventory.clear()
         pages.elementAt(pageNumber).forEachIndexed(this@PageGUI::offerLine)
         offerButton(pageNumber != 0, pages.drop(pageNumber + 1).firstOrNull() != null)
+        GUIHelper.fillEmptySlot(inventory)
     }
 
     protected fun isButton(uuid: UUID) = buttonID.contains(uuid)

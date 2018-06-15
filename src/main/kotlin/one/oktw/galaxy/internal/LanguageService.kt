@@ -37,8 +37,12 @@ class LanguageService {
     }
 
     inner class Translation(private val lang: Locale) {
-        operator fun get(key: String, default: String? = null): String {
-            return translationStorage[lang.toLanguageTag()]?.getNode(key)?.string ?: default ?: key
+        operator fun get(key: String, default: String? = null) = get(key.split('.'), default)
+
+        operator fun get(key: List<String>, default: String? = null) = get(key.toTypedArray(), default)
+
+        operator fun get(key: Array<String>, default: String? = null): String {
+            return translationStorage[lang.toLanguageTag()]?.getNode(*key)?.getString(default) ?: key.joinToString(".")
         }
     }
 }

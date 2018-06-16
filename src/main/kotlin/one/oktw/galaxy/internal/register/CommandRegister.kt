@@ -14,6 +14,7 @@ class CommandRegister {
             register(main, TPX().spec, "tpx")
             register(main, Sign().spec, "sign")
             register(main, Gun().spec, "gun")
+            register(main, Sword().spec, "sword")
         }
     }
 }

@@ -11,5 +11,6 @@ enum class ItemType {
     PISTOL,
     SNIPER,
     TOOL,
-    MATERIAL
+    MATERIAL,
+    SWORD
 }

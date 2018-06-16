@@ -1,6 +1,8 @@
 package one.oktw.galaxy
 
 import com.google.inject.Inject
+import kotlinx.coroutines.experimental.CloseableCoroutineDispatcher
+import kotlinx.coroutines.experimental.asCoroutineDispatcher
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
 import one.oktw.galaxy.galaxy.GalaxyManager
@@ -13,6 +15,7 @@ import one.oktw.galaxy.internal.register.EventRegister
 import one.oktw.galaxy.internal.register.RecipeRegister
 import one.oktw.galaxy.traveler.TravelerManager
 import org.slf4j.Logger
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.config.ConfigDir
 import org.spongepowered.api.config.DefaultConfig
 import org.spongepowered.api.event.Listener
@@ -34,6 +37,8 @@ import java.nio.file.Path
 class Main {
     companion object {
         lateinit var main: Main
+            private set
+        lateinit var serverThread: CloseableCoroutineDispatcher
             private set
         lateinit var galaxyManager: GalaxyManager
             private set
@@ -69,6 +74,7 @@ class Main {
 
     @Listener
     fun onPreInit(event: GamePreInitializationEvent) {
+        serverThread = Sponge.getScheduler().createSyncExecutor(this).asCoroutineDispatcher()
         languageService = LanguageService()
         DataRegister()
         RecipeRegister()

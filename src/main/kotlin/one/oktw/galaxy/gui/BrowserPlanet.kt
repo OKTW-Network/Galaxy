@@ -1,9 +1,11 @@
 package one.oktw.galaxy.gui
 
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.AccessLevel.DENY
@@ -78,12 +80,13 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
         if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
             event.isCancelled = true
 
-            // TODO async
-            runBlocking {
-                val planet = galaxyManager.getPlanet(uuid).await() ?: return@runBlocking
+            launch {
+                val planet = galaxyManager.getPlanet(uuid).await() ?: return@launch
 
                 if (planet.checkPermission(player) != DENY) {
-                    TeleportHelper.teleport(player, planet.loadWorld().get().spawnLocation)
+                    withContext(serverThread) {
+                        TeleportHelper.teleport(player, planet.loadWorld().get().spawnLocation)
+                    }
                     GUIHelper.closeAll(player)
                 }
             }

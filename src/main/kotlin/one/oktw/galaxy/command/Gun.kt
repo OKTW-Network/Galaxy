@@ -89,6 +89,7 @@ class Gun : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
                 val traveler = travelerManager.getTraveler(src)
+                traveler.item.removeAt(args.getOne<Int>("Gun").get())
 
                 traveler.save()
             }

@@ -98,11 +98,7 @@ class ChunkLoader(val entity: Entity) : GUI() {
 
                     chunkLoader.upgrade = it as ArrayList<Upgrade>
 
-                    if (newLevel != originLevel) {
-                        launch { chunkLoaderManager.updateChunkLoader(chunkLoader, true) }
-                    } else {
-                        launch { chunkLoaderManager.updateChunkLoader(chunkLoader) }
-                    }
+                    chunkLoaderManager.updateChunkLoader(chunkLoader, newLevel != originLevel)
                 }
         }
     }

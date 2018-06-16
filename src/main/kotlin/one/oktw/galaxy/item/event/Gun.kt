@@ -7,7 +7,7 @@ import kotlinx.coroutines.experimental.launch
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.EntityDamageSource
-import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataUUID
@@ -42,7 +42,6 @@ import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
 import org.spongepowered.api.item.ItemTypes.DIAMOND_SWORD
 import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.util.blockray.BlockRay
 import org.spongepowered.api.world.World
 import org.spongepowered.api.world.extent.EntityUniverse.EntityHit
@@ -85,14 +84,7 @@ class Gun {
                 if (!target.isEmpty()) target.first().intersection.distance(source) else gun.range
             ).await()
 
-            if (!target.isEmpty() && !wall.hasNext()) Task.builder().execute { _ ->
-                damageEntity(
-                    player,
-                    source,
-                    gun,
-                    target
-                )
-            }.submit(main)
+            if (!target.isEmpty() && !wall.hasNext()) damageEntity(player, source, gun, target)
 
             showTrajectory(
                 world, source, when {
@@ -110,9 +102,8 @@ class Gun {
     @Suppress("unused", "UNUSED_PARAMETER")
     fun onChangeDataHolder(event: ChangeDataHolderEvent.ValueChange, @Getter("getTargetHolder") @Has(SneakingData::class) player: Player) {
         player.getItemInHand(MAIN_HAND).filter { it[DataEnable.key].isPresent }.ifPresent {
-            val sneak: Boolean =
-                event.endResult.successfulData.firstOrNull { it.key == IS_SNEAKING }?.get() as Boolean?
-                        ?: player[IS_SNEAKING].get()
+            val sneak: Boolean = event.endResult.successfulData.firstOrNull { it.key == IS_SNEAKING }?.get() as Boolean?
+                    ?: player[IS_SNEAKING].get()
             if (it[DataEnable.key].get() != sneak) {
                 player.setItemInHand(MAIN_HAND, toggleScope(it))
             }
@@ -157,8 +148,7 @@ class Gun {
                 COOLING -> gun.cooling += it.level * 2
                 THROUGH -> gun.through += it.level
                 HEAT -> gun.maxTemp += it.level * 5
-                else -> {
-                }
+                else -> Unit
             }
         }
     }
@@ -174,15 +164,12 @@ class Gun {
     }
 
     private fun getTarget(world: World, source: Vector3d, direction: Vector3d, range: Double) = async {
-        world.getIntersectingEntities(
-            source,
-            direction,
-            range,
-            { it.entity is Living && it.entity !is Player && it.entity !is ArmorStand && (it.entity as EntityLivingBase).isEntityAlive }
-        )
+        world.getIntersectingEntities(source, direction, range) {
+            it.entity is Living && it.entity !is Player && it.entity !is ArmorStand && (it.entity as EntityLivingBase).isEntityAlive
+        }
     }
 
-    private fun getWall(world: World, source: Vector3d, direction: Vector3d, range: Double) = async {
+    private fun getWall(world: World, source: Vector3d, direction: Vector3d, range: Double) = async(serverThread) {
         BlockRay.from(world, source)
             .direction(direction)
             .distanceLimit(range)
@@ -210,10 +197,16 @@ class Gun {
             .forEach {
                 val entity = it.entity as Living
 
-                val damageSource = EntityDamageSource("player", player as EntityPlayer).setProjectile() as DamageSource
-                (entity as EntityLivingBase).hurtResistantTime = 0
-                entity.damage(gun.damage, damageSource)
-                gun.damage *= 0.9
+                launch(serverThread) {
+                    (entity as EntityLivingBase).hurtResistantTime = 0
+
+                    entity.damage(
+                        gun.damage,
+                        EntityDamageSource("player", player as EntityPlayer).setProjectile() as DamageSource
+                    )
+
+                    gun.damage *= 0.9
+                }
 
                 if ((entity as EntityLivingBase).isEntityAlive) {
                     player.playSound(
@@ -242,7 +235,6 @@ class Gun {
             else -> 10.0
         }
         var pos = source
-//                .add(line.div(interval / 4))
 
         for (i in 0..interval.roundToInt()) {
             world.spawnParticles(

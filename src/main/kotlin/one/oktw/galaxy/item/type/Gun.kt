@@ -27,8 +27,8 @@ import java.util.*
  * @property itemType Item type
  * @property style Gun style
  * @property maxTemp Max temp
- * @property heat heat pre use
- * @property cooling cooling pre tick
+ * @property heat heat per use
+ * @property cooling cooling per tick
  * @property range Gun range
  * @property damage Gun Damage
  * @property through Max damage entity number

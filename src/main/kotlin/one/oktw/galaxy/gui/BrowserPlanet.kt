@@ -84,10 +84,10 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
                 val planet = galaxyManager.getPlanet(uuid).await() ?: return@launch
 
                 if (planet.checkPermission(player) != DENY) {
+                    GUIHelper.closeAll(player)
                     withContext(serverThread) {
                         TeleportHelper.teleport(player, planet.loadWorld().get().spawnLocation)
                     }
-                    GUIHelper.closeAll(player)
                 }
             }
         }

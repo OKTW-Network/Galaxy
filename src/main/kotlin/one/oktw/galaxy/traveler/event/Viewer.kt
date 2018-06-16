@@ -24,7 +24,6 @@ import java.util.Arrays.asList
 
 @Suppress("unused")
 class Viewer {
-
     @Listener(order = Order.FIRST)
     fun onTarget(event: SetAITargetEvent, @Getter("getTarget") player: Player) {
         if (ViewerHelper.isViewer(player.uniqueId)) event.isCancelled = true
@@ -37,11 +36,7 @@ class Viewer {
 
     @Listener(order = Order.FIRST)
     fun onSpawnEntity(event: SpawnEntityEvent) {
-        val source = event.cause.allOf(Player::class.java).any {
-            ViewerHelper.isViewer(
-                it.uniqueId
-            )
-        }
+        val source = event.cause.allOf(Player::class.java).any { ViewerHelper.isViewer(it.uniqueId) }
 
         if (source) event.isCancelled = true
     }
@@ -72,11 +67,7 @@ class Viewer {
     @Listener(order = Order.FIRST)
     fun onInteractEntity(event: InteractEntityEvent, @Getter("getTargetEntity") entity: Entity) {
         val target = entity is Player && ViewerHelper.isViewer(entity.uniqueId)
-        val source = event.cause.allOf(Player::class.java).any {
-            ViewerHelper.isViewer(
-                it.uniqueId
-            )
-        }
+        val source = event.cause.allOf(Player::class.java).any { ViewerHelper.isViewer(it.uniqueId) }
 
         if (target || source) event.isCancelled = true
     }
@@ -116,22 +107,14 @@ class Viewer {
     @Listener(order = Order.FIRST)
     fun onDamageEntity(event: DamageEntityEvent) {
         val target = event.targetEntity is Player && ViewerHelper.isViewer(event.targetEntity.uniqueId)
-        val source = event.cause.allOf(Player::class.java).any {
-            ViewerHelper.isViewer(
-                it.uniqueId
-            )
-        }
+        val source = event.cause.allOf(Player::class.java).any { ViewerHelper.isViewer(it.uniqueId) }
 
         if (target || source) event.isCancelled = true
     }
 
     @Listener(order = Order.FIRST)
     fun onCollideEntity(event: CollideEntityEvent) {
-        val source = event.cause.filterIsInstance<Player>().any {
-            ViewerHelper.isViewer(
-                it.uniqueId
-            )
-        }
+        val source = event.cause.filterIsInstance<Player>().any { ViewerHelper.isViewer(it.uniqueId) }
 
         if (source) {
             event.isCancelled = true

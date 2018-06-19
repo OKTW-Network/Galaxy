@@ -3,7 +3,6 @@ package one.oktw.galaxy.command
 import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.item.enums.ItemType.SWORD
 import one.oktw.galaxy.item.enums.SwordType
-import one.oktw.galaxy.item.service.CoolDown
 import one.oktw.galaxy.item.type.Sword
 import one.oktw.galaxy.traveler.data.extensions.save
 import org.spongepowered.api.command.CommandResult
@@ -37,7 +36,7 @@ class Sword : CommandBase {
                 .arguments(
                     GenericArguments.integer(Text.of("Heat")),
                     GenericArguments.integer(Text.of("Max Heat")),
-                    GenericArguments.doubleNum(Text.of("AOE_damage")),
+                    GenericArguments.doubleNum(Text.of("AOE Damage")),
                     GenericArguments.doubleNum(Text.of("Damage")),
                     GenericArguments.enumValue(Text.of("Type"), SwordType::class.java),
                     GenericArguments.optional(GenericArguments.integer(Text.of("Cooling")), 1)
@@ -53,7 +52,7 @@ class Sword : CommandBase {
                     type = args.getOne<SwordType>("Type").get(),
                     maxTemp = args.getOne<Int>("Max Heat").get(),
                     cooling = args.getOne<Int>("Cooling").get(),
-                    AOE_damage = args.getOne<Double>("AOE_damage").get(),
+                    areaOfEffectDamage = args.getOne<Double>("AOE Damage").get(),
                     damage = args.getOne<Double>("Damage").get(),
                     heat = args.getOne<Int>("Heat").get()
                 )

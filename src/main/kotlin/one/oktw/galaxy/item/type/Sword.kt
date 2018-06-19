@@ -28,7 +28,7 @@ import java.util.*
  * @property maxTemp Max temp
  * @property heat heat per use
  * @property cooling cooling per tick
- * @property range Sword range
+ * @property areaOfEffectDamage Sword AOE Damage
  * @property damage Sword Damage
  * @property upgrade Upgrade list
  */
@@ -40,7 +40,7 @@ data class Sword(
     override var heat: Int = 0,
     override var cooling: Int = 1,
     var type: SwordType = MAGI,
-    var AOE_damage: Double = 0.0,
+    var areaOfEffectDamage: Double = 0.0,
     var damage: Double = 0.0,
     var upgrade: ArrayList<Upgrade> = ArrayList()
 ) : Item, Overheat {

@@ -6,9 +6,9 @@ import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.Group.OWNER
+import one.oktw.galaxy.galaxy.enums.Group.OWNER
+import one.oktw.galaxy.galaxy.traveler.data.Traveler
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
-import one.oktw.galaxy.traveler.data.Traveler
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys.*
 import org.spongepowered.api.data.type.SkullTypes
@@ -43,7 +43,7 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
         launch {
             pages = galaxyManager.run { traveler?.let { listGalaxy(it) } ?: listGalaxy() }.await()
                 .map {
-                    val owner = userStorage.get(it.members.first { it.group == OWNER }.uuid!!).get()
+                    val owner = userStorage.get(it.members.first { it.group == OWNER }.uuid).get()
 
                     ItemStack.builder()
                         .itemType(ItemTypes.SKULL)
@@ -102,7 +102,7 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
             event.isCancelled = true
 
             launch {
-                galaxyManager.getGalaxy(uuid).await()?.let {
+                galaxyManager.get(uuid).await()?.let {
                     GUIHelper.open(player) { GalaxyInfo(it, player) }
                 }
             }

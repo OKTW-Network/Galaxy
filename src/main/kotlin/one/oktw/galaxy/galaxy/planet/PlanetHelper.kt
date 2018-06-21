@@ -64,12 +64,12 @@ class PlanetHelper {
             return server.deleteWorld(properties)
         }
 
-        fun loadPlanet(planet: Planet): Optional<World> {
+        fun loadPlanet(planet: Planet): World? {
             return server.getWorldProperties(planet.world!!).orElse(null)?.let {
                 planet.lastTime = Date()
                 it.setGenerateSpawnOnLoad(false)
-                server.loadWorld(it)
-            } ?: Optional.empty()
+                server.loadWorld(it).orElse(null)
+            }
         }
 
         fun updatePlanet(planet: Planet) {

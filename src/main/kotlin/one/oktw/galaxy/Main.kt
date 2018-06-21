@@ -13,7 +13,7 @@ import one.oktw.galaxy.internal.register.CommandRegister
 import one.oktw.galaxy.internal.register.DataRegister
 import one.oktw.galaxy.internal.register.EventRegister
 import one.oktw.galaxy.internal.register.RecipeRegister
-import one.oktw.galaxy.traveler.TravelerManager
+import one.oktw.galaxy.machine.chunkloader.ChunkLoaderManager
 import org.slf4j.Logger
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.config.ConfigDir
@@ -21,7 +21,10 @@ import org.spongepowered.api.config.DefaultConfig
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.GameRegistryEvent
 import org.spongepowered.api.event.game.GameReloadEvent
-import org.spongepowered.api.event.game.state.*
+import org.spongepowered.api.event.game.state.GameConstructionEvent
+import org.spongepowered.api.event.game.state.GameInitializationEvent
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent
+import org.spongepowered.api.event.game.state.GameStartingServerEvent
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.world.gen.WorldGeneratorModifier
@@ -42,7 +45,7 @@ class Main {
             private set
         lateinit var galaxyManager: GalaxyManager
             private set
-        lateinit var travelerManager: TravelerManager
+        lateinit var chunkLoaderManager: ChunkLoaderManager
             private set
         lateinit var languageService: LanguageService
             private set
@@ -91,17 +94,12 @@ class Main {
 
     @Listener
     fun onStarting(event: GameStartingServerEvent) {
+        chunkLoaderManager = ChunkLoaderManager()
         CommandRegister()
     }
 
     @Listener
     fun onReload(event: GameReloadEvent) {
         //TODO
-    }
-
-    @Listener
-    fun onStop(event: GameStoppedServerEvent) {
-        galaxyManager.saveAll()
-        travelerManager.saveAll()
     }
 }

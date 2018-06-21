@@ -10,6 +10,7 @@ import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.enums.AccessLevel.DENY
 import one.oktw.galaxy.galaxy.data.Galaxy
+import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.galaxy.planet.data.extensions.checkPermission
 import one.oktw.galaxy.galaxy.planet.data.extensions.loadWorld
@@ -54,9 +55,9 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
                         ), // TODO
                         Text.of(
                             TextColors.AQUA,
-                            "${lang["UI.BrowserPlanet.Details.Security"]}: ",
+                            "${lang["UI.BrowserPlanet.Details.Visitable.text"]}: ",
                             TextColors.RESET,
-                            it.security.toString()
+                            lang["UI.BrowserPlanet.Details.Visitable.${it.visitable}"]
                         )
                     )
                 )
@@ -81,12 +82,12 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
             event.isCancelled = true
 
             launch {
-                val planet = galaxyManager.getPlanet(uuid).await() ?: return@launch
+                val planet = galaxyManager.get(planet = uuid).await()?.getPlanet(uuid) ?: return@launch
 
                 if (planet.checkPermission(player) != DENY) {
                     GUIHelper.closeAll(player)
                     withContext(serverThread) {
-                        TeleportHelper.teleport(player, planet.loadWorld().get().spawnLocation)
+                        TeleportHelper.teleport(player, planet.loadWorld()!!.spawnLocation)
                     }
                 }
             }

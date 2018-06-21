@@ -1,7 +1,5 @@
 package one.oktw.galaxy.galaxy.planet.data
 
-import one.oktw.galaxy.enums.SecurityLevel
-import one.oktw.galaxy.enums.SecurityLevel.VISIT
 import java.util.*
 
 data class Planet(
@@ -9,6 +7,6 @@ data class Planet(
     var world: UUID? = null,
     var name: String = "",
     var size: Int = 32,
-    var security: SecurityLevel = VISIT,
+    var visitable: Boolean = true,
     var lastTime: Date = Date()
 )

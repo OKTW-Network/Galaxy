@@ -7,6 +7,8 @@ import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.traveler.data.Traveler
 import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.world.World
+import org.spongepowered.api.world.storage.WorldProperties
 import java.util.*
 
 fun Galaxy.save() {
@@ -29,6 +31,12 @@ fun Galaxy.removePlanet(uuid: UUID) {
         save()
     }
 }
+
+fun Galaxy.getPlanet(uuid: UUID) = planets.firstOrNull { it.uuid == uuid }
+
+fun Galaxy.getPlanet(worldProperties: WorldProperties) = planets.firstOrNull { it.world == worldProperties.uniqueId }
+
+fun Galaxy.getPlanet(world: World) = getPlanet(world.properties)
 
 fun Galaxy.addMember(uuid: UUID, group: Group = Group.MEMBER) {
     if (members.any { it.uuid == uuid }) return

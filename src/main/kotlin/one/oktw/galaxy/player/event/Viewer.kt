@@ -1,8 +1,7 @@
-package one.oktw.galaxy.traveler.event
+package one.oktw.galaxy.player.event
 
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.WorldServer
-import one.oktw.galaxy.traveler.ViewerHelper
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
@@ -20,30 +19,50 @@ import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.event.item.inventory.DropItemEvent
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
 import org.spongepowered.api.item.ItemTypes.*
+import java.util.*
 import java.util.Arrays.asList
+import java.util.concurrent.ConcurrentHashMap
 
 @Suppress("unused")
 class Viewer {
+    companion object {
+        private val viewer = ConcurrentHashMap.newKeySet<UUID>()
+
+        fun setViewer(uuid: UUID) {
+            if (viewer.contains(uuid)) return
+
+            viewer += uuid
+        }
+
+        fun isViewer(uuid: UUID): Boolean {
+            return viewer.contains(uuid)
+        }
+
+        fun removeViewer(uuid: UUID) {
+            viewer -= uuid
+        }
+    }
+
     @Listener(order = Order.FIRST)
     fun onTarget(event: SetAITargetEvent, @Getter("getTarget") player: Player) {
-        if (ViewerHelper.isViewer(player.uniqueId)) event.isCancelled = true
+        if (isViewer(player.uniqueId)) event.isCancelled = true
     }
 
     @Listener(order = Order.FIRST)
     fun onDropItem(event: DropItemEvent.Pre, @First player: Player) {
-        if (ViewerHelper.isViewer(player.uniqueId)) event.isCancelled = true
+        if (isViewer(player.uniqueId)) event.isCancelled = true
     }
 
     @Listener(order = Order.FIRST)
     fun onSpawnEntity(event: SpawnEntityEvent) {
-        val source = event.cause.allOf(Player::class.java).any { ViewerHelper.isViewer(it.uniqueId) }
+        val source = event.cause.allOf(Player::class.java).any { isViewer(it.uniqueId) }
 
         if (source) event.isCancelled = true
     }
 
     @Listener(order = Order.FIRST)
     fun onChangeBlock(event: ChangeBlockEvent, @First player: Player) {
-        if (ViewerHelper.isViewer(player.uniqueId)) {
+        if (isViewer(player.uniqueId)) {
             event.isCancelled = true
             event.transactions.forEach {
                 it.original.location.ifPresent {
@@ -56,7 +75,7 @@ class Viewer {
 
     @Listener(order = Order.FIRST)
     fun onInteractBlock(event: InteractBlockEvent, @First player: Player) {
-        if (ViewerHelper.isViewer(player.uniqueId)) {
+        if (isViewer(player.uniqueId)) {
             event.isCancelled = true
             event.targetBlock.location.ifPresent {
                 (it.extent as WorldServer).playerChunkMap.markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))
@@ -66,8 +85,8 @@ class Viewer {
 
     @Listener(order = Order.FIRST)
     fun onInteractEntity(event: InteractEntityEvent, @Getter("getTargetEntity") entity: Entity) {
-        val target = entity is Player && ViewerHelper.isViewer(entity.uniqueId)
-        val source = event.cause.allOf(Player::class.java).any { ViewerHelper.isViewer(it.uniqueId) }
+        val target = entity is Player && isViewer(entity.uniqueId)
+        val source = event.cause.allOf(Player::class.java).any { isViewer(it.uniqueId) }
 
         if (target || source) event.isCancelled = true
     }
@@ -99,33 +118,33 @@ class Viewer {
             IRON_SWORD
         )
 
-        if (ViewerHelper.isViewer(player.uniqueId) && event.itemStack.type in blockList) {
+        if (isViewer(player.uniqueId) && event.itemStack.type in blockList) {
             event.isCancelled = true
         }
     }
 
     @Listener(order = Order.FIRST)
     fun onDamageEntity(event: DamageEntityEvent) {
-        val target = event.targetEntity is Player && ViewerHelper.isViewer(event.targetEntity.uniqueId)
-        val source = event.cause.allOf(Player::class.java).any { ViewerHelper.isViewer(it.uniqueId) }
+        val target = event.targetEntity is Player && isViewer(event.targetEntity.uniqueId)
+        val source = event.cause.allOf(Player::class.java).any { isViewer(it.uniqueId) }
 
         if (target || source) event.isCancelled = true
     }
 
     @Listener(order = Order.FIRST)
     fun onCollideEntity(event: CollideEntityEvent) {
-        val source = event.cause.filterIsInstance<Player>().any { ViewerHelper.isViewer(it.uniqueId) }
+        val source = event.cause.filterIsInstance<Player>().any { isViewer(it.uniqueId) }
 
         if (source) {
             event.isCancelled = true
         } else {
-            event.filterEntities { !ViewerHelper.isViewer(it.uniqueId) }
+            event.filterEntities { !isViewer(it.uniqueId) }
         }
     }
 
     @Listener(order = Order.FIRST)
     fun onCollideBlock(event: CollideBlockEvent, @First player: Player) {
-        if (ViewerHelper.isViewer(player.uniqueId)) event.isCancelled = true
+        if (isViewer(player.uniqueId)) event.isCancelled = true
     }
 
     // TODO add more Listener

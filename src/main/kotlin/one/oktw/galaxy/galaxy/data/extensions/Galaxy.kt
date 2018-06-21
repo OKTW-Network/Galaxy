@@ -1,12 +1,11 @@
 package one.oktw.galaxy.galaxy.data.extensions
 
 import one.oktw.galaxy.Main
-import one.oktw.galaxy.Main.Companion.travelerManager
-import one.oktw.galaxy.enums.Group
 import one.oktw.galaxy.galaxy.data.Galaxy
-import one.oktw.galaxy.galaxy.data.Member
+import one.oktw.galaxy.galaxy.enums.Group
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import one.oktw.galaxy.galaxy.planet.data.Planet
+import one.oktw.galaxy.galaxy.traveler.data.Traveler
 import org.spongepowered.api.entity.living.player.Player
 import java.util.*
 
@@ -34,7 +33,7 @@ fun Galaxy.removePlanet(uuid: UUID) {
 fun Galaxy.addMember(uuid: UUID, group: Group = Group.MEMBER) {
     if (members.any { it.uuid == uuid }) return
 
-    members.add(Member(uuid, group))
+    members.add(Traveler(uuid, group))
     save()
 }
 
@@ -42,6 +41,8 @@ fun Galaxy.delMember(uuid: UUID) {
     members.remove(members.firstOrNull { it.uuid == uuid } ?: return)
     save()
 }
+
+fun Galaxy.getMember(uuid: UUID) = members.firstOrNull { it.uuid == uuid }
 
 fun Galaxy.setGroup(uuid: UUID, group: Group) {
     members.first { it.uuid == uuid }.group = group
@@ -65,5 +66,5 @@ fun Galaxy.removeJoinRequest(uuid: UUID) {
 }
 
 fun Galaxy.dividends(number: Long) = takeStarDust(number * members.size).also {
-    if (it) members.forEach { travelerManager.getTraveler(it.uuid!!)!!.giveStarDust(number) }
+    if (it) members.forEach { it.giveStarDust(number) }
 }

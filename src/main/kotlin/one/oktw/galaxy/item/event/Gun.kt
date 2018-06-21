@@ -8,9 +8,9 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.EntityDamageSource
 import one.oktw.galaxy.Main.Companion.serverThread
-import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.getTraveler
 import one.oktw.galaxy.item.enums.ItemType
 import one.oktw.galaxy.item.enums.ItemType.PISTOL
 import one.oktw.galaxy.item.enums.ItemType.SNIPER
@@ -62,7 +62,7 @@ class Gun {
             .map(EyeLocationProperty::getValue).orElse(null)?.add(direction) ?: return
 
         launch {
-            val gun = (travelerManager.getTraveler(player).item
+            val gun = (getTraveler(player)!!.item
                 .filter { it is Gun }
                 .find { (it as Gun).uuid == itemStack[DataUUID.key].get() } as? Gun ?: return@launch)
                 .copy()
@@ -132,7 +132,7 @@ class Gun {
             if (it[DataEnable.key].get()) player.setItemInHand(OFF_HAND, toggleScope(it))
         }
 
-        showActionBar(player)
+        launch { showActionBar(player) }
     }
 
     private fun drift(direction: Vector3d): Vector3d {
@@ -290,8 +290,8 @@ class Gun {
         transform(DataEnable.key) { !it }
     }
 
-    private fun showActionBar(player: Player) {
-        val traveler = travelerManager.getTraveler(player)
+    private suspend fun showActionBar(player: Player) {
+        val traveler = getTraveler(player) ?: return
         val gun1 = player.getItemInHand(MAIN_HAND).orElse(null)?.run {
             traveler.item.filterIsInstance(Gun::class.java).firstOrNull { it.uuid == get(DataUUID.key).orElse(null) }
         }?.copy()?.let { doUpgrade(it) }

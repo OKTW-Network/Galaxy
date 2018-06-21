@@ -85,7 +85,6 @@ class Main {
         logger.info("Initializing...")
         DatabaseManager()
         galaxyManager = GalaxyManager()
-        travelerManager = TravelerManager()
         EventRegister()
         logger.info("Plugin initialized!")
     }

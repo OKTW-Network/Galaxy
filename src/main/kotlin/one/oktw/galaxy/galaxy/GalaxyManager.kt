@@ -5,14 +5,11 @@ import com.mongodb.client.model.Filters.text
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
-import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.data.Galaxy
-import one.oktw.galaxy.galaxy.data.Member
+import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
-import one.oktw.galaxy.galaxy.planet.data.Planet
+import one.oktw.galaxy.galaxy.traveler.data.Traveler
 import one.oktw.galaxy.internal.DatabaseManager.Companion.database
-import one.oktw.galaxy.traveler.data.Traveler
 import org.bson.conversions.Bson
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.scheduler.Task
@@ -35,9 +32,9 @@ class GalaxyManager {
     }
 
     fun createGalaxy(name: String, creator: Player, vararg members: UUID): Galaxy {
-        val memberList = ArrayList<Member>(members.size + 1)
-        memberList += Member(creator.uniqueId, OWNER)
-        memberList += members.map { Member(it) }
+        val memberList = ArrayList<Traveler>(members.size + 1)
+        memberList += Traveler(creator.uniqueId, OWNER)
+        memberList += members.map { Traveler(it) }
 
         val galaxy = Galaxy(name = name, members = memberList)
 
@@ -51,7 +48,7 @@ class GalaxyManager {
     }
 
     suspend fun deleteGalaxy(uuid: UUID) {
-        getGalaxy(uuid).await()?.planets?.forEach {
+        get(uuid).await()?.planets?.forEach {
             it.world.let { PlanetHelper.removePlanet(it!!) }
         }
 

@@ -1,5 +1,6 @@
-package one.oktw.galaxy.command
+package one.oktw.galaxy.command.debug
 
+import one.oktw.galaxy.command.CommandBase
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
@@ -13,7 +14,7 @@ import org.spongepowered.api.world.storage.WorldProperties
 class TPX : CommandBase {
     override val spec: CommandSpec
         get() = CommandSpec.builder()
-            .permission("oktw.command.tpx")
+            .permission("oktw.command.debug.tpx")
             .executor(this)
             .arguments(
                 GenericArguments.firstParsing(

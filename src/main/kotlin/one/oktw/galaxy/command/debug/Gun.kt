@@ -1,6 +1,7 @@
-package one.oktw.galaxy.command
+package one.oktw.galaxy.command.debug
 
 import kotlinx.coroutines.experimental.runBlocking
+import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.getTraveler
 import one.oktw.galaxy.item.enums.GunStyle
 import one.oktw.galaxy.item.enums.GunStyle.PISTOL_ORIGIN
@@ -10,6 +11,7 @@ import one.oktw.galaxy.item.enums.ItemType.SNIPER
 import one.oktw.galaxy.item.enums.UpgradeType.THROUGH
 import one.oktw.galaxy.item.type.Gun
 import one.oktw.galaxy.item.type.Upgrade
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -22,7 +24,7 @@ import org.spongepowered.api.text.Text
 class Gun : CommandBase {
     override val spec: CommandSpec
         get() = CommandSpec.builder()
-            .permission("oktw.command.gun")
+            .permission("oktw.command.debug.gun")
             .child(Add().spec, "add")
             .child(Remove().spec, "remove")
             .child(Get().spec, "get")
@@ -30,14 +32,16 @@ class Gun : CommandBase {
             .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-        return CommandResult.empty()
+        src.sendMessage(Sponge.getCommandManager().getUsage(src))
+
+        return CommandResult.success()
     }
 
     class Add : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
                 .executor(this)
-                .permission("oktw.command.gun.add")
+                .permission("oktw.command.debug.gun.add")
                 .arguments(
                     GenericArguments.integer(Text.of("Heat")),
                     GenericArguments.integer(Text.of("Max Heat")),
@@ -81,7 +85,7 @@ class Gun : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
                 .executor(this)
-                .permission("oktw.command.gun.remove")
+                .permission("oktw.command.debug.gun.remove")
                 .arguments(GenericArguments.integer(Text.of("Gun")))
                 .build()
 
@@ -98,7 +102,7 @@ class Gun : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
                 .executor(this)
-                .permission("oktw.command.gun.get")
+                .permission("oktw.command.debug.gun.get")
                 .arguments(GenericArguments.integer(Text.of("Gun")))
                 .build()
 
@@ -118,7 +122,7 @@ class Gun : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
                 .executor(this)
-                .permission("oktw.command.gun.list")
+                .permission("oktw.command.debug.gun.list")
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {

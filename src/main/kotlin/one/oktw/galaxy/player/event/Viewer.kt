@@ -18,6 +18,7 @@ import org.spongepowered.api.event.filter.Getter
 import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.event.item.inventory.DropItemEvent
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
+import org.spongepowered.api.event.network.ClientConnectionEvent
 import org.spongepowered.api.item.ItemTypes.*
 import java.util.*
 import java.util.Arrays.asList
@@ -29,8 +30,6 @@ class Viewer {
         private val viewer = ConcurrentHashMap.newKeySet<UUID>()
 
         fun setViewer(uuid: UUID) {
-            if (viewer.contains(uuid)) return
-
             viewer += uuid
         }
 
@@ -41,6 +40,11 @@ class Viewer {
         fun removeViewer(uuid: UUID) {
             viewer -= uuid
         }
+    }
+
+    @Listener
+    fun onDisconnect(event: ClientConnectionEvent.Disconnect) {
+        removeViewer(event.targetEntity.uniqueId)
     }
 
     @Listener(order = Order.FIRST)
@@ -133,9 +137,7 @@ class Viewer {
 
     @Listener(order = Order.FIRST)
     fun onCollideEntity(event: CollideEntityEvent) {
-        val source = event.cause.filterIsInstance<Player>().any { isViewer(it.uniqueId) }
-
-        if (source) {
+        if (event.cause.filterIsInstance<Player>().any { isViewer(it.uniqueId) }) {
             event.isCancelled = true
         } else {
             event.filterEntities { !isViewer(it.uniqueId) }

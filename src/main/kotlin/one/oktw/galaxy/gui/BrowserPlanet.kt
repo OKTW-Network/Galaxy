@@ -8,12 +8,12 @@ import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.AccessLevel.DENY
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.galaxy.planet.data.extensions.checkPermission
 import one.oktw.galaxy.galaxy.planet.data.extensions.loadWorld
+import one.oktw.galaxy.galaxy.planet.enums.AccessLevel.DENY
 import one.oktw.galaxy.item.enums.ButtonType.PLANET_O
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import one.oktw.galaxy.item.type.Button

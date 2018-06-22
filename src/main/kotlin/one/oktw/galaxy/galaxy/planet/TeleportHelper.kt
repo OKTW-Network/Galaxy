@@ -3,13 +3,13 @@ package one.oktw.galaxy.galaxy.planet
 import kotlinx.coroutines.experimental.async
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.serverThread
-import one.oktw.galaxy.enums.AccessLevel
-import one.oktw.galaxy.enums.AccessLevel.DENY
-import one.oktw.galaxy.enums.AccessLevel.VIEW
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.planet.data.extensions.checkPermission
 import one.oktw.galaxy.galaxy.planet.data.extensions.loadWorld
+import one.oktw.galaxy.galaxy.planet.enums.AccessLevel
+import one.oktw.galaxy.galaxy.planet.enums.AccessLevel.DENY
+import one.oktw.galaxy.galaxy.planet.enums.AccessLevel.VIEW
 import one.oktw.galaxy.player.event.Viewer.Companion.removeViewer
 import one.oktw.galaxy.player.event.Viewer.Companion.setViewer
 import org.spongepowered.api.entity.living.player.Player

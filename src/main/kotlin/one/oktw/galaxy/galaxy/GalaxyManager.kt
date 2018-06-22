@@ -36,7 +36,7 @@ class GalaxyManager {
 
     suspend fun deleteGalaxy(uuid: UUID) {
         get(uuid).await()?.planets?.forEach {
-            it.world.let { PlanetHelper.removePlanet(it!!) }
+            it.world.let { PlanetHelper.removePlanet(it) }
         }
 
         launch { collection.deleteOne(eq("uuid", uuid)) }

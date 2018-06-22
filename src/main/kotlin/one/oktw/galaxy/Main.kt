@@ -29,6 +29,7 @@ import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.world.gen.WorldGeneratorModifier
 import java.nio.file.Path
+import java.util.*
 
 @Suppress("UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
 @Plugin(
@@ -39,6 +40,8 @@ import java.nio.file.Path
 )
 class Main {
     companion object {
+        val dummyUUID: UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
+
         lateinit var main: Main
             private set
         lateinit var serverThread: CloseableCoroutineDispatcher

@@ -26,7 +26,7 @@ fun Galaxy.createPlanet(name: String): Planet {
 fun Galaxy.removePlanet(uuid: UUID) {
     val planet = planets.firstOrNull { it.uuid == uuid } ?: return
 
-    PlanetHelper.removePlanet(planet.world!!).thenAccept {
+    PlanetHelper.removePlanet(planet.world).thenAccept {
         if (it) planets.remove(planet)
         save()
     }

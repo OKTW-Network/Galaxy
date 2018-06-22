@@ -1,5 +1,6 @@
 package one.oktw.galaxy.galaxy.traveler.data
 
+import one.oktw.galaxy.Main.Companion.dummyUUID
 import one.oktw.galaxy.economy.StarDustKeeper
 import one.oktw.galaxy.galaxy.enums.Group
 import one.oktw.galaxy.galaxy.enums.Group.VISITOR
@@ -10,7 +11,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 data class Traveler(
-    val uuid: UUID = throw NullPointerException(),
+    val uuid: UUID = dummyUUID,
     var group: Group = VISITOR,
     var position: Position = Position(),
     var armor: ArrayList<Upgrade> = ArrayList(),

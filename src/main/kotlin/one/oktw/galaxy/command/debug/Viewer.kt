@@ -19,6 +19,7 @@ class Viewer : CommandBase {
             GenericArguments.playerOrSource(Text.of("player")),
             GenericArguments.optional(GenericArguments.bool(Text.of("enable")))
         )
+        .executor(this)
         .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {

@@ -18,6 +18,7 @@ class PlayerInfo : CommandBase {
     override val spec: CommandSpec = CommandSpec.builder()
         .permission("oktw.command.debug.player")
         .arguments(GenericArguments.playerOrSource(Text.of("player")))
+        .executor(this)
         .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {

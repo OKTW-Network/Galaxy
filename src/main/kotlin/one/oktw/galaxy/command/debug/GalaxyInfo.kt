@@ -16,6 +16,7 @@ class GalaxyInfo : CommandBase {
     override val spec: CommandSpec = CommandSpec.builder()
         .permission("oktw.command.debug.galaxy")
         .arguments(GenericArguments.uuid(Text.of("galaxy")))
+        .executor(this)
         .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {

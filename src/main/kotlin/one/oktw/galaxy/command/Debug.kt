@@ -15,6 +15,7 @@ class Debug : CommandBase {
         .child(TPX().spec, "tpx")
         .child(PlayerInfo().spec, "player")
         .child(GalaxyInfo().spec, "galaxy")
+        .executor(this)
         .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {

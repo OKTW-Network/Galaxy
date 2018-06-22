@@ -1,4 +1,4 @@
-package one.oktw.galaxy.block
+package one.oktw.galaxy.block.enums
 
 enum class FakeBlocks(val id: Int) {
     DUMMY(0),

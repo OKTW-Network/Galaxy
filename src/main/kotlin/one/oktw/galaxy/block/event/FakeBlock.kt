@@ -2,7 +2,7 @@ package one.oktw.galaxy.block.event
 
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.WorldServer
-import one.oktw.galaxy.block.FakeBlockItem
+import one.oktw.galaxy.block.data.FakeBlockItem
 import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.item.enums.ItemType

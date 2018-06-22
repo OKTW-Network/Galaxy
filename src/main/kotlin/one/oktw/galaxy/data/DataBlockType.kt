@@ -1,9 +1,9 @@
 package one.oktw.galaxy.data
 
 import com.google.common.reflect.TypeToken
-import one.oktw.galaxy.block.FakeBlocks
-import one.oktw.galaxy.block.FakeBlocks.DUMMY
-import one.oktw.galaxy.block.FakeBlocks.valueOf
+import one.oktw.galaxy.block.enums.FakeBlocks
+import one.oktw.galaxy.block.enums.FakeBlocks.DUMMY
+import one.oktw.galaxy.block.enums.FakeBlocks.valueOf
 import org.spongepowered.api.data.DataContainer
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataQuery

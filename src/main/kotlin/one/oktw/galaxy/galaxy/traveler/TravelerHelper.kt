@@ -15,20 +15,28 @@ class TravelerHelper {
         fun getTraveler(player: Player) = async { galaxyManager.get(player.world).await()?.getMember(player.uniqueId) }
 
         fun saveTraveler(player: Player, clean: Boolean = false) = async(serverThread) {
-            getTraveler(player).await()?.let {
-                it.experience = player[Keys.TOTAL_EXPERIENCE].get()
-                it.inventory = player.inventory.slots<Slot>().map { it.peek().orElse(ItemStack.empty()) }
+            val traveler = getTraveler(player).await()?.apply {
+                experience = player[Keys.TOTAL_EXPERIENCE].get()
+                inventory = player.inventory.slots<Slot>().map { it.peek().orElse(ItemStack.empty()) }
+            } ?: return@async null
+
+            if (clean) cleanPlayer(player)
+
+            galaxyManager.get(player.world).await()?.members?.run {
+                set(indexOfFirst { it.uuid == player.uniqueId }, traveler)
             }
 
-            if (clean) {
-                player.offer(Keys.TOTAL_EXPERIENCE, 0)
-                player.inventory.clear()
-            }
+            return@async traveler
         }
 
         fun loadTraveler(traveler: Traveler, player: Player) {
             player.offer(Keys.TOTAL_EXPERIENCE, traveler.experience)
             player.inventory.slots<Slot>().forEachIndexed { index, slot -> slot.set(traveler.inventory[index]) }
+        }
+
+        fun cleanPlayer(player: Player) {
+            player.offer(Keys.TOTAL_EXPERIENCE, 0)
+            player.inventory.clear()
         }
     }
 }

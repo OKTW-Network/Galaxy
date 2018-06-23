@@ -3,6 +3,8 @@ package one.oktw.galaxy.galaxy.data.extensions
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.enums.Group
+import one.oktw.galaxy.galaxy.enums.Group.MEMBER
+import one.oktw.galaxy.galaxy.enums.Group.VISITOR
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.traveler.data.Traveler
@@ -38,7 +40,7 @@ fun Galaxy.getPlanet(worldProperties: WorldProperties) = planets.firstOrNull { i
 
 fun Galaxy.getPlanet(world: World) = getPlanet(world.properties)
 
-fun Galaxy.addMember(uuid: UUID, group: Group = Group.MEMBER) {
+fun Galaxy.addMember(uuid: UUID, group: Group = MEMBER) {
     if (members.any { it.uuid == uuid }) return
 
     members.add(Traveler(uuid, group))
@@ -58,7 +60,7 @@ fun Galaxy.setGroup(uuid: UUID, group: Group) {
 }
 
 fun Galaxy.getGroup(player: Player): Group {
-    return members.firstOrNull { it.uuid == player.uniqueId }?.group ?: return Group.VISITOR
+    return members.firstOrNull { it.uuid == player.uniqueId }?.group ?: VISITOR
 }
 
 fun Galaxy.requestJoin(uuid: UUID) {

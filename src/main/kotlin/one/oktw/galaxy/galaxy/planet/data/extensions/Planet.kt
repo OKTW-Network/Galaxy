@@ -11,7 +11,7 @@ import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.world.World
 
 suspend fun Planet.checkPermission(player: Player): AccessLevel {
-    val group = galaxyManager.get(planet = uuid).await()?.getGroup(player) ?: return DENY
+    val group = galaxyManager.get(planet = uuid).await()?.getGroup(player) ?: VISITOR
 
     return if (group != VISITOR) MODIFY else if (visitable) VIEW else DENY
 }

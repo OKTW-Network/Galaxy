@@ -28,7 +28,7 @@ class TravelerHelper {
 
         fun loadTraveler(traveler: Traveler, player: Player) {
             player.offer(Keys.TOTAL_EXPERIENCE, traveler.experience)
-            player.inventory.slots<Slot>().forEachIndexed { index, slot -> traveler.inventory[index] }
+            player.inventory.slots<Slot>().forEachIndexed { index, slot -> slot.set(traveler.inventory[index]) }
         }
     }
 }

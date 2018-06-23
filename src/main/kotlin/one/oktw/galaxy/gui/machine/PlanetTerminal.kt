@@ -3,11 +3,13 @@ package one.oktw.galaxy.gui.machine
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.enums.Group
+import one.oktw.galaxy.enums.Group.*
 import one.oktw.galaxy.galaxy.planet.data.Planet
-import one.oktw.galaxy.gui.Confirm
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUIHelper
-import one.oktw.galaxy.item.enums.ButtonType.*
+import one.oktw.galaxy.item.enums.ButtonType.GUI_INFO
+import one.oktw.galaxy.item.enums.ButtonType.UPGRADE
 import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
@@ -25,13 +27,13 @@ import org.spongepowered.api.text.format.TextStyles.BOLD
 import java.util.*
 import java.util.Arrays.asList
 
-class ECS(private val planet: Planet, manage: Boolean = false) : GUI() {
+class PlanetTerminal(private val planet: Planet, group: Group = VISITOR) : GUI() {
     private val lang = languageService.getDefaultLanguage() // TODO set language
     private val buttonID = Array(2) { UUID.randomUUID() }
-    override val token = "ECS-${planet.uuid}${if (manage) "-manage" else ""}"
+    override val token = "PlanetTerminal-${planet.uuid}-$group"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.ECS.Title"])))
+        .property(InventoryTitle.of(Text.of(lang["UI.PlanetTerminal.Title"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
 
@@ -41,33 +43,25 @@ class ECS(private val planet: Planet, manage: Boolean = false) : GUI() {
         // Info
         Button(GUI_INFO).createItemStack()
             .apply {
-                offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.ECS.Button.info"]))
+                offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.PlanetTerminal.Button.info"]))
                 offer(
                     Keys.ITEM_LORE, asList(
-                        Text.of(BOLD, YELLOW, lang["UI.ECS.Info.Level"], RESET, ":", planet.level),
-                        Text.of(BOLD, YELLOW, lang["UI.ECS.Info.Range"], RESET, ":", planet.size),
-                        Text.of(BOLD, YELLOW, lang["UI.ECS.Info.Effect"], RESET, ":")
+                        Text.of(BOLD, YELLOW, lang["UI.PlanetTerminal.Info.Level"], RESET, ":", planet.level),
+                        Text.of(BOLD, YELLOW, lang["UI.PlanetTerminal.Info.Range"], RESET, ":", planet.size),
+                        Text.of(BOLD, YELLOW, lang["UI.PlanetTerminal.Info.Effect"], RESET, ":")
                     ).apply { addAll(planet.effect.map { Text.of(BOLD, it.type.potionTranslation) }) }
                 )
             }
             .let { inventory.set(4, 0, it) }
 
-        if (manage) {
-            // Upgrade level
+        if (group == OWNER || group == ADMIN) {
+            // ECS
             Button(UPGRADE).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[0]))
-                    offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.ECS.Button.upgrade"]))
+                    offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.PlanetTerminal.Button.ECS"]))
                 }
                 .let { inventory.set(3, 2, it) }
-
-            // Effect
-            Button(PLUS).createItemStack()
-                .apply {
-                    offer(DataUUID(buttonID[1]))
-                    offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.ECS.button.effect"]))
-                }
-                .let { inventory.set(6, 2, it) }
         }
 
         GUIHelper.fillEmptySlot(inventory)
@@ -88,20 +82,11 @@ class ECS(private val planet: Planet, manage: Boolean = false) : GUI() {
         val itemUUID = event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return
 
         when (itemUUID) {
-            buttonID[0] -> clickUpgrade(event.source as Player)
-            buttonID[1] -> clickEffect()
+            buttonID[0] -> clickECS(event.source as Player)
         }
     }
 
-    private fun clickUpgrade(player: Player) {
-        GUIHelper.open(player) {
-            Confirm(Text.of(lang["UI.ECS.UpgradeConfirm"])) {
-                // TODO
-            }
-        }
-    }
-
-    private fun clickEffect() {
+    private fun clickECS(player: Player) {
         // TODO
     }
 }

@@ -62,7 +62,7 @@ class Gun {
             .map(EyeLocationProperty::getValue).orElse(null)?.add(direction) ?: return
 
         launch {
-            val gun = (getTraveler(player)!!.item
+            val gun = (getTraveler(player).await()!!.item
                 .filter { it is Gun }
                 .find { (it as Gun).uuid == itemStack[DataUUID.key].get() } as? Gun ?: return@launch)
                 .copy()
@@ -291,7 +291,7 @@ class Gun {
     }
 
     private suspend fun showActionBar(player: Player) {
-        val traveler = getTraveler(player) ?: return
+        val traveler = getTraveler(player).await() ?: return
         val gun1 = player.getItemInHand(MAIN_HAND).orElse(null)?.run {
             traveler.item.filterIsInstance(Gun::class.java).firstOrNull { it.uuid == get(DataUUID.key).orElse(null) }
         }?.copy()?.let { doUpgrade(it) }

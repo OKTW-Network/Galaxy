@@ -1,5 +1,6 @@
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.serverThread
 import org.spongepowered.api.entity.living.player.Player
@@ -12,14 +13,23 @@ class GUIHelper {
         private val sync = ConcurrentHashMap<Player, ConcurrentLinkedDeque<GUI>>()
 
         fun open(player: Player, create: () -> GUI): GUI {
-            val new =
-                create().apply { registerEvent(InteractInventoryEvent.Close::class.java, this@Companion::closeEvent) }
+            val new = create().apply { registerEvent(InteractInventoryEvent.Close::class.java, ::closeEvent) }
             val gui = sync.values.mapNotNull { it.firstOrNull { it.token == new.token } }.firstOrNull() ?: new
 
             sync.getOrPut(player) { ConcurrentLinkedDeque() }.offerLast(gui)
             launch(serverThread) { player.openInventory(gui.inventory) }
 
             return gui
+        }
+
+        fun openAsync(player: Player, create: suspend () -> GUI) = async {
+            val new = create().apply { registerEvent(InteractInventoryEvent.Close::class.java, ::closeEvent) }
+            val gui = sync.values.mapNotNull { it.firstOrNull { it.token == new.token } }.firstOrNull() ?: new
+
+            sync.getOrPut(player) { ConcurrentLinkedDeque() }.offerLast(gui)
+            launch(serverThread) { player.openInventory(gui.inventory) }
+
+            return@async gui
         }
 
         fun close(token: String) {

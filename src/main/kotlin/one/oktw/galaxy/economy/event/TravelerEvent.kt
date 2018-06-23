@@ -16,7 +16,7 @@ class TravelerEvent {
     fun onPickupExp(event: PlayerPickupXpEvent) {
         val player = event.entityPlayer as Player
 
-        launch { getTraveler(player)?.giveStarDust(event.orb.xpValue) }
+        launch { getTraveler(player).await()?.giveStarDust(event.orb.xpValue) }
 
         ActionBarData(
             Text.of(

@@ -33,7 +33,7 @@ class ArmorHelper {
     companion object {
         fun offerArmor(player: Player) = launch {
             val lang = languageService.getDefaultLanguage() // TODO set language
-            val upgrade = getTraveler(player)?.armor ?: return@launch
+            val upgrade = getTraveler(player).await()?.armor ?: return@launch
             val helmet: ItemStack = getArmor(DIAMOND_HELMET)
             val chestplate: ItemStack = getArmor(DIAMOND_CHESTPLATE)
             val leggings: ItemStack = getArmor(DIAMOND_LEGGINGS)
@@ -118,7 +118,7 @@ class ArmorHelper {
 
         fun toggleLeggings(player: Player) = launch(serverThread) {
             val item = player.leggings.get()
-            val armor = getTraveler(player)?.armor ?: return@launch
+            val armor = getTraveler(player).await()?.armor ?: return@launch
 
             if (item[DataEnable.key].get()) {
                 removeEffect(player, JUMP_BOOST)
@@ -131,7 +131,7 @@ class ArmorHelper {
 
         fun toggleBoots(player: Player) = launch(serverThread) {
             val item = player.boots.get()
-            val armor = getTraveler(player)?.armor ?: return@launch
+            val armor = getTraveler(player).await()?.armor ?: return@launch
 
             if (item[DataEnable.key].get()) {
                 @Suppress("CAST_NEVER_SUCCEEDS")

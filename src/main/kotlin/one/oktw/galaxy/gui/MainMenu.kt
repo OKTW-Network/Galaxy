@@ -1,6 +1,5 @@
 package one.oktw.galaxy.gui
 
-import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
@@ -72,7 +71,7 @@ class MainMenu(val player: Player) : GUI() {
         event.isCancelled = true
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
-            buttonID[0] -> GUIHelper.open(player) { BrowserGalaxy(runBlocking { getTraveler(player) }) }
+            buttonID[0] -> GUIHelper.openAsync(player) { BrowserGalaxy(getTraveler(player).await()) }
             buttonID[1] -> GUIHelper.open(player) { CreateGalaxy() }
             buttonID[2] -> GUIHelper.open(player) { BrowserGalaxy() }
         }

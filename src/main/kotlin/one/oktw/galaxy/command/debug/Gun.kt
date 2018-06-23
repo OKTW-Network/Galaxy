@@ -58,7 +58,7 @@ class Gun : CommandBase {
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
-                val traveler = runBlocking { getTraveler(src)!! }
+                val traveler = runBlocking { getTraveler(src).await()!! }
                 val type = if (args.getOne<GunStyle>("Type").get() == SNIPER_SIGHT) SNIPER else PISTOL
                 val gun = Gun(
                     itemType = type,
@@ -91,7 +91,7 @@ class Gun : CommandBase {
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
-                val traveler = runBlocking { getTraveler(src)!! }
+                val traveler = runBlocking { getTraveler(src).await()!! }
                 traveler.item.removeAt(args.getOne<Int>("Gun").get())
             }
             return CommandResult.success()
@@ -108,7 +108,7 @@ class Gun : CommandBase {
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
-                val traveler = runBlocking { getTraveler(src)!! }
+                val traveler = runBlocking { getTraveler(src).await()!! }
                 val gun = traveler.item[args.getOne<Int>("Gun").get()] as? Gun ?: return CommandResult.empty()
 
                 gun.createItemStack().let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
@@ -127,7 +127,7 @@ class Gun : CommandBase {
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
-                val traveler = runBlocking { getTraveler(src)!! }
+                val traveler = runBlocking { getTraveler(src).await()!! }
 
                 src.sendMessage(Text.of(traveler.item.toString()))
             }

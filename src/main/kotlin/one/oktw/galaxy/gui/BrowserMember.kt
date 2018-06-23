@@ -9,7 +9,6 @@ import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.enums.Group
-import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.getTraveler
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
@@ -43,25 +42,26 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
         }
         .map {
             val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(it.uuid).get()
-            val status = if (user.isOnline) Text.of(GREEN, lang["UI.BrowserMember.Details.Online"])
-            else Text.of(RED, lang["UI.BrowserMember.Details.Offline"])
-            val location = user.player.orElse(null)
-                ?.let { runBlocking { getTraveler(it)?.position } }
-                ?.run {
-                    // output: (planeName x,y,z)
-                    Text.of(
-                        RESET,
-                        "(",
-                        GOLD,
-                        TextStyles.BOLD,
-                        "${runBlocking { galaxyManager.get(planet = planet!!).await()?.getPlanet(planet!!)!!.name }} ",
-                        TextStyles.RESET,
-                        GRAY,
-                        "${x.toInt()},${y.toInt()},${z.toInt()}",
-                        RESET,
-                        ")"
-                    )
-                }
+            val status = if (user.isOnline) {
+                Text.of(GREEN, lang["UI.BrowserMember.Details.Online"])
+            } else {
+                Text.of(RED, lang["UI.BrowserMember.Details.Offline"])
+            }
+            val location = user.player.orElse(null)?.run {
+                // output: (planeName x,y,z)
+                Text.of(
+                    RESET,
+                    "(",
+                    GOLD,
+                    TextStyles.BOLD,
+                    "${runBlocking { galaxyManager.get(world).await()?.getPlanet(world)!!.name }} ",
+                    TextStyles.RESET,
+                    GRAY,
+                    position,
+                    RESET,
+                    ")"
+                )
+            }
 
             ItemStack.builder()
                 .itemType(ItemTypes.SKULL)

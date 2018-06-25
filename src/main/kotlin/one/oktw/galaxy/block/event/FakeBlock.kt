@@ -39,9 +39,10 @@ class FakeBlock {
 
         if (!isBlock(blockItem) || !checkCanPlace(location)) return
 
-        placeBlock(blockItem, location)
-        playPlaceSound(player)
-        consumeItem(player, hand)
+        if (placeBlock(blockItem, location)) {
+            playPlaceSound(player)
+            consumeItem(player, hand)
+        }
     }
 
     @Listener
@@ -84,19 +85,22 @@ class FakeBlock {
         return location.extent.run { getIntersectingBlockCollisionBoxes(box).isEmpty() && getIntersectingEntities(box).isEmpty() }
     }
 
-    private fun placeBlock(blockItem: ItemStack, location: Location<World>) {
+    private fun placeBlock(blockItem: ItemStack, location: Location<World>): Boolean {
         val item = 59 - blockItem[ITEM_DURABILITY].get()
 
-        location.apply {
-            blockType = COMMAND_BLOCK
-            offer(
-                COMMAND,
-                "setblock ~ ~ ~ minecraft:mob_spawner 0 replace {SpawnData:{id:\"minecraft:armor_stand\",ArmorItems:[{},{},{},{id:\"minecraft:wooden_sword\",Count:1,Damage:$item,tag:{Unbreakable:1}}]},RequiredPlayerRange:0,MaxNearbyEntities:0}"
-            )
+        return location.run {
+            if (setBlockType(COMMAND_BLOCK)) {
+                offer(
+                    COMMAND,
+                    "setblock ~ ~ ~ minecraft:mob_spawner 0 replace {SpawnData:{id:\"minecraft:armor_stand\",ArmorItems:[{},{},{},{id:\"minecraft:wooden_sword\",Count:1,Damage:$item,tag:{Unbreakable:1}}]},RequiredPlayerRange:0,MaxNearbyEntities:0}"
+                )
 
-            (tileEntity.get() as CommandBlock).execute()
+                (tileEntity.get() as CommandBlock).execute()
 
-            offer(DataBlockType(blockItem[DataBlockType.key].get()))
+                offer(DataBlockType(blockItem[DataBlockType.key].get()))
+
+                true
+            } else false
         }
     }
 

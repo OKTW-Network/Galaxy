@@ -88,19 +88,23 @@ class FakeBlock {
     private fun placeBlock(blockItem: ItemStack, location: Location<World>): Boolean {
         val item = 59 - blockItem[ITEM_DURABILITY].get()
 
-        return location.run {
-            if (setBlockType(COMMAND_BLOCK)) {
-                offer(
-                    COMMAND,
-                    "setblock ~ ~ ~ minecraft:mob_spawner 0 replace {SpawnData:{id:\"minecraft:armor_stand\",ArmorItems:[{},{},{},{id:\"minecraft:wooden_sword\",Count:1,Damage:$item,tag:{Unbreakable:1}}]},RequiredPlayerRange:0,MaxNearbyEntities:0}"
-                )
+        location.run {
+            blockType = COMMAND_BLOCK
 
-                (tileEntity.get() as CommandBlock).execute()
+            // test place block success
+            val commandBlock = tileEntity.orElse(null) as? CommandBlock ?: return false
 
-                offer(DataBlockType(blockItem[DataBlockType.key].get()))
+            // place spawner
+            offer(
+                COMMAND,
+                "setblock ~ ~ ~ minecraft:mob_spawner 0 replace {SpawnData:{id:\"minecraft:armor_stand\",ArmorItems:[{},{},{},{id:\"minecraft:wooden_sword\",Count:1,Damage:$item,tag:{Unbreakable:1}}]},RequiredPlayerRange:0,MaxNearbyEntities:0}"
+            )
+            commandBlock.execute()
 
-                true
-            } else false
+            // offer block type data
+            offer(DataBlockType(blockItem[DataBlockType.key].get()))
+
+            return true
         }
     }
 

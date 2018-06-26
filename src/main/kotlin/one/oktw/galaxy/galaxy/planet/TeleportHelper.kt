@@ -1,6 +1,7 @@
 package one.oktw.galaxy.galaxy.planet
 
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
@@ -28,29 +29,30 @@ class TeleportHelper {
             planet.loadWorld()?.let { teleport(player, it) } ?: false
         }
 
+        fun teleport(player: Player, world: World) = async(serverThread) {
+            if (getAccess(player, world) == DENY) return@async false
+            if (!player.transferToWorld(world)) return@async false
 
-        suspend fun teleport(player: Player, world: World): Boolean {
-            if (getAccess(player, world) == DENY) return false
-            if (!player.transferToWorld(world)) return false
-
-            if (galaxyManager.get(world).await()?.getPlanet(world)?.checkPermission(player) == VIEW) {
-                setViewer(player.uniqueId)
-            } else {
-                removeViewer(player.uniqueId)
+            launch {
+                if (galaxyManager.get(world).await()?.getPlanet(world)?.checkPermission(player) == VIEW) {
+                    setViewer(player.uniqueId)
+                } else {
+                    removeViewer(player.uniqueId)
+                }
             }
 
-            return true
+            return@async true
         }
 
-        suspend fun teleport(player: Player, location: Location<World>, safety: Boolean = false): Boolean {
+        fun teleport(player: Player, location: Location<World>, safety: Boolean = false) = async(serverThread) {
             val permission = getAccess(player, location.extent)
 
-            if (permission == DENY) return false
-            if (!if (safety) player.setLocationSafely(location) else player.setLocation(location)) return false
+            if (permission == DENY) return@async false
+            if (!if (safety) player.setLocationSafely(location) else player.setLocation(location)) return@async false
 
             if (permission == VIEW) setViewer(player.uniqueId) else removeViewer(player.uniqueId)
 
-            return true
+            return@async true
         }
     }
 }

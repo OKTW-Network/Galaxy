@@ -1,11 +1,9 @@
 package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.languageService
-import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
@@ -86,9 +84,7 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
 
                 if (planet.checkPermission(player) != DENY) {
                     GUIHelper.closeAll(player)
-                    withContext(serverThread) {
-                        TeleportHelper.teleport(player, planet.loadWorld()!!.spawnLocation)
-                    }
+                    TeleportHelper.teleport(player, planet.loadWorld()!!.spawnLocation)
                 }
             }
         }

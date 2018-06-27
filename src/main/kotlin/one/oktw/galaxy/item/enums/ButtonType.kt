@@ -97,7 +97,7 @@ enum class ButtonType(val id: Int) {
     GUI_CORNER_SUPPORT_BOTTOM_RIGHT(94),
     GUI_CORNER_SUPPORT_BOTTOM_LEFT(95),
     GUI_INFO(96),
-    ECO(97),
-    LEAVE(98),
+    ECS(97),
+    EXIT(98),
     STARS(99)
 }

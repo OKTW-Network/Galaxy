@@ -5,6 +5,7 @@ import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.block.CustomBlocks.*
 import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.gui.GUIHelper
+import one.oktw.galaxy.gui.MainMenu
 import one.oktw.galaxy.gui.machine.PlanetTerminal
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
@@ -22,7 +23,7 @@ class BlockGUI {
 
         when (type) {
             DUMMY -> Unit
-            CONTROL_PANEL -> GUIHelper.open(player) { TODO() }
+            CONTROL_PANEL -> GUIHelper.open(player) { MainMenu(player) }
             PLANET_TERMINAL -> launch {
                 galaxyManager.getPlanetFromWorld(worldUUID).await()
                     ?.let { GUIHelper.open(player) { PlanetTerminal(it) } }

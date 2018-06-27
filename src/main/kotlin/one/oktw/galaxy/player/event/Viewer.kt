@@ -17,7 +17,6 @@ import org.spongepowered.api.event.entity.SpawnEntityEvent
 import org.spongepowered.api.event.entity.ai.SetAITargetEvent
 import org.spongepowered.api.event.filter.Getter
 import org.spongepowered.api.event.filter.cause.All
-import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.event.filter.cause.Root
 import org.spongepowered.api.event.item.inventory.DropItemEvent
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
@@ -56,7 +55,7 @@ class Viewer {
     }
 
     @Listener(order = Order.FIRST)
-    fun onDropItem(event: DropItemEvent.Pre, @First player: Player) {
+    fun onDropItem(event: DropItemEvent.Pre, @Root player: Player) {
         if (isViewer(player.uniqueId)) event.isCancelled = true
     }
 
@@ -76,7 +75,7 @@ class Viewer {
     }
 
     @Listener(order = Order.FIRST)
-    fun onInteractBlock(event: InteractBlockEvent, @First player: Player) {
+    fun onInteractBlock(event: InteractBlockEvent, @Root player: Player) {
         if (isViewer(player.uniqueId)) {
             event.isCancelled = true
             event.targetBlock.location.ifPresent {
@@ -94,7 +93,7 @@ class Viewer {
     }
 
     @Listener(order = Order.FIRST)
-    fun onInteractItem(event: InteractItemEvent.Secondary, @First player: Player) {
+    fun onInteractItem(event: InteractItemEvent.Secondary, @Root player: Player) {
         val blockList = asList(
             BOW,
             ENDER_PEARL,
@@ -133,15 +132,15 @@ class Viewer {
 
     @Listener(order = Order.FIRST)
     fun onCollideEntity(event: CollideEntityEvent) {
-        if (event.cause.filterIsInstance<Player>().any { isViewer(it.uniqueId) }) {
+        if (event.cause.first(Player::class.java).orElse(null)?.let { isViewer(it.uniqueId) } == true) {
             event.isCancelled = true
         } else {
-            event.filterEntities { !isViewer(it.uniqueId) }
+            event.filterEntities { it !is Player || !isViewer(it.uniqueId) }
         }
     }
 
     @Listener(order = Order.FIRST)
-    fun onCollideBlock(event: CollideBlockEvent, @First player: Player) {
+    fun onCollideBlock(event: CollideBlockEvent, @Root player: Player) {
         if (isViewer(player.uniqueId)) event.isCancelled = true
     }
 

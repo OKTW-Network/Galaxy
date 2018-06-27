@@ -16,7 +16,9 @@ import org.spongepowered.api.event.entity.InteractEntityEvent
 import org.spongepowered.api.event.entity.SpawnEntityEvent
 import org.spongepowered.api.event.entity.ai.SetAITargetEvent
 import org.spongepowered.api.event.filter.Getter
+import org.spongepowered.api.event.filter.cause.All
 import org.spongepowered.api.event.filter.cause.First
+import org.spongepowered.api.event.filter.cause.Root
 import org.spongepowered.api.event.item.inventory.DropItemEvent
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
 import org.spongepowered.api.event.network.ClientConnectionEvent
@@ -59,21 +61,16 @@ class Viewer {
     }
 
     @Listener(order = Order.FIRST)
-    fun onSpawnEntity(event: SpawnEntityEvent) {
-        val source = event.cause.allOf(Player::class.java).any { isViewer(it.uniqueId) }
-
-        if (source) event.isCancelled = true
+    fun onSpawnEntity(event: SpawnEntityEvent, @All players: Array<Player>) {
+        if (players.any { isViewer(it.uniqueId) }) event.isCancelled = true
     }
 
     @Listener(order = Order.FIRST)
-    fun onChangeBlock(event: ChangeBlockEvent, @First player: Player) {
+    fun onChangeBlock(event: ChangeBlockEvent.Pre, @Root player: Player) {
         if (isViewer(player.uniqueId)) {
             event.isCancelled = true
-            event.transactions.forEach {
-                it.original.location.ifPresent {
-                    (it.extent as WorldServer).playerChunkMap
-                        .markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))
-                }
+            event.locations.forEach {
+                (it.extent as WorldServer).playerChunkMap.markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))
             }
         }
     }

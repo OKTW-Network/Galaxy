@@ -14,7 +14,7 @@ class CommandRegister {
         Sponge.getCommandManager().apply {
             register(main, UnStuck().spec, "unstuck")
             register(main, Sign().spec, "sign")
-            register(main, Admin().spec, "Admin")
+            register(main, Admin().spec, "admin")
         }
     }
 }

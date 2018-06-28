@@ -44,7 +44,7 @@ class GalaxyManager {
 
     fun get(uuid: UUID? = null, planet: UUID? = null) = async {
         uuid?.let { collection.find(eq("uuid", uuid)).first() }
-                ?: planet?.let { collection.find(eq("planets.uuid")).first() }
+                ?: planet?.let { collection.find(eq("planets.uuid",planet)).first() }
     }
 
     fun get(worldProperties: WorldProperties): Deferred<Galaxy?> = async {

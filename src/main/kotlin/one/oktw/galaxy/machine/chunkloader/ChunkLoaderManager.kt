@@ -4,10 +4,8 @@ import com.flowpowered.math.vector.Vector3i
 import com.mongodb.client.model.Filters.eq
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import one.oktw.galaxy.galaxy.planet.data.Position
@@ -41,7 +39,7 @@ class ChunkLoaderManager {
                 val planet = galaxyManager.get(planet = it.position.planet!!).await()?.getPlanet(it.position.planet!!)
                         ?: return@forEach
                 val range = (it.upgrade.maxBy { it.level }?.level ?: 0) * 2 + 1
-                val world = withContext(serverThread) { planet.loadWorld() } ?: return@launch
+                val world = planet.loadWorld() ?: return@launch
 
                 worldTickets[it.uuid] = loadChunk(world.getLocation(it.position.toVector3d()), range)
             }

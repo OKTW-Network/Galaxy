@@ -1,6 +1,8 @@
 package one.oktw.galaxy.galaxy.planet
 
+import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.planet.gen.PlanetGenModifier
 import org.spongepowered.api.Sponge
@@ -64,8 +66,8 @@ class PlanetHelper {
             return server.deleteWorld(properties)
         }
 
-        fun loadPlanet(planet: Planet): World? {
-            return server.getWorldProperties(planet.world).orElse(null)?.let {
+        fun loadPlanet(planet: Planet): World? = runBlocking(serverThread) {
+            server.getWorldProperties(planet.world).orElse(null)?.let {
                 planet.lastTime = Date()
                 it.setGenerateSpawnOnLoad(false)
                 server.loadWorld(it).orElse(null)

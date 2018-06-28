@@ -1,4 +1,4 @@
-package one.oktw.galaxy.command.debug
+package one.oktw.galaxy.command.admin
 
 import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.command.CommandBase
@@ -24,7 +24,7 @@ import org.spongepowered.api.text.Text
 class Gun : CommandBase {
     override val spec: CommandSpec
         get() = CommandSpec.builder()
-            .permission("oktw.command.debug.gun")
+            .permission("oktw.command.admin.gun")
             .child(Add().spec, "add")
             .child(Remove().spec, "remove")
             .child(Get().spec, "get")
@@ -41,7 +41,7 @@ class Gun : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
                 .executor(this)
-                .permission("oktw.command.debug.gun.add")
+                .permission("oktw.command.admin.gun.add")
                 .arguments(
                     GenericArguments.integer(Text.of("Heat")),
                     GenericArguments.integer(Text.of("Max Heat")),
@@ -85,7 +85,7 @@ class Gun : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
                 .executor(this)
-                .permission("oktw.command.debug.gun.remove")
+                .permission("oktw.command.admin.gun.remove")
                 .arguments(GenericArguments.integer(Text.of("Gun")))
                 .build()
 
@@ -102,7 +102,7 @@ class Gun : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
                 .executor(this)
-                .permission("oktw.command.debug.gun.get")
+                .permission("oktw.command.admin.gun.get")
                 .arguments(GenericArguments.integer(Text.of("Gun")))
                 .build()
 
@@ -122,7 +122,7 @@ class Gun : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
                 .executor(this)
-                .permission("oktw.command.debug.gun.list")
+                .permission("oktw.command.admin.gun.list")
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {

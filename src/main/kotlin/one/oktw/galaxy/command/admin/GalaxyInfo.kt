@@ -1,4 +1,4 @@
-package one.oktw.galaxy.command.debug
+package one.oktw.galaxy.command.admin
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
@@ -14,7 +14,7 @@ import java.util.*
 
 class GalaxyInfo : CommandBase {
     override val spec: CommandSpec = CommandSpec.builder()
-        .permission("oktw.command.debug.galaxy")
+        .permission("oktw.command.admin.galaxy")
         .arguments(GenericArguments.uuid(Text.of("galaxy")))
         .executor(this)
         .build()

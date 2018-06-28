@@ -1,4 +1,4 @@
-package one.oktw.galaxy.command.debug
+package one.oktw.galaxy.command.admin
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
@@ -16,7 +16,7 @@ import org.spongepowered.api.text.Text
 
 class PlayerInfo : CommandBase {
     override val spec: CommandSpec = CommandSpec.builder()
-        .permission("oktw.command.debug.player")
+        .permission("oktw.command.admin.player")
         .arguments(GenericArguments.playerOrSource(Text.of("player")))
         .executor(this)
         .build()

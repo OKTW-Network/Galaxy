@@ -1,4 +1,4 @@
-package one.oktw.galaxy.command.debug
+package one.oktw.galaxy.command.admin
 
 import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.player.event.Viewer.Companion.isViewer
@@ -14,7 +14,7 @@ import org.spongepowered.api.text.Text
 
 class Viewer : CommandBase {
     override val spec: CommandSpec = CommandSpec.builder()
-        .permission("oktw.command.debug.viewer")
+        .permission("oktw.command.admin.viewer")
         .arguments(
             GenericArguments.playerOrSource(Text.of("player")),
             GenericArguments.optional(GenericArguments.bool(Text.of("enable")))

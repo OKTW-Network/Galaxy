@@ -7,7 +7,7 @@ import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
 import org.spongepowered.api.command.spec.CommandSpec
 
-class Debug : CommandBase {
+class Admin : CommandBase {
     override val spec: CommandSpec = CommandSpec.builder()
         .permission("oktw.command.debug")
         .child(Gun().spec, "gun")

@@ -15,6 +15,7 @@ class Admin : CommandBase {
         .child(TPX().spec, "tpx")
         .child(PlayerInfo().spec, "player")
         .child(GalaxyInfo().spec, "galaxy")
+        .child(Block().spec, "block")
         .executor(this)
         .build()
 

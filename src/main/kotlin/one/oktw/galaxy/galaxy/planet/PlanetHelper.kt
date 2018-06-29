@@ -69,14 +69,18 @@ class PlanetHelper {
         suspend fun loadPlanet(planet: Planet): World? = withContext(serverThread) {
             server.getWorldProperties(planet.world).orElse(null)?.let {
                 planet.lastTime = Date()
+                it.worldBorderDiameter = (planet.size * 16).toDouble()
                 it.setGenerateSpawnOnLoad(false)
+                server.saveWorldProperties(it)
                 server.loadWorld(it).orElse(null)
             }
         }
 
         fun updatePlanet(planet: Planet) {
-            server.getWorldProperties(planet.world)
-                .ifPresent { it.worldBorderDiameter = (planet.size * 16).toDouble() }
+            server.getWorldProperties(planet.world).ifPresent {
+                it.worldBorderDiameter = (planet.size * 16).toDouble()
+                server.saveWorldProperties(it)
+            }
         }
     }
 }

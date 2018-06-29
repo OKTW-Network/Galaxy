@@ -3,8 +3,10 @@ package one.oktw.galaxy.economy.event
 import kotlinx.coroutines.experimental.launch
 import net.minecraftforge.event.entity.player.PlayerPickupXpEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.languageService
-import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.getTraveler
+import one.oktw.galaxy.galaxy.data.extensions.getMember
+import one.oktw.galaxy.galaxy.data.extensions.saveMember
 import one.oktw.galaxy.player.data.ActionBarData
 import one.oktw.galaxy.player.service.ActionBar
 import org.spongepowered.api.entity.living.player.Player
@@ -16,7 +18,13 @@ class TravelerEvent {
     fun onPickupExp(event: PlayerPickupXpEvent) {
         val player = event.entityPlayer as Player
 
-        launch { getTraveler(player).await()?.giveStarDust(event.orb.xpValue) }
+        launch {
+            galaxyManager.get(player.world).await()?.run {
+                getMember(player.uniqueId)
+                    ?.apply { giveStarDust(event.orb.xpValue) }
+                    ?.let(::saveMember)
+            }
+        }
 
         ActionBarData(
             Text.of(

@@ -8,13 +8,12 @@ import one.oktw.galaxy.item.type.Item
 import one.oktw.galaxy.item.type.Upgrade
 import org.spongepowered.api.item.inventory.ItemStack
 import java.util.*
-import kotlin.collections.ArrayList
 
 data class Traveler(
     val uuid: UUID = dummyUUID,
     var group: Group = VISITOR,
     var armor: ArrayList<Upgrade> = ArrayList(),
     var item: ArrayList<Item> = ArrayList(),
-    var inventory: List<ItemStack> = ArrayList(),
+    var inventory: ArrayList<ItemStack> = ArrayList(),
     var experience: Int = 0
 ) : StarDustKeeper()

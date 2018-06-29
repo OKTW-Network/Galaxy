@@ -52,6 +52,10 @@ fun Galaxy.delMember(uuid: UUID) {
     save()
 }
 
+fun Galaxy.saveMember(traveler: Traveler) {
+    members.replaceAll { if (it.uuid == traveler.uuid) traveler else it }
+}
+
 fun Galaxy.getMember(uuid: UUID) = members.firstOrNull { it.uuid == uuid }
 
 fun Galaxy.setGroup(uuid: UUID, group: Group) {

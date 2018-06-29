@@ -9,29 +9,25 @@ import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.Slot
+import java.util.*
 
 class TravelerHelper {
     companion object {
         fun getTraveler(player: Player) = async { galaxyManager.get(player.world).await()?.getMember(player.uniqueId) }
 
-        fun saveTraveler(player: Player, clean: Boolean = false) = async(serverThread) {
-            val traveler = getTraveler(player).await()?.apply {
-                experience = player[Keys.TOTAL_EXPERIENCE].get()
-                inventory = player.inventory.slots<Slot>().map { it.peek().orElse(ItemStack.empty()) }
-            } ?: return@async null
-
-            if (clean) cleanPlayer(player)
-
-            galaxyManager.get(player.world).await()?.members?.run {
-                set(indexOfFirst { it.uuid == player.uniqueId }, traveler)
-            }
+        fun saveTraveler(traveler: Traveler, player: Player) = async(serverThread) {
+            traveler.experience = player[Keys.TOTAL_EXPERIENCE].get()
+            traveler.inventory =
+                    player.inventory.slots<Slot>().mapTo(ArrayList()) { it.peek().orElse(ItemStack.empty()) }
 
             return@async traveler
         }
 
         fun loadTraveler(traveler: Traveler, player: Player) {
             player.offer(Keys.TOTAL_EXPERIENCE, traveler.experience)
-            player.inventory.slots<Slot>().forEachIndexed { index, slot -> slot.set(traveler.inventory[index]) }
+            player.inventory.slots<Slot>().forEachIndexed { index, slot ->
+                slot.set(traveler.inventory.getOrElse(index) { ItemStack.empty() })
+            }
         }
 
         fun cleanPlayer(player: Player) {

@@ -3,12 +3,14 @@ package one.oktw.galaxy.player.event
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.armor.ArmorHelper
+import one.oktw.galaxy.galaxy.data.extensions.getMember
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
+import one.oktw.galaxy.galaxy.data.extensions.save
+import one.oktw.galaxy.galaxy.data.extensions.saveMember
 import one.oktw.galaxy.galaxy.planet.data.extensions.checkPermission
 import one.oktw.galaxy.galaxy.planet.enums.AccessLevel.*
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.cleanPlayer
-import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.getTraveler
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.saveTraveler
 import one.oktw.galaxy.player.event.Viewer.Companion.removeViewer
 import one.oktw.galaxy.player.event.Viewer.Companion.setViewer
@@ -41,11 +43,15 @@ class PlayerControl {
 
             if (from?.uuid != to?.uuid) {
                 // save player data
-                from?.let { saveTraveler(player, true).await() } ?: cleanPlayer(player)
+                from?.getMember(player.uniqueId)?.let {
+                    from.saveMember(saveTraveler(it, player).await())
+                    from.save()
+                    cleanPlayer(player)
+                } ?: cleanPlayer(player)
 
                 // load player data
                 to?.let {
-                    getTraveler(player).await()?.also {
+                    it.members.firstOrNull { it.uuid == player.uniqueId }?.also {
                         TravelerHelper.loadTraveler(it, player)
                         ArmorHelper.offerArmor(player)
                     }

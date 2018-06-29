@@ -26,7 +26,7 @@ class TeleportHelper {
         }
 
         fun teleport(player: Player, planet: Planet) = async(serverThread) {
-            planet.loadWorld()?.let { teleport(player, it) } ?: false
+            planet.loadWorld()?.let { teleport(player, it).await() } ?: false
         }
 
         fun teleport(player: Player, world: World) = async(serverThread) {

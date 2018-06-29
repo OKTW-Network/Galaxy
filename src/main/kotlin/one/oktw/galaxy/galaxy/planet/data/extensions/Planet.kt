@@ -16,6 +16,6 @@ suspend fun Planet.checkPermission(player: Player): AccessLevel {
     return if (group != VISITOR) MODIFY else if (visitable) VIEW else DENY
 }
 
-fun Planet.loadWorld(): World? {
+suspend fun Planet.loadWorld(): World? {
     return PlanetHelper.loadPlanet(this)
 }

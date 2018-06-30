@@ -25,12 +25,14 @@ class PlayerInfo : CommandBase {
         val player = args.getOne<Player>("player").get()
 
         launch {
+            val galaxy = galaxyManager.get(player.world).await()
             PaginationList.builder()
                 .contents(
                     Text.of("Name: ", player.name),
                     Text.of("UUID: ", player.uniqueId),
                     Text.of("Viewer mode: ", isViewer(player.uniqueId)),
-                    Text.of("Planet: ", galaxyManager.get(player.world).await()?.getPlanet(player.world))
+                    Text.of("Galaxy: ", galaxy?.name ,"(",galaxy?.uuid,")"),
+                    Text.of("Planet: ", galaxy?.getPlanet(player.world))
                 )
                 .title(Text.of("Player Info"))
                 .sendTo(src)

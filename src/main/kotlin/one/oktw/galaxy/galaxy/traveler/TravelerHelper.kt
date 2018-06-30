@@ -4,6 +4,7 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.serverThread
+import one.oktw.galaxy.armor.ArmorHelper.Companion.offerArmor
 import one.oktw.galaxy.galaxy.data.extensions.getMember
 import one.oktw.galaxy.galaxy.traveler.data.Traveler
 import org.spongepowered.api.data.key.Keys
@@ -25,10 +26,16 @@ class TravelerHelper {
         }
 
         fun loadTraveler(traveler: Traveler, player: Player) = launch(serverThread) {
+            // xp
             player.offer(Keys.TOTAL_EXPERIENCE, traveler.experience)
+
+            // inventory
             player.inventory.slots<Slot>().forEachIndexed { index, slot ->
                 slot.set(traveler.inventory.getOrElse(index) { ItemStack.empty() })
             }
+
+            // armor
+            offerArmor(player)
         }
 
         fun cleanPlayer(player: Player) = launch(serverThread) {

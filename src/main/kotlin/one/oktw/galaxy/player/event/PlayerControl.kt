@@ -4,13 +4,11 @@ import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.serverThread
-import one.oktw.galaxy.armor.ArmorHelper
 import one.oktw.galaxy.galaxy.data.extensions.getMember
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.data.extensions.saveMember
 import one.oktw.galaxy.galaxy.planet.data.extensions.checkPermission
 import one.oktw.galaxy.galaxy.planet.enums.AccessLevel.*
-import one.oktw.galaxy.galaxy.traveler.TravelerHelper
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.cleanPlayer
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.loadTraveler
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.saveTraveler
@@ -68,7 +66,7 @@ class PlayerControl {
         // save and clean player
         launch {
             galaxyManager.get(player.world).await()?.run {
-                getMember(player.uniqueId)?.let {
+                getMember(player.uniqueId)?.also {
                     saveMember(saveTraveler(it, player).await())
                     cleanPlayer(player)
                 }
@@ -86,23 +84,16 @@ class PlayerControl {
 
             if (from?.uuid != to?.uuid) {
                 // save and clean player data
-                from?.getMember(player.uniqueId)?.let {
+                from?.getMember(player.uniqueId)?.also {
                     from.saveMember(saveTraveler(it, player).await())
                     cleanPlayer(player)
                 } ?: cleanPlayer(player)
 
                 // load player data
-                to?.let {
-                    it.members.firstOrNull { it.uuid == player.uniqueId }?.also {
-                        TravelerHelper.loadTraveler(it, player)
-                        ArmorHelper.offerArmor(player)
-                    }
-                }
+                to?.let { it.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }
 
                 // Set GameMode
-                withContext(serverThread) {
-                    player.offer(Keys.GAME_MODE, event.toTransform.extent.properties.gameMode)
-                }
+                withContext(serverThread) { player.offer(Keys.GAME_MODE, event.toTransform.extent.properties.gameMode) }
             }
 
             // check permission

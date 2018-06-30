@@ -4,9 +4,9 @@ import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.Group
-import one.oktw.galaxy.enums.Group.*
-import one.oktw.galaxy.enums.Group.MEMBER
+import one.oktw.galaxy.galaxy.enums.Group
+import one.oktw.galaxy.galaxy.enums.Group.*
+import one.oktw.galaxy.galaxy.enums.Group.MEMBER
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.gui.GUI

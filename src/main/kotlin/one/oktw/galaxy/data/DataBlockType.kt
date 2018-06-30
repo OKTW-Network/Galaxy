@@ -1,9 +1,9 @@
 package one.oktw.galaxy.data
 
 import com.google.common.reflect.TypeToken
-import one.oktw.galaxy.block.CustomBlocks
-import one.oktw.galaxy.block.CustomBlocks.DUMMY
-import one.oktw.galaxy.block.CustomBlocks.valueOf
+import one.oktw.galaxy.block.enums.CustomBlocks
+import one.oktw.galaxy.block.enums.CustomBlocks.DUMMY
+import one.oktw.galaxy.block.enums.CustomBlocks.valueOf
 import org.spongepowered.api.data.DataContainer
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataQuery

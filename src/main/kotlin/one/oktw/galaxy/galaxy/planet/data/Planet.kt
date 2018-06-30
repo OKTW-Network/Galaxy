@@ -1,8 +1,6 @@
 package one.oktw.galaxy.galaxy.planet.data
 
 import one.oktw.galaxy.Main.Companion.dummyUUID
-import one.oktw.galaxy.enums.SecurityLevel
-import one.oktw.galaxy.enums.SecurityLevel.VISIT
 import org.spongepowered.api.effect.potion.PotionEffect
 import java.util.*
 import kotlin.collections.ArrayList

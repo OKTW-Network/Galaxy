@@ -2,8 +2,9 @@ package one.oktw.galaxy.block.event
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.block.CustomBlocks.*
+import one.oktw.galaxy.block.enums.CustomBlocks.*
 import one.oktw.galaxy.data.DataBlockType
+import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.MainMenu
 import one.oktw.galaxy.gui.machine.PlanetTerminal
@@ -18,15 +19,13 @@ class BlockGUI {
     fun onClickBlock(event: InteractBlockEvent.Primary, @First player: Player) {
         if (player[Keys.IS_SNEAKING].orElse(false) == true) return
 
-        val type = event.targetBlock[DataBlockType.key].orElse(null) ?: return
-        val worldUUID = player.world.uniqueId
-
-        when (type) {
+        when (event.targetBlock[DataBlockType.key].orElse(null) ?: return) {
             DUMMY -> Unit
             CONTROL_PANEL -> GUIHelper.open(player) { MainMenu(player) }
             PLANET_TERMINAL -> launch {
-                galaxyManager.getPlanetFromWorld(worldUUID).await()
-                    ?.let { GUIHelper.open(player) { PlanetTerminal(it) } }
+                galaxyManager.get(player.world).await()?.getPlanet(player.world)?.let {
+                    GUIHelper.open(player) { PlanetTerminal(it) }
+                }
             }
             HT_CRAFTING_TABLE -> GUIHelper.open(player) { TODO() }
         }

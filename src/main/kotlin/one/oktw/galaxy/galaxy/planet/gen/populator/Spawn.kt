@@ -1,11 +1,10 @@
 package one.oktw.galaxy.galaxy.planet.gen.populator
 
-import one.oktw.galaxy.Main
-import one.oktw.galaxy.block.CustomBlocks.PLANET_TERMINAL
-import one.oktw.galaxy.data.DataBlockType
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.serverThread
+import one.oktw.galaxy.block.enums.CustomBlocks.PLANET_TERMINAL
+import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import org.spongepowered.api.block.BlockTypes

@@ -1,4 +1,4 @@
-package one.oktw.galaxy.block
+package one.oktw.galaxy.block.enums
 
 enum class CustomBlocks(val id: Int? = null) {
     DUMMY,

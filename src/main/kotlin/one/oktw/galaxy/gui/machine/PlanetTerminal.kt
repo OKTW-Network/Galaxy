@@ -80,27 +80,18 @@ class PlanetTerminal(private val planet: Planet, group: Group = VISITOR) : GUI()
 
         when (group) {
             OWNER, ADMIN -> {
-                inventory.set(2, 3, buttonStarDust)
-                inventory.set(4, 3, buttonECS)
-                inventory.set(6, 3, buttonExit)
+                inventory.set(2, 2, buttonStarDust)
+                inventory.set(4, 2, buttonECS)
+                inventory.set(6, 2, buttonExit)
             }
             MEMBER -> {
-                inventory.set(3, 3, buttonStarDust)
-                inventory.set(5, 3, buttonExit)
+                inventory.set(3, 2, buttonStarDust)
+                inventory.set(5, 2, buttonExit)
             }
             VISITOR -> {
-                inventory.set(4, 3, buttonExit)
+                main.logger.info(buttonExit.toString())
+                inventory.set(4, 2, buttonExit)
             }
-        }
-
-        if (group == OWNER || group == ADMIN) {
-            // ECS
-            Button(UPGRADE).createItemStack()
-                .apply {
-                    offer(DataUUID(buttonID[0]))
-                    offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.PlanetTerminal.Button.ECS"]))
-                }
-                .let { inventory.set(3, 2, it) }
         }
 
         GUIHelper.fillEmptySlot(inventory)

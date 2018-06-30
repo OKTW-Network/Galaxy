@@ -106,4 +106,9 @@ class PlayerControl {
             } ?: setViewer(player.uniqueId)
         }
     }
+
+    @Listener
+    fun disablePortal(event: MoveEntityEvent.Teleport.Portal) {
+        event.toTransform = event.fromTransform
+    }
 }

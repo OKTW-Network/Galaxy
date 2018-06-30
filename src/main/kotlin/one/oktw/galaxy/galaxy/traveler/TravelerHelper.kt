@@ -1,6 +1,7 @@
 package one.oktw.galaxy.galaxy.traveler
 
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.data.extensions.getMember
@@ -23,14 +24,14 @@ class TravelerHelper {
             return@async traveler
         }
 
-        fun loadTraveler(traveler: Traveler, player: Player) {
+        fun loadTraveler(traveler: Traveler, player: Player) = launch(serverThread) {
             player.offer(Keys.TOTAL_EXPERIENCE, traveler.experience)
             player.inventory.slots<Slot>().forEachIndexed { index, slot ->
                 slot.set(traveler.inventory.getOrElse(index) { ItemStack.empty() })
             }
         }
 
-        fun cleanPlayer(player: Player) {
+        fun cleanPlayer(player: Player) = launch(serverThread) {
             player.offer(Keys.TOTAL_EXPERIENCE, 0)
             player.inventory.clear()
         }

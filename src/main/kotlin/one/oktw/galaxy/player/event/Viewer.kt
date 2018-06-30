@@ -1,15 +1,19 @@
 package one.oktw.galaxy.player.event
 
+import kotlinx.coroutines.experimental.launch
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.WorldServer
 import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataItemType
 import org.spongepowered.api.Sponge
-import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.key.Keys.GAME_MODE
+import org.spongepowered.api.data.key.Keys.POTION_EFFECTS
 import org.spongepowered.api.effect.potion.PotionEffect
 import org.spongepowered.api.effect.potion.PotionEffectTypes
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.entity.living.player.gamemode.GameModes.ADVENTURE
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.Order
 import org.spongepowered.api.event.block.ChangeBlockEvent
@@ -40,6 +44,7 @@ class Viewer {
 
         fun setViewer(uuid: UUID) {
             viewer += uuid
+            launch(serverThread) { Sponge.getServer().getPlayer(uuid).ifPresent { it.offer(GAME_MODE, ADVENTURE) } }
         }
 
         fun isViewer(uuid: UUID): Boolean {
@@ -58,7 +63,7 @@ class Viewer {
                 Sponge.getServer().onlinePlayers.forEach {
                     if (!isViewer(it.uniqueId)) return@forEach
 
-                    it.transform(Keys.POTION_EFFECTS) {
+                    it.transform(POTION_EFFECTS) {
                         (it ?: ArrayList()).apply { add(PotionEffect.of(PotionEffectTypes.SATURATION, 100, 1)) }
                     }
                 }

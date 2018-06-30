@@ -25,7 +25,7 @@ fun Galaxy.update(block: Galaxy.() -> Unit) = launch {
     refresh().also(block).save()
 }
 
-fun Galaxy.createPlanet(name: String): Planet {
+suspend fun Galaxy.createPlanet(name: String): Planet {
     val planet = PlanetHelper.createPlanet(name)
     update { planets.add(planet) }
 

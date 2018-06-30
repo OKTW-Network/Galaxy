@@ -46,15 +46,15 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.createGalaxy")
                 .arguments(
-                    GenericArguments.playerOrSource(Text.of("player")),
-                    GenericArguments.string(Text.of("name"))
+                    GenericArguments.string(Text.of("name")),
+                    GenericArguments.playerOrSource(Text.of("player"))
                 )
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             val player = args.getOne<Player>("player").get()
             val galaxy = GalaxyManager().createGalaxy(args.getOne<String>("name").get(),player)
-            src.sendMessage(Text.of(galaxy.uuid))
+            src.sendMessage(Text.of(TextColors.GREEN,galaxy.uuid))
             return CommandResult.success()
         }
     }
@@ -65,8 +65,8 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.createPlanet")
                 .arguments(
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
-                    GenericArguments.string(Text.of("name"))
+                    GenericArguments.string(Text.of("name")),
+                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
                 )
                 .build()
 
@@ -79,7 +79,7 @@ class GalaxyManage : CommandBase {
                     return@launch
                 }
                 val planet = galaxyManager.get(uuid).await()!!.createPlanet(args.getOne<String>("name").get())
-                src.sendMessage(Text.of(planet.uuid))
+                src.sendMessage(Text.of(TextColors.GREEN,planet.uuid))
             }
             return CommandResult.success()
         }
@@ -91,8 +91,8 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.addMember")
                 .arguments(
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
-                    GenericArguments.playerOrSource(Text.of("player")))
+                    GenericArguments.playerOrSource(Text.of("player")),
+                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))))
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
@@ -117,9 +117,9 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.SetGroup")
                 .arguments(
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
                     GenericArguments.playerOrSource(Text.of("player")),
-                    GenericArguments.enumValue(Text.of("Group"), Group::class.java)
+                    GenericArguments.enumValue(Text.of("Group"), Group::class.java),
+                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
                 )
                 .build()
 
@@ -146,8 +146,8 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.removeMember")
                 .arguments(
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
-                    GenericArguments.playerOrSource(Text.of("player")))
+                    GenericArguments.playerOrSource(Text.of("player")),
+                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))))
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
@@ -172,8 +172,8 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.rename")
                 .arguments(
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
-                    GenericArguments.string(Text.of("name"))
+                    GenericArguments.string(Text.of("name")),
+                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
                 )
                 .build()
 
@@ -187,7 +187,7 @@ class GalaxyManage : CommandBase {
                 }
                 val galaxy = galaxyManager.get(uuid).await()!!
                 galaxy.update {name = args.getOne<String>("name").get() }
-                src.sendMessage(Text.of(TextColors.GREEN,"Galaxy Renamed to",galaxy.name,"!"))
+                src.sendMessage(Text.of(TextColors.GREEN,"Galaxy Renamed to ",galaxy.name,"!"))
             }
             return CommandResult.success()
         }
@@ -199,8 +199,8 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.info")
                 .arguments(
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
-                    GenericArguments.string(Text.of("text"))
+                    GenericArguments.string(Text.of("text")),
+                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
                 )
                 .build()
 
@@ -214,7 +214,7 @@ class GalaxyManage : CommandBase {
                 }
                 val galaxy = galaxyManager.get(uuid).await()!!
                 galaxy.update { info = args.getOne<String>("text").get() }
-                src.sendMessage(Text.of(TextColors.GREEN,"Info set to",galaxy.info,"!"))
+                src.sendMessage(Text.of(TextColors.GREEN,"Info set to ",galaxy.info,"!"))
             }
             return CommandResult.success()
         }
@@ -226,8 +226,8 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.notice")
                 .arguments(
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
-                    GenericArguments.string(Text.of("text"))
+                    GenericArguments.string(Text.of("text")),
+                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
                 )
                 .build()
 
@@ -241,7 +241,7 @@ class GalaxyManage : CommandBase {
                 }
                 val galaxy = galaxyManager.get(uuid).await()!!
                 galaxy.update { notice = args.getOne<String>("text").get() }
-                src.sendMessage(Text.of(TextColors.GREEN,"Notice set to",galaxy.notice,"!"))
+                src.sendMessage(Text.of(TextColors.GREEN,"Notice set to ",galaxy.notice,"!"))
             }
             return CommandResult.success()
         }
@@ -253,8 +253,8 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.setSize")
                 .arguments(
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("planet"))),
-                    GenericArguments.integer(Text.of("size"))
+                    GenericArguments.integer(Text.of("size")),
+                    GenericArguments.optional(GenericArguments.uuid(Text.of("planet")))
                 )
                 .build()
 

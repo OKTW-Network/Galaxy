@@ -16,7 +16,7 @@ import org.spongepowered.api.event.filter.cause.First
 
 class BlockGUI {
     @Listener
-    fun onClickBlock(event: InteractBlockEvent.Primary, @First player: Player) {
+    fun onClickBlock(event: InteractBlockEvent.Secondary, @First player: Player) {
         if (player[Keys.IS_SNEAKING].orElse(false) == true) return
 
         when (event.targetBlock[DataBlockType.key].orElse(null) ?: return) {

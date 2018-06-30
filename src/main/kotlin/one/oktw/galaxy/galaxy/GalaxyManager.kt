@@ -53,7 +53,7 @@ class GalaxyManager {
 
     fun get(world: World) = get(world.properties)
 
-    fun get(player: Player) = async { collection.find(eq("member.uuid", player.uniqueId)).asSequence() }
+    fun get(player: Player) = async { collection.find(eq("members.uuid", player.uniqueId)).asSequence() }
 
     fun listGalaxy() = async { collection.find().asSequence() }
 

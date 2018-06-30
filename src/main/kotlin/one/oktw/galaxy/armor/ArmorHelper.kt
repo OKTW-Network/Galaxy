@@ -1,15 +1,18 @@
 package one.oktw.galaxy.armor
 
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED
 import net.minecraft.entity.ai.attributes.AttributeModifier
 import one.oktw.galaxy.Main.Companion.languageService
-import one.oktw.galaxy.Main.Companion.travelerManager
+import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.armor.ArmorEffect.Companion.offerEffect
 import one.oktw.galaxy.armor.ArmorEffect.Companion.removeEffect
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.getTraveler
 import one.oktw.galaxy.item.enums.ItemType.ARMOR
 import one.oktw.galaxy.item.enums.UpgradeType.*
 import org.spongepowered.api.data.key.Keys.*
@@ -28,25 +31,20 @@ import java.util.Arrays.asList
 
 class ArmorHelper {
     companion object {
-        fun offerArmor(player: Player) {
+        fun offerArmor(player: Player) = launch {
             val lang = languageService.getDefaultLanguage() // TODO set language
-            val upgrade = travelerManager.getTraveler(player).armor
+            val upgrade = getTraveler(player).await()?.armor ?: return@launch
             val helmet: ItemStack = getArmor(DIAMOND_HELMET)
             val chestplate: ItemStack = getArmor(DIAMOND_CHESTPLATE)
             val leggings: ItemStack = getArmor(DIAMOND_LEGGINGS)
             val boots: ItemStack = getArmor(DIAMOND_BOOTS)
+
             upgrade.firstOrNull { it.type == NIGHT_VISION }?.apply {
                 helmet.apply {
                     offer(DataEnable())
                     offer(
                         ITEM_LORE,
-                        asList(
-                            Text.of(
-                                TextColors.RED,
-                                TextStyles.UNDERLINE,
-                                lang["armor.effect.night_vision"]
-                            ).toText()
-                        )
+                        asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang["armor.effect.night_vision"]))
                     )
                 }
             }
@@ -79,24 +77,27 @@ class ArmorHelper {
                     offer(DataEnable())
                     offer(
                         ITEM_LORE,
-                        asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang["armor.effect.jump_boost"]).toText())
+                        asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang["armor.effect.jump_boost"]))
                     )
                 }
+
                 boots.apply {
                     offer(DataEnable())
                     offer(
                         ITEM_LORE,
-                        asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang["armor.effect.speed_boost"]).toText())
+                        asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang["armor.effect.speed_boost"]))
                     )
                 }
             }
 
-            upgrade.firstOrNull { it.type == FLY }?.apply { player.offer(CAN_FLY, true) }
+            withContext(serverThread) {
+                upgrade.firstOrNull { it.type == FLY }?.apply { player.offer(CAN_FLY, true) }
 
-            player.setHelmet(helmet)
-            player.setChestplate(chestplate)
-            player.setLeggings(leggings)
-            player.setBoots(boots)
+                player.setHelmet(helmet)
+                player.setChestplate(chestplate)
+                player.setLeggings(leggings)
+                player.setBoots(boots)
+            }
         }
 
         fun toggleHelmet(player: Player) {
@@ -115,9 +116,9 @@ class ArmorHelper {
             // TODO
         }
 
-        fun toggleLeggings(player: Player) {
+        fun toggleLeggings(player: Player) = launch(serverThread) {
             val item = player.leggings.get()
-            val armor = travelerManager.getTraveler(player).armor
+            val armor = getTraveler(player).await()?.armor ?: return@launch
 
             if (item[DataEnable.key].get()) {
                 removeEffect(player, JUMP_BOOST)
@@ -128,9 +129,9 @@ class ArmorHelper {
             player.setLeggings(toggleArmorStatus(item))
         }
 
-        fun toggleBoots(player: Player) {
+        fun toggleBoots(player: Player) = launch(serverThread) {
             val item = player.boots.get()
-            val armor = travelerManager.getTraveler(player).armor
+            val armor = getTraveler(player).await()?.armor ?: return@launch
 
             if (item[DataEnable.key].get()) {
                 @Suppress("CAST_NEVER_SUCCEEDS")

@@ -1,4 +1,4 @@
-package one.oktw.galaxy.enums
+package one.oktw.galaxy.galaxy.enums
 
 enum class Group {
     OWNER,

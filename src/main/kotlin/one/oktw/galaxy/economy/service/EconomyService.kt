@@ -12,7 +12,6 @@ class EconomyService {
             Task.builder()
                 .name("EconomyService")
                 .interval(20, TimeUnit.MINUTES)
-                .async()
                 .execute(::dailyTask)
                 .submit(main)
         }

@@ -1,6 +1,7 @@
 package one.oktw.galaxy.gui.machine
 
 import kotlinx.coroutines.experimental.launch
+import one.oktw.galaxy.Main.Companion.chunkLoaderManager
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
@@ -12,7 +13,6 @@ import one.oktw.galaxy.item.enums.ButtonType.X
 import one.oktw.galaxy.item.enums.UpgradeType
 import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.item.type.Upgrade
-import one.oktw.galaxy.machine.chunkloader.ChunkLoader.Companion.chunkLoaderManager
 import one.oktw.galaxy.machine.chunkloader.data.ChunkLoader
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.Entity
@@ -98,11 +98,7 @@ class ChunkLoader(val entity: Entity) : GUI() {
 
                     chunkLoader.upgrade = it as ArrayList<Upgrade>
 
-                    if (newLevel != originLevel) {
-                        launch { chunkLoaderManager.updateChunkLoader(chunkLoader, true) }
-                    } else {
-                        launch { chunkLoaderManager.updateChunkLoader(chunkLoader) }
-                    }
+                    chunkLoaderManager.updateChunkLoader(chunkLoader, newLevel != originLevel)
                 }
         }
     }

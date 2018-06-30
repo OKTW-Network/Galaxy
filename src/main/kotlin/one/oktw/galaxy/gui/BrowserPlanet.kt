@@ -1,16 +1,14 @@
 package one.oktw.galaxy.gui
 
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.AccessLevel.DENY
 import one.oktw.galaxy.galaxy.data.Galaxy
+import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
-import one.oktw.galaxy.galaxy.planet.data.extensions.checkPermission
-import one.oktw.galaxy.galaxy.planet.data.extensions.loadWorld
 import one.oktw.galaxy.item.enums.ButtonType.PLANET_O
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import one.oktw.galaxy.item.type.Button
@@ -52,9 +50,9 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
                         ), // TODO
                         Text.of(
                             TextColors.AQUA,
-                            "${lang["UI.BrowserPlanet.Details.Security"]}: ",
+                            "${lang["UI.BrowserPlanet.Details.Visitable.text"]}: ",
                             TextColors.RESET,
-                            it.security.toString()
+                            lang["UI.BrowserPlanet.Details.Visitable.${it.visitable}"]
                         )
                     )
                 )
@@ -78,14 +76,10 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
         if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
             event.isCancelled = true
 
-            // TODO async
-            runBlocking {
-                val planet = galaxyManager.getPlanet(uuid).await() ?: return@runBlocking
+            launch {
+                val planet = galaxyManager.get(planet = uuid).await()?.getPlanet(uuid) ?: return@launch
 
-                if (planet.checkPermission(player) != DENY) {
-                    TeleportHelper.teleport(player, planet.loadWorld().get().spawnLocation)
-                    GUIHelper.closeAll(player)
-                }
+                if (TeleportHelper.teleport(player, planet).await()) GUIHelper.closeAll(player)
             }
         }
     }

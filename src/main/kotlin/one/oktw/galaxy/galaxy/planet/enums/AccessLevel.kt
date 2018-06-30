@@ -1,4 +1,4 @@
-package one.oktw.galaxy.enums
+package one.oktw.galaxy.galaxy.planet.enums
 
 enum class AccessLevel {
     MODIFY,

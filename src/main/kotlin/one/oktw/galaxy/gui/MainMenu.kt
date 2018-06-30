@@ -2,8 +2,8 @@ package one.oktw.galaxy.gui
 
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.Main.Companion.travelerManager
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.getTraveler
 import one.oktw.galaxy.item.enums.ButtonType.GALAXY
 import one.oktw.galaxy.item.enums.ButtonType.PLUS
 import one.oktw.galaxy.item.type.Button
@@ -71,7 +71,7 @@ class MainMenu(val player: Player) : GUI() {
         event.isCancelled = true
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
-            buttonID[0] -> GUIHelper.open(player) { BrowserGalaxy(travelerManager.getTraveler(player)) }
+            buttonID[0] -> GUIHelper.open(player) { BrowserGalaxy(player) }
             buttonID[1] -> GUIHelper.open(player) { CreateGalaxy() }
             buttonID[2] -> GUIHelper.open(player) { BrowserGalaxy() }
         }

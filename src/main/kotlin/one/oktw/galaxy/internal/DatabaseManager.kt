@@ -63,11 +63,11 @@ class DatabaseManager {
                 // connect settings
                 MongoClientSettings.builder()
                     .codecRegistry(it)
-                    .applyConnectionString(ConnectionString(config.string))
+                    .applyConnectionString(ConnectionString(config.string!!))
                     .build()
             }
             .let(MongoClients::create) // connect
-            .getDatabase(ConnectionString(config.string).database!!) // get database
+            .getDatabase(ConnectionString(config.string!!).database!!) // get database
     }
 
     class SpongeDataCodecProvider : CodecProvider {

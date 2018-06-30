@@ -1,8 +1,10 @@
 package one.oktw.galaxy.galaxy.planet.gen.populator
 
-import kotlinx.coroutines.experimental.runBlocking
-import one.oktw.galaxy.Main
+import kotlinx.coroutines.experimental.launch
+import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.PortionTypes
@@ -106,8 +108,8 @@ class Spawn : Populator {
 
         // beacon
         volume.setBlockType(start, BlockTypes.BEACON)
-        runBlocking {
-            Main.galaxyManager.getPlanetFromWorld(world.uniqueId).await()?.uuid?.apply {
+        launch(serverThread) {
+            galaxyManager.get(world).await()?.getPlanet(world)?.uuid?.apply {
                 volume.offer(start, DataUUID(this))
                 volume.addScheduledUpdate(start, 0, 0)
             }

@@ -3,10 +3,11 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.enums.Group.ADMIN
-import one.oktw.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.requestJoin
+import one.oktw.galaxy.galaxy.data.extensions.refresh
+import one.oktw.galaxy.galaxy.enums.Group.ADMIN
+import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys
@@ -109,9 +110,9 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
         val player = event.source as Player
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
-            buttonID[0] -> GUIHelper.open(player) { BrowserMember(galaxy) }
-            buttonID[1] -> GUIHelper.open(player) { BrowserPlanet(galaxy) }
-            buttonID[2] -> GUIHelper.open(player) { GalaxyManagement(galaxy) }
+            buttonID[0] -> GUIHelper.openAsync(player) { BrowserMember(galaxy.refresh()) }
+            buttonID[1] -> GUIHelper.openAsync(player) { BrowserPlanet(galaxy.refresh()) }
+            buttonID[2] -> GUIHelper.openAsync(player) { GalaxyManagement(galaxy.refresh()) }
             buttonID[3] -> {
                 galaxy.requestJoin(player.uniqueId)
 

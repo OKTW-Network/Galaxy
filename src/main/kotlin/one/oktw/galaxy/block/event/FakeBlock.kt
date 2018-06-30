@@ -2,7 +2,7 @@ package one.oktw.galaxy.block.event
 
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.WorldServer
-import one.oktw.galaxy.block.FakeBlockItem
+import one.oktw.galaxy.block.data.FakeBlockItem
 import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.item.enums.ItemType
@@ -39,9 +39,10 @@ class FakeBlock {
 
         if (!isBlock(blockItem) || !checkCanPlace(location)) return
 
-        placeBlock(blockItem, location)
-        playPlaceSound(player)
-        consumeItem(player, hand)
+        if (placeBlock(blockItem, location)) {
+            playPlaceSound(player)
+            consumeItem(player, hand)
+        }
     }
 
     @Listener
@@ -84,19 +85,26 @@ class FakeBlock {
         return location.extent.run { getIntersectingBlockCollisionBoxes(box).isEmpty() && getIntersectingEntities(box).isEmpty() }
     }
 
-    private fun placeBlock(blockItem: ItemStack, location: Location<World>) {
+    private fun placeBlock(blockItem: ItemStack, location: Location<World>): Boolean {
         val item = 59 - blockItem[ITEM_DURABILITY].get()
 
-        location.apply {
+        location.run {
             blockType = COMMAND_BLOCK
+
+            // test place block success
+            val commandBlock = tileEntity.orElse(null) as? CommandBlock ?: return false
+
+            // place spawner
             offer(
                 COMMAND,
                 "setblock ~ ~ ~ minecraft:mob_spawner 0 replace {SpawnData:{id:\"minecraft:armor_stand\",ArmorItems:[{},{},{},{id:\"minecraft:wooden_sword\",Count:1,Damage:$item,tag:{Unbreakable:1}}]},RequiredPlayerRange:0,MaxNearbyEntities:0}"
             )
+            commandBlock.execute()
 
-            (tileEntity.get() as CommandBlock).execute()
-
+            // offer block type data
             offer(DataBlockType(blockItem[DataBlockType.key].get()))
+
+            return true
         }
     }
 

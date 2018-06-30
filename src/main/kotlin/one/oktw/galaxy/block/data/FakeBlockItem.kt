@@ -1,6 +1,7 @@
-package one.oktw.galaxy.block
+package one.oktw.galaxy.block.data
 
 import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.block.enums.FakeBlocks
 import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.item.ItemUtil.Companion.removeCoolDown

@@ -1,9 +1,10 @@
 package one.oktw.galaxy.gui
 
-import one.oktw.galaxy.Main.Companion.main
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
+import one.oktw.galaxy.Main.Companion.serverThread
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
-import org.spongepowered.api.scheduler.Task
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedDeque
 
@@ -12,14 +13,23 @@ class GUIHelper {
         private val sync = ConcurrentHashMap<Player, ConcurrentLinkedDeque<GUI>>()
 
         fun open(player: Player, create: () -> GUI): GUI {
-            val new =
-                create().apply { registerEvent(InteractInventoryEvent.Close::class.java, this@Companion::closeEvent) }
+            val new = create().apply { registerEvent(InteractInventoryEvent.Close::class.java, ::closeEvent) }
             val gui = sync.values.mapNotNull { it.firstOrNull { it.token == new.token } }.firstOrNull() ?: new
 
             sync.getOrPut(player) { ConcurrentLinkedDeque() }.offerLast(gui)
-            Task.builder().execute { _ -> player.openInventory(gui.inventory) }.submit(main)
+            launch(serverThread) { player.openInventory(gui.inventory) }
 
             return gui
+        }
+
+        fun openAsync(player: Player, create: suspend () -> GUI) = async {
+            val new = create().apply { registerEvent(InteractInventoryEvent.Close::class.java, ::closeEvent) }
+            val gui = sync.values.mapNotNull { it.firstOrNull { it.token == new.token } }.firstOrNull() ?: new
+
+            sync.getOrPut(player) { ConcurrentLinkedDeque() }.offerLast(gui)
+            launch(serverThread) { player.openInventory(gui.inventory) }
+
+            return@async gui
         }
 
         fun close(token: String) {
@@ -27,7 +37,7 @@ class GUIHelper {
                 if (stack.peekLast()?.token == token) {
                     stack.pollLast()
                     val gui = stack.peekLast()
-                    if (gui != null) player.openInventory(gui.inventory) else closeInventory(player)
+                    if (gui != null) player.openInventory(gui.inventory) else launch(serverThread) { player.closeInventory() }
                 }
 
                 stack.removeIf { it.token == token }
@@ -35,7 +45,7 @@ class GUIHelper {
         }
 
         fun closeAll(player: Player) {
-            closeInventory(player)
+            launch(serverThread) { player.closeInventory() }
             sync -= player
         }
 
@@ -53,10 +63,6 @@ class GUIHelper {
             } else {
                 sync -= player
             }
-        }
-
-        private fun closeInventory(player: Player) {
-            Task.builder().execute { _ -> player.closeInventory() }.submit(main)
         }
     }
 }

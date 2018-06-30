@@ -3,7 +3,9 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.serverThread
+import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.item.enums.ButtonType.GUI_CENTER
+import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys.DISPLAY_NAME
 import org.spongepowered.api.entity.living.player.Player
@@ -56,7 +58,10 @@ class GUIHelper {
         }
 
         fun fillEmptySlot(inventory: Inventory) {
-            val item = Button(GUI_CENTER).createItemStack().apply { offer(DISPLAY_NAME, Text.of("")) }
+            val item = Button(GUI_CENTER).createItemStack().apply {
+                offer(DISPLAY_NAME, Text.of(""))
+                offer(DataItemType(BUTTON))
+            }
 
             while (inventory.size() < inventory.capacity()) {
                 if (inventory.offer(item.copy()).type != InventoryTransactionResult.Type.SUCCESS) break

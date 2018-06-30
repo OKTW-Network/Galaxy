@@ -16,10 +16,10 @@ import org.spongepowered.api.event.filter.cause.First
 
 class BlockGUI {
     @Listener
-    fun onClickBlock(event: InteractBlockEvent.Secondary, @First player: Player) {
+    fun onClickBlock(event: InteractBlockEvent.Secondary.MainHand, @First player: Player) {
         if (player[Keys.IS_SNEAKING].orElse(false) == true) return
 
-        when (event.targetBlock[DataBlockType.key].orElse(null) ?: return) {
+        when (event.targetBlock.location.orElse(null).get(DataBlockType.key).orElse(null) ?: return) {
             DUMMY -> Unit
             CONTROL_PANEL -> GUIHelper.open(player) { MainMenu(player) }
             PLANET_TERMINAL -> launch {

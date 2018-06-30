@@ -5,6 +5,9 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.WorldServer
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.serverThread
+import one.oktw.galaxy.block.enums.CustomBlocks.CONTROL_PANEL
+import one.oktw.galaxy.block.enums.CustomBlocks.PLANET_TERMINAL
+import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.data.DataItemType
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys.GAME_MODE
@@ -104,6 +107,11 @@ class Viewer {
     @Listener(order = Order.FIRST)
     fun onInteractBlock(event: InteractBlockEvent, @Root player: Player) {
         if (isViewer(player.uniqueId)) {
+            // whitelist some custom blocks
+            event.targetBlock.location.orElse(null)?.get(DataBlockType.key)?.orElse(null)?.let {
+                if (it in asList(PLANET_TERMINAL, CONTROL_PANEL)) return
+            }
+
             event.isCancelled = true
             event.targetBlock.location.ifPresent {
                 (it.extent as WorldServer).playerChunkMap.markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))

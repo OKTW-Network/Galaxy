@@ -1,10 +1,12 @@
-package one.oktw.galaxy.command
+package one.oktw.galaxy.command.admin
 
-import one.oktw.galaxy.Main.Companion.travelerManager
+import kotlinx.coroutines.experimental.runBlocking
+import one.oktw.galaxy.command.CommandBase
+import one.oktw.galaxy.galaxy.traveler.TravelerHelper
 import one.oktw.galaxy.item.enums.ItemType.SWORD
 import one.oktw.galaxy.item.enums.SwordType
 import one.oktw.galaxy.item.type.Sword
-import one.oktw.galaxy.traveler.data.extensions.save
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -25,7 +27,9 @@ class Sword : CommandBase {
             .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-        return CommandResult.empty()
+        src.sendMessage(Sponge.getCommandManager().getUsage(src))
+
+        return CommandResult.success()
     }
 
     class Add : CommandBase {
@@ -45,7 +49,7 @@ class Sword : CommandBase {
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
-                val traveler = travelerManager.getTraveler(src)
+                val traveler = runBlocking { TravelerHelper.getTraveler(src).await()!! }
 
                 val sword = Sword(
                     itemType = SWORD,
@@ -58,7 +62,6 @@ class Sword : CommandBase {
                 )
 
                 traveler.item.add(sword)
-                traveler.save()
 
                 sword.createItemStack().let { src.setItemInHand(
                     if (args.getOne<SwordType>("Type").get() == SwordType.SCABBARD) HandTypes.OFF_HAND else HandTypes.MAIN_HAND, it) }
@@ -78,9 +81,8 @@ class Sword : CommandBase {
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
-                val traveler = travelerManager.getTraveler(src)
+                val traveler = runBlocking { TravelerHelper.getTraveler(src).await()!! }
                 traveler.item.removeAt(args.getOne<Int>("Sword").get())
-                traveler.save()
             }
             return CommandResult.success()
         }
@@ -96,7 +98,7 @@ class Sword : CommandBase {
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
-                val traveler = travelerManager.getTraveler(src)
+                val traveler = runBlocking { TravelerHelper.getTraveler(src).await()!! }
                 val sword = traveler.item[args.getOne<Int>("Sword").get()] as? Sword ?: return CommandResult.empty()
 
                 sword.createItemStack().let { src.setItemInHand(
@@ -116,7 +118,7 @@ class Sword : CommandBase {
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
-                val traveler = travelerManager.getTraveler(src)
+                val traveler = runBlocking { TravelerHelper.getTraveler(src).await()!! }
 
                 src.sendMessage(Text.of(traveler.item.toString()))
             }

@@ -1,5 +1,6 @@
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
@@ -8,6 +9,7 @@ import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
+import one.oktw.galaxy.galaxy.data.extensions.refresh
 import one.oktw.galaxy.galaxy.enums.Group
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import org.spongepowered.api.Sponge
@@ -37,9 +39,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
     override val pages = galaxy.members.asSequence()
-        .filter {
-            if (manage) it.group != Group.OWNER else true
-        }
+        .filter { if (manage) it.group != Group.OWNER else true }
         .map {
             val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(it.uuid).get()
             val status = if (user.isOnline) {
@@ -57,7 +57,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
                     "${runBlocking { galaxyManager.get(world).await()?.getPlanet(world)!!.name }} ",
                     TextStyles.RESET,
                     GRAY,
-                    position,
+                    position.toInt(),
                     RESET,
                     ")"
                 )
@@ -100,8 +100,10 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
         if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
             event.isCancelled = true
 
-            if (manage) {
-                GUIHelper.open(event.source as Player) { ManageMember(galaxy, uuid) }
+            if (!manage) return
+
+            launch {
+                GUIHelper.openAsync(event.source as Player) { ManageMember(galaxy.refresh(), uuid) }.await()
                     .registerEvent(InteractInventoryEvent.Close::class.java) { offerPage(0) }
             }
         }

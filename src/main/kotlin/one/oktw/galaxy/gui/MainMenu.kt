@@ -71,7 +71,7 @@ class MainMenu(val player: Player) : GUI() {
         event.isCancelled = true
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
-            buttonID[0] -> GUIHelper.openAsync(player) { BrowserGalaxy(getTraveler(player).await()) }
+            buttonID[0] -> GUIHelper.open(player) { BrowserGalaxy(player) }
             buttonID[1] -> GUIHelper.open(player) { CreateGalaxy() }
             buttonID[2] -> GUIHelper.open(player) { BrowserGalaxy() }
         }

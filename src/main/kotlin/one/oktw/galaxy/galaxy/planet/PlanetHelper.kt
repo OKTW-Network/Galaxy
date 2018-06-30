@@ -22,8 +22,8 @@ class PlanetHelper {
         suspend fun createPlanet(name: String): Planet {
             if (server.getWorldProperties(name).isPresent)
                 throw IllegalArgumentException("World already exists")
-            if (!name.matches(Regex("[a-z0-9]+", RegexOption.IGNORE_CASE)))
-                throw IllegalArgumentException("Name only allow a~z and 0~9")
+            if (!name.matches(Regex("[a-z0-9\\-_]+", RegexOption.IGNORE_CASE)))
+                throw IllegalArgumentException("Name contains characters that are not allowed")
 
             val properties: WorldProperties
             val archetype = Sponge.getRegistry().getType(WorldArchetype::class.java, name).orElse(null)

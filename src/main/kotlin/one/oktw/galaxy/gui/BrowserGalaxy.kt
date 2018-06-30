@@ -27,7 +27,7 @@ import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 import java.util.Arrays.asList
 
-class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
+class BrowserGalaxy(player: Player? = null) : PageGUI() {
     // Todo get player language
     private val lang = languageService.getDefaultLanguage()
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
@@ -41,7 +41,7 @@ class BrowserGalaxy(traveler: Traveler? = null) : PageGUI() {
 
     init {
         launch {
-            pages = galaxyManager.run { traveler?.let { listGalaxy(it) } ?: listGalaxy() }.await()
+            pages = galaxyManager.run { player?.let { get(it) } ?: listGalaxy() }.await()
                 .map {
                     val owner = userStorage.get(it.members.first { it.group == OWNER }.uuid).get()
 

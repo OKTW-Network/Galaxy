@@ -2,7 +2,7 @@ package one.oktw.galaxy.internal.register
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.block.data.FakeBlockItem
-import one.oktw.galaxy.block.enums.FakeBlocks.HT_CRAFTING_TABLE
+import one.oktw.galaxy.block.enums.CustomBlocks.HT_CRAFTING_TABLE
 import one.oktw.galaxy.item.enums.ToolType.WRENCH
 import one.oktw.galaxy.item.enums.UpgradeType.*
 import one.oktw.galaxy.item.type.Tool

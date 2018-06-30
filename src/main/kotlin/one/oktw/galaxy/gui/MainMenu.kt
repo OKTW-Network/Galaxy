@@ -3,7 +3,6 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
-import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.getTraveler
 import one.oktw.galaxy.item.enums.ButtonType.GALAXY
 import one.oktw.galaxy.item.enums.ButtonType.PLUS
 import one.oktw.galaxy.item.type.Button
@@ -21,7 +20,7 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-class MainMenu(val player: Player) : GUI() {
+class MainMenu(private val player: Player) : GUI() {
     // Todo get player lang
     private val lang = languageService.getDefaultLanguage()
     override val token = "MainMenu-${player.uniqueId}"
@@ -62,6 +61,8 @@ class MainMenu(val player: Player) : GUI() {
                 )
             }
             .let { inventory.set(4, 0, it) }
+
+        GUIHelper.fillEmptySlot(inventory)
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)

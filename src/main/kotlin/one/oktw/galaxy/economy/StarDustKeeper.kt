@@ -7,22 +7,22 @@ open class StarDustKeeper {
     var starDust = 0L
         private set
 
-    fun giveStarDust(number: Int) = giveStarDust(number.toLong())
+    fun giveStarDust(number: Number): Boolean {
+        val i = number.toLong()
 
-    fun giveStarDust(number: Long): Boolean {
-        if (number < 0) return false
+        if (i < 0) return false
 
-        starDust += number
+        starDust += i
 
         return true
     }
 
-    fun takeStarDust(number: Int) = takeStarDust(number.toLong())
+    fun takeStarDust(number: Number): Boolean {
+        val i = number.toLong()
 
-    fun takeStarDust(number: Long): Boolean {
-        if (number < 0 || starDust < number) return false
+        if (i < 0 || starDust < i) return false
 
-        starDust -= number
+        starDust -= i
 
         return true
     }

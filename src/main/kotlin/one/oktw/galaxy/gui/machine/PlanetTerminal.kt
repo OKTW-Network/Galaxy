@@ -1,13 +1,11 @@
 package one.oktw.galaxy.gui.machine
 
-import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.enums.Group
 import one.oktw.galaxy.galaxy.enums.Group.*
 import one.oktw.galaxy.galaxy.enums.Group.MEMBER
-import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUIHelper
@@ -89,7 +87,6 @@ class PlanetTerminal(private val planet: Planet, group: Group = VISITOR) : GUI()
                 inventory.set(5, 2, buttonExit)
             }
             VISITOR -> {
-                main.logger.info(buttonExit.toString())
                 inventory.set(4, 2, buttonExit)
             }
         }
@@ -115,9 +112,7 @@ class PlanetTerminal(private val planet: Planet, group: Group = VISITOR) : GUI()
         when (itemUUID) {
             buttonID[0] -> clickStarDust(player)
             buttonID[1] -> clickECS(player)
-            buttonID[2] -> launch {
-                TeleportHelper.teleport(player, Sponge.getServer().run { getWorld(defaultWorldName).get() })
-            }
+            buttonID[2] -> player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() })
         }
     }
 

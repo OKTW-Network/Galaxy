@@ -86,8 +86,8 @@ class PlayerControl {
                 // save and clean player data
                 from?.getMember(player.uniqueId)?.also {
                     from.saveMember(saveTraveler(it, player).await())
-                    cleanPlayer(player)
-                } ?: cleanPlayer(player)
+                    cleanPlayer(player).join()
+                } ?: cleanPlayer(player).join()
 
                 // load player data
                 to?.let { it.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }

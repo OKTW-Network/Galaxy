@@ -2,6 +2,7 @@ package one.oktw.galaxy.machine.chunkloader
 
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.withContext
+import one.oktw.galaxy.Main.Companion.chunkLoaderManager
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.gui.GUIHelper
@@ -18,28 +19,18 @@ import org.spongepowered.api.event.entity.InteractEntityEvent
 import org.spongepowered.api.event.entity.SpawnEntityEvent
 import org.spongepowered.api.event.filter.Getter
 import org.spongepowered.api.event.filter.cause.First
-import org.spongepowered.api.event.game.state.GameStartingServerEvent
 import org.spongepowered.api.event.world.ExplosionEvent
 
 class ChunkLoader {
-    companion object {
-        lateinit var chunkLoaderManager: ChunkLoaderManager
-            private set
-    }
-
-    @Listener
-    fun onStart(event: GameStartingServerEvent) {
-        chunkLoaderManager = ChunkLoaderManager()
-    }
-
     @Listener
     fun onSpawnEntity(event: SpawnEntityEvent, @First player: Player) {
         val enderCrystal = event.entities.firstOrNull { it is EnderCrystal } as? EnderCrystal ?: return
 
         if (enderCrystal.location.add(0.0, -1.0, 0.0).blockType == BlockTypes.OBSIDIAN) {
             launch {
-                val uuid = chunkLoaderManager.addChunkLoader(enderCrystal.location).await().uuid
-                withContext(serverThread) { enderCrystal.offer(DataUUID(uuid)) }
+                chunkLoaderManager.addChunkLoader(enderCrystal.location).uuid.let {
+                    withContext(serverThread) { enderCrystal.offer(DataUUID(it)) }
+                }
             }
         }
     }

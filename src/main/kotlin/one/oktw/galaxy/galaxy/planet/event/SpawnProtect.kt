@@ -14,10 +14,9 @@ class SpawnProtect {
 
     @Listener
     fun onChangeBlock(event: ChangeBlockEvent.Pre) {
-        if (event.locations.any {
-                it.extent.spawnLocation.blockPosition
-                    .run { AABB(add(2, 3, 2), sub(2, 1, 2)) }
-                    .contains(it.blockPosition)
-            }) event.isCancelled = true
+        val aabb = event.locations.firstOrNull()?.extent?.spawnLocation?.blockPosition
+            ?.run { AABB(add(2, 3, 2), sub(2, 1, 2)) } ?: return
+
+        if (event.locations.any { aabb.contains(it.blockPosition) }) event.isCancelled = true
     }
 }

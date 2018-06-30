@@ -1,6 +1,8 @@
 package one.oktw.galaxy.galaxy.planet
 
+import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.planet.gen.PlanetGenModifier
 import org.spongepowered.api.Sponge
@@ -64,17 +66,21 @@ class PlanetHelper {
             return server.deleteWorld(properties)
         }
 
-        fun loadPlanet(planet: Planet): Optional<World> {
-            return server.getWorldProperties(planet.world!!).orElse(null)?.let {
+        suspend fun loadPlanet(planet: Planet): World? = withContext(serverThread) {
+            server.getWorldProperties(planet.world).orElse(null)?.let {
                 planet.lastTime = Date()
+                it.worldBorderDiameter = (planet.size * 16).toDouble()
                 it.setGenerateSpawnOnLoad(false)
-                server.loadWorld(it)
-            } ?: Optional.empty()
+                server.saveWorldProperties(it)
+                server.loadWorld(it).orElse(null)
+            }
         }
 
         fun updatePlanet(planet: Planet) {
-            server.getWorldProperties(planet.world!!)
-                .ifPresent { it.worldBorderDiameter = (planet.size * 16).toDouble() }
+            server.getWorldProperties(planet.world).ifPresent {
+                it.worldBorderDiameter = (planet.size * 16).toDouble()
+                server.saveWorldProperties(it)
+            }
         }
     }
 }

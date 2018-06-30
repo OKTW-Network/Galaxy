@@ -13,7 +13,7 @@ import one.oktw.galaxy.internal.register.CommandRegister
 import one.oktw.galaxy.internal.register.DataRegister
 import one.oktw.galaxy.internal.register.EventRegister
 import one.oktw.galaxy.internal.register.RecipeRegister
-import one.oktw.galaxy.traveler.TravelerManager
+import one.oktw.galaxy.machine.chunkloader.ChunkLoaderManager
 import org.slf4j.Logger
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.config.ConfigDir
@@ -21,11 +21,15 @@ import org.spongepowered.api.config.DefaultConfig
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.GameRegistryEvent
 import org.spongepowered.api.event.game.GameReloadEvent
-import org.spongepowered.api.event.game.state.*
+import org.spongepowered.api.event.game.state.GameConstructionEvent
+import org.spongepowered.api.event.game.state.GameInitializationEvent
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent
+import org.spongepowered.api.event.game.state.GameStartingServerEvent
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.world.gen.WorldGeneratorModifier
 import java.nio.file.Path
+import java.util.*
 
 @Suppress("UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
 @Plugin(
@@ -36,13 +40,15 @@ import java.nio.file.Path
 )
 class Main {
     companion object {
+        val dummyUUID: UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
+
         lateinit var main: Main
             private set
         lateinit var serverThread: CloseableCoroutineDispatcher
             private set
         lateinit var galaxyManager: GalaxyManager
             private set
-        lateinit var travelerManager: TravelerManager
+        lateinit var chunkLoaderManager: ChunkLoaderManager
             private set
         lateinit var languageService: LanguageService
             private set
@@ -85,24 +91,18 @@ class Main {
         logger.info("Initializing...")
         DatabaseManager()
         galaxyManager = GalaxyManager()
-        travelerManager = TravelerManager()
         EventRegister()
         logger.info("Plugin initialized!")
     }
 
     @Listener
     fun onStarting(event: GameStartingServerEvent) {
+        chunkLoaderManager = ChunkLoaderManager()
         CommandRegister()
     }
 
     @Listener
     fun onReload(event: GameReloadEvent) {
         //TODO
-    }
-
-    @Listener
-    fun onStop(event: GameStoppedServerEvent) {
-        galaxyManager.saveAll()
-        travelerManager.saveAll()
     }
 }

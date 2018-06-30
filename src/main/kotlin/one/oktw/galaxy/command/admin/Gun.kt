@@ -1,6 +1,8 @@
-package one.oktw.galaxy.command
+package one.oktw.galaxy.command.admin
 
-import one.oktw.galaxy.Main.Companion.travelerManager
+import kotlinx.coroutines.experimental.runBlocking
+import one.oktw.galaxy.command.CommandBase
+import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.getTraveler
 import one.oktw.galaxy.item.enums.GunStyle
 import one.oktw.galaxy.item.enums.GunStyle.PISTOL_ORIGIN
 import one.oktw.galaxy.item.enums.GunStyle.SNIPER_SIGHT
@@ -9,7 +11,7 @@ import one.oktw.galaxy.item.enums.ItemType.SNIPER
 import one.oktw.galaxy.item.enums.UpgradeType.THROUGH
 import one.oktw.galaxy.item.type.Gun
 import one.oktw.galaxy.item.type.Upgrade
-import one.oktw.galaxy.traveler.data.extensions.save
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -22,7 +24,7 @@ import org.spongepowered.api.text.Text
 class Gun : CommandBase {
     override val spec: CommandSpec
         get() = CommandSpec.builder()
-            .permission("oktw.command.gun")
+            .permission("oktw.command.admin.gun")
             .child(Add().spec, "add")
             .child(Remove().spec, "remove")
             .child(Get().spec, "get")
@@ -30,14 +32,16 @@ class Gun : CommandBase {
             .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-        return CommandResult.empty()
+        src.sendMessage(Sponge.getCommandManager().getUsage(src))
+
+        return CommandResult.success()
     }
 
     class Add : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
                 .executor(this)
-                .permission("oktw.command.gun.add")
+                .permission("oktw.command.admin.gun.add")
                 .arguments(
                     GenericArguments.integer(Text.of("Heat")),
                     GenericArguments.integer(Text.of("Max Heat")),
@@ -54,7 +58,7 @@ class Gun : CommandBase {
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
-                val traveler = travelerManager.getTraveler(src)
+                val traveler = runBlocking { getTraveler(src).await()!! }
                 val type = if (args.getOne<GunStyle>("Type").get() == SNIPER_SIGHT) SNIPER else PISTOL
                 val gun = Gun(
                     itemType = type,
@@ -69,7 +73,6 @@ class Gun : CommandBase {
                 args.getOne<Int>("Through").ifPresent { gun.upgrade.add(Upgrade(THROUGH, it)) }
 
                 traveler.item.add(gun)
-                traveler.save()
 
                 gun.createItemStack().let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
                 src.sendMessage(Text.of(gun.uuid.toString()))
@@ -82,16 +85,14 @@ class Gun : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
                 .executor(this)
-                .permission("oktw.command.gun.remove")
+                .permission("oktw.command.admin.gun.remove")
                 .arguments(GenericArguments.integer(Text.of("Gun")))
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
-                val traveler = travelerManager.getTraveler(src)
+                val traveler = runBlocking { getTraveler(src).await()!! }
                 traveler.item.removeAt(args.getOne<Int>("Gun").get())
-
-                traveler.save()
             }
             return CommandResult.success()
         }
@@ -101,13 +102,13 @@ class Gun : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
                 .executor(this)
-                .permission("oktw.command.gun.get")
+                .permission("oktw.command.admin.gun.get")
                 .arguments(GenericArguments.integer(Text.of("Gun")))
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
-                val traveler = travelerManager.getTraveler(src)
+                val traveler = runBlocking { getTraveler(src).await()!! }
                 val gun = traveler.item[args.getOne<Int>("Gun").get()] as? Gun ?: return CommandResult.empty()
 
                 gun.createItemStack().let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
@@ -121,12 +122,12 @@ class Gun : CommandBase {
         override val spec: CommandSpec
             get() = CommandSpec.builder()
                 .executor(this)
-                .permission("oktw.command.gun.list")
+                .permission("oktw.command.admin.gun.list")
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src is Player) {
-                val traveler = travelerManager.getTraveler(src)
+                val traveler = runBlocking { getTraveler(src).await()!! }
 
                 src.sendMessage(Text.of(traveler.item.toString()))
             }

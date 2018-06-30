@@ -22,11 +22,6 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot
 
 class Armor {
     @Listener
-    fun onPlayerJoin(event: ClientConnectionEvent.Join, @Getter("getTargetEntity") player: Player) {
-        offerArmor(player)
-    }
-
-    @Listener
     fun onPlayerDisconnect(event: ClientConnectionEvent.Disconnect, @Getter("getTargetEntity") player: Player) {
         removeAllEffect(player)
     }

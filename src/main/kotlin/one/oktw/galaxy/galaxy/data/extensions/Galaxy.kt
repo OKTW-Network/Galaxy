@@ -1,23 +1,33 @@
 package one.oktw.galaxy.galaxy.data.extensions
 
-import one.oktw.galaxy.Main
-import one.oktw.galaxy.Main.Companion.travelerManager
-import one.oktw.galaxy.enums.Group
+import kotlinx.coroutines.experimental.launch
+import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.galaxy.data.Galaxy
-import one.oktw.galaxy.galaxy.data.Member
+import one.oktw.galaxy.galaxy.enums.Group
+import one.oktw.galaxy.galaxy.enums.Group.MEMBER
+import one.oktw.galaxy.galaxy.enums.Group.VISITOR
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import one.oktw.galaxy.galaxy.planet.data.Planet
+import one.oktw.galaxy.galaxy.traveler.data.Traveler
 import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.world.World
+import org.spongepowered.api.world.storage.WorldProperties
 import java.util.*
 
-fun Galaxy.save() {
-    Main.galaxyManager.saveGalaxy(this)
+private fun Galaxy.save() {
+    galaxyManager.saveGalaxy(this)
+}
+
+suspend fun Galaxy.refresh() = galaxyManager.get(uuid).await()!!
+
+fun Galaxy.update(block: Galaxy.() -> Unit) = launch {
+    block()
+    refresh().also(block).save()
 }
 
 fun Galaxy.createPlanet(name: String): Planet {
     val planet = PlanetHelper.createPlanet(name)
-    planets.add(planet)
-    save()
+    update { planets.add(planet) }
 
     return planet
 }
@@ -25,45 +35,45 @@ fun Galaxy.createPlanet(name: String): Planet {
 fun Galaxy.removePlanet(uuid: UUID) {
     val planet = planets.firstOrNull { it.uuid == uuid } ?: return
 
-    PlanetHelper.removePlanet(planet.world!!).thenAccept {
-        if (it) planets.remove(planet)
-        save()
+    PlanetHelper.removePlanet(planet.world).thenAccept {
+        if (it) update { planets.remove(planet) }
     }
 }
 
-fun Galaxy.addMember(uuid: UUID, group: Group = Group.MEMBER) {
-    if (members.any { it.uuid == uuid }) return
+fun Galaxy.getPlanet(uuid: UUID) = planets.firstOrNull { it.uuid == uuid }
 
-    members.add(Member(uuid, group))
-    save()
+fun Galaxy.getPlanet(worldProperties: WorldProperties) = planets.firstOrNull { it.world == worldProperties.uniqueId }
+
+fun Galaxy.getPlanet(world: World) = getPlanet(world.properties)
+
+fun Galaxy.addMember(uuid: UUID, group: Group = MEMBER) = update {
+    if (members.any { it.uuid == uuid }) return@update
+
+    members.add(Traveler(uuid, group))
 }
 
-fun Galaxy.delMember(uuid: UUID) {
-    members.remove(members.firstOrNull { it.uuid == uuid } ?: return)
-    save()
+fun Galaxy.delMember(uuid: UUID) = update { members.remove(members.firstOrNull { it.uuid == uuid } ?: return@update) }
+
+fun Galaxy.saveMember(traveler: Traveler) = update {
+    members.replaceAll { if (it.uuid == traveler.uuid) traveler else it }
 }
 
-fun Galaxy.setGroup(uuid: UUID, group: Group) {
-    members.first { it.uuid == uuid }.group = group
-    save()
-}
+fun Galaxy.getMember(uuid: UUID) = members.firstOrNull { it.uuid == uuid }
 
-fun Galaxy.getGroup(player: Player): Group {
-    return members.firstOrNull { it.uuid == player.uniqueId }?.group ?: return Group.VISITOR
-}
+fun Galaxy.setGroup(uuid: UUID, group: Group) = update { members.first { it.uuid == uuid }.group = group }
 
-fun Galaxy.requestJoin(uuid: UUID) {
-    if (uuid in joinRequest) return
+fun Galaxy.getGroup(player: Player) = members.firstOrNull { it.uuid == player.uniqueId }?.group ?: VISITOR
+
+fun Galaxy.requestJoin(uuid: UUID) = update {
+    if (uuid in joinRequest) return@update
 
     joinRequest.add(uuid)
-    save()
 }
 
-fun Galaxy.removeJoinRequest(uuid: UUID) {
-    joinRequest.remove(uuid)
-    save()
-}
+fun Galaxy.removeJoinRequest(uuid: UUID) = update { joinRequest.remove(uuid) }
 
-fun Galaxy.dividends(number: Long) = takeStarDust(number * members.size).also {
-    if (it) members.forEach { travelerManager.getTraveler(it.uuid!!)!!.giveStarDust(number) }
+fun Galaxy.dividends(number: Long) = update {
+    takeStarDust(number * members.size).also {
+        if (it) members.forEach { it.giveStarDust(number) }
+    }
 }

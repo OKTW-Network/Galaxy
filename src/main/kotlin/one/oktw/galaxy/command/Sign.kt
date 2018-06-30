@@ -1,6 +1,7 @@
 package one.oktw.galaxy.command
 
 import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.player.event.Viewer.Companion.isViewer
 import org.spongepowered.api.block.BlockTypes.STANDING_SIGN
 import org.spongepowered.api.block.BlockTypes.WALL_SIGN
 import org.spongepowered.api.command.CommandResult
@@ -27,7 +28,7 @@ class Sign : CommandBase {
             .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-        if (src !is Player) return CommandResult.empty()
+        if (src !is Player || isViewer(src.uniqueId)) return CommandResult.empty()
         val lang = languageService.getDefaultLanguage() // Todo get player lang
 
         val blockRay = BlockRay.from(src)

@@ -1,4 +1,4 @@
-package one.oktw.galaxy.traveler.data
+package one.oktw.galaxy.player.data
 
 import org.spongepowered.api.text.Text
 

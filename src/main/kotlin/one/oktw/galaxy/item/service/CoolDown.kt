@@ -3,8 +3,8 @@ package one.oktw.galaxy.item.service
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.item.data.Heat
 import one.oktw.galaxy.item.type.Overheat
-import one.oktw.galaxy.traveler.data.ActionBarData
-import one.oktw.galaxy.traveler.service.ActionBar.Companion.setActionBar
+import one.oktw.galaxy.player.data.ActionBarData
+import one.oktw.galaxy.player.service.ActionBar.Companion.setActionBar
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.text.Text

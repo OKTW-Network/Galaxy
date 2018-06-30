@@ -1,7 +1,7 @@
-package one.oktw.galaxy.traveler.service
+package one.oktw.galaxy.player.service
 
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.traveler.data.ActionBarData
+import one.oktw.galaxy.player.data.ActionBarData
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.text.Text
@@ -15,7 +15,7 @@ class ActionBar {
             Task.builder()
                 .name("ActionBar")
                 .intervalTicks(1)
-                .execute(::tick)
+                .execute(Companion::tick)
                 .submit(main)
         }
 

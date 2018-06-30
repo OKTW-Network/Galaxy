@@ -8,16 +8,16 @@ import one.oktw.galaxy.galaxy.planet.event.SpawnProtect
 import one.oktw.galaxy.item.event.Gun
 import one.oktw.galaxy.item.event.ItemProtect
 import one.oktw.galaxy.machine.chunkloader.ChunkLoader
-import one.oktw.galaxy.traveler.event.Traveler
-import one.oktw.galaxy.traveler.event.Viewer
+import one.oktw.galaxy.player.event.PlayerControl
+import one.oktw.galaxy.player.event.Viewer
 import org.spongepowered.api.Sponge
 
 class EventRegister {
     init {
         main.logger.info("Registering Event...")
         Sponge.getEventManager().apply {
-            registerListeners(main, Traveler())
             registerListeners(main, Viewer())
+            registerListeners(main, PlayerControl())
             registerListeners(main, SpawnProtect())
             registerListeners(main, Gun())
             registerListeners(main, ChunkLoader())

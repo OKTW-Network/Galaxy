@@ -1,6 +1,7 @@
 package one.oktw.galaxy.player.event
 
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
 import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.serverThread
@@ -22,6 +23,7 @@ import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.entity.MoveEntityEvent
 import org.spongepowered.api.event.filter.Getter
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent
 import org.spongepowered.api.event.network.ClientConnectionEvent
 import org.spongepowered.api.resourcepack.ResourcePack
 import org.spongepowered.api.resourcepack.ResourcePacks
@@ -90,7 +92,7 @@ class PlayerControl {
         launch {
             galaxyManager.get(player.world).await()?.run {
                 getMember(player.uniqueId)?.also {
-                    saveMember(saveTraveler(it, player).await())
+                    saveMember(saveTraveler(it, player))
                     cleanPlayer(player)
                 }
             }
@@ -108,7 +110,7 @@ class PlayerControl {
             if (from?.uuid != to?.uuid) {
                 // save and clean player data
                 from?.getMember(player.uniqueId)?.also {
-                    from.saveMember(saveTraveler(it, player).await())
+                    from.saveMember(saveTraveler(it, player))
                     cleanPlayer(player).join()
                 } ?: cleanPlayer(player).join()
 
@@ -139,5 +141,17 @@ class PlayerControl {
     @Listener
     fun disablePortal(event: MoveEntityEvent.Teleport.Portal) {
         event.toTransform = event.fromTransform
+    }
+
+    @Listener
+    fun onServerStop(event: GameStoppingServerEvent) {
+        Sponge.getServer().onlinePlayers.forEach { player ->
+            runBlocking { galaxyManager.get(player.world).await() }?.run {
+                getMember(player.uniqueId)?.also {
+                    launch { saveMember(saveTraveler(it, player)) }
+                    cleanPlayer(player)
+                }
+            }
+        }
     }
 }

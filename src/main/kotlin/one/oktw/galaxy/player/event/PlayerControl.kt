@@ -66,7 +66,7 @@ class PlayerControl {
 
     @Listener
     fun onJoin(event: ClientConnectionEvent.Join, @Getter("getTargetEntity") player: Player) {
-        launch {
+        launch(serverThread) {
             val galaxy = galaxyManager.get(player.world).await()
 
             // restore player data
@@ -89,7 +89,7 @@ class PlayerControl {
     @Listener
     fun onDisconnect(event: ClientConnectionEvent.Disconnect, @Getter("getTargetEntity") player: Player) {
         // save and clean player
-        launch {
+        launch(serverThread) {
             galaxyManager.get(player.world).await()?.run {
                 getMember(player.uniqueId)?.also {
                     saveMember(saveTraveler(it, player))
@@ -101,9 +101,9 @@ class PlayerControl {
 
     @Listener
     fun onChangeWorld(event: MoveEntityEvent.Teleport, @Getter("getTargetEntity") player: Player) {
-        if (event.fromTransform.extent == event.toTransform.extent) return
+        launch(serverThread) {
+            if (event.fromTransform.extent == event.toTransform.extent) return@launch
 
-        launch {
             val from = galaxyManager.get(event.fromTransform.extent).await()
             val to = galaxyManager.get(event.toTransform.extent).await()
 
@@ -111,8 +111,8 @@ class PlayerControl {
                 // save and clean player data
                 from?.getMember(player.uniqueId)?.also {
                     from.saveMember(saveTraveler(it, player))
-                    cleanPlayer(player).join()
-                } ?: cleanPlayer(player).join()
+                    cleanPlayer(player)
+                } ?: cleanPlayer(player)
 
                 // load player data
                 to?.let { it.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }
@@ -148,7 +148,7 @@ class PlayerControl {
         Sponge.getServer().onlinePlayers.forEach { player ->
             runBlocking { galaxyManager.get(player.world).await() }?.run {
                 getMember(player.uniqueId)?.also {
-                    launch { saveMember(saveTraveler(it, player)) }
+                    saveMember(saveTraveler(it, player))
                     cleanPlayer(player)
                 }
             }

@@ -12,6 +12,8 @@ import one.oktw.galaxy.galaxy.planet.enums.AccessLevel.*
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.cleanPlayer
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.loadTraveler
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.saveTraveler
+import one.oktw.galaxy.internal.ConfigManager.Companion.config
+import one.oktw.galaxy.internal.ConfigManager.Companion.save
 import one.oktw.galaxy.player.event.Viewer.Companion.removeViewer
 import one.oktw.galaxy.player.event.Viewer.Companion.setViewer
 import org.spongepowered.api.Sponge
@@ -21,9 +23,28 @@ import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.entity.MoveEntityEvent
 import org.spongepowered.api.event.filter.Getter
 import org.spongepowered.api.event.network.ClientConnectionEvent
+import org.spongepowered.api.resourcepack.ResourcePack
+import org.spongepowered.api.resourcepack.ResourcePacks
 import org.spongepowered.api.service.user.UserStorageService
+import java.net.URI
 
 class PlayerControl {
+    private val lobbyResourcePack: ResourcePack?
+    private val planetResourcePack: ResourcePack?
+
+    init {
+        val config = config.getNode("resource-pack")
+
+        if (config.getNode("lobby").isVirtual) {
+            config.getNode("lobby").setComment("Lobby ResourcePack")
+        }
+        if (config.getNode("planet").isVirtual) config.getNode("planet").setComment("Planet ResourcePack")
+        save()
+
+        lobbyResourcePack = config.getNode("lobby").string?.let { ResourcePacks.fromUri(URI(it)) }
+        planetResourcePack = config.getNode("planet").string?.let { ResourcePacks.fromUri(URI(it)) }
+    }
+
     @Listener
     fun onAuth(event: ClientConnectionEvent.Auth) {
         val userService = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
@@ -58,6 +79,8 @@ class PlayerControl {
                 MODIFY -> Viewer.removeViewer(player.uniqueId)
                 DENY -> launch(serverThread) { player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() }) }
             }
+
+            if (galaxy == null) lobbyResourcePack?.let(player::sendResourcePack) else planetResourcePack?.let(player::sendResourcePack)
         }
     }
 
@@ -104,6 +127,12 @@ class PlayerControl {
                     DENY -> player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() })
                 }
             } ?: setViewer(player.uniqueId)
+
+            if (to == null) {
+                lobbyResourcePack?.let(player::sendResourcePack)
+            } else if (from == null) {
+                planetResourcePack?.let(player::sendResourcePack)
+            }
         }
     }
 

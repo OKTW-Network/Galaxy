@@ -146,10 +146,12 @@ class PlayerControl {
     @Listener
     fun onServerStop(event: GameStoppingServerEvent) {
         Sponge.getServer().onlinePlayers.forEach { player ->
-            runBlocking { galaxyManager.get(player.world).await() }?.run {
-                getMember(player.uniqueId)?.also {
-                    saveMember(saveTraveler(it, player))
-                    cleanPlayer(player)
+            runBlocking {
+                galaxyManager.get(player.world).await()?.run {
+                    getMember(player.uniqueId)?.also {
+                        saveMember(saveTraveler(it, player))
+                        cleanPlayer(player)
+                    }
                 }
             }
         }

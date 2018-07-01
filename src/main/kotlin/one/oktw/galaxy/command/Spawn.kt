@@ -36,7 +36,7 @@ class Spawn : CommandBase {
                 delay(1, TimeUnit.SECONDS)
             }
 
-            withContext(serverThread) { src.transferToWorld(src.world) }
+            withContext(serverThread) { src.setLocationSafely(src.world.spawnLocation) }
 
             lock -= src
         }

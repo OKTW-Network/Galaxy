@@ -1,6 +1,7 @@
 package one.oktw.galaxy.player.event
 
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
 import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.serverThread
@@ -22,6 +23,7 @@ import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.entity.MoveEntityEvent
 import org.spongepowered.api.event.filter.Getter
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent
 import org.spongepowered.api.event.network.ClientConnectionEvent
 import org.spongepowered.api.resourcepack.ResourcePack
 import org.spongepowered.api.resourcepack.ResourcePacks
@@ -64,7 +66,7 @@ class PlayerControl {
 
     @Listener
     fun onJoin(event: ClientConnectionEvent.Join, @Getter("getTargetEntity") player: Player) {
-        launch {
+        launch(serverThread) {
             val galaxy = galaxyManager.get(player.world).await()
 
             // restore player data
@@ -87,10 +89,10 @@ class PlayerControl {
     @Listener
     fun onDisconnect(event: ClientConnectionEvent.Disconnect, @Getter("getTargetEntity") player: Player) {
         // save and clean player
-        launch {
+        launch(serverThread) {
             galaxyManager.get(player.world).await()?.run {
                 getMember(player.uniqueId)?.also {
-                    saveMember(saveTraveler(it, player).await())
+                    saveMember(saveTraveler(it, player))
                     cleanPlayer(player)
                 }
             }
@@ -99,18 +101,18 @@ class PlayerControl {
 
     @Listener
     fun onChangeWorld(event: MoveEntityEvent.Teleport, @Getter("getTargetEntity") player: Player) {
-        if (event.fromTransform.extent == event.toTransform.extent) return
+        launch(serverThread) {
+            if (event.fromTransform.extent == event.toTransform.extent) return@launch
 
-        launch {
             val from = galaxyManager.get(event.fromTransform.extent).await()
             val to = galaxyManager.get(event.toTransform.extent).await()
 
             if (from?.uuid != to?.uuid) {
                 // save and clean player data
                 from?.getMember(player.uniqueId)?.also {
-                    from.saveMember(saveTraveler(it, player).await())
-                    cleanPlayer(player).join()
-                } ?: cleanPlayer(player).join()
+                    from.saveMember(saveTraveler(it, player))
+                    cleanPlayer(player)
+                } ?: cleanPlayer(player)
 
                 // load player data
                 to?.let { it.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }
@@ -139,5 +141,17 @@ class PlayerControl {
     @Listener
     fun disablePortal(event: MoveEntityEvent.Teleport.Portal) {
         event.toTransform = event.fromTransform
+    }
+
+    @Listener
+    fun onServerStop(event: GameStoppingServerEvent) {
+        Sponge.getServer().onlinePlayers.forEach { player ->
+            runBlocking { galaxyManager.get(player.world).await() }?.run {
+                getMember(player.uniqueId)?.also {
+                    saveMember(saveTraveler(it, player))
+                    cleanPlayer(player)
+                }
+            }
+        }
     }
 }

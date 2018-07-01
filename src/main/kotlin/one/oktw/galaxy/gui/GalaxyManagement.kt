@@ -6,6 +6,7 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.createPlanet
+import one.oktw.galaxy.galaxy.data.extensions.refresh
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
@@ -161,9 +162,9 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
                 }
                 Sponge.getEventManager().registerListener(main, MessageChannelEvent.Chat::class.java, chatListener)
             }
-            buttonID[1] -> GUIHelper.open(player) { BrowserMember(galaxy, true) }
+            buttonID[1] -> GUIHelper.openAsync(player) { BrowserMember(galaxy.refresh(), true) }
             buttonID[2] -> Unit // TODO GUIHelper.open(player) { AddMember() }
-            buttonID[3] -> GUIHelper.open(player) { GalaxyJoinRequest(galaxy) }
+            buttonID[3] -> GUIHelper.openAsync(player) { GalaxyJoinRequest(galaxy.refresh()) }
             buttonID[4] -> Unit // TODO GUIHelper.open(player) { RenameGalaxy() }
             buttonID[5] -> Unit // TODO edit info
             buttonID[6] -> Unit // TODO edit notice

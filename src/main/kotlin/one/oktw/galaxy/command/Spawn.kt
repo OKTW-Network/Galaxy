@@ -2,7 +2,8 @@ package one.oktw.galaxy.command
 
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
-import one.oktw.galaxy.galaxy.planet.TeleportHelper
+import kotlinx.coroutines.experimental.withContext
+import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.player.data.ActionBarData
 import one.oktw.galaxy.player.service.ActionBar
 import org.spongepowered.api.command.CommandResult
@@ -31,11 +32,11 @@ class Spawn : CommandBase {
 
         launch {
             for (i in 0..4) {
-                ActionBar.setActionBar(src, ActionBarData(Text.of(TextColors.GREEN, "請等待 ${5 - i} 後傳送")))
+                ActionBar.setActionBar(src, ActionBarData(Text.of(TextColors.GREEN, "請等待 ${5 - i} 秒後傳送")))
                 delay(1, TimeUnit.SECONDS)
             }
 
-            TeleportHelper.teleport(src, src.world)
+            withContext(serverThread) { src.transferToWorld(src.world) }
 
             lock -= src
         }

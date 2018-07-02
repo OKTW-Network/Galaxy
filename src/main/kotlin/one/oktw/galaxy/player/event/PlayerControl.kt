@@ -5,6 +5,7 @@ import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
 import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.data.extensions.getMember
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
@@ -60,14 +61,18 @@ class PlayerControl {
                     continue
                 }
 
-                val player = players.next()
+                try {
+                    val player = players.next()
 
-                galaxyManager.get(player.world).await()?.run {
-                    getMember(player.uniqueId)?.also {
-                        withContext(serverThread) { saveMember(saveTraveler(it, player)) }
+                    galaxyManager.get(player.world).await()?.run {
+                        getMember(player.uniqueId)?.also {
+                            withContext(serverThread) { saveMember(saveTraveler(it, player)) }
 
-                        delay(10, TimeUnit.SECONDS)
+                            delay(10, TimeUnit.SECONDS)
+                        }
                     }
+                } catch (e: RuntimeException) {
+                    main.logger.error("Saving player data error", e)
                 }
             }
         }

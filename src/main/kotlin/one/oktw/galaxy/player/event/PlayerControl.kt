@@ -1,9 +1,11 @@
 package one.oktw.galaxy.player.event
 
+import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
 import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.data.extensions.getMember
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
@@ -29,6 +31,7 @@ import org.spongepowered.api.resourcepack.ResourcePack
 import org.spongepowered.api.resourcepack.ResourcePacks
 import org.spongepowered.api.service.user.UserStorageService
 import java.net.URI
+import java.util.concurrent.TimeUnit
 
 class PlayerControl {
     private val lobbyResourcePack: ResourcePack?
@@ -45,6 +48,34 @@ class PlayerControl {
 
         lobbyResourcePack = config.getNode("lobby").string?.let { ResourcePacks.fromUri(URI(it)) }
         planetResourcePack = config.getNode("planet").string?.let { ResourcePacks.fromUri(URI(it)) }
+
+        // Auto save player data every 1 min
+        launch {
+            val server = Sponge.getServer()
+            var players = server.onlinePlayers.iterator()
+
+            while (true) {
+                if (!players.hasNext()) {
+                    players = server.onlinePlayers.iterator()
+                    delay(1, TimeUnit.MINUTES)
+                    continue
+                }
+
+                try {
+                    val player = players.next()
+
+                    galaxyManager.get(player.world).await()?.run {
+                        getMember(player.uniqueId)?.also {
+                            withContext(serverThread) { saveMember(saveTraveler(it, player)) }
+
+                            delay(10, TimeUnit.SECONDS)
+                        }
+                    }
+                } catch (e: RuntimeException) {
+                    main.logger.error("Saving player data error", e)
+                }
+            }
+        }
     }
 
     @Listener

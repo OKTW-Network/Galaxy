@@ -104,9 +104,17 @@ class MainMenu(private val player: Player) : GUI() {
                         val name = it.rawMessage.toPlain()
                         val confirmCallback = TextActions.executeCallback {
                             if (lock) return@executeCallback
-                            galaxyManager.createGalaxy(name, player)
                             lock = true
-                            player.sendMessage(Text.of(YELLOW, "星系創建成功！"))
+
+                            launch {
+                                if (galaxyManager.get(player).await().any { it.getGroup(player) == OWNER }) {
+                                    player.sendMessage(Text.of(RED, "你只能擁有一個星系"))
+                                    return@launch
+                                }
+
+                                galaxyManager.createGalaxy(name, player)
+                                player.sendMessage(Text.of(YELLOW, "星系創建成功！"))
+                            }
                         }
                         val cancelCallback = TextActions.executeCallback {
                             if (lock) return@executeCallback

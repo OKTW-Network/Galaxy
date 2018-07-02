@@ -48,7 +48,7 @@ class PlayerControl {
         lobbyResourcePack = config.getNode("lobby").string?.let { ResourcePacks.fromUri(URI(it)) }
         planetResourcePack = config.getNode("planet").string?.let { ResourcePacks.fromUri(URI(it)) }
 
-        // Auto save player data every 10 sec
+        // Auto save player data every 1 min
         launch {
             val server = Sponge.getServer()
             var players = server.onlinePlayers.iterator()

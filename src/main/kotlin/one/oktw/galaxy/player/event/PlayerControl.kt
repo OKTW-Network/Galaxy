@@ -48,7 +48,7 @@ class PlayerControl {
         planetResourcePack = config.getNode("planet").string?.let { ResourcePacks.fromUri(URI(it)) }
 
         // Auto save player data every 1 min
-        launch {
+        launch(serverThread) {
             val server = Sponge.getServer()
             var players = server.onlinePlayers.iterator()
 
@@ -61,6 +61,8 @@ class PlayerControl {
 
                 try {
                     val player = players.next()
+
+                    if (!player.isOnline) continue
 
                     galaxyManager.get(player.world).await()?.run {
                         getMember(player.uniqueId)?.also {

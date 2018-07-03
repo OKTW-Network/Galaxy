@@ -31,7 +31,7 @@ class GalaxyManager {
     }
 
     fun saveGalaxy(galaxy: Galaxy) {
-        collection.replaceOne(eq("uuid", galaxy.uuid), galaxy)
+        collection.findOneAndReplace(eq("uuid", galaxy.uuid), galaxy)
     }
 
     suspend fun deleteGalaxy(uuid: UUID) {

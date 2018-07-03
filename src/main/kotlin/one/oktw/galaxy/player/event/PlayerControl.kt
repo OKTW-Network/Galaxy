@@ -95,6 +95,9 @@ class PlayerControl {
 
     @Listener
     fun onJoin(event: ClientConnectionEvent.Join, @Getter("getTargetEntity") player: Player) {
+        // make player as viewer for safe
+        setViewer(player.uniqueId)
+
         launch(serverThread) {
             val galaxy = galaxyManager.get(player.world).await()
 
@@ -103,14 +106,15 @@ class PlayerControl {
 
             // check permission for target planet
             when (galaxy?.getPlanet(player.world)?.checkPermission(player) ?: VIEW) {
-                VIEW -> {
-                    Viewer.setViewer(player.uniqueId)
-                    cleanPlayer(player)
+                VIEW -> cleanPlayer(player)
+                MODIFY -> {
+                    removeViewer(player.uniqueId)
+                    player.offer(Keys.GAME_MODE, player.world.properties.gameMode)
                 }
-                MODIFY -> Viewer.removeViewer(player.uniqueId)
                 DENY -> player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() })
             }
 
+            // send resource pack
             if (galaxy == null) lobbyResourcePack?.let(player::sendResourcePack) else planetResourcePack?.let(player::sendResourcePack)
         }
     }
@@ -130,35 +134,36 @@ class PlayerControl {
 
     @Listener
     fun onChangeWorld(event: MoveEntityEvent.Teleport, @Getter("getTargetEntity") player: Player) {
+        // make player as viewer for safe
+        setViewer(player.uniqueId)
+
         launch(serverThread) {
             if (event.fromTransform.extent == event.toTransform.extent) return@launch
 
             val from = galaxyManager.get(event.fromTransform.extent).await()
             val to = galaxyManager.get(event.toTransform.extent).await()
 
-            if (from?.uuid != to?.uuid) {
-                // save and clean player data
-                from?.getMember(player.uniqueId)?.also {
-                    from.saveMember(saveTraveler(it, player))
-                    cleanPlayer(player)
-                } ?: cleanPlayer(player)
+            if (from?.uuid == to?.uuid) return@launch
+            // save and clean player data
+            from?.getMember(player.uniqueId)?.also {
+                from.saveMember(saveTraveler(it, player))
+                cleanPlayer(player)
+            } ?: cleanPlayer(player)
 
-                // load player data
-                to?.let { it.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }
-
-                // Set GameMode
-                player.offer(Keys.GAME_MODE, event.toTransform.extent.properties.gameMode)
-            }
+            // restore player data
+            to?.let { it.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }
 
             // check permission
-            to?.also {
-                when (it.getPlanet(event.toTransform.extent)?.checkPermission(player)) {
-                    VIEW -> setViewer(player.uniqueId)
-                    MODIFY -> removeViewer(player.uniqueId)
-                    DENY -> player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() })
+            when (to?.getPlanet(event.toTransform.extent)?.checkPermission(player) ?: VIEW) {
+                VIEW -> Unit
+                MODIFY -> {
+                    removeViewer(player.uniqueId)
+                    player.offer(Keys.GAME_MODE, event.toTransform.extent.properties.gameMode)
                 }
-            } ?: setViewer(player.uniqueId)
+                DENY -> player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() })
+            }
 
+            // send resource pack
             if (to == null) {
                 lobbyResourcePack?.let(player::sendResourcePack)
             } else if (from == null) {
@@ -176,12 +181,8 @@ class PlayerControl {
     fun onServerStop(event: GameStoppingServerEvent) {
         Sponge.getServer().onlinePlayers.forEach { player ->
             runBlocking {
-                galaxyManager.get(player.world).await()?.run {
-                    getMember(player.uniqueId)?.also {
-                        saveMember(saveTraveler(it, player))
-                        cleanPlayer(player)
-                    }
-                }
+                galaxyManager.get(player.world).await()
+                    ?.run { getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)) } }
             }
         }
     }

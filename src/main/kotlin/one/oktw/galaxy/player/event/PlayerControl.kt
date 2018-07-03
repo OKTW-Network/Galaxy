@@ -40,9 +40,7 @@ class PlayerControl {
     init {
         val config = config.getNode("resource-pack")
 
-        if (config.getNode("lobby").isVirtual) {
-            config.getNode("lobby").setComment("Lobby ResourcePack")
-        }
+        if (config.getNode("lobby").isVirtual) config.getNode("lobby").setComment("Lobby ResourcePack")
         if (config.getNode("planet").isVirtual) config.getNode("planet").setComment("Planet ResourcePack")
         save()
 
@@ -88,9 +86,7 @@ class PlayerControl {
         // check world load else send to default world
         user.worldUniqueId.orElse(null)?.let(server::getWorld)?.run {
             if (!isPresent) {
-                server.defaultWorld.get().run {
-                    user.setLocation(spawnPosition.toDouble(), uniqueId)
-                }
+                server.defaultWorld.get().run { user.setLocation(spawnPosition.toDouble(), uniqueId) }
             }
         }
     }
@@ -110,7 +106,7 @@ class PlayerControl {
                     cleanPlayer(player)
                 }
                 MODIFY -> Viewer.removeViewer(player.uniqueId)
-                DENY -> launch(serverThread) { player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() }) }
+                DENY -> player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() })
             }
 
             if (galaxy == null) lobbyResourcePack?.let(player::sendResourcePack) else planetResourcePack?.let(player::sendResourcePack)
@@ -149,7 +145,7 @@ class PlayerControl {
                 to?.let { it.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }
 
                 // Set GameMode
-                withContext(serverThread) { player.offer(Keys.GAME_MODE, event.toTransform.extent.properties.gameMode) }
+                player.offer(Keys.GAME_MODE, event.toTransform.extent.properties.gameMode)
             }
 
             // check permission

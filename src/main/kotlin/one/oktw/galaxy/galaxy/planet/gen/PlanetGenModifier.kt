@@ -1,5 +1,6 @@
 package one.oktw.galaxy.galaxy.planet.gen
 
+import one.oktw.galaxy.galaxy.planet.gen.populator.FillSpawn
 import one.oktw.galaxy.galaxy.planet.gen.populator.Spawn
 import org.spongepowered.api.data.DataContainer
 import org.spongepowered.api.world.gen.WorldGenerator
@@ -8,7 +9,8 @@ import org.spongepowered.api.world.storage.WorldProperties
 
 class PlanetGenModifier : WorldGeneratorModifier {
     override fun modifyWorldGenerator(world: WorldProperties, settings: DataContainer, worldGenerator: WorldGenerator) {
-        worldGenerator.populators.add(0, Spawn())
+        worldGenerator.populators.add(0, FillSpawn())
+        worldGenerator.populators.add(Spawn())
     }
 
     override fun getName() = "Planet"

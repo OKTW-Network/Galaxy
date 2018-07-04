@@ -3,7 +3,6 @@ package one.oktw.galaxy.player.event
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
-import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.serverThread
@@ -66,8 +65,7 @@ class PlayerControl {
 
                     galaxyManager.get(player.world).await()?.run {
                         getMember(player.uniqueId)?.also {
-                            withContext(serverThread) { saveMember(saveTraveler(it, player)) }
-
+                            saveMember(saveTraveler(it, player))
                             delay(10, TimeUnit.SECONDS)
                         }
                     }

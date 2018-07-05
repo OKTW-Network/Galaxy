@@ -2,7 +2,8 @@ package one.oktw.galaxy.player.event
 
 import net.minecraftforge.event.entity.living.LivingEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.spongepowered.api.block.BlockTypes.IRON_BLOCK
+import one.oktw.galaxy.block.enums.CustomBlocks.ELEVATOR
+import one.oktw.galaxy.data.DataBlockType
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 
@@ -14,11 +15,11 @@ class Elevator {
             val player = it.targetHolder as? Player ?: return@registerEvent
             val location = player.location.sub(0.0, 1.0, 0.0)
 
-            if (location.blockType != IRON_BLOCK) return@registerEvent
+            if (location[DataBlockType.key].orElse(null) != ELEVATOR) return@registerEvent
 
             var target: Double? = null
             for (i in 3..8) {
-                if (location.sub(0.0, i.toDouble(), 0.0).blockType == IRON_BLOCK) {
+                if (location.sub(0.0, i.toDouble(), 0.0).get(DataBlockType.key).orElse(null) == ELEVATOR) {
                     target = i.toDouble()
                     break
                 }
@@ -32,11 +33,11 @@ class Elevator {
         val player = event.entity as? Player ?: return
         val location = player.location.sub(0.0, 1.0, 0.0)
 
-        if (location.blockType != IRON_BLOCK) return
+        if (location[DataBlockType.key].orElse(null) != ELEVATOR) return
 
         var target: Double? = null
         for (i in 3..8) {
-            if (location.add(0.0, i.toDouble(), 0.0).blockType == IRON_BLOCK) {
+            if (location.add(0.0, i.toDouble(), 0.0).get(DataBlockType.key).orElse(null) == ELEVATOR) {
                 target = i.toDouble()
                 break
             }

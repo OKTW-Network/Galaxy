@@ -132,12 +132,12 @@ class PlayerControl {
 
     @Listener
     fun onChangeWorld(event: MoveEntityEvent.Teleport, @Getter("getTargetEntity") player: Player) {
+        if (event.fromTransform.extent == event.toTransform.extent) return
+
         // make player as viewer for safe
         setViewer(player.uniqueId)
 
         launch(serverThread) {
-            if (event.fromTransform.extent == event.toTransform.extent) return@launch
-
             val from = galaxyManager.get(event.fromTransform.extent).await()
             val to = galaxyManager.get(event.toTransform.extent).await()
 

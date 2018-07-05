@@ -5,6 +5,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import one.oktw.galaxy.block.enums.CustomBlocks.ELEVATOR
 import one.oktw.galaxy.data.DataBlockType
 import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.effect.sound.SoundTypes.ENTITY_ENDERMEN_TELEPORT
 import org.spongepowered.api.entity.living.player.Player
 
 class Elevator {
@@ -24,7 +25,10 @@ class Elevator {
                     break
                 }
             }
-            target?.let { player.setLocation(player.location.sub(0.0, it, 0.0)) }
+            target?.also {
+                player.location = player.location.sub(0.0, it, 0.0)
+                player.world.playSound(ENTITY_ENDERMEN_TELEPORT, player.position.sub(0.0, it, 0.0), 1.0)
+            }
         }
     }
 
@@ -42,6 +46,9 @@ class Elevator {
                 break
             }
         }
-        target?.let { player.setLocation(player.location.add(0.0, it, 0.0)) }
+        target?.also {
+            player.location = player.location.add(0.0, it, 0.0)
+            player.world.playSound(ENTITY_ENDERMEN_TELEPORT, player.position.add(0.0, it, 0.0), 1.0)
+        }
     }
 }

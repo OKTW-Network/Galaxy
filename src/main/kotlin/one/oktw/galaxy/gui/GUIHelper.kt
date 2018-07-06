@@ -45,7 +45,7 @@ class GUIHelper {
                 if (stack.peekLast()?.token == token) {
                     stack.pollLast()
                     val gui = stack.peekLast()
-                    if (gui != null) player.openInventory(gui.inventory) else launch(serverThread) { player.closeInventory() }
+                    launch(serverThread) { gui?.run { player.openInventory(inventory) } ?: player.closeInventory() }
                 }
 
                 stack.removeIf { it.token == token }

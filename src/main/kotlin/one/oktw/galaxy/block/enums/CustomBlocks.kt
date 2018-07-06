@@ -4,5 +4,6 @@ enum class CustomBlocks(val id: Int? = null) {
     DUMMY,
     CONTROL_PANEL,
     PLANET_TERMINAL,
-    HT_CRAFTING_TABLE(1)
+    HT_CRAFTING_TABLE(1),
+    ELEVATOR(2)
 }

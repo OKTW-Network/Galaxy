@@ -93,13 +93,13 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
+        event.isCancelled = true
+
         val player = event.source as Player
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
         if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
-            event.isCancelled = true
-
             launch {
                 galaxyManager.get(uuid).await()?.let {
                     GUIHelper.open(player) { GalaxyInfo(it, player) }

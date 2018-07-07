@@ -94,12 +94,12 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
+        event.isCancelled = true
+
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
         if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
-            event.isCancelled = true
-
             if (!manage) return
 
             launch {

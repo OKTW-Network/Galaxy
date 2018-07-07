@@ -1,4 +1,4 @@
-package one.oktw.galaxy.player.event
+package one.oktw.galaxy.block.event
 
 import net.minecraftforge.event.entity.living.LivingEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent

@@ -17,6 +17,7 @@ import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.saveTraveler
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.internal.ConfigManager.Companion.config
 import one.oktw.galaxy.internal.ConfigManager.Companion.save
+import one.oktw.galaxy.player.event.Viewer.Companion.isViewer
 import one.oktw.galaxy.player.event.Viewer.Companion.removeViewer
 import one.oktw.galaxy.player.event.Viewer.Companion.setViewer
 import org.spongepowered.api.Sponge
@@ -120,6 +121,8 @@ class PlayerControl {
 
     @Listener
     fun onDisconnect(event: ClientConnectionEvent.Disconnect, @Getter("getTargetEntity") player: Player) {
+        if (isViewer(player.uniqueId)) return // skip viewer
+
         // save and clean player
         launch(serverThread) {
             galaxyManager.get(player.world).await()?.run {

@@ -6,6 +6,7 @@ import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.planet.gen.PlanetGenModifier
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.world.World
 import org.spongepowered.api.world.WorldArchetype
 import org.spongepowered.api.world.storage.WorldProperties
@@ -13,9 +14,18 @@ import java.io.IOException
 import java.io.UncheckedIOException
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 class PlanetHelper {
     companion object {
+        init {
+            // force unload world
+            Task.builder()
+                .interval(5, TimeUnit.MINUTES)
+                .execute { _ -> Sponge.getServer().apply { worlds.forEach { unloadWorld(it) } } }
+                .submit(main)
+        }
+
         private val logger = main.logger
         private val server = Sponge.getServer()
 

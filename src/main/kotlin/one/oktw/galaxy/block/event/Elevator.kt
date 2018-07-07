@@ -1,4 +1,4 @@
-package one.oktw.galaxy.player.event
+package one.oktw.galaxy.block.event
 
 import net.minecraftforge.event.entity.living.LivingEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -11,7 +11,7 @@ import org.spongepowered.api.entity.living.player.Player
 class Elevator {
     init {
         Keys.IS_SNEAKING.registerEvent(Player::class.java) {
-            if (it.endResult.successfulData.firstOrNull()?.get() != true) return@registerEvent
+            if (it.endResult.successfulData.firstOrNull { it.key == Keys.IS_SNEAKING }?.get() != true) return@registerEvent
 
             val player = it.targetHolder as? Player ?: return@registerEvent
             val location = player.location.sub(0.0, 1.0, 0.0)

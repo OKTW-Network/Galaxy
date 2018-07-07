@@ -27,7 +27,8 @@ class BlockGUI {
                     GUIHelper.open(player) { PlanetTerminal(it) }
                 }
             }
-            HT_CRAFTING_TABLE -> GUIHelper.open(player) { TODO() }
+            HT_CRAFTING_TABLE -> Unit // TODO GUIHelper.open(player) { }
+            else -> Unit
         }
     }
 }

@@ -22,7 +22,6 @@ class EventRegister {
         main.logger.info("Registering Event...")
         Sponge.getEventManager().apply {
             registerListeners(main, Viewer())
-            registerListeners(main, PlayerControl())
             registerListeners(main, SpawnProtect())
             registerListeners(main, Gun())
             registerListeners(main, ChunkLoader())
@@ -32,6 +31,7 @@ class EventRegister {
             registerListeners(main, FakeBlock())
             registerListeners(main, BlockGUI())
             registerListeners(main, Harvest())
+            registerListeners(main, PlayerControl())
         }
 
         MinecraftForge.EVENT_BUS.apply {

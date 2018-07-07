@@ -14,6 +14,7 @@ import one.oktw.galaxy.galaxy.planet.enums.AccessLevel.*
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.cleanPlayer
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.loadTraveler
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.saveTraveler
+import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.internal.ConfigManager.Companion.config
 import one.oktw.galaxy.internal.ConfigManager.Companion.save
 import one.oktw.galaxy.player.event.Viewer.Companion.removeViewer
@@ -128,6 +129,8 @@ class PlayerControl {
                 }
             }
         }
+
+        GUIHelper.closeAll(player)
     }
 
     @Listener

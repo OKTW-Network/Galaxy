@@ -68,7 +68,8 @@ class FakeBlock {
 
         val location = event.targetBlock.location.orElse(null) ?: return
         val entity = location.createEntity(EntityTypes.ITEM)
-        val item = FakeBlockItem(location[DataBlockType.key].orElse(null) ?: return).createItemStack().createSnapshot()
+        val block = location[DataBlockType.key].orElse(null)?.apply { if (id == null) return } ?: return
+        val item = FakeBlockItem(block).createItemStack().createSnapshot()
 
         entity.offer(REPRESENTED_ITEM, item)
         location.removeBlock()

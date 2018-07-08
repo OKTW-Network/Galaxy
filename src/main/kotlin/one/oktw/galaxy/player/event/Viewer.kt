@@ -76,7 +76,7 @@ class Viewer {
             .submit(main)
     }
 
-    @Listener
+    @Listener(order = Order.POST)
     fun onDisconnect(event: ClientConnectionEvent.Disconnect) {
         removeViewer(event.targetEntity.uniqueId)
     }

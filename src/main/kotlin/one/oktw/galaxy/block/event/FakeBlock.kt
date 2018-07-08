@@ -32,9 +32,6 @@ class FakeBlock {
     @Listener
     fun onPlaceBlock(event: InteractBlockEvent.Secondary, @First player: Player) {
         val location = event.targetBlock.location.orElse(null)?.getRelative(event.targetSide) ?: return
-
-        if (location.hasBlock()) return
-
         var hand: HandType = MAIN_HAND
         val blockItem = player.getItemInHand(MAIN_HAND).orElse(null)
                 ?: player.getItemInHand(OFF_HAND).orElse(null)?.apply { hand = OFF_HAND }

@@ -186,7 +186,7 @@ class PlayerControl {
         Sponge.getServer().onlinePlayers.forEach { player ->
             runBlocking {
                 galaxyManager.get(player.world).await()
-                    ?.run { getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)) } }
+                    ?.run { getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)).join() } }
             }
         }
     }

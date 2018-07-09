@@ -63,7 +63,7 @@ class PlayerControl {
                 try {
                     val player = players.next()
 
-                    if (!player.isOnline) continue
+                    if (!player.isOnline || isViewer(player.uniqueId)) continue
 
                     galaxyManager.get(player.world).await()?.run {
                         getMember(player.uniqueId)?.also {
@@ -126,10 +126,7 @@ class PlayerControl {
         // save and clean player
         launch(serverThread) {
             galaxyManager.get(player.world).await()?.run {
-                getMember(player.uniqueId)?.also {
-                    saveMember(saveTraveler(it, player))
-                    cleanPlayer(player)
-                }
+                getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)) }
             }
         }
 

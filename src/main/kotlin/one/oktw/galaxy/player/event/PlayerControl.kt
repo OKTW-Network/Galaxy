@@ -67,7 +67,7 @@ class PlayerControl {
 
                     galaxyManager.get(player.world).await()?.run {
                         getMember(player.uniqueId)?.also {
-                            saveMember(saveTraveler(it, player))
+                            saveMember(saveTraveler(it, player)).join()
                             delay(10, TimeUnit.SECONDS)
                         }
                     }
@@ -147,7 +147,7 @@ class PlayerControl {
             if (from?.uuid == to?.uuid) return@launch
             // save and clean player data
             from?.getMember(player.uniqueId)?.also {
-                from.saveMember(saveTraveler(it, player))
+                from.saveMember(saveTraveler(it, player)).join()
                 cleanPlayer(player)
             } ?: cleanPlayer(player)
 

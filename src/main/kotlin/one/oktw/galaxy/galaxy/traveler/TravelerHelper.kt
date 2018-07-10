@@ -2,6 +2,7 @@ package one.oktw.galaxy.galaxy.traveler
 
 import kotlinx.coroutines.experimental.async
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.armor.ArmorHelper.Companion.offerArmor
 import one.oktw.galaxy.galaxy.data.extensions.getMember
 import one.oktw.galaxy.galaxy.traveler.data.Traveler
@@ -18,6 +19,11 @@ class TravelerHelper {
         fun saveTraveler(traveler: Traveler, player: Player): Traveler {
             traveler.experience = player[Keys.TOTAL_EXPERIENCE].get()
             traveler.inventory = player.inventory.slots<Slot>().mapTo(ArrayList()) { it.peek().orElse(empty()) }
+
+            if (traveler.experience == 0 && traveler.inventory.all { it == empty() }) {
+                main.logger.error("Try save empty player!", player.toString())
+                throw RuntimeException("Saving empty player")
+            }
 
             return traveler
         }
@@ -36,7 +42,7 @@ class TravelerHelper {
         }
 
         fun cleanPlayer(player: Player) {
-            player.offer(Keys.TOTAL_EXPERIENCE, 0)
+            player.remove(Keys.TOTAL_EXPERIENCE)
             player.inventory.clear()
         }
     }

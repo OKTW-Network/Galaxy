@@ -1,7 +1,11 @@
 package one.oktw.galaxy.command.admin
 
+import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
+import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.command.CommandBase
+import one.oktw.galaxy.galaxy.data.extensions.getMember
+import one.oktw.galaxy.galaxy.data.extensions.saveMember
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.getTraveler
 import one.oktw.galaxy.item.enums.GunStyle
 import one.oktw.galaxy.item.enums.GunStyle.PISTOL_ORIGIN
@@ -73,6 +77,13 @@ class Gun : CommandBase {
                 args.getOne<Int>("Through").ifPresent { gun.upgrade.add(Upgrade(THROUGH, it)) }
 
                 traveler.item.add(gun)
+                launch{
+                    galaxyManager.get(src.world).await()?.run {
+                        getMember(src.uniqueId)?.also {
+                            saveMember(traveler)
+                        }
+                    }
+                }
 
                 gun.createItemStack().let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
                 src.sendMessage(Text.of(gun.uuid.toString()))

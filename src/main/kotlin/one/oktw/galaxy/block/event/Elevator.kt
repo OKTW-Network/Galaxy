@@ -19,7 +19,7 @@ class Elevator {
             if (location[DataBlockType.key].orElse(null) != ELEVATOR) return@registerEvent
 
             var target: Double? = null
-            for (i in 3..8) {
+            for (i in 3..16) {
                 if (location.sub(0.0, i.toDouble(), 0.0).get(DataBlockType.key).orElse(null) == ELEVATOR) {
                     target = i.toDouble()
                     break
@@ -27,7 +27,7 @@ class Elevator {
             }
             target?.also {
                 player.location = player.location.sub(0.0, it, 0.0)
-                player.world.playSound(ENTITY_ENDERMEN_TELEPORT, player.position.sub(0.0, it, 0.0), 1.0)
+                player.world.playSound(ENTITY_ENDERMEN_TELEPORT, player.position, 1.0)
             }
         }
     }
@@ -40,7 +40,7 @@ class Elevator {
         if (location[DataBlockType.key].orElse(null) != ELEVATOR) return
 
         var target: Double? = null
-        for (i in 3..8) {
+        for (i in 3..16) {
             if (location.add(0.0, i.toDouble(), 0.0).get(DataBlockType.key).orElse(null) == ELEVATOR) {
                 target = i.toDouble()
                 break
@@ -48,7 +48,7 @@ class Elevator {
         }
         target?.also {
             player.location = player.location.add(0.0, it, 0.0)
-            player.world.playSound(ENTITY_ENDERMEN_TELEPORT, player.position.add(0.0, it, 0.0), 1.0)
+            player.world.playSound(ENTITY_ENDERMEN_TELEPORT, player.position, 1.0)
         }
     }
 }

@@ -27,7 +27,7 @@ class Elevator {
             }
             target?.also {
                 player.location = player.location.sub(0.0, it, 0.0)
-                player.world.playSound(ENTITY_ENDERMEN_TELEPORT, player.position.sub(0.0, it, 0.0), 1.0)
+                player.world.playSound(ENTITY_ENDERMEN_TELEPORT, player.position, 1.0)
             }
         }
     }
@@ -48,7 +48,7 @@ class Elevator {
         }
         target?.also {
             player.location = player.location.add(0.0, it, 0.0)
-            player.world.playSound(ENTITY_ENDERMEN_TELEPORT, player.position.add(0.0, it, 0.0), 1.0)
+            player.world.playSound(ENTITY_ENDERMEN_TELEPORT, player.position, 1.0)
         }
     }
 }

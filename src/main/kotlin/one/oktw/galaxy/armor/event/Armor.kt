@@ -50,7 +50,7 @@ class Armor {
 
     @Listener
     fun onChangeInventory(event: ChangeInventoryEvent) {
-        event.filter { it[DataItemType.key].orElse(null) != ARMOR }
+        if (event.transactions.any { it.default[DataItemType.key].orElse(null) == ARMOR }) event.isCancelled = true
     }
 
     @Listener

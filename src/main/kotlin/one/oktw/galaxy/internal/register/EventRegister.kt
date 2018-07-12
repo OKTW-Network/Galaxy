@@ -7,7 +7,6 @@ import one.oktw.galaxy.block.event.BlockGUI
 import one.oktw.galaxy.block.event.Elevator
 import one.oktw.galaxy.block.event.FakeBlock
 import one.oktw.galaxy.economy.event.EconomyEvent
-import one.oktw.galaxy.economy.event.TravelerEvent
 import one.oktw.galaxy.galaxy.planet.event.SpawnProtect
 import one.oktw.galaxy.item.event.Gun
 import one.oktw.galaxy.item.event.ItemProtect
@@ -22,20 +21,19 @@ class EventRegister {
         main.logger.info("Registering Event...")
         Sponge.getEventManager().apply {
             registerListeners(main, Viewer())
-            registerListeners(main, SpawnProtect())
-            registerListeners(main, Gun())
-            registerListeners(main, ChunkLoader())
-            registerListeners(main, ItemProtect())
             registerListeners(main, Armor())
-            registerListeners(main, EconomyEvent())
-            registerListeners(main, FakeBlock())
-            registerListeners(main, BlockGUI())
-            registerListeners(main, Harvest())
+            registerListeners(main, ItemProtect())
+            registerListeners(main, SpawnProtect())
             registerListeners(main, PlayerControl())
+            registerListeners(main, Gun())
+            registerListeners(main, BlockGUI())
+            registerListeners(main, ChunkLoader())
+            registerListeners(main, FakeBlock())
+            registerListeners(main, Harvest())
         }
 
         MinecraftForge.EVENT_BUS.apply {
-            register(TravelerEvent())
+            register(EconomyEvent())
             register(Elevator())
         }
     }

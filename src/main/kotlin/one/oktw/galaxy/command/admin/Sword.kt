@@ -1,7 +1,11 @@
 package one.oktw.galaxy.command.admin
 
+import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.command.CommandBase
+import one.oktw.galaxy.galaxy.data.extensions.getMember
+import one.oktw.galaxy.galaxy.data.extensions.saveMember
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper
 import one.oktw.galaxy.item.enums.ItemType.SWORD
 import one.oktw.galaxy.item.enums.SwordType
@@ -62,6 +66,13 @@ class Sword : CommandBase {
                 )
 
                 traveler.item.add(sword)
+                launch{
+                    Main.galaxyManager.get(src.world).await()?.run {
+                        getMember(src.uniqueId)?.also {
+                            saveMember(traveler)
+                        }
+                    }
+                }
 
                 sword.createItemStack().let { src.setItemInHand(
                     if (args.getOne<SwordType>("Type").get() == SwordType.SCABBARD) HandTypes.OFF_HAND else HandTypes.MAIN_HAND, it) }

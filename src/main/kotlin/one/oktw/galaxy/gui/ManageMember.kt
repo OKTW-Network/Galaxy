@@ -38,8 +38,7 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
     private val buttonID = Array(3) { UUID.randomUUID() }
 
     init {
-        val gridInventory =
-            inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
+        val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
         // button
         Button(MEMBER_REMOVE).createItemStack()
@@ -50,7 +49,7 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
                     Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.ManageMember.remove_member"])
                 )
             }
-            .let { gridInventory.set(1, 0, it) }
+            .let { inventory.set(1, 0, it) }
 
         Button(MEMBER_CHANGE).createItemStack()
             .apply {
@@ -60,7 +59,9 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
                     Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.ManageMember.change_group"])
                 )
             }
-            .let { gridInventory.set(3, 0, it) }
+            .let { inventory.set(3, 0, it) }
+
+        GUIHelper.fillEmptySlot(inventory)
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)

@@ -5,8 +5,13 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.WorldServer
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.serverThread
+import one.oktw.galaxy.block.enums.CustomBlocks.CONTROL_PANEL
+import one.oktw.galaxy.block.enums.CustomBlocks.PLANET_TERMINAL
+import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.data.DataItemType
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.block.BlockTypes.STANDING_SIGN
+import org.spongepowered.api.block.BlockTypes.WALL_SIGN
 import org.spongepowered.api.data.key.Keys.GAME_MODE
 import org.spongepowered.api.data.key.Keys.POTION_EFFECTS
 import org.spongepowered.api.effect.potion.PotionEffect
@@ -71,7 +76,7 @@ class Viewer {
             .submit(main)
     }
 
-    @Listener
+    @Listener(order = Order.POST)
     fun onDisconnect(event: ClientConnectionEvent.Disconnect) {
         removeViewer(event.targetEntity.uniqueId)
     }
@@ -104,6 +109,13 @@ class Viewer {
     @Listener(order = Order.FIRST)
     fun onInteractBlock(event: InteractBlockEvent, @Root player: Player) {
         if (isViewer(player.uniqueId)) {
+            // whitelist some custom blocks
+            if (event.targetBlock.state.type in asList(STANDING_SIGN, WALL_SIGN)) return
+
+            event.targetBlock.location.orElse(null)?.get(DataBlockType.key)?.orElse(null)?.let {
+                if (it in asList(PLANET_TERMINAL, CONTROL_PANEL)) return
+            }
+
             event.isCancelled = true
             event.targetBlock.location.ifPresent {
                 (it.extent as WorldServer).playerChunkMap.markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))

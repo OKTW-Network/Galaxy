@@ -1,7 +1,9 @@
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
@@ -26,8 +28,7 @@ import org.spongepowered.api.text.format.TextStyles
 
 class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
-    // Todo get player lang
-    private val lang = languageService.getDefaultLanguage()
+    private val lang = languageService.getDefaultLanguage() // Todo get player lang
     override val token = "InviteManagement-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
@@ -65,11 +66,13 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
 
             GUIHelper.open(event.source as Player) {
                 Confirm(Text.of(lang["UI.GalaxyJoinRequest.Conform_join"])) {
-                    if (it) galaxy.addMember(uuid)
+                    launch(serverThread) {
+                        if (it) galaxy.addMember(uuid)
 
-                    galaxy.removeJoinRequest(uuid)
+                        galaxy.removeJoinRequest(uuid).join()
 
-                    offerPage(0)
+                        offerPage(0)
+                    }
                 }
             }
         }

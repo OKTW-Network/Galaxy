@@ -1,9 +1,9 @@
 package one.oktw.galaxy.data
 
 import com.google.common.reflect.TypeToken
-import one.oktw.galaxy.block.enums.FakeBlocks
-import one.oktw.galaxy.block.enums.FakeBlocks.DUMMY
-import one.oktw.galaxy.block.enums.FakeBlocks.valueOf
+import one.oktw.galaxy.block.enums.CustomBlocks
+import one.oktw.galaxy.block.enums.CustomBlocks.DUMMY
+import one.oktw.galaxy.block.enums.CustomBlocks.valueOf
 import org.spongepowered.api.data.DataContainer
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataQuery
@@ -17,11 +17,11 @@ import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.value.mutable.Value
 import java.util.*
 
-class DataBlockType(type: FakeBlocks = DUMMY) :
-    AbstractSingleEnumData<FakeBlocks, DataBlockType, DataBlockType.Immutable>(type, key, DUMMY) {
+class DataBlockType(type: CustomBlocks = DUMMY) :
+    AbstractSingleEnumData<CustomBlocks, DataBlockType, DataBlockType.Immutable>(type, key, DUMMY) {
     companion object {
-        val key: Key<Value<FakeBlocks>> = Key.builder()
-            .type(object : TypeToken<Value<FakeBlocks>>() {})
+        val key: Key<Value<CustomBlocks>> = Key.builder()
+            .type(object : TypeToken<Value<CustomBlocks>>() {})
             .id("block_type")
             .name("Block Type")
             .query(DataQuery.of("type"))
@@ -47,8 +47,8 @@ class DataBlockType(type: FakeBlocks = DUMMY) :
     }
 
 
-    class Immutable(type: FakeBlocks = DUMMY) :
-        AbstractImmutableSingleEnumData<FakeBlocks, Immutable, DataBlockType>(type, DUMMY, key) {
+    class Immutable(type: CustomBlocks = DUMMY) :
+        AbstractImmutableSingleEnumData<CustomBlocks, Immutable, DataBlockType>(type, DUMMY, key) {
         override fun getContentVersion() = 1
         override fun asMutable() = DataBlockType((value))
     }

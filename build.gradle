@@ -1,7 +1,7 @@
 buildscript {
-    ext.kotlin_version = '1.2.50'
+    ext.kotlin_version = '1.2.51'
     ext.sponge_version = "7.1.0-SNAPSHOT"
-    ext.Coroutines_version = "0.23.2"
+    ext.Coroutines_version = "0.23.4"
 
     repositories {
         mavenCentral()
@@ -36,8 +36,8 @@ repositories {
 }
 
 minecraft {
-    version = "1.12.2-14.23.3.2655"
-    mappings = "snapshot_20180424"
+    version = "1.12.2-14.23.4.2705"
+    mappings = "snapshot_20180708"
     makeObfSourceJar = false
 }
 
@@ -45,7 +45,7 @@ dependencies {
     compile "org.spongepowered:spongeapi:$sponge_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$Coroutines_version"
-    compile "org.mongodb:mongodb-driver-sync:3.7.0"
+    compile "org.mongodb:mongodb-driver-sync:3.8.0"
 }
 
 kotlin {

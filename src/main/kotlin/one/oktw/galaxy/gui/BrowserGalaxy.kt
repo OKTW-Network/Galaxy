@@ -7,7 +7,6 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
-import one.oktw.galaxy.galaxy.traveler.data.Traveler
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys.*
@@ -94,13 +93,13 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
+        event.isCancelled = true
+
         val player = event.source as Player
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
         if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
-            event.isCancelled = true
-
             launch {
                 galaxyManager.get(uuid).await()?.let {
                     GUIHelper.open(player) { GalaxyInfo(it, player) }

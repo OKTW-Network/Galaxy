@@ -19,11 +19,11 @@ class PlanetHelper {
         private val logger = main.logger
         private val server = Sponge.getServer()
 
-        fun createPlanet(name: String): Planet {
+        suspend fun createPlanet(name: String): Planet {
             if (server.getWorldProperties(name).isPresent)
                 throw IllegalArgumentException("World already exists")
-            if (!name.matches(Regex("[a-z0-9]+", RegexOption.IGNORE_CASE)))
-                throw IllegalArgumentException("Name only allow a~z and 0~9")
+            if (!name.matches(Regex("[a-z0-9\\-_]+", RegexOption.IGNORE_CASE)))
+                throw IllegalArgumentException("Name contains characters that are not allowed")
 
             val properties: WorldProperties
             val archetype = Sponge.getRegistry().getType(WorldArchetype::class.java, name).orElse(null)
@@ -37,8 +37,8 @@ class PlanetHelper {
             logger.info("Create World [{}]", name)
 
             try {
-                properties = server.createWorldProperties(name, archetype)
-                server.saveWorldProperties(properties)
+                properties = withContext(serverThread) { server.createWorldProperties(name, archetype) }
+                withContext(serverThread) { server.saveWorldProperties(properties) }
             } catch (e: IOException) {
                 logger.error("Create world failed!", e)
                 throw UncheckedIOException(e)

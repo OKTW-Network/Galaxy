@@ -2,7 +2,8 @@ package one.oktw.galaxy.internal.register
 
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.block.data.FakeBlockItem
-import one.oktw.galaxy.block.enums.FakeBlocks.HT_CRAFTING_TABLE
+import one.oktw.galaxy.block.enums.CustomBlocks.ELEVATOR
+import one.oktw.galaxy.block.enums.CustomBlocks.HT_CRAFTING_TABLE
 import one.oktw.galaxy.item.enums.ToolType.WRENCH
 import one.oktw.galaxy.item.enums.UpgradeType.*
 import one.oktw.galaxy.item.type.Tool
@@ -18,6 +19,7 @@ import org.spongepowered.api.item.recipe.crafting.Ingredient
 import org.spongepowered.api.item.recipe.crafting.Ingredient.builder
 import org.spongepowered.api.item.recipe.crafting.Ingredient.of
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe
+import org.spongepowered.api.item.recipe.crafting.ShapelessCraftingRecipe
 import java.util.Arrays.asList
 
 class RecipeRegister {
@@ -277,6 +279,14 @@ class RecipeRegister {
                     .result(Upgrade(DAMAGE, 5).createItemStack())
                     .group("upgrade")
                     .build("upgrade_damage_5", main)
+            )
+
+            register(
+                ShapelessCraftingRecipe.builder()
+                    .addIngredient(of(ENDER_PEARL))
+                    .addIngredient(of(IRON_BLOCK))
+                    .result(FakeBlockItem(ELEVATOR).createItemStack())
+                    .build("elevator", main)
             )
         }
     }

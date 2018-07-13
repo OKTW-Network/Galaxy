@@ -1,6 +1,6 @@
 package one.oktw.galaxy.command.admin
 
-import one.oktw.galaxy.block.enums.FakeBlocks
+import one.oktw.galaxy.block.enums.CustomBlocks
 import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.data.DataBlockType
 import org.spongepowered.api.command.CommandResult
@@ -15,7 +15,7 @@ import org.spongepowered.api.util.blockray.BlockRay
 class Block : CommandBase {
     override val spec: CommandSpec = CommandSpec.builder()
         .permission("oktw.command.admin.block")
-        .arguments(GenericArguments.enumValue(Text.of("type"), FakeBlocks::class.java))
+        .arguments(GenericArguments.enumValue(Text.of("type"), CustomBlocks::class.java))
         .executor(this)
         .build()
 
@@ -26,7 +26,7 @@ class Block : CommandBase {
             .stopFilter(BlockRay.continueAfterFilter(BlockRay.onlyAirFilter(), 1))
             .build().end().orElse(null)
 
-        block?.location?.offer(DataBlockType(args.getOne<FakeBlocks>("type").get()))
+        block?.location?.offer(DataBlockType(args.getOne<CustomBlocks>("type").get()))
                 ?: src.sendMessage(Text.of("You need looking block!"))
 
         return CommandResult.success()

@@ -69,13 +69,13 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
+        event.isCancelled = true
+
         val player = event.source as Player
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
         if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
-            event.isCancelled = true
-
             launch {
                 val planet = galaxyManager.get(planet = uuid).await()?.getPlanet(uuid) ?: return@launch
 

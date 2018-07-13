@@ -33,7 +33,7 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-class ChunkLoader(val entity: Entity) : GUI() {
+class ChunkLoader(private val entity: Entity) : GUI() {
     private val uuid = entity[DataUUID.key].orElse(null)
     private lateinit var chunkLoader: ChunkLoader
     private lateinit var upgradeGUI: GUI
@@ -65,6 +65,8 @@ class ChunkLoader(val entity: Entity) : GUI() {
                 offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, lang["UI.ChunkLoader.Remove"]))
             }
             .let { inventory.set(3, 0, it) }
+
+        GUIHelper.fillEmptySlot(inventory)
 
         // register event
         registerEvent(InteractInventoryEvent.Close::class.java, this::closeEventListener)

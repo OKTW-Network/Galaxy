@@ -1,15 +1,15 @@
 package one.oktw.galaxy.galaxy.traveler
 
 import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.Main.Companion.serverThread
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.armor.ArmorHelper.Companion.offerArmor
 import one.oktw.galaxy.galaxy.data.extensions.getMember
 import one.oktw.galaxy.galaxy.traveler.data.Traveler
-import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.key.Keys.EXPERIENCE_LEVEL
+import org.spongepowered.api.data.key.Keys.TOTAL_EXPERIENCE
 import org.spongepowered.api.entity.living.player.Player
-import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.item.inventory.ItemStack.empty
 import org.spongepowered.api.item.inventory.Slot
 import java.util.*
 
@@ -17,29 +17,33 @@ class TravelerHelper {
     companion object {
         fun getTraveler(player: Player) = async { galaxyManager.get(player.world).await()?.getMember(player.uniqueId) }
 
-        fun saveTraveler(traveler: Traveler, player: Player) = async(serverThread) {
-            traveler.experience = player[Keys.TOTAL_EXPERIENCE].get()
-            traveler.inventory =
-                    player.inventory.slots<Slot>().mapTo(ArrayList()) { it.peek().orElse(ItemStack.empty()) }
+        fun saveTraveler(traveler: Traveler, player: Player): Traveler {
+            traveler.experience = player[TOTAL_EXPERIENCE].get()
+            traveler.inventory = player.inventory.slots<Slot>().mapTo(ArrayList()) { it.peek().orElse(empty()) }
 
-            return@async traveler
+            if (traveler.experience == 0 && traveler.inventory.all { it == empty() }) {
+                main.logger.error("Try save empty player!", player.toString())
+                throw RuntimeException("Saving empty player")
+            }
+
+            return traveler
         }
 
-        fun loadTraveler(traveler: Traveler, player: Player) = launch(serverThread) {
+        fun loadTraveler(traveler: Traveler, player: Player) {
             // xp
-            player.offer(Keys.TOTAL_EXPERIENCE, traveler.experience)
+            player.offer(TOTAL_EXPERIENCE, traveler.experience)
 
             // inventory
             player.inventory.slots<Slot>().forEachIndexed { index, slot ->
-                slot.set(traveler.inventory.getOrElse(index) { ItemStack.empty() })
+                slot.set(traveler.inventory.getOrElse(index) { empty() })
             }
 
             // armor
             offerArmor(player)
         }
 
-        fun cleanPlayer(player: Player) = launch(serverThread) {
-            player.offer(Keys.TOTAL_EXPERIENCE, 0)
+        fun cleanPlayer(player: Player) {
+            player.offer(EXPERIENCE_LEVEL, 0)
             player.inventory.clear()
         }
     }

@@ -2,7 +2,7 @@ package one.oktw.galaxy.player.event
 
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.util.math.BlockPos
-import org.spongepowered.api.block.BlockTypes
+import org.spongepowered.api.block.BlockTypes.*
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
@@ -15,9 +15,10 @@ class Harvest {
         val block = event.targetBlock
         val age = block[Keys.GROWTH_STAGE].orElse(null) ?: return
         val max = when (block.state.type) {
-            BlockTypes.COCOA -> 2
-            BlockTypes.MELON_STEM -> 8
-            BlockTypes.PUMPKIN_STEM -> 8
+            COCOA -> 2
+            BEETROOTS -> 3
+            MELON_STEM -> 8
+            PUMPKIN_STEM -> 8
             else -> 7
         }
 

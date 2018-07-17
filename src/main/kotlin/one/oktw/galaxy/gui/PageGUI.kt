@@ -1,8 +1,8 @@
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.languageService
-import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.item.enums.ButtonType.ARROW_LEFT
 import one.oktw.galaxy.item.enums.ButtonType.ARROW_RIGHT
@@ -31,7 +31,9 @@ abstract class PageGUI : GUI() {
 
     protected abstract suspend fun get(number: Int, skip: Int): List<ItemStack>
 
-    protected fun offerPage(pageNumber: Int) = launch(serverThread) {
+    protected fun offerPage(pageNumber: Int) = launch {
+        delay(100)
+
         inventory.clear()
 
         get(MAX_ITEM, pageNumber * MAX_ITEM).chunked(9).forEachIndexed(this@PageGUI::offerLine)

@@ -1,5 +1,7 @@
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.experimental.channels.map
+import kotlinx.coroutines.experimental.channels.toList
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.languageService
@@ -82,6 +84,8 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
                         )
                         .build()
                 }
+                .toList() // TODO lazy get
+                .asSequence()
                 .chunked(9)
                 .chunked(5)
 

@@ -4,6 +4,8 @@ import com.flowpowered.math.vector.Vector3i
 import com.mongodb.client.model.Filters.eq
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.reactive.awaitFirstOrNull
+import kotlinx.coroutines.experimental.reactive.consumeEach
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
@@ -35,9 +37,9 @@ class ChunkLoaderManager {
         logger.info("Loading world has ChunkLoader...")
 
         launch {
-            collection.find().forEach {
+            collection.find().consumeEach {
                 val planet = galaxyManager.get(planet = it.position.planet!!).await()?.getPlanet(it.position.planet!!)
-                        ?: return@forEach
+                        ?: return@consumeEach
                 val range = (it.upgrade.maxBy { it.level }?.level ?: 0) * 2 + 1
                 val world = planet.loadWorld() ?: return@launch
 
@@ -76,7 +78,7 @@ class ChunkLoaderManager {
 
         val planet = galaxyManager.get(world).await()?.getPlanet(world) ?: return@launch
 
-        collection.find(eq("position.planet", planet.uuid)).forEach { chunkLoader ->
+        collection.find(eq("position.planet", planet.uuid)).consumeEach { chunkLoader ->
             val range = (chunkLoader.upgrade.maxBy { it.level }?.level ?: 0) * 2 + 1
 
             worldTickets[chunkLoader.uuid] = loadChunk(world.getLocation(chunkLoader.position.toVector3d()), range)
@@ -98,7 +100,7 @@ class ChunkLoaderManager {
     }
 
     fun get(uuid: UUID) = async {
-        return@async collection.find(eq("uuid", uuid)).firstOrNull()
+        return@async collection.find(eq("uuid", uuid)).awaitFirstOrNull()
     }
 
     fun delete(uuid: UUID) {

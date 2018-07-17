@@ -4,6 +4,8 @@ import com.mongodb.client.model.Filters.eq
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.reactive.awaitFirstOrNull
+import kotlinx.coroutines.experimental.reactive.openSubscription
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
@@ -43,19 +45,19 @@ class GalaxyManager {
     }
 
     fun get(uuid: UUID? = null, planet: UUID? = null) = async {
-        uuid?.let { collection.find(eq("uuid", uuid)).first() }
-                ?: planet?.let { collection.find(eq("planets.uuid", planet)).first() }
+        uuid?.let { collection.find(eq("uuid", uuid)).first().awaitFirstOrNull() }
+                ?: planet?.let { collection.find(eq("planets.uuid", planet)).first().awaitFirstOrNull() }
     }
 
     fun get(worldProperties: WorldProperties): Deferred<Galaxy?> = async {
-        collection.find(eq("planets.world", worldProperties.uniqueId)).first()
+        collection.find(eq("planets.world", worldProperties.uniqueId)).first().awaitFirstOrNull()
     }
 
     fun get(world: World) = get(world.properties)
 
-    fun get(player: Player) = async { collection.find(eq("members.uuid", player.uniqueId)).asSequence() }
+    fun get(player: Player) = async { collection.find(eq("members.uuid", player.uniqueId)).openSubscription() }
 
-    fun listGalaxy() = async { collection.find().asSequence() }
+    fun listGalaxy() = async { collection.find().openSubscription() }
 
-    fun listGalaxy(filter: Bson) = async { collection.find(filter).asSequence() }
+    fun listGalaxy(filter: Bson) = async { collection.find(filter).openSubscription() }
 }

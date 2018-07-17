@@ -33,7 +33,7 @@ import org.spongepowered.api.text.format.TextStyles.BOLD
 import org.spongepowered.api.text.format.TextStyles.UNDERLINE
 import java.util.*
 
-class MainMenu(private val player: Player) : GUI() {
+class MainMenu(player: Player) : GUI() {
     // Todo get player lang
     private val lang = languageService.getDefaultLanguage()
     private lateinit var chatListener: EventListener<MessageChannelEvent.Chat>
@@ -87,6 +87,8 @@ class MainMenu(private val player: Player) : GUI() {
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
+        val player = event.source as Player
+
         event.isCancelled = true
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {

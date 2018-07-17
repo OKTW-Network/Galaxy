@@ -303,8 +303,10 @@ class GalaxyManage : CommandBase {
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-            if (args.getOne<Int>("size").get() > 375000 || args.getOne<Int>("size").get() < 0) {
-                src.sendMessage(Text.of(TextColors.RED, "Size must be between 0 and 375000"))
+            val maxChunkSize = 375000
+            val minChunkSize = 0
+            if (args.getOne<Int>("size").get() > maxChunkSize || args.getOne<Int>("size").get() < minChunkSize) {
+                src.sendMessage(Text.of(TextColors.RED, "Size must be between $minChunkSize and $maxChunkSize"))
                 return CommandResult.empty()
             }
             var uuid = args.getOne<UUID>("galaxy").orElse(null)

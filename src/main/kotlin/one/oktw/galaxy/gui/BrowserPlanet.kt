@@ -77,7 +77,7 @@ class BrowserPlanet(galaxy: Galaxy) : PageGUI() {
 
         if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
             launch {
-                val planet = galaxyManager.get(planet = uuid).await()?.getPlanet(uuid) ?: return@launch
+                val planet = galaxyManager.get(planet = uuid)?.getPlanet(uuid) ?: return@launch
 
                 if (TeleportHelper.teleport(player, planet).await()) GUIHelper.closeAll(player)
             }

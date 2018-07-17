@@ -25,7 +25,7 @@ class PlayerInfo : CommandBase {
         val player = args.getOne<Player>("player").get()
 
         launch {
-            val galaxy = galaxyManager.get(player.world).await()
+            val galaxy = galaxyManager.get(player.world)
             PaginationList.builder()
                 .contents(
                     Text.of("Name: ", player.name),

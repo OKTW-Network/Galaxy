@@ -1,8 +1,6 @@
 package one.oktw.galaxy.galaxy
 
 import com.mongodb.client.model.Filters.eq
-import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.awaitFirstOrNull
 import kotlinx.coroutines.experimental.reactive.openSubscription
@@ -28,7 +26,7 @@ class GalaxyManager {
 
         val galaxy = Galaxy(name = name, members = memberList)
 
-        launch { collection.insertOne(galaxy) }
+        collection.insertOne(galaxy)
         return galaxy
     }
 
@@ -37,27 +35,27 @@ class GalaxyManager {
     }
 
     suspend fun deleteGalaxy(uuid: UUID) {
-        get(uuid).await()?.planets?.forEach {
+        get(uuid)?.planets?.forEach {
             it.world.let { PlanetHelper.removePlanet(it) }
         }
 
         launch { collection.deleteOne(eq("uuid", uuid)) }
     }
 
-    fun get(uuid: UUID? = null, planet: UUID? = null) = async {
-        uuid?.let { collection.find(eq("uuid", uuid)).first().awaitFirstOrNull() }
+    suspend fun get(uuid: UUID? = null, planet: UUID? = null): Galaxy? {
+        return uuid?.let { collection.find(eq("uuid", uuid)).first().awaitFirstOrNull() }
                 ?: planet?.let { collection.find(eq("planets.uuid", planet)).first().awaitFirstOrNull() }
     }
 
-    fun get(worldProperties: WorldProperties): Deferred<Galaxy?> = async {
+
+    suspend fun get(worldProperties: WorldProperties) =
         collection.find(eq("planets.world", worldProperties.uniqueId)).first().awaitFirstOrNull()
-    }
 
-    fun get(world: World) = get(world.properties)
+    suspend fun get(world: World) = get(world.properties)
 
-    fun get(player: Player) = async { collection.find(eq("members.uuid", player.uniqueId)).openSubscription() }
+    fun get(player: Player) = collection.find(eq("members.uuid", player.uniqueId)).openSubscription()
 
-    fun listGalaxy() = async { collection.find().openSubscription() }
+    fun listGalaxy() = collection.find().openSubscription()
 
-    fun listGalaxy(filter: Bson) = async { collection.find(filter).openSubscription() }
+    fun listGalaxy(filter: Bson) = collection.find(filter).openSubscription()
 }

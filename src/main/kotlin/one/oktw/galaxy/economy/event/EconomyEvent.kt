@@ -24,7 +24,7 @@ class EconomyEvent {
         val player = event.entityPlayer as Player
 
         launch {
-            galaxyManager.get(player.world).await()?.run {
+            galaxyManager.get(player.world)?.run {
                 getMember(player.uniqueId)
                     ?.apply { giveStarDust(event.orb.xpValue) }
                     ?.let(::saveMember)

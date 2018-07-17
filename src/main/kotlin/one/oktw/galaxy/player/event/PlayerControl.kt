@@ -65,7 +65,7 @@ class PlayerControl {
 
                     if (!player.isOnline || isViewer(player.uniqueId)) continue
 
-                    galaxyManager.get(player.world).await()?.run {
+                    galaxyManager.get(player.world)?.run {
                         getMember(player.uniqueId)?.also {
                             saveMember(saveTraveler(it, player)).join()
                             delay(10, TimeUnit.SECONDS)
@@ -99,7 +99,7 @@ class PlayerControl {
         setViewer(player.uniqueId)
 
         launch(serverThread) {
-            val galaxy = galaxyManager.get(player.world).await()
+            val galaxy = galaxyManager.get(player.world)
 
             // restore player data
             galaxy?.getMember(player.uniqueId)?.let { loadTraveler(it, player) }
@@ -125,7 +125,7 @@ class PlayerControl {
 
         // save and clean player
         launch(serverThread) {
-            galaxyManager.get(player.world).await()?.run {
+            galaxyManager.get(player.world)?.run {
                 getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)) }
             }
         }
@@ -141,8 +141,8 @@ class PlayerControl {
         setViewer(player.uniqueId)
 
         launch(serverThread) {
-            val from = galaxyManager.get(event.fromTransform.extent).await()
-            val to = galaxyManager.get(event.toTransform.extent).await()
+            val from = galaxyManager.get(event.fromTransform.extent)
+            val to = galaxyManager.get(event.toTransform.extent)
 
             if (from?.uuid == to?.uuid) return@launch
             // save and clean player data
@@ -182,7 +182,7 @@ class PlayerControl {
     fun onServerStop(event: GameStoppingServerEvent) {
         Sponge.getServer().onlinePlayers.forEach { player ->
             runBlocking {
-                galaxyManager.get(player.world).await()
+                galaxyManager.get(player.world)
                     ?.run { getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)).join() } }
             }
         }

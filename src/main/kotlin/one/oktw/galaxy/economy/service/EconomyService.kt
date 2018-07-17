@@ -21,7 +21,7 @@ class EconomyService {
 
         private fun dailyTask() {
             launch {
-                galaxyManager.listGalaxy().await().consumeEach {
+                galaxyManager.listGalaxy().consumeEach {
                     it.giveInterest()
                     galaxyManager.saveGalaxy(it)
                 }

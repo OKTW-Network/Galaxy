@@ -54,7 +54,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
                     "(",
                     GOLD,
                     TextStyles.BOLD,
-                    "${runBlocking { galaxyManager.get(world).await()?.getPlanet(world)?.name ?: world.name }} ",
+                    "${runBlocking { galaxyManager.get(world)?.getPlanet(world)?.name ?: world.name }} ",
                     TextStyles.RESET,
                     GRAY,
                     position.toInt(),

@@ -25,7 +25,7 @@ class GalaxyInfo : CommandBase {
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         var uuid = args.getOne<UUID>("galaxy").orElse(null)
         launch {
-            if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
+            if (uuid == null && src is Player) uuid = galaxyManager.get(src.world)?.uuid
             if (uuid == null) {
                 src.sendMessage(
                     Text.of(
@@ -36,7 +36,7 @@ class GalaxyInfo : CommandBase {
                 )
                 return@launch
             }
-            val galaxy = galaxyManager.get(uuid).await()!!
+            val galaxy = galaxyManager.get(uuid)!!
 
             PaginationList.builder()
                 .contents(

@@ -18,7 +18,7 @@ private fun Galaxy.save() {
     galaxyManager.saveGalaxy(this)
 }
 
-suspend fun Galaxy.refresh() = galaxyManager.get(uuid).await()!!
+suspend fun Galaxy.refresh() = galaxyManager.get(uuid)!!
 
 fun Galaxy.update(block: Galaxy.() -> Unit) = launch {
     block()

@@ -42,7 +42,7 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
 
     init {
         launch {
-            pages = galaxyManager.run { player?.let { get(it) } ?: listGalaxy() }.await()
+            pages = galaxyManager.run { player?.let { get(it) } ?: listGalaxy() }
                 .map {
                     val owner = userStorage.get(it.members.first { it.group == OWNER }.uuid).get()
 
@@ -105,7 +105,7 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
 
         if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
             launch {
-                galaxyManager.get(uuid).await()?.let {
+                galaxyManager.get(uuid)?.let {
                     GUIHelper.open(player) { GalaxyInfo(it, player) }
                 }
             }

@@ -38,7 +38,7 @@ class ChunkLoaderManager {
 
         launch {
             collection.find().consumeEach {
-                val planet = galaxyManager.get(planet = it.position.planet!!).await()?.getPlanet(it.position.planet!!)
+                val planet = galaxyManager.get(planet = it.position.planet!!)?.getPlanet(it.position.planet!!)
                         ?: return@consumeEach
                 val range = (it.upgrade.maxBy { it.level }?.level ?: 0) * 2 + 1
                 val world = planet.loadWorld() ?: return@launch
@@ -76,7 +76,7 @@ class ChunkLoaderManager {
     private fun reloadChunkLoader(world: World) = launch {
         logger.info("Reloading ChunkLoader in \"{}\" ...", world.name)
 
-        val planet = galaxyManager.get(world).await()?.getPlanet(world) ?: return@launch
+        val planet = galaxyManager.get(world)?.getPlanet(world) ?: return@launch
 
         collection.find(eq("position.planet", planet.uuid)).consumeEach { chunkLoader ->
             val range = (chunkLoader.upgrade.maxBy { it.level }?.level ?: 0) * 2 + 1
@@ -89,7 +89,7 @@ class ChunkLoaderManager {
 
     suspend fun addChunkLoader(location: Location<World>): ChunkLoader {
         val chunkLoader = ChunkLoader(
-            position = Position(location.position, galaxyManager.get(location.extent).await()!!.uuid)
+            position = Position(location.position, galaxyManager.get(location.extent)!!.uuid)
         )
         launch { collection.insertOne(chunkLoader) }
 
@@ -112,7 +112,7 @@ class ChunkLoaderManager {
         collection.replaceOne(eq("uuid", chunkLoader.uuid), chunkLoader)
 
         if (reload) {
-            val planet = chunkLoader.position.planet?.let { galaxyManager.get(planet = it).await()?.getPlanet(it) }
+            val planet = chunkLoader.position.planet?.let { galaxyManager.get(planet = it)?.getPlanet(it) }
                     ?: return@launch
             val range = chunkLoader.upgrade.maxBy { it.level }?.level ?: 0
 

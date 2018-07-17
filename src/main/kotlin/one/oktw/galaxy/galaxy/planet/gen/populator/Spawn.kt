@@ -111,7 +111,7 @@ class Spawn : Populator {
         // beacon
         volume.setBlockType(start, BlockTypes.BEACON)
         launch(serverThread) {
-            galaxyManager.get(world).await()?.getPlanet(world)?.uuid?.apply {
+            galaxyManager.get(world)?.getPlanet(world)?.uuid?.apply {
                 volume.offer(start, DataBlockType(PLANET_TERMINAL))
                 volume.offer(start, DataUUID(this))
                 volume.addScheduledUpdate(start, 0, 0)

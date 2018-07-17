@@ -23,11 +23,17 @@ class GalaxyInfo : CommandBase {
         .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-        var uuid= args.getOne<UUID>("galaxy").orElse(null)
+        var uuid = args.getOne<UUID>("galaxy").orElse(null)
         launch {
             if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
             if (uuid == null) {
-                src.sendMessage(Text.of(TextColors.RED,"Not enough arguments!\n",Sponge.getCommandManager().getUsage(src)))
+                src.sendMessage(
+                    Text.of(
+                        TextColors.RED,
+                        "Not enough arguments!\n",
+                        Sponge.getCommandManager().getUsage(src)
+                    )
+                )
                 return@launch
             }
             val galaxy = galaxyManager.get(uuid).await()!!

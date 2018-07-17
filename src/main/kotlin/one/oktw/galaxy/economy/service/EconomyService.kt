@@ -1,7 +1,7 @@
 package one.oktw.galaxy.economy.service
 
-import kotlinx.coroutines.experimental.channels.consumeEach
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.reactive.consumeEach
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
 import org.spongepowered.api.scheduler.Task

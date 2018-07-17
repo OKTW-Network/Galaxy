@@ -1,9 +1,9 @@
 package one.oktw.galaxy.galaxy
 
 import com.mongodb.client.model.Filters.eq
+import com.mongodb.reactivestreams.client.FindPublisher
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.awaitFirstOrNull
-import kotlinx.coroutines.experimental.reactive.openSubscription
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
@@ -53,9 +53,9 @@ class GalaxyManager {
 
     suspend fun get(world: World) = get(world.properties)
 
-    fun get(player: Player) = collection.find(eq("members.uuid", player.uniqueId)).openSubscription()
+    fun get(player: Player): FindPublisher<Galaxy> = collection.find(eq("members.uuid", player.uniqueId))
 
-    fun listGalaxy() = collection.find().openSubscription()
+    fun listGalaxy(): FindPublisher<Galaxy> = collection.find()
 
-    fun listGalaxy(filter: Bson) = collection.find(filter).openSubscription()
+    fun listGalaxy(filter: Bson): FindPublisher<Galaxy> = collection.find(filter)
 }

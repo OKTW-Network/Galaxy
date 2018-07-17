@@ -3,6 +3,7 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.channels.map
 import kotlinx.coroutines.experimental.channels.toList
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.reactive.openSubscription
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
@@ -29,71 +30,70 @@ import java.util.*
 import java.util.Arrays.asList
 
 class BrowserGalaxy(player: Player? = null) : PageGUI() {
-    // Todo get player language
     private val lang = languageService.getDefaultLanguage()
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
+    private val list = galaxyManager.run { player?.let { get(it) } ?: listGalaxy() }
     override val token = "BrowserGalaxy-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
         .property(InventoryTitle.of(Text.of(lang["UI.BrowserGalaxy.Title"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
-    override lateinit var pages: Sequence<List<List<ItemStack>>>
 
     init {
-        launch {
-            pages = galaxyManager.run { player?.let { get(it) } ?: listGalaxy() }
-                .map {
-                    val owner = userStorage.get(it.members.first { it.group == OWNER }.uuid).get()
-
-                    ItemStack.builder()
-                        .itemType(ItemTypes.SKULL)
-                        .itemData(DataItemType(BUTTON))
-                        .itemData(DataUUID(it.uuid))
-                        .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, it.name))
-                        .add(SKULL_TYPE, SkullTypes.PLAYER)
-                        .add(REPRESENTED_PLAYER, owner.profile)
-                        .add(
-                            ITEM_LORE,
-                            asList(
-                                Text.of(
-                                    TextColors.GREEN,
-                                    "${lang["UI.BrowserGalaxy.Details.Info"]}: ",
-                                    TextColors.RESET,
-                                    it.info
-                                ),
-                                Text.of(
-                                    TextColors.GREEN,
-                                    "${lang["UI.BrowserGalaxy.Details.Owner"]}: ",
-                                    TextColors.RESET,
-                                    owner.name
-                                ),
-                                Text.of(
-                                    TextColors.GREEN,
-                                    "${lang["UI.BrowserGalaxy.Details.Members"]}: ",
-                                    TextColors.RESET,
-                                    it.members.size
-                                ),
-                                Text.of(
-                                    TextColors.GREEN,
-                                    "${lang["UI.BrowserGalaxy.Details.Planets"]}: ",
-                                    TextColors.RESET,
-                                    it.planets.size
-                                )
-                            )
-                        )
-                        .build()
-                }
-                .toList() // TODO lazy get
-                .asSequence()
-                .chunked(9)
-                .chunked(5)
-
-            offerPage(0)
-        }
+        offerPage(0)
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
+    }
+
+    override suspend fun get(number: Int, skip: Int): List<ItemStack> {
+        return list
+            .skip(skip)
+            .limit(number)
+            .openSubscription()
+            .map {
+                val owner = userStorage.get(it.members.first { it.group == OWNER }.uuid).get()
+
+                ItemStack.builder()
+                    .itemType(ItemTypes.SKULL)
+                    .itemData(DataItemType(BUTTON))
+                    .itemData(DataUUID(it.uuid))
+                    .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, it.name))
+                    .add(SKULL_TYPE, SkullTypes.PLAYER)
+                    .add(REPRESENTED_PLAYER, owner.profile)
+                    .add(
+                        ITEM_LORE,
+                        asList(
+                            Text.of(
+                                TextColors.GREEN,
+                                "${lang["UI.BrowserGalaxy.Details.Info"]}: ",
+                                TextColors.RESET,
+                                it.info
+                            ),
+                            Text.of(
+                                TextColors.GREEN,
+                                "${lang["UI.BrowserGalaxy.Details.Owner"]}: ",
+                                TextColors.RESET,
+                                owner.name
+                            ),
+                            Text.of(
+                                TextColors.GREEN,
+                                "${lang["UI.BrowserGalaxy.Details.Members"]}: ",
+                                TextColors.RESET,
+                                it.members.size
+                            ),
+                            Text.of(
+                                TextColors.GREEN,
+                                "${lang["UI.BrowserGalaxy.Details.Planets"]}: ",
+                                TextColors.RESET,
+                                it.planets.size
+                            )
+                        )
+                    )
+                    .build()
+            }
+            .toList()
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {

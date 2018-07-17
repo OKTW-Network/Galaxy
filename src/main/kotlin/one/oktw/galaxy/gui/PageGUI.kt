@@ -1,7 +1,8 @@
 package one.oktw.galaxy.gui
 
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.item.enums.ButtonType.ARROW_LEFT
 import one.oktw.galaxy.item.enums.ButtonType.ARROW_RIGHT
@@ -17,8 +18,9 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
+private const val MAX_ITEM = 45
+
 abstract class PageGUI : GUI() {
-    abstract val pages: Sequence<List<List<ItemStack>>>
     private val lang = languageService.getDefaultLanguage() // TODO get player lang
     private var pageNumber = 0
     private val buttonID = Array(2) { UUID.randomUUID() }
@@ -27,10 +29,13 @@ abstract class PageGUI : GUI() {
         registerEvent(ClickInventoryEvent::class.java, ::clickEvent)
     }
 
-    protected fun offerPage(pageNumber: Int) = async {
+    protected abstract suspend fun get(number: Int, skip: Int): List<ItemStack>
+
+    protected fun offerPage(pageNumber: Int) = launch(serverThread) {
         inventory.clear()
-        pages.elementAt(pageNumber).forEachIndexed(this@PageGUI::offerLine)
-        offerButton(pageNumber != 0, pages.drop(pageNumber + 1).firstOrNull() != null)
+
+        get(MAX_ITEM, pageNumber * MAX_ITEM).chunked(9).forEachIndexed(this@PageGUI::offerLine)
+        offerButton(pageNumber != 0, !get(1, (pageNumber + 1) * MAX_ITEM).isEmpty())
     }
 
     protected fun isButton(uuid: UUID) = buttonID.contains(uuid)
@@ -68,7 +73,7 @@ abstract class PageGUI : GUI() {
 
         if (item[DataUUID.key].orElse(null) in buttonID) {
             when (item[DataUUID.key].get()) {
-                buttonID[0] -> offerPage(--pageNumber)
+                buttonID[0] -> if (pageNumber > 0) offerPage(--pageNumber)
                 buttonID[1] -> offerPage(++pageNumber)
             }
 

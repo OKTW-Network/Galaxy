@@ -15,7 +15,7 @@ import java.util.*
 
 class TravelerHelper {
     companion object {
-        fun getTraveler(player: Player) = async { galaxyManager.get(player.world).await()?.getMember(player.uniqueId) }
+        fun getTraveler(player: Player) = async { galaxyManager.get(player.world)?.getMember(player.uniqueId) }
 
         fun saveTraveler(traveler: Traveler, player: Player): Traveler {
             traveler.experience = player[TOTAL_EXPERIENCE].get()

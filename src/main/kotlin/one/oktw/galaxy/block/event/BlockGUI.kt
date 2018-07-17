@@ -23,7 +23,7 @@ class BlockGUI {
             DUMMY -> Unit
             CONTROL_PANEL -> GUIHelper.open(player) { MainMenu(player) }
             PLANET_TERMINAL -> launch {
-                galaxyManager.get(player.world).await()?.getPlanet(player.world)?.let {
+                galaxyManager.get(player.world)?.getPlanet(player.world)?.let {
                     GUIHelper.open(player) { PlanetTerminal(it) }
                 }
             }

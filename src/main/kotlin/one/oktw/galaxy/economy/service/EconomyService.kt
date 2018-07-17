@@ -1,9 +1,9 @@
 package one.oktw.galaxy.economy.service
 
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.reactive.consumeEach
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.Main.Companion.serverThread
 import org.spongepowered.api.scheduler.Task
 import java.util.concurrent.TimeUnit
 
@@ -12,15 +12,16 @@ class EconomyService {
         init {
             Task.builder()
                 .name("EconomyService")
-                .interval(20, TimeUnit.MINUTES)
                 .async()
+                .delay(20, TimeUnit.MINUTES)
+                .interval(20, TimeUnit.MINUTES)
                 .execute(::dailyTask)
                 .submit(main)
         }
 
         private fun dailyTask() {
-            launch(serverThread) {
-                galaxyManager.listGalaxy().await().forEach {
+            launch {
+                galaxyManager.listGalaxy().consumeEach {
                     it.giveInterest()
                     galaxyManager.saveGalaxy(it)
                 }

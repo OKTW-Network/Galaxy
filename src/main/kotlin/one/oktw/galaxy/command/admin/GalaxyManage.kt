@@ -73,7 +73,7 @@ class GalaxyManage : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             var uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
+                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world)?.uuid
                 if (uuid == null) {
                     src.sendMessage(
                         Text.of(
@@ -84,7 +84,7 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                val planet = galaxyManager.get(uuid).await()!!.createPlanet(args.getOne<String>("name").get())
+                val planet = galaxyManager.get(uuid)!!.createPlanet(args.getOne<String>("name").get())
                 src.sendMessage(Text.of(TextColors.GREEN, planet.uuid))
             }
             return CommandResult.success()
@@ -106,7 +106,7 @@ class GalaxyManage : CommandBase {
             val player = args.getOne<Player>("player").get()
             var uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
+                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world)?.uuid
                 if (uuid == null) {
                     src.sendMessage(
                         Text.of(
@@ -117,7 +117,7 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                galaxyManager.get(uuid).await()!!.addMember(player.uniqueId)
+                galaxyManager.get(uuid)!!.addMember(player.uniqueId)
                 src.sendMessage(Text.of(TextColors.GREEN, "Member added！"))
             }
             return CommandResult.success()
@@ -140,7 +140,7 @@ class GalaxyManage : CommandBase {
             val player = args.getOne<Player>("player").get()
             var uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
+                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world)?.uuid
                 if (uuid == null) {
                     src.sendMessage(
                         Text.of(
@@ -151,7 +151,7 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                galaxyManager.get(uuid).await()!!
+                galaxyManager.get(uuid)!!
                     .setGroup(player.uniqueId, args.getOne<Group>("Group").get())
                 src.sendMessage(Text.of(TextColors.GREEN, "Group set！"))
             }
@@ -174,7 +174,7 @@ class GalaxyManage : CommandBase {
             val player = args.getOne<Player>("player").get()
             var uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
+                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world)?.uuid
                 if (uuid == null) {
                     src.sendMessage(
                         Text.of(
@@ -185,7 +185,7 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                galaxyManager.get(uuid).await()!!.delMember(player.uniqueId)
+                galaxyManager.get(uuid)!!.delMember(player.uniqueId)
                 src.sendMessage(Text.of(TextColors.GREEN, "Member removed！"))
             }
             return CommandResult.success()
@@ -206,7 +206,7 @@ class GalaxyManage : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             var uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
+                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world)?.uuid
                 if (uuid == null) {
                     src.sendMessage(
                         Text.of(
@@ -217,7 +217,7 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                val galaxy = galaxyManager.get(uuid).await()!!
+                val galaxy = galaxyManager.get(uuid)!!
                 galaxy.update { name = args.getOne<String>("name").get() }
                 src.sendMessage(Text.of(TextColors.GREEN, "Galaxy Renamed to ", galaxy.name, "!"))
             }
@@ -239,7 +239,7 @@ class GalaxyManage : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             var uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
+                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world)?.uuid
                 if (uuid == null) {
                     src.sendMessage(
                         Text.of(
@@ -250,7 +250,7 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                val galaxy = galaxyManager.get(uuid).await()!!
+                val galaxy = galaxyManager.get(uuid)!!
                 galaxy.update { info = args.getOne<String>("text").get() }
                 src.sendMessage(Text.of(TextColors.GREEN, "Info set to ", galaxy.info, "!"))
             }
@@ -272,7 +272,7 @@ class GalaxyManage : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             var uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
+                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world)?.uuid
                 if (uuid == null) {
                     src.sendMessage(
                         Text.of(
@@ -283,7 +283,7 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                val galaxy = galaxyManager.get(uuid).await()!!
+                val galaxy = galaxyManager.get(uuid)!!
                 galaxy.update { notice = args.getOne<String>("text").get() }
                 src.sendMessage(Text.of(TextColors.GREEN, "Notice set to ", galaxy.notice, "!"))
             }
@@ -312,7 +312,7 @@ class GalaxyManage : CommandBase {
             var uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
                 if (uuid == null && src is Player) uuid =
-                        galaxyManager.get(src.world).await()?.getPlanet(src.world)?.uuid
+                        galaxyManager.get(src.world)?.getPlanet(src.world)?.uuid
                 if (uuid == null) {
                     src.sendMessage(
                         Text.of(
@@ -323,7 +323,7 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                val planet = Main.galaxyManager.get(planet = uuid).await()!!.getPlanet(uuid)!!
+                val planet = Main.galaxyManager.get(planet = uuid)!!.getPlanet(uuid)!!
                 planet.size = args.getOne<Int>("size").get()
                 PlanetHelper.updatePlanet(planet)
                 src.sendMessage(Text.of(TextColors.GREEN, "Size set to", planet.size, "!"))

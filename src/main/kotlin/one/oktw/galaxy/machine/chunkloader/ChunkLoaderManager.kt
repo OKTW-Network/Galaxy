@@ -4,6 +4,8 @@ import com.flowpowered.math.vector.Vector3i
 import com.mongodb.client.model.Filters.eq
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.reactive.awaitFirstOrNull
+import kotlinx.coroutines.experimental.reactive.consumeEach
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
@@ -35,9 +37,9 @@ class ChunkLoaderManager {
         logger.info("Loading world has ChunkLoader...")
 
         launch {
-            collection.find().forEach {
-                val planet = galaxyManager.get(planet = it.position.planet!!).await()?.getPlanet(it.position.planet!!)
-                        ?: return@forEach
+            collection.find().consumeEach {
+                val planet = galaxyManager.get(planet = it.position.planet!!)?.getPlanet(it.position.planet!!)
+                        ?: return@consumeEach
                 val range = (it.upgrade.maxBy { it.level }?.level ?: 0) * 2 + 1
                 val world = planet.loadWorld() ?: return@launch
 
@@ -74,9 +76,9 @@ class ChunkLoaderManager {
     private fun reloadChunkLoader(world: World) = launch {
         logger.info("Reloading ChunkLoader in \"{}\" ...", world.name)
 
-        val planet = galaxyManager.get(world).await()?.getPlanet(world) ?: return@launch
+        val planet = galaxyManager.get(world)?.getPlanet(world) ?: return@launch
 
-        collection.find(eq("position.planet", planet.uuid)).forEach { chunkLoader ->
+        collection.find(eq("position.planet", planet.uuid)).consumeEach { chunkLoader ->
             val range = (chunkLoader.upgrade.maxBy { it.level }?.level ?: 0) * 2 + 1
 
             worldTickets[chunkLoader.uuid] = loadChunk(world.getLocation(chunkLoader.position.toVector3d()), range)
@@ -87,7 +89,7 @@ class ChunkLoaderManager {
 
     suspend fun addChunkLoader(location: Location<World>): ChunkLoader {
         val chunkLoader = ChunkLoader(
-            position = Position(location.position, galaxyManager.get(location.extent).await()!!.uuid)
+            position = Position(location.position, galaxyManager.get(location.extent)!!.uuid)
         )
         launch { collection.insertOne(chunkLoader) }
 
@@ -98,7 +100,7 @@ class ChunkLoaderManager {
     }
 
     fun get(uuid: UUID) = async {
-        return@async collection.find(eq("uuid", uuid)).firstOrNull()
+        return@async collection.find(eq("uuid", uuid)).awaitFirstOrNull()
     }
 
     fun delete(uuid: UUID) {
@@ -110,7 +112,7 @@ class ChunkLoaderManager {
         collection.replaceOne(eq("uuid", chunkLoader.uuid), chunkLoader)
 
         if (reload) {
-            val planet = chunkLoader.position.planet?.let { galaxyManager.get(planet = it).await()?.getPlanet(it) }
+            val planet = chunkLoader.position.planet?.let { galaxyManager.get(planet = it)?.getPlanet(it) }
                     ?: return@launch
             val range = chunkLoader.upgrade.maxBy { it.level }?.level ?: 0
 

@@ -3,6 +3,8 @@ package one.oktw.galaxy.internal.register
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.*
 import org.spongepowered.api.data.DataRegistration
+import org.spongepowered.api.item.ItemTypes.STICK
+import org.spongepowered.api.item.inventory.ItemStack
 
 class DataRegister {
     private val plugin = main.plugin
@@ -49,5 +51,16 @@ class DataRegister {
             .dataClass(DataBlockType::class.java).immutableClass(DataBlockType.Immutable::class.java)
             .builder(DataBlockType.Builder())
             .buildAndRegister(plugin)
+
+        // just load custom data
+        ItemStack.builder()
+            .itemType(STICK)
+            .itemData(DataUUID())
+            .itemData(DataOverheat())
+            .itemData(DataEnable())
+            .itemData(DataUpgrade())
+            .itemData(DataItemType())
+            .itemData(DataBlockType())
+            .build()
     }
 }

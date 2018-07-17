@@ -12,7 +12,7 @@ import one.oktw.galaxy.player.data.ActionBarData
 import one.oktw.galaxy.player.service.ActionBar
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.format.TextColors
+import org.spongepowered.api.text.format.TextColors.AQUA
 
 class EconomyEvent {
     init {
@@ -22,22 +22,21 @@ class EconomyEvent {
     @SubscribeEvent
     fun onPickupExp(event: PlayerPickupXpEvent) {
         val player = event.entityPlayer as Player
+        val lang = languageService.getDefaultLanguage()
 
         launch {
             galaxyManager.get(player.world)?.run {
                 getMember(player.uniqueId)
-                    ?.apply { giveStarDust(event.orb.xpValue) }
+                    ?.apply {
+                        giveStarDust(event.orb.xpValue)
+
+                        Text.of(AQUA, lang["traveler.event.get_dust"].format(event.orb.xpValue, starDust))
+                            .let { ActionBarData(it, 2, 10) }
+                            .let { ActionBar.setActionBar(player, it) }
+                    }
                     ?.let(::saveMember)
             }
         }
 
-        ActionBarData(
-            Text.of(
-                TextColors.AQUA,
-                languageService.getDefaultLanguage()["traveler.event.get_dust"].format(event.orb.xpValue) // TODO set language
-            ),
-            2,
-            10
-        ).let { ActionBar.setActionBar(player, it) }
     }
 }

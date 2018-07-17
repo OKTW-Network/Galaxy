@@ -26,12 +26,12 @@ class GalaxyManager {
 
         val galaxy = Galaxy(name = name, members = memberList)
 
-        collection.insertOne(galaxy)
+        launch { collection.insertOne(galaxy).awaitFirstOrNull() }
         return galaxy
     }
 
-    fun saveGalaxy(galaxy: Galaxy) {
-        collection.findOneAndReplace(eq("uuid", galaxy.uuid), galaxy)
+    suspend fun saveGalaxy(galaxy: Galaxy) {
+        collection.findOneAndReplace(eq("uuid", galaxy.uuid), galaxy).awaitFirstOrNull()
     }
 
     suspend fun deleteGalaxy(uuid: UUID) {

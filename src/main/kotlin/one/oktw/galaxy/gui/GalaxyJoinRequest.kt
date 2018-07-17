@@ -3,7 +3,6 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.languageService
-import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
@@ -70,8 +69,8 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
 
             GUIHelper.open(event.source as Player) {
                 Confirm(Text.of(lang["UI.GalaxyJoinRequest.Conform_join"])) {
-                    launch(serverThread) {
-                        if (it) galaxy.addMember(uuid)
+                    launch {
+                        if (it) galaxy.addMember(uuid).join()
 
                         galaxy.removeJoinRequest(uuid).join()
 

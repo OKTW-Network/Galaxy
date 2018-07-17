@@ -2,16 +2,25 @@ package one.oktw.galaxy.player.event
 
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.util.math.BlockPos
+import org.spongepowered.api.block.BlockType
 import org.spongepowered.api.block.BlockTypes.*
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.block.InteractBlockEvent
 import org.spongepowered.api.event.filter.cause.First
-import org.spongepowered.api.util.Direction
-import org.spongepowered.api.world.gen.populator.Pumpkin
+import org.spongepowered.api.world.Location
+import org.spongepowered.api.world.World
+import java.util.Arrays.asList
 
 class Harvest {
+    fun isNextTo(location: Location<World>, type: BlockType): Boolean {
+        return location.add(1.0, 0.0, 0.0).blockType == type ||
+                location.add(0.0, 0.0, 1.0).blockType == type ||
+                location.add(-1.0, 0.0, 0.0).blockType == type ||
+                location.add(0.0, 0.0, -1.0).blockType == type
+    }
+
     @Listener
     fun onClick(event: InteractBlockEvent.Secondary.MainHand, @First player: Player) {
         val block = event.targetBlock
@@ -20,20 +29,11 @@ class Harvest {
             PUMPKIN -> {
                 val location = block.location.get();
 
-                if (
-                    location.add(0.0, -1.0, 0.0).blockType != GRASS &&
-                    location.add(0.0, -1.0, 0.0).blockType != DIRT &&
-                    location.add(0.0, -1.0, 0.0).blockType != FARMLAND
-                ) {
+                if (location.add(0.0, -1.0, 0.0).blockType !in asList(GRASS, DIRT, FARMLAND)) {
                     return
                 }
 
-                if (
-                    location.add(1.0, 0.0, 0.0).blockType != PUMPKIN_STEM &&
-                    location.add(0.0, 0.0, 1.0).blockType != PUMPKIN_STEM &&
-                    location.add(-1.0, 0.0, 0.0).blockType != PUMPKIN_STEM &&
-                    location.add(0.0, 0.0, -1.0).blockType != PUMPKIN_STEM
-                ) {
+                if (!isNextTo(location, PUMPKIN_STEM)) {
                     return
                 }
 
@@ -42,20 +42,11 @@ class Harvest {
             MELON_BLOCK -> {
                 val location = block.location.get();
 
-                if (
-                        location.add(0.0, -1.0, 0.0).blockType != GRASS &&
-                        location.add(0.0, -1.0, 0.0).blockType != DIRT &&
-                        location.add(0.0, -1.0, 0.0).blockType != FARMLAND
-                ) {
+                if (location.add(0.0, -1.0, 0.0).blockType !in asList(GRASS, DIRT, FARMLAND)) {
                     return
                 }
 
-                if (
-                        location.add(1.0, 0.0, 0.0).blockType != MELON_STEM &&
-                        location.add(0.0, 0.0, 1.0).blockType != MELON_STEM &&
-                        location.add(-1.0, 0.0, 0.0).blockType != MELON_STEM &&
-                        location.add(0.0, 0.0, -1.0).blockType != MELON_STEM
-                ) {
+                if (!isNextTo(location, MELON_STEM)) {
                     return
                 }
 
@@ -73,7 +64,12 @@ class Harvest {
 
                 if (age != max) return
 
-                if ((player as EntityPlayerMP).interactionManager.tryHarvestBlock(block.position.run { BlockPos(x, y, z) })) {
+                if (
+                    (player as EntityPlayerMP).interactionManager.tryHarvestBlock(
+                        block.position.run { BlockPos(x, y, z) }
+                    )
+                ) {
+
                     block.location.get().block = block.state.with(Keys.GROWTH_STAGE, 0).get()
                 }
             }

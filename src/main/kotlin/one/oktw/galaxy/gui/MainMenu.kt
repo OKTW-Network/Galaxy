@@ -1,6 +1,8 @@
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.experimental.channels.any
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.reactive.openSubscription
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
@@ -60,7 +62,7 @@ class MainMenu(player: Player) : GUI() {
             .let { inventory.set(0, 0, it) }
 
         launch(serverThread) {
-            if (galaxyManager.get(player).await().any { it.getGroup(player) == OWNER }) return@launch
+            if (galaxyManager.get(player).openSubscription().any { it.getGroup(player) == OWNER }) return@launch
 
             Button(PLUS).createItemStack()
                 .apply {
@@ -109,7 +111,7 @@ class MainMenu(player: Player) : GUI() {
                             lock = true
 
                             launch {
-                                if (galaxyManager.get(player).await().any { it.getGroup(player) == OWNER }) {
+                                if (galaxyManager.get(player).openSubscription().any { it.getGroup(player) == OWNER }) {
                                     player.sendMessage(Text.of(RED, "你只能擁有一個星系"))
                                     return@launch
                                 }

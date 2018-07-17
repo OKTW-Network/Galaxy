@@ -14,11 +14,11 @@ import org.spongepowered.api.world.World
 import org.spongepowered.api.world.storage.WorldProperties
 import java.util.*
 
-private fun Galaxy.save() {
+private suspend fun Galaxy.save() {
     galaxyManager.saveGalaxy(this)
 }
 
-suspend fun Galaxy.refresh() = galaxyManager.get(uuid).await()!!
+suspend fun Galaxy.refresh() = galaxyManager.get(uuid)!!
 
 fun Galaxy.update(block: Galaxy.() -> Unit) = launch {
     block()

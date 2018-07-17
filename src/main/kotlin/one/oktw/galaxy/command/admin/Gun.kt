@@ -78,7 +78,7 @@ class Gun : CommandBase {
 
                 traveler.item.add(gun)
                 launch{
-                    galaxyManager.get(src.world).await()?.run {
+                    galaxyManager.get(src.world)?.run {
                         getMember(src.uniqueId)?.also {
                             saveMember(traveler)
                         }

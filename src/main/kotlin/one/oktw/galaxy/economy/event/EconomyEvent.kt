@@ -25,7 +25,7 @@ class EconomyEvent {
         val lang = languageService.getDefaultLanguage()
 
         launch {
-            galaxyManager.get(player.world).await()?.run {
+            galaxyManager.get(player.world)?.run {
                 getMember(player.uniqueId)
                     ?.apply {
                         giveStarDust(event.orb.xpValue)

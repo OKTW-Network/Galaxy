@@ -31,7 +31,7 @@ class PlayerInfo : CommandBase {
                     Text.of("Name: ", player.name),
                     Text.of("UUID: ", player.uniqueId),
                     Text.of("Viewer mode: ", isViewer(player.uniqueId)),
-                    Text.of("Galaxy: ", galaxy?.name, "(", galaxy?.uuid, ")"),
+                    Text.of("Galaxy: ${galaxy?.name} (${galaxy?.uuid})"),
                     Text.of("Planet: ", galaxy?.getPlanet(player.world))
                 )
                 .title(Text.of("Player Info"))

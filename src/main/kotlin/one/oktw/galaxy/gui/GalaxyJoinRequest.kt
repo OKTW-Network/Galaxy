@@ -25,6 +25,7 @@ import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
+import kotlin.streams.toList
 
 class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
@@ -45,8 +46,9 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
 
     override suspend fun get(number: Int, skip: Int): List<ItemStack> {
         return galaxy.refresh().joinRequest
-            .drop(skip)
-            .take(number)
+            .parallelStream()
+            .skip(skip.toLong())
+            .limit(number.toLong())
             .map {
                 val user = userStorage.get(it).get()
                 ItemStack.builder()
@@ -58,6 +60,7 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
                     .add(Keys.REPRESENTED_PLAYER, user.profile)
                     .build()
             }
+            .toList()
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {

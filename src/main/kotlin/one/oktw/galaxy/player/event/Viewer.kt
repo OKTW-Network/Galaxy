@@ -174,7 +174,7 @@ class Viewer {
         if (event.cause.first(Player::class.java).orElse(null)?.let { isViewer(it.uniqueId) } == true) {
             event.isCancelled = true
         } else {
-            event.filterEntities { it !is Player || !isViewer(it.uniqueId) }
+            event.entities.removeIf { it is Player && isViewer(it.uniqueId) }
         }
     }
 

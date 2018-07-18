@@ -18,7 +18,7 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-private const val MAX_ITEM = 45
+private const val ONE_PAGE = 45
 
 abstract class PageGUI : GUI() {
     private val lang = languageService.getDefaultLanguage() // TODO get player lang
@@ -36,8 +36,8 @@ abstract class PageGUI : GUI() {
 
         inventory.clear()
 
-        get(MAX_ITEM, pageNumber * MAX_ITEM).chunked(9).forEachIndexed(this@PageGUI::offerLine)
-        offerButton(pageNumber != 0, !get(1, (pageNumber + 1) * MAX_ITEM).isEmpty())
+        offerButton(pageNumber != 0, !get(1, (pageNumber + 1) * ONE_PAGE).isEmpty())
+        get(ONE_PAGE, pageNumber * ONE_PAGE).chunked(9).forEachIndexed(this@PageGUI::offerLine)
     }
 
     protected fun isButton(uuid: UUID) = buttonID.contains(uuid)

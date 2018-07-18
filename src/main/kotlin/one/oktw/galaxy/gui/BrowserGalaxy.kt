@@ -1,6 +1,5 @@
 package one.oktw.galaxy.gui
 
-import kotlinx.coroutines.experimental.channels.map
 import kotlinx.coroutines.experimental.channels.toList
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.openSubscription
@@ -28,6 +27,7 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 import java.util.Arrays.asList
+import kotlin.streams.toList
 
 class BrowserGalaxy(player: Player? = null) : PageGUI() {
     private val lang = languageService.getDefaultLanguage()
@@ -52,6 +52,8 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
             .skip(skip)
             .limit(number)
             .openSubscription()
+            .toList()
+            .parallelStream()
             .map {
                 val owner = userStorage.get(it.members.first { it.group == OWNER }.uuid).get()
 

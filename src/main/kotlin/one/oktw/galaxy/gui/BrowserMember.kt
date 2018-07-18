@@ -27,6 +27,7 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors.*
 import org.spongepowered.api.text.format.TextStyles
 import java.util.Arrays.asList
+import kotlin.streams.toList
 
 class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = false) : PageGUI() {
     // Todo get player lang
@@ -47,8 +48,9 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
 
     override suspend fun get(number: Int, skip: Int): List<ItemStack> {
         return galaxy.refresh().members
-            .drop(skip)
-            .take(number)
+            .parallelStream()
+            .skip(skip.toLong())
+            .limit(number.toLong())
             .map {
                 val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(it.uuid).get()
                 val status = if (user.isOnline) {
@@ -92,6 +94,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
                     )
                     .build()
             }
+            .toList()
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {

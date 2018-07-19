@@ -1,6 +1,8 @@
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.experimental.channels.any
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.reactive.openSubscription
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
@@ -33,7 +35,7 @@ import org.spongepowered.api.text.format.TextStyles.BOLD
 import org.spongepowered.api.text.format.TextStyles.UNDERLINE
 import java.util.*
 
-class MainMenu(private val player: Player) : GUI() {
+class MainMenu(player: Player) : GUI() {
     // Todo get player lang
     private val lang = languageService.getDefaultLanguage()
     private lateinit var chatListener: EventListener<MessageChannelEvent.Chat>
@@ -60,7 +62,7 @@ class MainMenu(private val player: Player) : GUI() {
             .let { inventory.set(0, 0, it) }
 
         launch(serverThread) {
-            if (galaxyManager.get(player).await().any { it.getGroup(player) == OWNER }) return@launch
+            if (galaxyManager.get(player).openSubscription().any { it.getGroup(player) == OWNER }) return@launch
 
             Button(PLUS).createItemStack()
                 .apply {
@@ -87,6 +89,8 @@ class MainMenu(private val player: Player) : GUI() {
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
+        val player = event.source as Player
+
         event.isCancelled = true
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
@@ -107,7 +111,7 @@ class MainMenu(private val player: Player) : GUI() {
                             lock = true
 
                             launch {
-                                if (galaxyManager.get(player).await().any { it.getGroup(player) == OWNER }) {
+                                if (galaxyManager.get(player).openSubscription().any { it.getGroup(player) == OWNER }) {
                                     player.sendMessage(Text.of(RED, "你只能擁有一個星系"))
                                     return@launch
                                 }

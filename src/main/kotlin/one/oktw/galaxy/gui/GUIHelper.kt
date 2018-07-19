@@ -54,7 +54,8 @@ class GUIHelper {
 
         fun closeAll(player: Player) {
             launch(serverThread) { player.closeInventory() }
-            sync -= player
+            sync.filterKeys { it.uniqueId == player.uniqueId }.keys.forEach { sync -= it }
+            launch { cleanOffline() }
         }
 
         fun fillEmptySlot(inventory: Inventory) {
@@ -82,6 +83,10 @@ class GUIHelper {
             } else {
                 sync -= player
             }
+        }
+
+        private fun cleanOffline() {
+            sync.filterKeys { !it.isOnline }.keys.forEach { sync -= it }
         }
     }
 }

@@ -20,7 +20,7 @@ import org.spongepowered.api.world.World
 class TeleportHelper {
     companion object {
         suspend fun getAccess(player: Player, world: World): AccessLevel {
-            val planet = galaxyManager.get(world).await()?.getPlanet(world) ?: return DENY
+            val planet = galaxyManager.get(world)?.getPlanet(world) ?: return DENY
 
             return planet.checkPermission(player)
         }
@@ -34,7 +34,7 @@ class TeleportHelper {
             if (!player.transferToWorld(world)) return@async false
 
             launch {
-                if (galaxyManager.get(world).await()?.getPlanet(world)?.checkPermission(player) == VIEW) {
+                if (galaxyManager.get(world)?.getPlanet(world)?.checkPermission(player) == VIEW) {
                     setViewer(player.uniqueId)
                 } else {
                     removeViewer(player.uniqueId)

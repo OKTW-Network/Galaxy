@@ -3,11 +3,11 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.languageService
-import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.addMember
+import one.oktw.galaxy.galaxy.data.extensions.refresh
 import one.oktw.galaxy.galaxy.data.extensions.removeJoinRequest
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import org.spongepowered.api.Sponge
@@ -25,6 +25,7 @@ import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
+import kotlin.streams.toList
 
 class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
@@ -35,26 +36,31 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
         .property(InventoryTitle.of(Text.of(lang["UI.GalaxyJoinRequest.Title"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
-    override val pages = galaxy.joinRequest.asSequence()
-        .map {
-            val user = userStorage.get(it).get()
-            ItemStack.builder()
-                .itemType(ItemTypes.SKULL)
-                .itemData(DataItemType(BUTTON))
-                .itemData(DataUUID(it))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, user.name))
-                .add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
-                .add(Keys.REPRESENTED_PLAYER, user.profile)
-                .build()
-        }
-        .chunked(9)
-        .chunked(5)
 
     init {
         offerPage(0)
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
+    }
+
+    override suspend fun get(number: Int, skip: Int): List<ItemStack> {
+        return galaxy.refresh().joinRequest
+            .parallelStream()
+            .skip(skip.toLong())
+            .limit(number.toLong())
+            .map {
+                val user = userStorage.get(it).get()
+                ItemStack.builder()
+                    .itemType(ItemTypes.SKULL)
+                    .itemData(DataItemType(BUTTON))
+                    .itemData(DataUUID(it))
+                    .add(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, user.name))
+                    .add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
+                    .add(Keys.REPRESENTED_PLAYER, user.profile)
+                    .build()
+            }
+            .toList()
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
@@ -66,8 +72,8 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
 
             GUIHelper.open(event.source as Player) {
                 Confirm(Text.of(lang["UI.GalaxyJoinRequest.Conform_join"])) {
-                    launch(serverThread) {
-                        if (it) galaxy.addMember(uuid)
+                    launch {
+                        if (it) galaxy.addMember(uuid).join()
 
                         galaxy.removeJoinRequest(uuid).join()
 

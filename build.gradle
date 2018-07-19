@@ -45,7 +45,8 @@ dependencies {
     compile "org.spongepowered:spongeapi:$sponge_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$Coroutines_version"
-    compile "org.mongodb:mongodb-driver-sync:3.8.0"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$Coroutines_version"
+    compile "org.mongodb:mongodb-driver-reactivestreams:1.9.0"
 }
 
 kotlin {
@@ -67,12 +68,14 @@ shadowJar {
     exclude "dummyThing"
     dependencies {
         include dependency("org.mongodb:")
+        include dependency("org.reactivestreams:")
         include dependency("org.jetbrains.kotlin:")
         include dependency("org.jetbrains.kotlinx:")
     }
 
     relocate "com.mongodb", "one.oktw.relocate.com.mongodb"
     relocate "org.bson", "one.oktw.relocate.org.bson"
+    relocate "org.reactivestreams", "one.oktw.relocate.org.reactivestreams"
     relocate "kotlin", "one.oktw.relocate.kotlin"
     relocate "kotlinx", "one.oktw.relocate.kotlinx"
 }

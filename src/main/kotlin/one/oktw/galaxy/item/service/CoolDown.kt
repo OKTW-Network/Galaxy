@@ -41,10 +41,10 @@ class CoolDown {
                         val text = actionBarText(items.first, items.second)
 
                         if (getHeat(items.first).temp != 0 || (items.second?.let(::getHeat)?.temp ?: 0) != 0) {
-                            setActionBar(player, ActionBarData(text, 1))
+                            setActionBar(player, ActionBarData(text))
                         } else {
                             iterator.remove()
-                            setActionBar(player, ActionBarData(text, 1, 60))
+                            setActionBar(player, ActionBarData(text, time = 60))
                         }
                     }
                 }

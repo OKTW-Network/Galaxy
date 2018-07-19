@@ -32,7 +32,7 @@ class Spawn : CommandBase {
 
         launch {
             for (i in 0..4) {
-                ActionBar.setActionBar(src, ActionBarData(Text.of(TextColors.GREEN, "請等待 ${5 - i} 秒後傳送")))
+                ActionBar.setActionBar(src, ActionBarData(Text.of(TextColors.GREEN, "請等待 ${5 - i} 秒後傳送"), 3))
                 delay(1, TimeUnit.SECONDS)
             }
 

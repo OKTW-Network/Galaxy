@@ -33,8 +33,7 @@ class EconomyEvent {
                         giveStarDust(event.orb.xpValue)
 
                         Text.of(AQUA, lang["traveler.event.get_dust"].format(event.orb.xpValue, starDust))
-                            .let { ActionBarData(it, 2, 10) }
-                            .let { ActionBar.setActionBar(player, it) }
+                            .let { ActionBar.setActionBar(player, ActionBarData(it, 2, 10)) }
                     }
                     ?.let(::saveMember)
             }

@@ -24,6 +24,8 @@ class EconomyEvent {
         val player = event.entityPlayer as Player
         val lang = languageService.getDefaultLanguage()
 
+        if (event.orb.xpValue == 0) return
+
         launch {
             galaxyManager.get(player.world)?.run {
                 getMember(player.uniqueId)

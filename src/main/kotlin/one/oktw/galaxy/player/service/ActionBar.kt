@@ -6,10 +6,11 @@ import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.title.Title
+import java.util.concurrent.ConcurrentHashMap
 
 class ActionBar {
     companion object {
-        private val actionBar = HashMap<Player, ActionBarData>()
+        private val actionBar = ConcurrentHashMap<Player, ActionBarData>()
 
         init {
             Task.builder()
@@ -24,15 +25,11 @@ class ActionBar {
         }
 
         private fun tick() {
-            val iterator = actionBar.iterator()
-
-            while (iterator.hasNext()) {
-                val (player, data) = iterator.next()
-
+            for ((player, data) in actionBar) {
                 player.sendTitle(buildTitle(data.text))
 
                 // remove if timeout
-                if (data.time > 0) data.time-- else iterator.remove()
+                if (data.time > 0) data.time-- else actionBar -= player
             }
         }
 

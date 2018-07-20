@@ -10,6 +10,7 @@ import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.data.extensions.refresh
+import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
@@ -30,7 +31,6 @@ import java.util.Arrays.asList
 import kotlin.streams.toList
 
 class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = false) : PageGUI() {
-    // Todo get player lang
     private val lang = languageService.getDefaultLanguage()
     override val token = "BrowserMember-${galaxy.uuid}${if (manage) "-manage" else ""}"
     override val inventory: Inventory = Inventory.builder()
@@ -51,6 +51,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
             .parallelStream()
             .skip(skip.toLong())
             .limit(number.toLong())
+            .filter { !manage || it.group != OWNER }
             .map {
                 val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(it.uuid).get()
                 val status = if (user.isOnline) {

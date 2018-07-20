@@ -16,7 +16,7 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
-import java.lang.Math.pow
+import java.lang.Math.*
 import java.util.*
 import java.util.Arrays.asList
 import kotlin.collections.ArrayList
@@ -82,21 +82,15 @@ class NumberSelect(content: Text, private val callback: (Int) -> Unit) : GUI() {
             }
             in plusButton -> {
                 val pos = plusButton.indexOf(uuid)
-                val newValue = value + pow(10.0, pos.toDouble()).toInt()
 
-                if (newValue < 10000000) {
-                    this.value = newValue
-                    updateDisplay()
-                }
+                value = min(value + pow(10.0, pos.toDouble()).toInt(), 9999999)
+                updateDisplay()
             }
             in minusButton -> {
                 val pos = minusButton.indexOf(uuid)
-                val value = pow(10.0, pos.toDouble()).toInt()
 
-                if (value <= this.value) {
-                    this.value -= value
-                    updateDisplay()
-                }
+                value = max(value - pow(10.0, pos.toDouble()).toInt(), 0)
+                updateDisplay()
             }
         }
     }

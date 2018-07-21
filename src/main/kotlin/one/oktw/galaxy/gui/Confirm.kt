@@ -44,7 +44,7 @@ class Confirm(content: Text, private val callback: (Boolean) -> Unit) : GUI() {
         Button(X).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Conform.No"]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.No"]))
             }
             .let { inventory.set(3, 0, it) }
 

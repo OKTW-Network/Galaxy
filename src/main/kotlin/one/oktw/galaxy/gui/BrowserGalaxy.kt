@@ -36,7 +36,7 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
     override val token = "BrowserGalaxy-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.BrowserGalaxy.Title"])))
+        .property(InventoryTitle.of(Text.of(lang["UI.Title.GalaxyList"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
 
@@ -69,25 +69,25 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
                         asList(
                             Text.of(
                                 TextColors.GREEN,
-                                "${lang["UI.BrowserGalaxy.Details.Info"]}: ",
+                                "${lang["UI.Tip.Info"]}: ",
                                 TextColors.RESET,
                                 it.info
                             ),
                             Text.of(
                                 TextColors.GREEN,
-                                "${lang["UI.BrowserGalaxy.Details.Owner"]}: ",
+                                "${lang["UI.Tip.Owner"]}: ",
                                 TextColors.RESET,
                                 owner.name
                             ),
                             Text.of(
                                 TextColors.GREEN,
-                                "${lang["UI.BrowserGalaxy.Details.Members"]}: ",
+                                "${lang["UI.Tip.MemberCount"]}: ",
                                 TextColors.RESET,
                                 it.members.size
                             ),
                             Text.of(
                                 TextColors.GREEN,
-                                "${lang["UI.BrowserGalaxy.Details.Planets"]}: ",
+                                "${lang["UI.Tip.PlanetCount"]}: ",
                                 TextColors.RESET,
                                 it.planets.size
                             )

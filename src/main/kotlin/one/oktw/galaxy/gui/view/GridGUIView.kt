@@ -74,6 +74,7 @@ open class GridGUIView<EnumValue, Data>(
 
     override fun getSlots(name: EnumValue): ArrayList<ItemStack> {
         val listToReturn = ArrayList<ItemStack>()
+
         for (y in 0 until dimension.second) {
             for (x in 0 until dimension.first) {
                 if (layout[getOffset(x, y)] == name) {
@@ -116,6 +117,7 @@ open class GridGUIView<EnumValue, Data>(
                     } else {
                         setSlot(x, y, null)
                     }
+
                     if (data != null) {
                         map[getOffset(x, y)] = data
                     } else {
@@ -179,12 +181,9 @@ open class GridGUIView<EnumValue, Data>(
         for (y in 0 until dimension.second) {
             for (x in 0 until dimension.first) {
                 val name = layout[getOffset(x, y)]
-
-                hashMap[name] = (hashMap[name] ?: -1) + 1
-
                 val item = cache[getOffset(x, y)] ?: continue
-
                 val idOfSlot = item[DataUUID.key].orElse(null) ?: continue
+                hashMap[name] = (hashMap[name] ?: -1) + 1
 
                 if (idOfItemToFind == idOfSlot) {
                     return (hashMap[name] ?: return null).let { Pair(name, it) }
@@ -205,7 +204,6 @@ open class GridGUIView<EnumValue, Data>(
         for (y in 0 until dimension.second) {
             for (x in 0 until dimension.first) {
                 val item = cache[getOffset(x, y)] ?: continue
-
                 val idOfSlot = item[DataUUID.key].orElse(null) ?: continue
 
                 if (idOfItemToFind == idOfSlot) {

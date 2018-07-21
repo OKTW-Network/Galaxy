@@ -65,7 +65,7 @@ class BrowserPlanet(private val galaxy: Galaxy) : PageGUI() {
                                 TextColors.AQUA,
                                 "${lang["UI.Tip.AllowVisit"]}: ",
                                 TextColors.RESET,
-                                lang["UI.BrowserPlanet.Details.Visitable.${it.visitable}"]
+                                lang["UI.Tip.${it.visitable}"]
                             )
                         )
                     )

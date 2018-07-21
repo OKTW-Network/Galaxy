@@ -5,9 +5,12 @@ import net.minecraft.world.WorldServer
 import one.oktw.galaxy.block.data.FakeBlockItem
 import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.data.DataItemType
+import one.oktw.galaxy.event.PlaceCustomBlockEvent
+import one.oktw.galaxy.event.RemoveCustomBlockEvent
 import one.oktw.galaxy.item.enums.ItemType
 import one.oktw.galaxy.item.enums.ToolType.WRENCH
 import one.oktw.galaxy.item.type.Tool
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.block.BlockTypes.COMMAND_BLOCK
 import org.spongepowered.api.block.tileentity.CommandBlock
 import org.spongepowered.api.data.key.Keys.*
@@ -40,6 +43,9 @@ class FakeBlock {
         if (!isBlock(blockItem) || !checkCanPlace(location)) return
 
         if (placeBlock(blockItem, location)) {
+            val customEvent = PlaceCustomBlockEvent(location, blockItem, event.cause)
+            Sponge.getEventManager().post(customEvent)
+
             playPlaceSound(player)
             consumeItem(player, hand)
         }
@@ -74,6 +80,9 @@ class FakeBlock {
         entity.offer(REPRESENTED_ITEM, item)
         location.removeBlock()
         location.spawnEntity(entity)
+
+        val customEvent = RemoveCustomBlockEvent(event.targetBlock.location.orElse(null), event.cause)
+        Sponge.getEventManager().post(customEvent)
     }
 
     private fun isBlock(item: ItemStack): Boolean {

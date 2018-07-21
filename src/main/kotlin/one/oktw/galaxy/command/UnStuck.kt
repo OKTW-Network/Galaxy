@@ -3,6 +3,7 @@ package one.oktw.galaxy.command
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.languageService
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -46,33 +47,42 @@ class UnStuck : CommandBase {
             )
 
             if (src.setLocationSafely(src.location)) {
-                callbackLimit.add(random)
-                src.sendMessage(
-                    Text.of(
-                        TextColors.GREEN, "${lang["command.Unstuck.success"]}\n",
-                        TextColors.GOLD, lang["command.Unstuck.does_not_unstuck"], retryButton
+
+                if (src.world == Sponge.getServer().run { getWorld(defaultWorldName).get() }) {
+                    src.sendMessage(Text.of(TextColors.GREEN, lang["command.Unstuck.success"]))
+                } else {
+                    callbackLimit.add(random)
+                    src.sendMessage(
+                        Text.of(
+                            TextColors.GREEN, "${lang["command.Unstuck.success"]}\n",
+                            TextColors.GOLD, lang["command.Unstuck.does_not_unstuck"], retryButton
+                        )
                     )
-                )
-                launch {
-                    delay(5, TimeUnit.MINUTES)
-                    if (random in callbackLimit) {
-                        callbackLimit.remove(random)
+                    launch {
+                        delay(5, TimeUnit.MINUTES)
+                        if (random in callbackLimit) {
+                            callbackLimit.remove(random)
+                        }
                     }
                 }
 
                 return CommandResult.affectedEntities(1)
             } else if (src.setLocationSafely(src.location.add(0.0, 2.0, 0.0))) {
-                callbackLimit.add(random)
-                src.sendMessage(
-                    Text.of(
-                        TextColors.GREEN, "${lang["command.Unstuck.success"]}\n",
-                        TextColors.GOLD, lang["command.Unstuck.does_not_unstuck"], retryButton
+                if (src.world == Sponge.getServer().run { getWorld(defaultWorldName).get() }) {
+                    src.sendMessage(Text.of(TextColors.GREEN, lang["command.Unstuck.success"]))
+                } else {
+                    callbackLimit.add(random)
+                    src.sendMessage(
+                        Text.of(
+                            TextColors.GREEN, "${lang["command.Unstuck.success"]}\n",
+                            TextColors.GOLD, lang["command.Unstuck.does_not_unstuck"], retryButton
+                        )
                     )
-                )
-                launch {
-                    delay(5, TimeUnit.MINUTES)
-                    if (random in callbackLimit) {
-                        callbackLimit.remove(random)
+                    launch {
+                        delay(5, TimeUnit.MINUTES)
+                        if (random in callbackLimit) {
+                            callbackLimit.remove(random)
+                        }
                     }
                 }
 

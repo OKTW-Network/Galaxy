@@ -99,5 +99,15 @@ enum class ButtonType(val id: Int) {
     GUI_INFO(96),
     ECS(97),
     EXIT(98),
-    STARS(99)
+    STARS(99),
+    NUMBER_0(100),
+    NUMBER_1(101),
+    NUMBER_2(102),
+    NUMBER_3(103),
+    NUMBER_4(104),
+    NUMBER_5(105),
+    NUMBER_6(106),
+    NUMBER_7(107),
+    NUMBER_8(108),
+    NUMBER_9(109)
 }

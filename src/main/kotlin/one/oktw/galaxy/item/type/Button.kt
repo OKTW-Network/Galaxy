@@ -10,6 +10,7 @@ import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import org.spongepowered.api.data.key.Keys.*
 import org.spongepowered.api.item.ItemTypes.DIAMOND_HOE
 import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.text.Text
 
 @BsonDiscriminator
 data class Button(val type: ButtonType = BLANK) : Item {
@@ -18,6 +19,7 @@ data class Button(val type: ButtonType = BLANK) : Item {
     override fun createItemStack(): ItemStack = ItemStack.builder()
         .itemType(DIAMOND_HOE)
         .itemData(DataItemType(BUTTON))
+        .add(DISPLAY_NAME, Text.EMPTY)
         .add(UNBREAKABLE, true)
         .add(HIDE_UNBREAKABLE, true)
         .add(HIDE_MISCELLANEOUS, true)

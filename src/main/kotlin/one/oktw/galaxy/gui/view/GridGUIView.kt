@@ -17,7 +17,7 @@ open class GridGUIView<EnumValue, Data>(
     private val cache = HashMap<Int, ItemStack?>() // workaround for the messy sponge api
 
     private fun getOffset(x: Int, y: Int): Int {
-        return y * dimension.first + x;
+        return y * dimension.first + x
     }
 
     private val grid: GridInventory by lazy {
@@ -32,10 +32,6 @@ open class GridGUIView<EnumValue, Data>(
             grid.poll(x, y)
             cache.remove(getOffset(x, y))
         }
-    }
-
-    private fun getSlot(x: Int, y: Int): ItemStack? {
-        return grid.getSlot(x, y).orElse(null)?.peek()?.orElse(null)
     }
 
     override fun setSlot(name: EnumValue, item: ItemStack?) {
@@ -152,7 +148,7 @@ open class GridGUIView<EnumValue, Data>(
 
         for (y in 0 until dimension.second) {
             for (x in 0 until dimension.first) {
-                val name = layout[getOffset(x, y)];
+                val name = layout[getOffset(x, y)]
 
                 hashMap[name] = (hashMap[name] ?: -1) + 1
 
@@ -160,7 +156,7 @@ open class GridGUIView<EnumValue, Data>(
 
                 val idOfSlot = item[DataUUID.key].orElse(null) ?: continue
 
-                if (idOfItemToFind === idOfSlot) {
+                if (idOfItemToFind == idOfSlot) {
                     return (hashMap[name] ?: return null).let { Pair(name, it) }
                 }
             }
@@ -182,7 +178,7 @@ open class GridGUIView<EnumValue, Data>(
 
                 val idOfSlot = item[DataUUID.key].orElse(null) ?: continue
 
-                if (idOfItemToFind === idOfSlot) {
+                if (idOfItemToFind == idOfSlot) {
                     return map[getOffset(x, y)]
                 }
             }

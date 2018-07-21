@@ -11,7 +11,7 @@ open class GridGUIView<EnumValue, Data>(
     override val inventory: Inventory,
     override val layout: ArrayList<EnumValue>,
     private val dimension: Pair<Int, Int>
-) : GUIView<EnumValue, Data>(inventory, layout) {
+) : IGUIView<EnumValue, Data> {
 
     private val map = HashMap<Int, Data>()
     private val cache = HashMap<Int, ItemStack?>() // workaround for the messy sponge api
@@ -50,7 +50,7 @@ open class GridGUIView<EnumValue, Data>(
                 if (layout[getOffset(x, y)] == name) {
                     setSlot(x, y, item)
 
-                    if (data!= null) {
+                    if (data != null) {
                         map[getOffset(x, y)] = data
                     } else {
                         map.remove(getOffset(x, y))
@@ -89,6 +89,7 @@ open class GridGUIView<EnumValue, Data>(
 
     override fun setSlots(name: EnumValue, listToAdd: ArrayList<ItemStack?>) {
         val iterator = listToAdd.iterator()
+
         for (y in 0 until dimension.second) {
             for (x in 0 until dimension.first) {
                 if (layout[getOffset(x, y)] == name) {
@@ -105,6 +106,7 @@ open class GridGUIView<EnumValue, Data>(
 
     override fun setSlots(name: EnumValue, listToAdd: ArrayList<ItemStack?>, data: Data?) {
         val iterator = listToAdd.iterator()
+
         for (y in 0 until dimension.second) {
             for (x in 0 until dimension.first) {
                 if (layout[getOffset(x, y)] == name) {
@@ -124,8 +126,36 @@ open class GridGUIView<EnumValue, Data>(
         }
     }
 
+    override fun setSlotPairs(name: EnumValue, listToAdd: ArrayList<Pair<ItemStack?, Data?>>) {
+        val iterator = listToAdd.iterator()
+
+        for (y in 0 until dimension.second) {
+            for (x in 0 until dimension.first) {
+                if (layout[getOffset(x, y)] == name) {
+                    if (iterator.hasNext()) {
+                        iterator.next().let {
+                            setSlot(x, y, it.first)
+
+                            it.second.let {
+                                if (it != null) {
+                                    map[getOffset(x, y)] = it
+                                } else {
+                                    map.remove(getOffset(x, y))
+                                }
+                            }
+                        }
+                    } else {
+                        setSlot(x, y, null)
+                        map.remove(getOffset(x, y))
+                    }
+                }
+            }
+        }
+    }
+
     override fun countSlots(name: EnumValue): Int {
         var count = 0
+
         for (y in 0 until dimension.second) {
             for (x in 0 until dimension.first) {
                 if (layout[getOffset(x, y)] == name) {
@@ -139,7 +169,7 @@ open class GridGUIView<EnumValue, Data>(
 
     override fun getNameOf(event: ClickInventoryEvent): Pair<EnumValue, Int>? {
         val itemToFind = event.cursorTransaction.default.createStack()
-        return  getNameOf(itemToFind)
+        return getNameOf(itemToFind)
     }
 
     override fun getNameOf(stack: ItemStack): Pair<EnumValue, Int>? {

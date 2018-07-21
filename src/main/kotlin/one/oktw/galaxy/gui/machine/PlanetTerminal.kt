@@ -1,13 +1,11 @@
 package one.oktw.galaxy.gui.machine
 
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
-import one.oktw.galaxy.galaxy.data.extensions.getGroup
-import one.oktw.galaxy.galaxy.data.extensions.getPlanet
-import one.oktw.galaxy.galaxy.data.extensions.refresh
-import one.oktw.galaxy.galaxy.data.extensions.requestJoin
+import one.oktw.galaxy.galaxy.data.extensions.*
 import one.oktw.galaxy.galaxy.enums.Group.*
 import one.oktw.galaxy.galaxy.enums.Group.MEMBER
 import one.oktw.galaxy.gui.*
@@ -38,7 +36,7 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
     override val token = "PlanetTerminal-${galaxy.uuid}-${player.uniqueId}"
     override val inventory: Inventory = Inventory.builder()
         .of(if (galaxy.getGroup(player) == VISITOR) CHEST else DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.PlanetTerminal.Title"])))
+        .property(InventoryTitle.of(Text.of(lang["UI.Title.PlanetTerminal"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
 
@@ -158,7 +156,33 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
             buttonID[0] -> player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() })
             buttonID[1] -> GUIHelper.openAsync(player) { BrowserPlanet(galaxy.refresh()) }
-            buttonID[2] -> Unit // TODO star dust
+            buttonID[2] -> GUIHelper.openAsync(player) {
+                NumberSelect(
+                    Text.of(lang["UI.Title.SelectStarDustCount"]),
+                    asList(
+                        Text.of(
+                            GREEN,
+                            lang["UI.Tip.StarDustCount"].format(galaxy.refresh().getMember(player.uniqueId)?.starDust)
+                        )
+                    )
+                ) {
+                    if (it <= 0) return@NumberSelect
+
+                    launch {
+                        val galaxy = galaxy.refresh()
+                        val member = galaxy.getMember(player.uniqueId) ?: return@launch
+
+                        if (member.takeStarDust(it)) {
+                            galaxy.saveMember(member).join()
+                            galaxy.update { giveStarDust(it) }.join()
+
+                            player.sendMessage(Text.of(AQUA, lang["Respond.DonateStarDustTip"].format(it)))
+                        } else {
+                            player.sendMessage(Text.of(RED, lang["Respond.StarDustNotEnough"]))
+                        }
+                    }
+                }
+            }
             buttonID[3] -> GUIHelper.openAsync(player) { BrowserMember(galaxy.refresh()) }
             buttonID[4] -> Unit // TODO ECS
             buttonID[5] -> GUIHelper.openAsync(player) { GalaxyManagement(galaxy.refresh()) }

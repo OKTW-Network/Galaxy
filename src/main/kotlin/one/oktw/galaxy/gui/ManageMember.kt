@@ -24,6 +24,7 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
+import java.util.Arrays.asList
 
 class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI() {
     // Todo get player lang
@@ -48,6 +49,7 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
                     Keys.DISPLAY_NAME,
                     Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.ManageMember.remove_member"])
                 )
+                offer(Keys.ITEM_LORE, asList(Text.of(TextColors.RED, lang["UI.removeMemberNotify"])))
             }
             .let { inventory.set(1, 0, it) }
 

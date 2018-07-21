@@ -47,49 +47,49 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
         Button(PLUS).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.GalaxyManagement.new_planet"]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.Button.CreateNewPlanet"]))
             }
             .let { inventory.set(1, 1, it) }
 
         Button(LIST).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.GalaxyManagement.manage_member"]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.Button.ManageMember"]))
             }
             .let { inventory.set(2, 1, it) }
 
         Button(MEMBER_ADD).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[2]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.GalaxyManagement.add_member"]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.Button.AddMember"]))
             }
             .let { inventory.set(3, 1, it) }
 
         Button(MEMBER_ASK).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[3]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.GalaxyManagement.join_application"]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.Button.JoinRequestList"]))
             }
             .let { inventory.set(4, 1, it) }
 
         Button(WRITE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[4]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.GalaxyManagement.rename"]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.Button.Rename"]))
             }
             .let { inventory.set(5, 1, it) }
 
         Button(WRITE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[4]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.GalaxyManagement.change_info"]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.Button.ChangeGalaxyInfo"]))
             }
             .let { inventory.set(6, 1, it) }
 
         Button(WRITE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[4]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.GalaxyManagement.change_notification"]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.Button.ChangeGalaxyNotification"]))
             }
             .let { inventory.set(7, 1, it) }
 

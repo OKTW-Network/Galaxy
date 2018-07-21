@@ -32,7 +32,7 @@ class BrowserPlanet(private val galaxy: Galaxy) : PageGUI() {
     override val token = "BrowserPlanet-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.BrowserPlanet.Title"])))
+        .property(InventoryTitle.of(Text.of(lang["UI.Title.PlanetList"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
 
@@ -57,15 +57,15 @@ class BrowserPlanet(private val galaxy: Galaxy) : PageGUI() {
                         asList(
                             Text.of(
                                 TextColors.AQUA,
-                                "${lang["UI.BrowserPlanet.Details.Players"]}: ",
+                                "${lang["UI.Tip.PlayerCount"]}: ",
                                 TextColors.RESET,
                                 0
                             ), // TODO
                             Text.of(
                                 TextColors.AQUA,
-                                "${lang["UI.BrowserPlanet.Details.Visitable.text"]}: ",
+                                "${lang["UI.Tip.AllowVisit"]}: ",
                                 TextColors.RESET,
-                                lang["UI.BrowserPlanet.Details.Visitable.${it.visitable}"]
+                                lang["UI.Tip.${it.visitable}"]
                             )
                         )
                     )

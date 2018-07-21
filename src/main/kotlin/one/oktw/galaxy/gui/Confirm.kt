@@ -37,14 +37,14 @@ class Confirm(content: Text, private val callback: (Boolean) -> Unit) : GUI() {
         Button(OK).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Conform.Yes"]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.Yes"]))
             }
             .let { inventory.set(1, 0, it) }
 
         Button(X).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Conform.No"]))
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.No"]))
             }
             .let { inventory.set(3, 0, it) }
 

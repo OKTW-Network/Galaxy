@@ -42,7 +42,7 @@ class MainMenu(player: Player) : GUI() {
     override val token = "MainMenu-${player.uniqueId}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(lang["UI.MainMenu.Title"])))
+        .property(InventoryTitle.of(Text.of(lang["UI.Title.StarShipController"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
     private val buttonID = Array(3) { UUID.randomUUID() }
@@ -56,7 +56,7 @@ class MainMenu(player: Player) : GUI() {
                 offer(DataUUID(buttonID[0]))
                 offer(
                     Keys.DISPLAY_NAME,
-                    Text.of(GREEN, BOLD, lang["UI.MainMenu.list_joined_galaxy"])
+                    Text.of(GREEN, BOLD, lang["UI.Button.ListJoinedGalaxy"])
                 )
             }
             .let { inventory.set(0, 0, it) }
@@ -67,7 +67,7 @@ class MainMenu(player: Player) : GUI() {
             Button(PLUS).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[1]))
-                    offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.MainMenu.create_galaxy"]))
+                    offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.Button.CreateGalaxy"]))
                 }
                 .let { inventory.set(2, 0, it) }
         }
@@ -77,7 +77,7 @@ class MainMenu(player: Player) : GUI() {
                 offer(DataUUID(buttonID[2]))
                 offer(
                     Keys.DISPLAY_NAME,
-                    Text.of(GREEN, BOLD, lang["UI.MainMenu.list_all_galaxy"])
+                    Text.of(GREEN, BOLD, lang["UI.Button.ListAllGalaxy"])
                 )
             }
             .let { inventory.set(4, 0, it) }

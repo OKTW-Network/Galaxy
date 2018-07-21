@@ -82,7 +82,7 @@ class FakeBlock {
         location.removeBlock()
         location.spawnEntity(entity)
 
-        RemoveCustomBlockEvent(event.targetBlock.location.orElse(null), event.cause).let {
+        RemoveCustomBlockEvent(location, event.cause).let {
             Sponge.getEventManager().post(it)
         }
     }

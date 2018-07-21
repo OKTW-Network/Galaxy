@@ -43,8 +43,9 @@ class FakeBlock {
         if (!isBlock(blockItem) || !checkCanPlace(location)) return
 
         if (placeBlock(blockItem, location)) {
-            val customEvent = PlaceCustomBlockEvent(location, blockItem, event.cause)
-            Sponge.getEventManager().post(customEvent)
+            PlaceCustomBlockEvent(location, blockItem, event.cause).let {
+                Sponge.getEventManager().post(it)
+            }
 
             playPlaceSound(player)
             consumeItem(player, hand)
@@ -81,8 +82,9 @@ class FakeBlock {
         location.removeBlock()
         location.spawnEntity(entity)
 
-        val customEvent = RemoveCustomBlockEvent(event.targetBlock.location.orElse(null), event.cause)
-        Sponge.getEventManager().post(customEvent)
+        RemoveCustomBlockEvent(event.targetBlock.location.orElse(null), event.cause).let {
+            Sponge.getEventManager().post(it)
+        }
     }
 
     private fun isBlock(item: ItemStack): Boolean {

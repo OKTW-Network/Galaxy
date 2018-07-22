@@ -4,7 +4,6 @@ import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.block.enums.CustomBlocks.*
 import one.oktw.galaxy.data.DataBlockType
-import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.MainMenu
 import one.oktw.galaxy.gui.machine.PlanetTerminal
@@ -23,9 +22,7 @@ class BlockGUI {
             DUMMY -> Unit
             CONTROL_PANEL -> GUIHelper.open(player) { MainMenu(player) }
             PLANET_TERMINAL -> launch {
-                galaxyManager.get(player.world)?.getPlanet(player.world)?.let {
-                    GUIHelper.open(player) { PlanetTerminal(it) }
-                }
+                galaxyManager.get(player.world)?.let { GUIHelper.open(player) { PlanetTerminal(it, player) } }
             }
             HT_CRAFTING_TABLE -> Unit // TODO GUIHelper.open(player) { }
             else -> Unit

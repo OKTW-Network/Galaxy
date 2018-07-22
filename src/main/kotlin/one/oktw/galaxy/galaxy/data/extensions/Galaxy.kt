@@ -14,7 +14,6 @@ import one.oktw.galaxy.galaxy.traveler.extensions.getPlayer
 import one.oktw.galaxy.player.event.Viewer.Companion.setViewer
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
-import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors.RED
 import org.spongepowered.api.world.World
@@ -60,11 +59,10 @@ fun Galaxy.addMember(uuid: UUID, group: Group = MEMBER) = update {
 }
 
 fun Galaxy.delMember(uuid: UUID) {
-    val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(uuid).get()
-    if (user.isOnline) {
-        val member = members.firstOrNull { it.uuid == uuid } ?: return
-        val player = member.getPlayer()
-        val planet = getPlanet(player?.world!!)
+    val member = members.firstOrNull { it.uuid == uuid } ?: return
+    val player = member.getPlayer()
+    if (player != null) {
+        val planet = getPlanet(player.world)
         if (planet != null) {
             player.sendMessage(Text.of(RED, languageService.getDefaultLanguage()["traveler.memberRemovedNotice"]))
             if (planet.visitable) {

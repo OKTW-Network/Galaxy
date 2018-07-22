@@ -91,7 +91,7 @@ class ChunkLoaderManager {
         val chunkLoader = ChunkLoader(
             position = Position(location.position, galaxyManager.get(location.extent)!!.uuid)
         )
-        launch { collection.insertOne(chunkLoader) }
+        collection.insertOne(chunkLoader).awaitFirstOrNull()
 
         worldTickets[chunkLoader.uuid] = loadChunk(location, 1)
 
@@ -103,13 +103,13 @@ class ChunkLoaderManager {
         return@async collection.find(eq("uuid", uuid)).awaitFirstOrNull()
     }
 
-    fun delete(uuid: UUID) {
+    suspend fun delete(uuid: UUID) {
         worldTickets[uuid]?.release()
-        launch { collection.deleteOne(eq("uuid", uuid)) }
+        collection.deleteOne(eq("uuid", uuid)).awaitFirstOrNull()
     }
 
     fun updateChunkLoader(chunkLoader: ChunkLoader, reload: Boolean = false) = launch {
-        collection.replaceOne(eq("uuid", chunkLoader.uuid), chunkLoader)
+        collection.replaceOne(eq("uuid", chunkLoader.uuid), chunkLoader).awaitFirstOrNull()
 
         if (reload) {
             val planet = chunkLoader.position.planet?.let { galaxyManager.get(planet = it)?.getPlanet(it) }

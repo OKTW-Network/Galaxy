@@ -2,7 +2,6 @@ package one.oktw.galaxy.galaxy
 
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.reactivestreams.client.FindPublisher
-import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.awaitFirstOrNull
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
@@ -19,14 +18,14 @@ import kotlin.collections.ArrayList
 class GalaxyManager {
     private val collection = database.getCollection("Galaxy", Galaxy::class.java)
 
-    fun createGalaxy(name: String, creator: Player, vararg members: UUID): Galaxy {
+    suspend fun createGalaxy(name: String, creator: Player, vararg members: UUID): Galaxy {
         val memberList = ArrayList<Traveler>(members.size + 1)
         memberList += Traveler(creator.uniqueId, OWNER)
         memberList += members.map { Traveler(it) }
 
         val galaxy = Galaxy(name = name, members = memberList)
 
-        launch { collection.insertOne(galaxy).awaitFirstOrNull() }
+        collection.insertOne(galaxy).awaitFirstOrNull()
         return galaxy
     }
 
@@ -39,7 +38,7 @@ class GalaxyManager {
             it.world.let { PlanetHelper.removePlanet(it) }
         }
 
-        launch { collection.deleteOne(eq("uuid", uuid)) }
+        collection.deleteOne(eq("uuid", uuid)).awaitFirstOrNull()
     }
 
     suspend fun get(uuid: UUID? = null, planet: UUID? = null): Galaxy? {
@@ -48,8 +47,9 @@ class GalaxyManager {
     }
 
 
-    suspend fun get(worldProperties: WorldProperties) =
-        collection.find(eq("planets.world", worldProperties.uniqueId)).first().awaitFirstOrNull()
+    suspend fun get(worldProperties: WorldProperties): Galaxy? {
+        return collection.find(eq("planets.world", worldProperties.uniqueId)).first().awaitFirstOrNull()
+    }
 
     suspend fun get(world: World) = get(world.properties)
 

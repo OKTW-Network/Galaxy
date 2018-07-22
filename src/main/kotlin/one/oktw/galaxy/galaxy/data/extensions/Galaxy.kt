@@ -2,6 +2,7 @@ package one.oktw.galaxy.galaxy.data.extensions
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.enums.Group
 import one.oktw.galaxy.galaxy.enums.Group.MEMBER
@@ -9,7 +10,12 @@ import one.oktw.galaxy.galaxy.enums.Group.VISITOR
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.traveler.data.Traveler
+import one.oktw.galaxy.galaxy.traveler.extensions.getPlayer
+import one.oktw.galaxy.player.event.Viewer.Companion.setViewer
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.format.TextColors.RED
 import org.spongepowered.api.world.World
 import org.spongepowered.api.world.storage.WorldProperties
 import java.util.*
@@ -52,7 +58,22 @@ fun Galaxy.addMember(uuid: UUID, group: Group = MEMBER) = update {
     members.add(Traveler(uuid, group))
 }
 
-fun Galaxy.delMember(uuid: UUID) = update { members.remove(members.firstOrNull { it.uuid == uuid } ?: return@update) }
+fun Galaxy.delMember(uuid: UUID) {
+    val member = members.firstOrNull { it.uuid == uuid } ?: return
+    val player = member.getPlayer()
+    if (player != null) {
+        val planet = getPlanet(player.world)
+        if (planet != null) {
+            player.sendMessage(Text.of(RED, languageService.getDefaultLanguage()["traveler.memberRemovedNotice"]))
+            if (planet.visitable) {
+                setViewer(uuid)
+            } else {
+                player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() })
+            }
+        }
+    }
+    update { members.remove(members.first { it.uuid == uuid }) }
+}
 
 fun Galaxy.saveMember(traveler: Traveler) = update {
     members.replaceAll { if (it.uuid == traveler.uuid) traveler else it }

@@ -8,6 +8,7 @@ import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.galaxy.GalaxyManager
 import one.oktw.galaxy.galaxy.data.extensions.*
 import one.oktw.galaxy.galaxy.enums.Group
+import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
@@ -181,6 +182,16 @@ class GalaxyManage : CommandBase {
                         Text.of(
                             TextColors.RED,
                             "Not enough arguments!\n",
+                            Sponge.getCommandManager().getUsage(src)
+                        )
+                    )
+                    return@launch
+                }
+                if (galaxyManager.get(uuid)!!.getMember(player.uniqueId)?.group == OWNER) {
+                    src.sendMessage(
+                        Text.of(
+                            TextColors.RED,
+                            "You are deleting an owner!\n",
                             Sponge.getCommandManager().getUsage(src)
                         )
                     )

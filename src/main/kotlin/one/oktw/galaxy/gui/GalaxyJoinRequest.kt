@@ -33,7 +33,7 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
     override val token = "InviteManagement-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.GalaxyJoinRequest.Title"])))
+        .property(InventoryTitle.of(Text.of(lang["UI.Title.JoinRequestList"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
 
@@ -71,7 +71,7 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
             event.isCancelled = true
 
             GUIHelper.open(event.source as Player) {
-                Confirm(Text.of(lang["UI.GalaxyJoinRequest.Conform_join"])) {
+                Confirm(Text.of(lang["UI.Title.ConfirmJoinRequest"])) {
                     launch {
                         if (it) galaxy.addMember(uuid).join()
 

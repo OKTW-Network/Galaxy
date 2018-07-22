@@ -35,7 +35,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
     override val token = "BrowserMember-${galaxy.uuid}${if (manage) "-manage" else ""}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.BrowserMember.Title"])))
+        .property(InventoryTitle.of(Text.of(lang["UI.Title.MemberList"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
 
@@ -55,9 +55,9 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
             .map {
                 val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(it.uuid).get()
                 val status = if (user.isOnline) {
-                    Text.of(GREEN, lang["UI.BrowserMember.Details.Online"])
+                    Text.of(GREEN, lang["UI.Tip.Online"])
                 } else {
-                    Text.of(RED, lang["UI.BrowserMember.Details.Offline"])
+                    Text.of(RED, lang["UI.Tip.Offline"])
                 }
                 val location = user.player.orElse(null)?.run {
                     // output: (planeName x,y,z)
@@ -87,10 +87,10 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
                         asList(
                             Text.of(
                                 YELLOW,
-                                "${lang["UI.BrowserMember.Details.Status"]}: ",
+                                "${lang["UI.Tip.Status"]}: ",
                                 if (location != null) status.concat(location) else status
                             ),
-                            Text.of(YELLOW, "${lang["UI.BrowserMember.Details.Group"]}: ", RESET, it.group.toString())
+                            Text.of(YELLOW, "${lang["UI.Tip.PermissionGroup"]}: ", RESET, it.group.toString())
                         )
                     )
                     .build()

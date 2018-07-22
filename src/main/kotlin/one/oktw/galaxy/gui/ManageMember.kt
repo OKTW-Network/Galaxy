@@ -47,7 +47,7 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
                 offer(DataUUID(buttonID[0]))
                 offer(
                     Keys.DISPLAY_NAME,
-                    Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.ManageMember.remove_member"])
+                    Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.RemoveMember"])
                 )
                 offer(Keys.ITEM_LORE, asList(Text.of(TextColors.RED, lang["UI.removeMemberNotify"])))
             }
@@ -58,7 +58,7 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
                 offer(DataUUID(buttonID[1]))
                 offer(
                     Keys.DISPLAY_NAME,
-                    Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.ManageMember.change_group"])
+                    Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.ChangePermissionGroup"])
                 )
             }
             .let { inventory.set(3, 0, it) }
@@ -76,7 +76,7 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
             buttonID[0] -> GUIHelper.open(player) {
-                Confirm(Text.of(lang["UI.ManageMember.confirm_remove"])) {
+                Confirm(Text.of(lang["UI.Button.ConfirmRemoveMember"])) {
                     if (it) {
                         galaxy.delMember(member)
                         GUIHelper.close(token)

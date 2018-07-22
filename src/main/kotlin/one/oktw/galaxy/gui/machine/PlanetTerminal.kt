@@ -42,20 +42,20 @@ class PlanetTerminal(private val planet: Planet, group: Group = VISITOR) : GUI()
         Button(ECS).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.PlanetTerminal.Button.ECS"]))
+                offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.Button.ECS"]))
             }
     }
     private val buttonExit by lazy {
         Button(EXIT).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[2]))
-                offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.PlanetTerminal.Button.Exit"]))
+                offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.Button.LeavePlanet"]))
             }
     }
     override val token = "PlanetTerminal-${planet.uuid}-$group"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.PlanetTerminal.Title"])))
+        .property(InventoryTitle.of(Text.of(lang["UI.Title.PlanetTerminal"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
 
@@ -65,11 +65,11 @@ class PlanetTerminal(private val planet: Planet, group: Group = VISITOR) : GUI()
         // Info
         Button(GUI_INFO).createItemStack()
             .apply {
-                offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.PlanetTerminal.Button.info"]))
+                offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.Button.Info"]))
                 offer(
                     Keys.ITEM_LORE, asList(
-                        Text.of(BOLD, YELLOW, lang["UI.PlanetTerminal.Info.Level"], RESET, ":", planet.level),
-                        Text.of(BOLD, YELLOW, lang["UI.PlanetTerminal.Info.Range"], RESET, ":", planet.size),
+                        Text.of(BOLD, YELLOW, lang["UI.Tip.PlanetLevel"], RESET, ":", planet.level),
+                        Text.of(BOLD, YELLOW, lang["UI.Tip.PlanetRange"], RESET, ":", planet.size),
                         Text.of(BOLD, YELLOW, lang["UI.PlanetTerminal.Info.Effect"], RESET, ":")
                     ).apply { addAll(planet.effect.map { Text.of(BOLD, it.type.potionTranslation) }) }
                 )

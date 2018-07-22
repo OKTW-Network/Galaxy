@@ -4,7 +4,7 @@ import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStack
 
-interface IGUIView<EnumValue, Data> {
+interface GUIView<EnumValue, Data> {
     val inventory: Inventory
     val layout: ArrayList<EnumValue>
     // override all item of the given names slots

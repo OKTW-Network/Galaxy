@@ -11,7 +11,7 @@ open class GridGUIView<EnumValue, Data>(
     override val inventory: Inventory,
     override val layout: ArrayList<EnumValue>,
     private val dimension: Pair<Int, Int>
-) : IGUIView<EnumValue, Data> {
+) : GUIView<EnumValue, Data> {
 
     private val map = HashMap<Int, Data>()
     private val cache = HashMap<Int, ItemStack?>() // workaround for the messy sponge api
@@ -186,7 +186,7 @@ open class GridGUIView<EnumValue, Data>(
                 hashMap[name] = (hashMap[name] ?: -1) + 1
 
                 if (idOfItemToFind == idOfSlot) {
-                    return (hashMap[name] ?: return null).let { Pair(name, it) }
+                    return hashMap[name]?.let { Pair(name, it) }
                 }
             }
         }

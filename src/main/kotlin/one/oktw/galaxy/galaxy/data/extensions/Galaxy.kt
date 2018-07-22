@@ -12,7 +12,9 @@ import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.traveler.data.Traveler
 import one.oktw.galaxy.galaxy.traveler.extensions.getPlayer
 import one.oktw.galaxy.player.event.Viewer.Companion.setViewer
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors.RED
 import org.spongepowered.api.world.World
@@ -58,14 +60,21 @@ fun Galaxy.addMember(uuid: UUID, group: Group = MEMBER) = update {
 }
 
 fun Galaxy.delMember(uuid: UUID) {
-    val member = members.firstOrNull { it.uuid == uuid } ?: return
-    val planet = getPlanet(member.getPlayer()?.world!!)
-    if (planet != null) {
-        member.getPlayer()
-            ?.sendMessage(Text.of(RED, languageService.getDefaultLanguage()["traveler.memberRemovedNotice"]))
-        if (planet.visitable) setViewer(uuid)
+    val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(uuid).get()
+    if (user.isOnline) {
+        val member = members.firstOrNull { it.uuid == uuid } ?: return
+        val player = member.getPlayer()
+        val planet = getPlanet(player?.world!!)
+        if (planet != null) {
+            player.sendMessage(Text.of(RED, languageService.getDefaultLanguage()["traveler.memberRemovedNotice"]))
+            if (planet.visitable) {
+                setViewer(uuid)
+            } else {
+                player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() })
+            }
+        }
     }
-    update { members.remove(members.firstOrNull { it.uuid == uuid } ?: return@update) }
+    update { members.remove(members.first { it.uuid == uuid }) }
 }
 
 fun Galaxy.saveMember(traveler: Traveler) = update {

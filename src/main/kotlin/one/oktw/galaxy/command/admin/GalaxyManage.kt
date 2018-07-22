@@ -191,8 +191,7 @@ class GalaxyManage : CommandBase {
                     src.sendMessage(
                         Text.of(
                             TextColors.RED,
-                            "You are deleting an owner!\n",
-                            Sponge.getCommandManager().getUsage(src)
+                            "You are deleting an owner"
                         )
                     )
                     return@launch

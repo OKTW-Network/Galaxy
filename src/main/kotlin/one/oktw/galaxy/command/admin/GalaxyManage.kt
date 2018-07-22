@@ -1,6 +1,7 @@
 package one.oktw.galaxy.command.admin
 
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.command.CommandBase
@@ -53,7 +54,7 @@ class GalaxyManage : CommandBase {
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             val player = args.getOne<Player>("player").get()
-            val galaxy = GalaxyManager().createGalaxy(args.getOne<String>("name").get(), player)
+            val galaxy = runBlocking { GalaxyManager().createGalaxy(args.getOne<String>("name").get(), player) }
             src.sendMessage(Text.of(TextColors.GREEN, galaxy.uuid))
             return CommandResult.success()
         }

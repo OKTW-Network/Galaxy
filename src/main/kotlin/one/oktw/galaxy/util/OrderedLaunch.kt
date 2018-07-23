@@ -6,7 +6,7 @@ import one.oktw.galaxy.Main
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class OrderedLaunch {
-    private val todos = ConcurrentLinkedQueue<suspend CoroutineScope.()->Unit>()
+    private val todos = ConcurrentLinkedQueue<suspend CoroutineScope.() -> Unit>()
     private var activatedJob: Job? = null
 
     private fun runTask() {
@@ -28,7 +28,7 @@ class OrderedLaunch {
         }
     }
 
-    fun launch(block: suspend CoroutineScope.()->Unit) {
+    fun launch(block: suspend CoroutineScope.() -> Unit) {
         synchronized(this) {
             todos.add(block)
 

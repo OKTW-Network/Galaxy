@@ -1,9 +1,6 @@
 package one.oktw.galaxy.gui.view
 
-import kotlinx.coroutines.experimental.CoroutineScope
-import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
-import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
@@ -13,7 +10,6 @@ import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.collections.ArrayList
 
 open class GridGUIView<EnumValue, Data>(

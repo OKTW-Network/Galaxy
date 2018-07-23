@@ -9,6 +9,10 @@ import java.util.*
 interface GUIView<EnumValue, Data> {
     val inventory: Inventory
     val layout: List<EnumValue>
+
+    // only used to indicate the gui is disabled, has no side effect at all
+    var disabled: Boolean
+
     // override all item of the given names slots
     fun setSlot(name: EnumValue, item: ItemStack?)
 

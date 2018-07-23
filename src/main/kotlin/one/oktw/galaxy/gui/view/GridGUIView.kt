@@ -16,13 +16,8 @@ open class GridGUIView<EnumValue, Data>(
     override val layout: List<EnumValue>,
     private val dimension: Pair<Int, Int>
 ) : GUIView<EnumValue, Data> {
-    override fun getDataOf(stack: ItemStackSnapshot): Data? {
-        return stack.createStack().let { getDataOf(it) }
-    }
+    override var disabled = false
 
-    override fun getNameOf(stack: ItemStackSnapshot): Pair<EnumValue, Int>? {
-        return stack.createStack().let { getNameOf(it) }
-    }
 
     private val map = HashMap<Int, Data>()
     private val cache = ConcurrentHashMap<Int, UUID>() // workaround for the messy sponge api
@@ -225,6 +220,10 @@ open class GridGUIView<EnumValue, Data>(
         return stack[DataUUID.key].orElse(null)?.let { getNameOf(it) }
     }
 
+    override fun getNameOf(stack: ItemStackSnapshot): Pair<EnumValue, Int>? {
+        return stack[DataUUID.key].orElse(null)?.let { getNameOf(it) }
+    }
+
 
     override fun getDataOf(id: UUID): Data? {
         for (y in 0 until dimension.second) {
@@ -245,6 +244,10 @@ open class GridGUIView<EnumValue, Data>(
     }
 
     override fun getDataOf(stack: ItemStack): Data? {
+        return stack[DataUUID.key].orElse(null)?.let { getDataOf(it) }
+    }
+
+    override fun getDataOf(stack: ItemStackSnapshot): Data? {
         return stack[DataUUID.key].orElse(null)?.let { getDataOf(it) }
     }
 }

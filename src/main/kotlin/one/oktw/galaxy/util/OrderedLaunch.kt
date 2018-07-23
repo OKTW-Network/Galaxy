@@ -2,7 +2,6 @@ package one.oktw.galaxy.util
 
 import kotlinx.coroutines.experimental.CoroutineScope
 import kotlinx.coroutines.experimental.Job
-import one.oktw.galaxy.Main
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class OrderedLaunch {
@@ -11,8 +10,6 @@ class OrderedLaunch {
 
     private fun runTask() {
         if (todos.size > 0) {
-            Main.main.logger.info("starting a task")
-
             val todo = todos.poll()
             activatedJob = kotlinx.coroutines.experimental.launch(block = todo)
 
@@ -20,11 +17,8 @@ class OrderedLaunch {
                 (activatedJob as Job).join()
                 activatedJob = null
 
-                Main.main.logger.info("task finished, starting another task")
                 runTask()
             }
-        } else {
-            Main.main.logger.info("task empty, bye")
         }
     }
 
@@ -33,7 +27,6 @@ class OrderedLaunch {
             todos.add(block)
 
             if (activatedJob == null) {
-                Main.main.logger.info("no active job found, starting the new task")
                 runTask()
             }
         }

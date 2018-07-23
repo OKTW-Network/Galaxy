@@ -3,6 +3,8 @@ package one.oktw.galaxy.gui.view
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.item.inventory.ItemStackSnapshot
+import java.util.*
 
 interface GUIView<EnumValue, Data> {
     val inventory: Inventory
@@ -39,9 +41,21 @@ interface GUIView<EnumValue, Data> {
     // get name from a ItemStack
     fun getNameOf(stack: ItemStack): Pair<EnumValue, Int>?
 
+    // get name from a ItemStack
+    fun getNameOf(stack: ItemStackSnapshot): Pair<EnumValue, Int>?
+
+    // get name from a ItemStack
+    fun getNameOf(id: UUID): Pair<EnumValue, Int>?
+
     // get the data of field from event
     fun getDataOf(event: ClickInventoryEvent): Data?
 
     // get name from a ItemStack
     fun getDataOf(stack: ItemStack): Data?
+
+    // get name from a ItemStack
+    fun getDataOf(stack: ItemStackSnapshot): Data?
+
+    // get name from a ItemStack
+    fun getDataOf(id: UUID): Data?
 }

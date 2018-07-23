@@ -6,7 +6,7 @@ import org.spongepowered.api.item.inventory.ItemStack
 
 interface GUIView<EnumValue, Data> {
     val inventory: Inventory
-    val layout: ArrayList<EnumValue>
+    val layout: List<EnumValue>
     // override all item of the given names slots
     fun setSlot(name: EnumValue, item: ItemStack?)
 
@@ -17,19 +17,21 @@ interface GUIView<EnumValue, Data> {
     fun getSlot(name: EnumValue): ItemStack?
 
     // override all item of the given names slots
-    fun setSlots(name: EnumValue, listToAdd: ArrayList<ItemStack?>)
+    fun setSlots(name: EnumValue, listToAdd: List<ItemStack?>)
 
     // override all item of the given names slots
-    fun setSlots(name: EnumValue, listToAdd: ArrayList<ItemStack?>, data: Data?)
+    fun setSlots(name: EnumValue, listToAdd: List<ItemStack?>, data: Data?)
 
     // override all item of the given names slots
-    fun setSlotPairs(name: EnumValue, listToAdd: ArrayList<Pair<ItemStack?, Data?>>)
+    fun setSlotPairs(name: EnumValue, listToAdd: List<Pair<ItemStack?, Data?>>)
 
     // retrieve all slots of the given named slots
-    fun getSlots(name: EnumValue): ArrayList<ItemStack>
+    fun getSlots(name: EnumValue): List<ItemStack>
 
     // retrieve counts of a named slot
     fun countSlots(name: EnumValue): Int
+
+    fun clear()
 
     // get the name of field from event
     fun getNameOf(event: ClickInventoryEvent): Pair<EnumValue, Int>?

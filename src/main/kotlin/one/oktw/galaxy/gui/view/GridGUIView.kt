@@ -1,20 +1,24 @@
 package one.oktw.galaxy.gui.view
 
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.data.DataUUID
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 
 open class GridGUIView<EnumValue, Data>(
     override val inventory: Inventory,
-    override val layout: ArrayList<EnumValue>,
+    override val layout: List<EnumValue>,
     private val dimension: Pair<Int, Int>
 ) : GUIView<EnumValue, Data> {
 
     private val map = HashMap<Int, Data>()
-    private val cache = HashMap<Int, ItemStack?>() // workaround for the messy sponge api
+    private val cache = ConcurrentHashMap<Int, UUID>() // workaround for the messy sponge api
 
     private fun getOffset(x: Int, y: Int): Int {
         return y * dimension.first + x
@@ -25,12 +29,19 @@ open class GridGUIView<EnumValue, Data>(
     }
 
     private fun setSlot(x: Int, y: Int, item: ItemStack?) {
-        if (item != null) {
-            grid.set(x, y, item)
-            cache[getOffset(x, y)] = item
-        } else {
-            grid.poll(x, y)
-            cache.remove(getOffset(x, y))
+        launch {
+            if (item != null) {
+                grid.set(x, y, item)
+
+                item[DataUUID.key].orElse(null)?.let {
+                    cache[getOffset(x, y)] = it
+                } ?: let {
+                    cache.remove(getOffset(x, y))
+                }
+            } else {
+                grid.poll(x, y)
+                cache.remove(getOffset(x, y))
+            }
         }
     }
 
@@ -64,7 +75,7 @@ open class GridGUIView<EnumValue, Data>(
         for (y in 0 until dimension.second) {
             for (x in 0 until dimension.first) {
                 if (layout[getOffset(x, y)] == name) {
-                    return cache[getOffset(x, y)]
+                    return grid.getSlot(x, y).orElse(null)?.peek()?.orElse(null)
                 }
             }
         }
@@ -72,13 +83,13 @@ open class GridGUIView<EnumValue, Data>(
         return null
     }
 
-    override fun getSlots(name: EnumValue): ArrayList<ItemStack> {
+    override fun getSlots(name: EnumValue): List<ItemStack> {
         val listToReturn = ArrayList<ItemStack>()
 
         for (y in 0 until dimension.second) {
             for (x in 0 until dimension.first) {
                 if (layout[getOffset(x, y)] == name) {
-                    cache[getOffset(x, y)]?.let {
+                    grid.getSlot(x, y).orElse(null)?.peek()?.orElse(null)?.let {
                         listToReturn.add(it)
                     }
                 }
@@ -88,15 +99,16 @@ open class GridGUIView<EnumValue, Data>(
         return listToReturn
     }
 
-    override fun setSlots(name: EnumValue, listToAdd: ArrayList<ItemStack?>) {
+    override fun setSlots(name: EnumValue, listToAdd: List<ItemStack?>) {
         val iterator = listToAdd.iterator()
 
         for (y in 0 until dimension.second) {
             for (x in 0 until dimension.first) {
                 if (layout[getOffset(x, y)] == name) {
                     if (iterator.hasNext()) {
-                        val item = iterator.next()
-                        setSlot(x, y, item)
+                        iterator.next().let {
+                            setSlot(x, y, it)
+                        }
                     } else {
                         setSlot(x, y, null)
                     }
@@ -105,15 +117,16 @@ open class GridGUIView<EnumValue, Data>(
         }
     }
 
-    override fun setSlots(name: EnumValue, listToAdd: ArrayList<ItemStack?>, data: Data?) {
+    override fun setSlots(name: EnumValue, listToAdd: List<ItemStack?>, data: Data?) {
         val iterator = listToAdd.iterator()
 
         for (y in 0 until dimension.second) {
             for (x in 0 until dimension.first) {
                 if (layout[getOffset(x, y)] == name) {
                     if (iterator.hasNext()) {
-                        val item = iterator.next()
-                        setSlot(x, y, item)
+                        iterator.next().let {
+                            setSlot(x, y, it)
+                        }
                     } else {
                         setSlot(x, y, null)
                     }
@@ -128,7 +141,7 @@ open class GridGUIView<EnumValue, Data>(
         }
     }
 
-    override fun setSlotPairs(name: EnumValue, listToAdd: ArrayList<Pair<ItemStack?, Data?>>) {
+    override fun setSlotPairs(name: EnumValue, listToAdd: List<Pair<ItemStack?, Data?>>) {
         val iterator = listToAdd.iterator()
 
         for (y in 0 until dimension.second) {
@@ -169,6 +182,12 @@ open class GridGUIView<EnumValue, Data>(
         return count
     }
 
+    override fun clear() {
+        inventory.clear()
+        cache.clear()
+        map.clear()
+    }
+
     override fun getNameOf(event: ClickInventoryEvent): Pair<EnumValue, Int>? {
         val itemToFind = event.cursorTransaction.default.createStack()
         return getNameOf(itemToFind)
@@ -181,8 +200,7 @@ open class GridGUIView<EnumValue, Data>(
         for (y in 0 until dimension.second) {
             for (x in 0 until dimension.first) {
                 val name = layout[getOffset(x, y)]
-                val item = cache[getOffset(x, y)] ?: continue
-                val idOfSlot = item[DataUUID.key].orElse(null) ?: continue
+                val idOfSlot = cache[getOffset(x, y)] ?: continue
                 hashMap[name] = (hashMap[name] ?: -1) + 1
 
                 if (idOfItemToFind == idOfSlot) {
@@ -203,8 +221,7 @@ open class GridGUIView<EnumValue, Data>(
 
         for (y in 0 until dimension.second) {
             for (x in 0 until dimension.first) {
-                val item = cache[getOffset(x, y)] ?: continue
-                val idOfSlot = item[DataUUID.key].orElse(null) ?: continue
+                val idOfSlot = cache[getOffset(x, y)] ?: continue
 
                 if (idOfItemToFind == idOfSlot) {
                     return map[getOffset(x, y)]

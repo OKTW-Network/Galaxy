@@ -187,16 +187,12 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                if (galaxyManager.get(uuid)!!.getMember(player.uniqueId)?.group == OWNER) {
-                    src.sendMessage(
-                        Text.of(
-                            TextColors.RED,
-                            "You are deleting an owner"
-                        )
-                    )
+                val galaxy = galaxyManager.get(uuid)!!
+                if (galaxy.getMember(player.uniqueId)?.group == OWNER) {
+                    src.sendMessage(Text.of(TextColors.RED, "You are deleting an owner"))
                     return@launch
                 }
-                galaxyManager.get(uuid)!!.delMember(player.uniqueId)
+                galaxy.delMember(player.uniqueId)
                 src.sendMessage(Text.of(TextColors.GREEN, "Member removed！"))
             }
             return CommandResult.success()

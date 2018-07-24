@@ -83,14 +83,14 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
 
         Button(WRITE).createItemStack()
             .apply {
-                offer(DataUUID(buttonID[4]))
+                offer(DataUUID(buttonID[5]))
                 offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.ChangeGalaxyInfo"]))
             }
             .let { inventory.set(6, 1, it) }
 
         Button(WRITE).createItemStack()
             .apply {
-                offer(DataUUID(buttonID[4]))
+                offer(DataUUID(buttonID[6]))
                 offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.ChangeGalaxyNotification"]))
             }
             .let { inventory.set(7, 1, it) }

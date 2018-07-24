@@ -23,10 +23,13 @@ class GalaxyInfo : CommandBase {
         .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-        var uuid = args.getOne<UUID>("galaxy").orElse(null)
+        val uuid = args.getOne<UUID>("galaxy").orElse(null)
         launch {
-            if (uuid == null && src is Player) uuid = galaxyManager.get(src.world)?.uuid
-            if (uuid == null) {
+            var galaxy = galaxyManager.get(uuid)
+            //If galaxy(uuid) is null then get player galaxy
+            if (galaxy == null && src is Player) galaxy = galaxyManager.get(src.world)
+            //If it is still null then return
+            if (galaxy == null) {
                 src.sendMessage(
                     Text.of(
                         TextColors.RED,
@@ -36,7 +39,6 @@ class GalaxyInfo : CommandBase {
                 )
                 return@launch
             }
-            val galaxy = galaxyManager.get(uuid)!!
 
             PaginationList.builder()
                 .contents(

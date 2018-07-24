@@ -6,24 +6,26 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.createPlanet
+import one.oktw.galaxy.galaxy.data.extensions.getMember
 import one.oktw.galaxy.galaxy.data.extensions.refresh
+import one.oktw.galaxy.galaxy.data.extensions.update
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.galaxy.planet.data.extensions.loadWorld
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.util.Chat.Companion.confirm
 import one.oktw.galaxy.util.Chat.Companion.input
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
-import org.spongepowered.api.event.EventListener
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
-import org.spongepowered.api.event.message.MessageChannelEvent
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
 import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
+import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors.*
 import org.spongepowered.api.text.format.TextStyles
@@ -37,10 +39,8 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
         .property(InventoryTitle.of(Text.of(galaxy.name)))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(main)
-    // Todo get player lang
     private val lang = languageService.getDefaultLanguage()
     private val buttonID = Array(7) { UUID.randomUUID() }
-    private lateinit var chatListener: EventListener<MessageChannelEvent.Chat>
 
     init {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
@@ -139,11 +139,36 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
                 }
             }
             buttonID[1] -> GUIHelper.openAsync(player) { BrowserMember(galaxy.refresh(), true) }
-            buttonID[2] -> Unit // TODO GUIHelper.open(player) { AddMember() }
+            buttonID[2] -> launch {
+                val username = input(player, Text.of(AQUA, "請輸入遊戲ID："))?.toPlain() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
+                val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(username)
+
+                if (user.isPresent) {
+                    galaxy.getMember(user.get().uniqueId)
+                    player.sendMessage(Text.of(GREEN, "已成功將 $username 加入星系！"))
+                } else {
+                    player.sendMessage(Text.of(RED, "找不到玩家"))
+                }
+            }
             buttonID[3] -> GUIHelper.openAsync(player) { GalaxyJoinRequest(galaxy.refresh()) }
-            buttonID[4] -> Unit // TODO GUIHelper.open(player) { RenameGalaxy() }
-            buttonID[5] -> Unit // TODO edit info
-            buttonID[6] -> Unit // TODO edit notice
+            buttonID[4] -> launch {
+                val input = input(player, Text.of(AQUA, "請輸入新名稱："))?.toPlain() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
+
+                galaxy.update { name = input }.join()
+                player.sendMessage(Text.of(GREEN, "重新命名成功！"))
+            }
+            buttonID[5] -> launch {
+                val input = input(player, Text.of(AQUA, "請輸入星系資訊："))?.toPlain() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
+
+                galaxy.update { info = input }.join()
+                player.sendMessage(Text.of(GREEN, "設定成功！"))
+            }
+            buttonID[6] -> launch {
+                val input = input(player, Text.of(AQUA, "請輸入星系通知："))?.toPlain() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
+
+                galaxy.update { notice = input }.join()
+                player.sendMessage(Text.of(GREEN, "設定成功！"))
+            }
         }
     }
 }

@@ -17,10 +17,8 @@ import one.oktw.galaxy.util.Chat.Companion.confirm
 import one.oktw.galaxy.util.Chat.Companion.input
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
-import org.spongepowered.api.event.EventListener
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
-import org.spongepowered.api.event.message.MessageChannelEvent
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
 import org.spongepowered.api.item.inventory.property.InventoryTitle
@@ -34,9 +32,7 @@ import org.spongepowered.api.text.format.TextStyles.BOLD
 import java.util.*
 
 class MainMenu(player: Player) : GUI() {
-    // Todo get player lang
     private val lang = languageService.getDefaultLanguage()
-    private lateinit var chatListener: EventListener<MessageChannelEvent.Chat>
     override val token = "MainMenu-${player.uniqueId}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)

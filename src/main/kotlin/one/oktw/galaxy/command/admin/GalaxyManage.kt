@@ -349,7 +349,7 @@ class GalaxyManage : CommandBase {
                 }
                 planet.size = args.getOne<Int>("size").get()
                 PlanetHelper.updatePlanet(planet)
-                src.sendMessage(Text.of(TextColors.GREEN, "Size set to", planet.size, "!"))
+                src.sendMessage(Text.of(TextColors.GREEN, "Size set to ", planet.size, "!"))
             }
             return CommandResult.success()
         }

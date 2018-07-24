@@ -94,8 +94,6 @@ class MainMenu(player: Player) : GUI() {
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
             buttonID[0] -> GUIHelper.open(player) { BrowserGalaxy(player) }
             buttonID[1] -> launch {
-                GUIHelper.closeAll(player)
-
                 if (galaxyManager.get(player).openSubscription().any { it.getGroup(player) == OWNER }) {
                     player.sendMessage(Text.of(RED, "你只能擁有一個星系"))
                     return@launch

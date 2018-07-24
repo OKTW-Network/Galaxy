@@ -108,8 +108,6 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
             buttonID[0] -> launch {
-                GUIHelper.closeAll(player)
-
                 if (galaxy.planets.size >= 1) {
                     player.sendMessage(Text.of(RED, "目前僅能創建一個星球！請等待日後開放"))
                     return@launch

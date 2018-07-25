@@ -26,7 +26,7 @@ class ChunkLoaderManager {
     private val logger = main.logger
     private val ticketManager = Sponge.getServer().chunkTicketManager
     private val collection = database.getCollection("ChunkLoader", ChunkLoader::class.java)
-    private val worldTickets: ConcurrentHashMap<UUID, ChunkTicketManager.LoadingTicket> = ConcurrentHashMap()
+    private val worldTickets = ConcurrentHashMap<UUID, ChunkTicketManager.LoadingTicket>()
 
     init {
         ticketManager.registerCallback(main) { tickets, world ->
@@ -55,25 +55,22 @@ class ChunkLoaderManager {
 
     private fun loadChunk(location: Location<World>, range: Int): ChunkTicketManager.LoadingTicket {
         val ticket = ticketManager.createTicket(main, location.extent).get()
-
-        launch {
-            val chunkPos = location.chunkPosition
-            val chunkList = HashSet<Vector3i>()
-            for (x in chunkPos.x - range..chunkPos.x + range) {
-                for (z in chunkPos.z - range..chunkPos.z + range) {
-                    chunkList.add(Vector3i(x, 0, z))
-                }
+        val chunkPos = location.chunkPosition
+        val chunkList = HashSet<Vector3i>()
+        for (x in chunkPos.x - range..chunkPos.x + range) {
+            for (z in chunkPos.z - range..chunkPos.z + range) {
+                chunkList.add(Vector3i(x, 0, z))
             }
-            if (chunkList.size > ticket.numChunks) {
-                main.logger.warn(
-                    "ChunkLoader({}) level({} chunks) large then forge limit({} chunks)!",
-                    location.extent.toString(),
-                    chunkList.size,
-                    ticket.numChunks
-                )
-            }
-            chunkList.parallelStream().forEach(ticket::forceChunk)
         }
+        if (chunkList.size > ticket.numChunks) {
+            main.logger.warn(
+                "ChunkLoader({}) level({} chunks) large then forge limit({} chunks)!",
+                location.extent.toString(),
+                chunkList.size,
+                ticket.numChunks
+            )
+        }
+        chunkList.forEach(ticket::forceChunk)
 
         return ticket
     }

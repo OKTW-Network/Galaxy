@@ -5,10 +5,7 @@ import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
-import one.oktw.galaxy.galaxy.data.extensions.createPlanet
-import one.oktw.galaxy.galaxy.data.extensions.getMember
-import one.oktw.galaxy.galaxy.data.extensions.refresh
-import one.oktw.galaxy.galaxy.data.extensions.update
+import one.oktw.galaxy.galaxy.data.extensions.*
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.galaxy.planet.data.extensions.loadWorld
 import one.oktw.galaxy.item.enums.ButtonType.*
@@ -144,7 +141,7 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
                 val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(username)
 
                 if (user.isPresent) {
-                    galaxy.getMember(user.get().uniqueId)
+                    galaxy.addMember(user.get().uniqueId)
                     player.sendMessage(Text.of(GREEN, "已成功將 $username 加入星系！"))
                 } else {
                     player.sendMessage(Text.of(RED, "找不到玩家"))

@@ -4,8 +4,12 @@ import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.extensions.serialize
 import one.oktw.galaxy.galaxy.data.Galaxy
-import one.oktw.galaxy.galaxy.data.extensions.*
+import one.oktw.galaxy.galaxy.data.extensions.addMember
+import one.oktw.galaxy.galaxy.data.extensions.createPlanet
+import one.oktw.galaxy.galaxy.data.extensions.refresh
+import one.oktw.galaxy.galaxy.data.extensions.update
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.galaxy.planet.data.extensions.loadWorld
 import one.oktw.galaxy.item.enums.ButtonType.*
@@ -137,14 +141,27 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
             }
             buttonID[1] -> GUIHelper.openAsync(player) { BrowserMember(galaxy.refresh(), true) }
             buttonID[2] -> launch {
-                val username = input(player, Text.of(AQUA, "請輸入遊戲ID："))?.toPlain() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
-                val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(username)
+                val input = input(player, Text.of(AQUA, "請輸入遊戲ID："))?.toPlain()?.split(" ") ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
+                val addList = ArrayList<String>()
+                val invList = ArrayList<String>()
+                val userStorageService = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
 
-                if (user.isPresent) {
-                    galaxy.addMember(user.get().uniqueId)
-                    player.sendMessage(Text.of(GREEN, "已成功將 $username 加入星系！"))
-                } else {
-                    player.sendMessage(Text.of(RED, "找不到玩家"))
+                input.forEach {
+                    val user = userStorageService.get(it).orElse(null)
+                    if (user != null) {
+                        galaxy.addMember(user.uniqueId)
+                        addList += it
+                    } else {
+                        invList += it
+                    }
+                }
+
+                if (addList.isNotEmpty()) {
+                    player.sendMessage(Text.of(GREEN, "已成功將 ", RESET, addList, GREEN, " 加入星系！"))
+                }
+
+                if (invList.isNotEmpty()) {
+                    player.sendMessage(Text.of(RED, "找不到玩家：", RESET, invList))
                 }
             }
             buttonID[3] -> GUIHelper.openAsync(player) { GalaxyJoinRequest(galaxy.refresh()) }
@@ -155,13 +172,13 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
                 player.sendMessage(Text.of(GREEN, "重新命名成功！"))
             }
             buttonID[5] -> launch {
-                val input = input(player, Text.of(AQUA, "請輸入星系資訊："))?.toPlain() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
+                val input = input(player, Text.of(AQUA, "請輸入星系資訊："))?.serialize() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
 
                 galaxy.update { info = input }.join()
                 player.sendMessage(Text.of(GREEN, "設定成功！"))
             }
             buttonID[6] -> launch {
-                val input = input(player, Text.of(AQUA, "請輸入星系通知："))?.toPlain() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
+                val input = input(player, Text.of(AQUA, "請輸入星系通知："))?.serialize() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
 
                 galaxy.update { notice = input }.join()
                 player.sendMessage(Text.of(GREEN, "設定成功！"))

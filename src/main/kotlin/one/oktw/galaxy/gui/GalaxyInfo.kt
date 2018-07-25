@@ -3,6 +3,7 @@ package one.oktw.galaxy.gui
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.extensions.deserialize
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.refresh
 import one.oktw.galaxy.galaxy.data.extensions.requestJoin
@@ -21,8 +22,7 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.format.TextColors
-import org.spongepowered.api.text.serializer.TextSerializers
+import org.spongepowered.api.text.format.TextColors.*
 import java.util.*
 import java.util.Arrays.asList
 
@@ -45,14 +45,14 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
         Button(MEMBERS).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.Button.MemberList"]))
+                offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.MemberList"]))
             }
             .let { inventory.set(0, 0, it) }
 
         Button(PLANET_O).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.Button.PlanetList"]))
+                offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.PlanetList"]))
             }
             .let { inventory.set(2, 0, it) }
 
@@ -61,17 +61,17 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
                 Button(LIST).createItemStack()
                     .apply {
                         offer(DataUUID(buttonID[2]))
-                        offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.Button.ManageGalaxy"]))
+                        offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.ManageGalaxy"]))
                     }
                     .let { inventory.set(4, 0, it) }
             }
             member != null -> {
                 Button(WARNING).createItemStack()
                     .apply {
-                        offer(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, lang["UI.Button.GalaxyNotice"]))
+                        offer(Keys.DISPLAY_NAME, Text.of(YELLOW, lang["UI.Button.GalaxyNotice"]))
                         offer(
                             Keys.ITEM_LORE,
-                            galaxy.notice.split('\n').map(TextSerializers.FORMATTING_CODE::deserialize)
+                            galaxy.notice.split("\\n").map { Text.of(WHITE, it.deserialize()) }
                         )
                     }
                     .let { inventory.set(4, 0, it) }
@@ -80,10 +80,10 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
                 Button(PLUS).createItemStack()
                     .apply {
                         if (player.uniqueId in galaxy.joinRequest) {
-                            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GRAY, lang["UI.Button.JoinRequestSent"]))
+                            offer(Keys.DISPLAY_NAME, Text.of(GRAY, lang["UI.Button.JoinRequestSent"]))
                         } else {
                             offer(DataUUID(buttonID[3]))
-                            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.Button.JoinRequest"]))
+                            offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.JoinRequest"]))
                         }
                     }
                     .let { inventory.set(4, 0, it) }
@@ -101,7 +101,7 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
 
         Button(PLUS).createItemStack()
             .apply {
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GRAY, lang["UI.Button.JoinRequestSent"]))
+                offer(Keys.DISPLAY_NAME, Text.of(GRAY, lang["UI.Button.JoinRequestSent"]))
             }
             .let { inventory.set(4, 0, it) }
     }

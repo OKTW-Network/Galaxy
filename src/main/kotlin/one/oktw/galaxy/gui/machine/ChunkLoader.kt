@@ -100,7 +100,7 @@ class ChunkLoader(private val entity: Entity) : GUI() {
 
                     chunkLoader.upgrade = it as ArrayList<Upgrade>
 
-                    chunkLoaderManager.updateChunkLoader(chunkLoader, newLevel != originLevel)
+                    chunkLoaderManager.update(chunkLoader, newLevel != originLevel)
                 }
         }
     }

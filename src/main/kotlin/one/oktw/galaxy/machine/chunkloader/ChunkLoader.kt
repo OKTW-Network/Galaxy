@@ -28,7 +28,7 @@ class ChunkLoader {
 
         if (enderCrystal.location.add(0.0, -1.0, 0.0).blockType == BlockTypes.OBSIDIAN) {
             launch {
-                chunkLoaderManager.addChunkLoader(enderCrystal.location).uuid.let {
+                chunkLoaderManager.add(enderCrystal.location).uuid.let {
                     withContext(serverThread) { enderCrystal.offer(DataUUID(it)) }
                 }
             }

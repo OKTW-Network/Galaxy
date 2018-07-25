@@ -10,7 +10,8 @@ import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.data.extensions.refresh
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
-import one.oktw.galaxy.item.enums.ButtonType.PLANET_O
+import one.oktw.galaxy.galaxy.planet.enums.PlanetType.*
+import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys
@@ -27,7 +28,6 @@ import org.spongepowered.api.text.format.TextStyles
 import java.util.Arrays.asList
 
 class BrowserPlanet(private val galaxy: Galaxy) : PageGUI() {
-    // Todo get player lang
     private val lang = languageService.getDefaultLanguage()
     override val token = "BrowserPlanet-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
@@ -48,8 +48,11 @@ class BrowserPlanet(private val galaxy: Galaxy) : PageGUI() {
             .drop(skip)
             .take(number)
             .map {
-                // TODO planet type
-                Button(PLANET_O).createItemStack().apply {
+                when (it.type) {
+                    NORMAL -> Button(PLANET_O)
+                    NETHER -> Button(PLANET_N)
+                    END -> Button(PLANET_E)
+                }.createItemStack().apply {
                     offer(DataUUID(it.uuid))
                     offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, it.name))
                     offer(
@@ -59,8 +62,8 @@ class BrowserPlanet(private val galaxy: Galaxy) : PageGUI() {
                                 TextColors.AQUA,
                                 "${lang["UI.Tip.PlayerCount"]}: ",
                                 TextColors.RESET,
-                                0
-                            ), // TODO
+                                0 // TODO player on planet
+                            ),
                             Text.of(
                                 TextColors.AQUA,
                                 "${lang["UI.Tip.AllowVisit"]}: ",

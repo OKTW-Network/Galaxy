@@ -4,8 +4,11 @@ import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.planet.data.Planet
+import one.oktw.galaxy.galaxy.planet.enums.PlanetType
+import one.oktw.galaxy.galaxy.planet.enums.PlanetType.NORMAL
 import one.oktw.galaxy.galaxy.planet.gen.PlanetGenModifier
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.world.DimensionTypes.*
 import org.spongepowered.api.world.World
 import org.spongepowered.api.world.WorldArchetype
 import org.spongepowered.api.world.storage.WorldProperties
@@ -19,20 +22,27 @@ class PlanetHelper {
         private val logger = main.logger
         private val server = Sponge.getServer()
 
-        suspend fun createPlanet(name: String): Planet {
+        suspend fun createPlanet(name: String, type: PlanetType = NORMAL): Planet {
             if (server.getWorldProperties(name).isPresent)
                 throw IllegalArgumentException("World already exists")
             if (!name.matches(Regex("[a-z0-9\\-_]+", RegexOption.IGNORE_CASE)))
                 throw IllegalArgumentException("Name contains characters that are not allowed")
 
             val properties: WorldProperties
-            val archetype = Sponge.getRegistry().getType(WorldArchetype::class.java, name).orElse(null)
-                    ?: WorldArchetype.builder()
-                        .generateSpawnOnLoad(false)
-                        .loadsOnStartup(false)
-                        .keepsSpawnLoaded(false)
-                        .generatorModifiers(PlanetGenModifier())
-                        .build(name, name)
+            val archetype = Sponge.getRegistry().getType(WorldArchetype::class.java, "planet").orElse(null)
+                ?: WorldArchetype.builder()
+                    .dimension(
+                        when (type) {
+                            PlanetType.NORMAL -> OVERWORLD
+                            PlanetType.NETHER -> NETHER
+                            PlanetType.END -> THE_END
+                        }
+                    )
+                    .generateSpawnOnLoad(false)
+                    .loadsOnStartup(false)
+                    .keepsSpawnLoaded(false)
+                    .generatorModifiers(PlanetGenModifier())
+                    .build("planet", "planet")
 
             logger.info("Create World [{}]", name)
 

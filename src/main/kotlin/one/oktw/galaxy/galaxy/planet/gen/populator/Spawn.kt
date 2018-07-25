@@ -12,6 +12,7 @@ import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.PortionTypes
 import org.spongepowered.api.text.translation.Translation
 import org.spongepowered.api.util.Direction
+import org.spongepowered.api.world.DimensionTypes.NETHER
 import org.spongepowered.api.world.World
 import org.spongepowered.api.world.extent.Extent
 import org.spongepowered.api.world.gen.Populator
@@ -42,6 +43,12 @@ class Spawn : Populator {
 
         var start = spawn
         for (y in 0..192) {
+            // fallback to default spawn in nether
+            if (start.y + y > 115 && world.dimension.type == NETHER) {
+                start = spawn
+                break
+            }
+
             if (volume.getBlockType(start.add(0, y, 0)) == BlockTypes.AIR) {
                 start = start.add(0, y, 0)
                 break

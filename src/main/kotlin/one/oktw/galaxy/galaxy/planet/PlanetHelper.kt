@@ -6,9 +6,9 @@ import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType.NORMAL
-import one.oktw.galaxy.galaxy.planet.gen.PlanetGenModifier
+import one.oktw.galaxy.galaxy.planet.gen.NormalGenModifier
 import org.spongepowered.api.Sponge
-import org.spongepowered.api.world.DimensionTypes.*
+import org.spongepowered.api.world.DimensionTypes.NETHER
 import org.spongepowered.api.world.World
 import org.spongepowered.api.world.WorldArchetype
 import org.spongepowered.api.world.storage.WorldProperties
@@ -21,6 +21,19 @@ class PlanetHelper {
     companion object {
         private val logger = main.logger
         private val server = Sponge.getServer()
+        private val normalArchetype = Sponge.getRegistry().getType(WorldArchetype::class.java, "planet").orElse(null) ?: WorldArchetype.builder()
+            .generateSpawnOnLoad(false)
+            .loadsOnStartup(false)
+            .keepsSpawnLoaded(false)
+            .generatorModifiers(NormalGenModifier())
+            .build("planet", "planet")
+        private val netherArchetype = Sponge.getRegistry().getType(WorldArchetype::class.java, "planet_nether").orElse(null) ?: WorldArchetype.builder()
+            .dimension(NETHER)
+            .generateSpawnOnLoad(false)
+            .loadsOnStartup(false)
+            .keepsSpawnLoaded(false)
+            .generatorModifiers(NormalGenModifier())
+            .build("planet_nether", "planet_nether")
 
         suspend fun createPlanet(name: String, type: PlanetType = NORMAL): Planet {
             if (server.getWorldProperties(name).isPresent)
@@ -29,20 +42,11 @@ class PlanetHelper {
                 throw IllegalArgumentException("Name contains characters that are not allowed")
 
             val properties: WorldProperties
-            val archetype = Sponge.getRegistry().getType(WorldArchetype::class.java, "planet").orElse(null)
-                ?: WorldArchetype.builder()
-                    .dimension(
-                        when (type) {
-                            PlanetType.NORMAL -> OVERWORLD
-                            PlanetType.NETHER -> NETHER
-                            PlanetType.END -> THE_END
-                        }
-                    )
-                    .generateSpawnOnLoad(false)
-                    .loadsOnStartup(false)
-                    .keepsSpawnLoaded(false)
-                    .generatorModifiers(PlanetGenModifier())
-                    .build("planet", "planet")
+            val archetype = when (type) {
+                PlanetType.NORMAL -> normalArchetype
+                PlanetType.NETHER -> netherArchetype
+                PlanetType.END -> TODO()
+            }
 
             logger.info("Create World [{}]", name)
 

@@ -6,12 +6,12 @@ import org.spongepowered.api.world.gen.WorldGenerator
 import org.spongepowered.api.world.gen.WorldGeneratorModifier
 import org.spongepowered.api.world.storage.WorldProperties
 
-class PlanetGenModifier : WorldGeneratorModifier {
+class NetherGenModifier : WorldGeneratorModifier {
     override fun modifyWorldGenerator(world: WorldProperties, settings: DataContainer, worldGenerator: WorldGenerator) {
         worldGenerator.populators.add(Spawn())
     }
 
-    override fun getName() = "Planet"
+    override fun getName() = "Planet-Nether"
 
-    override fun getId() = "planet"
+    override fun getId() = "planet_nether"
 }

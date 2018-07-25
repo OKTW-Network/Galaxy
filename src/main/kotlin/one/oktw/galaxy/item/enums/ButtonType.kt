@@ -26,7 +26,7 @@ enum class ButtonType(val id: Int) {
     O(23),
     GALAXY(24),
     PLANET_O(25),
-    PLANET_M(26),
+    PLANET_N(26),
     PLANET_E(27),
     GUEST(28),
     MEMBER(29),

@@ -4,7 +4,6 @@ import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.languageService
-import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
@@ -12,7 +11,6 @@ import one.oktw.galaxy.galaxy.data.extensions.refresh
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType.*
 import one.oktw.galaxy.item.enums.ButtonType.*
-import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import one.oktw.galaxy.item.type.Button
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
@@ -77,13 +75,18 @@ class BrowserPlanet(private val galaxy: Galaxy) : PageGUI() {
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
-        event.isCancelled = true
+        if (view.disabled) return
+
+        // ignore prev and next page, because they are handled by the PageGUI
+        if (view.getNameOf(event)?.first !in asList(Companion.Slot.NEXT, Companion.Slot.PREV)) {
+            event.isCancelled = true
+        }
 
         val player = event.source as Player
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
-        if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
+        if (view.getNameOf(uuid)?.first == Companion.Slot.ITEMS) {
             launch {
                 val planet = galaxyManager.get(planet = uuid)?.getPlanet(uuid) ?: return@launch
 

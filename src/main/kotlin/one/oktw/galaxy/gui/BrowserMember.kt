@@ -99,12 +99,19 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
+        if (view.disabled) return
+
+        // ignore prev and next page, because the are handled by the PageGUI
+        if (view.getNameOf(event)?.first !in asList(Companion.Slot.NEXT, Companion.Slot.PREV)) {
+            event.isCancelled = true
+        }
+
         event.isCancelled = true
 
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
-        if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
+        if (view.getNameOf(uuid)?.first == Companion.Slot.ITEMS) {
             if (!manage) return
 
             launch {

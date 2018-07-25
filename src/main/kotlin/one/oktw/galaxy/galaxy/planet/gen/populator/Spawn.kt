@@ -42,13 +42,8 @@ class Spawn : Populator {
         if (spawn.x !in min.x..max.x || spawn.z !in min.z..max.z) return
 
         var start = spawn
-        for (y in 0..192) {
-            // fallback to default spawn in nether
-            if (start.y + y > 115 && world.dimension.type == NETHER) {
-                start = spawn
-                break
-            }
-
+        val top = if (world.dimension.type == NETHER) 54 else 192
+        for (y in 0..top) {
             if (volume.getBlockType(start.add(0, y, 0)) == BlockTypes.AIR) {
                 start = start.add(0, y, 0)
                 break

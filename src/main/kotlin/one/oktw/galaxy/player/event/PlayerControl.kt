@@ -144,15 +144,16 @@ class PlayerControl {
             val from = galaxyManager.get(event.fromTransform.extent)
             val to = galaxyManager.get(event.toTransform.extent)
 
-            if (from?.uuid == to?.uuid) return@launch
-            // save and clean player data
-            from?.getMember(player.uniqueId)?.also {
-                from.saveMember(saveTraveler(it, player)).join()
-                cleanPlayer(player)
-            } ?: cleanPlayer(player)
+            if (from?.uuid != to?.uuid) {
+                // save and clean player data
+                from?.getMember(player.uniqueId)?.also {
+                    from.saveMember(saveTraveler(it, player)).join()
+                    cleanPlayer(player)
+                } ?: cleanPlayer(player)
 
-            // restore player data
-            to?.let { it.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }
+                // restore player data
+                to?.let { it.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }
+            }
 
             // check permission
             when (to?.getPlanet(event.toTransform.extent)?.checkPermission(player) ?: VIEW) {

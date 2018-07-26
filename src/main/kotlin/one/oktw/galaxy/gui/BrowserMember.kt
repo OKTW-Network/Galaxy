@@ -102,7 +102,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
         if (view.disabled) return
 
         // ignore prev and next page, because the are handled by the PageGUI
-        if (view.getNameOf(event)?.first !in asList(Companion.Slot.NEXT, Companion.Slot.PREV)) {
+        if (!isButton(event.cursorTransaction.default)) {
             event.isCancelled = true
         }
 

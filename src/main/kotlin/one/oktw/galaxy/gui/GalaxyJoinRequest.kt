@@ -68,7 +68,7 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
         if (view.disabled) return
 
         // ignore prev and next page, because the are handled by the PageGUI
-        if (view.getNameOf(event)?.first !in Arrays.asList(Companion.Slot.NEXT, Companion.Slot.PREV)) {
+        if (!isButton(event.cursorTransaction.default)) {
             event.isCancelled = true
         }
 

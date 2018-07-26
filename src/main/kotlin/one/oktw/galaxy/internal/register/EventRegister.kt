@@ -32,7 +32,6 @@ class EventRegister {
             registerListeners(main, ChunkLoader())
             registerListeners(main, FakeBlock())
             registerListeners(main, Harvest())
-            registerListeners(main, Harvest())
             registerListeners(main, PortalManager())
         }
 

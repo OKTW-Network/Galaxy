@@ -3,12 +3,11 @@ package one.oktw.galaxy.machine.portal
 import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.reactivestreams.client.FindPublisher
-import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.reactive.awaitFirst
 import kotlinx.coroutines.experimental.reactive.awaitFirstOrNull
+import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.block.enums.CustomBlocks
 import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.galaxy.planet.data.Planet
@@ -33,8 +32,6 @@ class PortalHelper {
         private fun getNeighborFrames(center: Location<World>): List<Location<World>> {
             val list = ArrayList<Location<World>>()
 
-            main.logger.info("search from ${center}")
-
             for (position in Arrays.asList(
                 center.getBlockRelative(Direction.EAST),
                 center.getBlockRelative(Direction.WEST),
@@ -43,9 +40,6 @@ class PortalHelper {
             )) {
                 if (isFrame(position)) {
                     list += position
-                    main.logger.info("${position} is frame")
-                } else {
-                    main.logger.info("${position} is not frame")
                 }
             }
 
@@ -60,10 +54,9 @@ class PortalHelper {
                 list[Triple(it.blockX, it.blockY, it.blockZ)] = it
             }
 
-            main.logger.info("search from ${center}")
             generation.add(center)
 
-            async(Main.serverThread) {
+            withContext(Main.serverThread) {
                 while (list.size <= maxCount) {
                     val newGeneration = ArrayList<Location<World>>()
                     var found = false
@@ -89,7 +82,7 @@ class PortalHelper {
                         break
                     }
                 }
-            }.await()
+            }
 
             if (list.size > maxCount) {
                 return null

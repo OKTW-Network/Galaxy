@@ -118,21 +118,17 @@ class Portal(private val portal: one.oktw.galaxy.machine.portal.data.Portal) : P
                     return@launch
                 }
 
-                player.sendMessage(Text.of("detect %d source frames".format(sourceFrames.size)))
 
                 val sourceEntities = player.world.entities.filter {
                     sourceFrames[Triple(it.location.blockX, it.location.blockY - 1, it.location.blockZ)] != null
                 }
 
-                player.sendMessage(Text.of("detect %d source entities".format(sourceEntities.size)))
 
                 val targetFrames = targetPortal.position
                     .let { Location(targetWorld, it.x, it.y, it.z) }
                     .let { PortalHelper.searchPortalFrame(it, MAX_FRAME); }
                     ?.values
                     ?.let { ArrayList(it) }
-
-                player.sendMessage(Text.of("detect %d target entities".format(sourceEntities.size)))
 
                 if (targetFrames == null) {
                     player.sendMessage(Text.of("You placed too much frames on the other side!"))

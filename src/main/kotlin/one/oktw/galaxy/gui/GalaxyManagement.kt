@@ -19,6 +19,7 @@ import one.oktw.galaxy.util.Chat.Companion.input
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.entity.living.player.User
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
@@ -141,27 +142,19 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
             }
             buttonID[1] -> GUIHelper.openAsync(player) { BrowserMember(galaxy.refresh(), true) }
             buttonID[2] -> launch {
-                val input = input(player, Text.of(AQUA, "請輸入遊戲ID："))?.toPlain()?.split(" ") ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
-                val addList = ArrayList<String>()
-                val invList = ArrayList<String>()
-                val userStorageService = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
+                val input = input(player, Text.of(AQUA, "請輸入遊戲ID："))?.toPlain() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
 
-                input.forEach {
-                    val user = userStorageService.get(it).orElse(null)
+                try {
+                    val user: User? = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(input).orElse(null)
+
                     if (user != null) {
-                        galaxy.addMember(user.uniqueId)
-                        addList += it
+                        galaxy.addMember(user.uniqueId).join()
+                        player.sendMessage(Text.of(GREEN, "已成功將 ", RESET, user.name, GREEN, " 加入星系！"))
                     } else {
-                        invList += it
+                        player.sendMessage(Text.of(RED, "找不到玩家"))
                     }
-                }
-
-                if (addList.isNotEmpty()) {
-                    player.sendMessage(Text.of(GREEN, "已成功將 ", RESET, addList, GREEN, " 加入星系！"))
-                }
-
-                if (invList.isNotEmpty()) {
-                    player.sendMessage(Text.of(RED, "找不到玩家：", RESET, invList))
+                } catch (e: RuntimeException) {
+                    player.sendMessage(Text.of(RED, "參數錯誤"))
                 }
             }
             buttonID[3] -> GUIHelper.openAsync(player) { GalaxyJoinRequest(galaxy.refresh()) }

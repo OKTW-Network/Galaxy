@@ -5,5 +5,7 @@ enum class CustomBlocks(val id: Int? = null, val hasGUI: Boolean = false) {
     CONTROL_PANEL(null, true),
     PLANET_TERMINAL(null, true),
     HT_CRAFTING_TABLE(1, true),
-    ELEVATOR(2)
+    ELEVATOR(2),
+    PORTAL(3),
+    ADVANCED_PORTAL(4)
 }

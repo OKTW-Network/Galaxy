@@ -5,6 +5,7 @@ import one.oktw.galaxy.block.data.FakeBlockItem
 import one.oktw.galaxy.block.enums.CustomBlocks.ELEVATOR
 import one.oktw.galaxy.block.enums.CustomBlocks.HT_CRAFTING_TABLE
 import one.oktw.galaxy.item.enums.MaterialType
+import one.oktw.galaxy.block.enums.CustomBlocks.*
 import one.oktw.galaxy.item.enums.ToolType.WRENCH
 import one.oktw.galaxy.item.enums.UpgradeType.*
 import one.oktw.galaxy.item.type.Material
@@ -290,6 +291,25 @@ class RecipeRegister {
                     .addIngredient(of(IRON_BLOCK))
                     .result(FakeBlockItem(ELEVATOR).createItemStack())
                     .build("elevator", main)
+            )
+
+
+            register(
+                ShapelessCraftingRecipe.builder()
+                    .addIngredient(of(DIAMOND_BLOCK))
+                    .addIngredient(of(ENDER_PEARL))
+                    .addIngredient(of(IRON_BLOCK))
+                    .result(FakeBlockItem(PORTAL).createItemStack())
+                    .build("portal", main)
+            )
+
+            register(
+                ShapelessCraftingRecipe.builder()
+                    .addIngredient(of(EMERALD_BLOCK))
+                    .addIngredient(of(ENDER_PEARL))
+                    .addIngredient(of(IRON_BLOCK))
+                    .result(FakeBlockItem(ADVANCED_PORTAL).createItemStack())
+                    .build("advanced_portal", main)
             )
         }
 

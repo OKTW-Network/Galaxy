@@ -1,22 +1,20 @@
 package one.oktw.galaxy.gui.machine
 
-import kotlinx.coroutines.experimental.Job
+import com.flowpowered.math.vector.Vector3d
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.channels.toList
-import kotlinx.coroutines.experimental.joinChildren
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.openSubscription
 import one.oktw.galaxy.Main
-import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.gui.GUIHelper
-import one.oktw.galaxy.gui.GalaxyManagement
 import one.oktw.galaxy.gui.PageGUI
 import one.oktw.galaxy.machine.portal.PortalHelper
 import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
@@ -31,9 +29,10 @@ import org.spongepowered.api.text.format.TextStyles
 import org.spongepowered.api.world.Location
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.streams.toList
 
 class Portal(private val portal: one.oktw.galaxy.machine.portal.data.Portal) : PageGUI() {
+    private val MAX_FRAME = 63
+
     private val lang = Main.languageService.getDefaultLanguage()
     private val list = PortalHelper.getAvailableTargets(portal)
 
@@ -103,17 +102,80 @@ class Portal(private val portal: one.oktw.galaxy.machine.portal.data.Portal) : P
 
         val (slot) = view.getNameOf(event) ?: return
 
-        if (slot == Companion.PageGUISlot.ITEMS) {
+        if (slot == Companion.Slot.ITEMS) {
             launch {
-                val target = PortalHelper.getPortal(uuid) ?: return@launch
-                val planetId = target.position.planet?: return@launch
-                val planet = Main.galaxyManager.get(null, planetId)?.getPlanet(planetId) ?: return@launch
-                val world = PlanetHelper.loadPlanet(planet) ?: return@launch
+                val targetPortal = PortalHelper.getPortal(uuid) ?: return@launch
+                val planetId = targetPortal.position.planet ?: return@launch
+                val targetPlanet = Main.galaxyManager.get(null, planetId)?.getPlanet(planetId) ?: return@launch
+                val targetWorld = PlanetHelper.loadPlanet(targetPlanet) ?: return@launch
+
+                val sourceFrames = portal.position
+                    .let { Location(player.world, it.x, it.y, it.z) }
+                    .let { PortalHelper.searchPortalFrame(it, MAX_FRAME); }
+
+                if (sourceFrames == null) {
+                    player.sendMessage(Text.of("You placed too much frames!"))
+                    return@launch
+                }
+
+                player.sendMessage(Text.of("detect %d source frames".format(sourceFrames.size)))
+
+                val sourceEntities = player.world.entities.filter {
+                    sourceFrames[Triple(it.location.blockX, it.location.blockY - 1, it.location.blockZ)] != null
+                }
+
+                player.sendMessage(Text.of("detect %d source entities".format(sourceEntities.size)))
+
+                val targetFrames = targetPortal.position
+                    .let { Location(targetWorld, it.x, it.y, it.z) }
+                    .let { PortalHelper.searchPortalFrame(it, MAX_FRAME); }
+                    ?.values
+                    ?.let { ArrayList(it) }
+
+                player.sendMessage(Text.of("detect %d target entities".format(sourceEntities.size)))
+
+                if (targetFrames == null) {
+                    player.sendMessage(Text.of("You placed too much frames on the other side!"))
+                    return@launch
+                }
+
+                var index = 0
+
+                sourceEntities.forEach {
+                    val target = if (targetFrames.size != 0) targetFrames[index % targetFrames.size] else Location(
+                        targetWorld,
+                        targetPortal.position.x,
+                        targetPortal.position.y,
+                        targetPortal.position.z
+                    )
+
+                    index++
+
+                    if (it.type == EntityTypes.PLAYER) {
+                        val currentPlayer = it as Player
+
+                        // we teleport the main player to exact position
+                        if (currentPlayer == player) return@forEach
+
+                        TeleportHelper.teleport(
+                            it as Player,
+                            // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
+                            Location(targetWorld, target.x + 0.5, target.y + 1, target.z + 0.5)
+                        )
+                    } else {
+                        async(Main.serverThread) {
+                            it.transferToWorld(
+                                targetWorld,
+                                Vector3d(target.x + 0.5, target.y + 1, target.z + 0.5)
+                            )
+                        }
+                    }
+                }
 
                 TeleportHelper.teleport(
                     player,
-                    // offset y by 1, so you are on the block, offsset x and z by 0.5, so you are on the center of block
-                    Location(world, target.position.x + 0.5, target.position.y + 1, target.position.z + 0.5)
+                    // offset y by 1, so you are on the top of block, offset x and z by 0.5, so you are on the center of block
+                    Location(targetWorld, targetPortal.position.x + 0.5, targetPortal.position.y + 1, targetPortal.position.z + 0.5)
                 )
 
                 GUIHelper.closeAll(player)

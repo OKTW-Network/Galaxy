@@ -311,6 +311,15 @@ class RecipeRegister {
                     .result(FakeBlockItem(ADVANCED_PORTAL).createItemStack())
                     .build("advanced_portal", main)
             )
+
+            register(
+                ShapelessCraftingRecipe.builder()
+                    .addIngredient(of(GOLD_BLOCK))
+                    .addIngredient(of(ENDER_PEARL))
+                    .addIngredient(of(IRON_BLOCK))
+                    .result(FakeBlockItem(PORTAL_FRAME).createItemStack())
+                    .build("portal_frame", main)
+            )
         }
 
         Sponge.getRegistry().smeltingRecipeRegistry.apply {

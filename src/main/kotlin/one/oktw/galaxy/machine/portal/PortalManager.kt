@@ -1,25 +1,23 @@
 package one.oktw.galaxy.machine.portal
 
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.block.enums.CustomBlocks.*
+import one.oktw.galaxy.block.enums.CustomBlocks.ADVANCED_PORTAL
+import one.oktw.galaxy.block.enums.CustomBlocks.PORTAL
 import one.oktw.galaxy.data.DataBlockType
-import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.event.PlaceCustomBlockEvent
-import one.oktw.galaxy.item.enums.ItemType
-import org.spongepowered.api.block.BlockTypes
-import org.spongepowered.api.data.key.Keys
-import org.spongepowered.api.entity.living.player.Player
-import org.spongepowered.api.event.Listener
-import org.spongepowered.api.text.Text
-import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.event.RemoveCustomBlockEvent
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.machine.Portal
-import java.util.Arrays.asList
+import org.spongepowered.api.block.BlockTypes
+import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData
-
+import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.event.Listener
+import org.spongepowered.api.text.Text
+import java.util.Arrays.asList
 
 
 class PortalManager {
@@ -100,7 +98,7 @@ class PortalManager {
                     )
                 }?.let {
                     if (it) {
-                        player.sendMessage(Text.of("You remvoed a portal"))
+                        player.sendMessage(Text.of("You removed a portal"))
                     }
                 }?: let {
                     player.sendMessage(Text.of("error: fail to get planet"))

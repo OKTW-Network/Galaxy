@@ -11,7 +11,6 @@ import org.spongepowered.api.data.key.Keys.TOTAL_EXPERIENCE
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.inventory.ItemStack.empty
 import org.spongepowered.api.item.inventory.Slot
-import java.util.*
 
 class TravelerHelper {
     companion object {
@@ -20,6 +19,7 @@ class TravelerHelper {
         fun saveTraveler(traveler: Traveler, player: Player): Traveler {
             traveler.experience = player[TOTAL_EXPERIENCE].get()
             traveler.inventory = player.inventory.slots<Slot>().mapTo(ArrayList()) { it.peek().orElse(empty()) }
+            traveler.enderChest = player.enderChestInventory.slots<Slot>().mapTo(ArrayList()) { it.peek().orElse(empty()) }
 
             if (traveler.experience == 0 && traveler.inventory.all { it == empty() }) {
                 main.logger.error("Try save empty player!", player.toString())
@@ -38,6 +38,11 @@ class TravelerHelper {
                 slot.set(traveler.inventory.getOrElse(index) { empty() })
             }
 
+            // ender chest
+            player.enderChestInventory.slots<Slot>().forEachIndexed { index, slot ->
+                slot.set(traveler.enderChest.getOrElse(index) { empty() })
+            }
+
             // armor
             offerArmor(player)
         }
@@ -45,6 +50,7 @@ class TravelerHelper {
         fun cleanPlayer(player: Player) {
             player.offer(EXPERIENCE_LEVEL, 0)
             player.inventory.clear()
+            player.enderChestInventory.clear()
         }
     }
 }

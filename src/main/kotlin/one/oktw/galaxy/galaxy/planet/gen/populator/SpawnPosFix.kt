@@ -26,10 +26,8 @@ class SpawnPosFix(private val minY: Int = 64, private val maxY: Int = 256) : Pop
 
     override fun populate(world: World, volume: Extent, random: Random) {
         val spawn = world.spawnLocation.blockPosition
-        val min = volume.blockMin
-        val max = volume.blockMax
 
-        if (spawn.x !in min.x..max.x || spawn.z !in min.z..max.z) return
+        if (spawn.x !in volume.blockMin.x..volume.blockMax.x || spawn.z !in volume.blockMin.z..volume.blockMax.z) return
 
         var pos = Vector3i(spawn.x, 0, spawn.z)
         for (y in minY..maxY) {

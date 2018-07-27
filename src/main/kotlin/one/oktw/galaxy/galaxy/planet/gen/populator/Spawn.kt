@@ -36,6 +36,8 @@ class Spawn : Populator {
     override fun populate(world: World, volume: Extent, random: Random) {
         val spawn = world.spawnLocation.blockPosition
 
+        if (spawn.x !in volume.blockMin.x..volume.blockMax.x || spawn.z !in volume.blockMin.z..volume.blockMax.z) return
+
         // clean
         for (x in spawn.x - 2..spawn.x + 2) {
             for (y in spawn.y - 1..spawn.y + 3) {

@@ -6,6 +6,7 @@ import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType.NORMAL
+import one.oktw.galaxy.galaxy.planet.gen.NetherGenModifier
 import one.oktw.galaxy.galaxy.planet.gen.NormalGenModifier
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.world.DimensionTypes.NETHER
@@ -32,7 +33,7 @@ class PlanetHelper {
             .generateSpawnOnLoad(false)
             .loadsOnStartup(false)
             .keepsSpawnLoaded(false)
-            .generatorModifiers(NormalGenModifier())
+            .generatorModifiers(NetherGenModifier())
             .build("planet_nether", "planet_nether")
 
         suspend fun createPlanet(name: String, type: PlanetType = NORMAL): Planet {

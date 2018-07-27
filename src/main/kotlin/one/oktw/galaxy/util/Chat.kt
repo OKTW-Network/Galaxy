@@ -4,6 +4,7 @@ import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.gui.GUIHelper
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.EventListener
@@ -28,6 +29,8 @@ class Chat {
         suspend fun input(player: Player, message: Text) = suspendCoroutine<Text?> { continuation ->
             val eventManager = Sponge.getEventManager()
             lateinit var listener: EventListener<MessageChannelEvent.Chat>
+
+            GUIHelper.closeAll(player)
 
             listener = EventListener {
                 if (it.source != player) return@EventListener

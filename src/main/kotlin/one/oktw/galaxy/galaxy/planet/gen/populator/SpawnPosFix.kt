@@ -25,7 +25,7 @@ class SpawnPosFix(private val minY: Int = 64, private val maxY: Int = 255) : Pop
     }
 
     override fun populate(world: World, volume: Extent, random: Random) {
-        val spawn = world.spawnLocation.blockPosition
+        val spawn = world.properties.spawnPosition
 
         if (spawn.x !in volume.blockMin.x..volume.blockMax.x || spawn.z !in volume.blockMin.z..volume.blockMax.z) return
 

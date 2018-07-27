@@ -27,6 +27,7 @@ class PlanetHelper {
             .loadsOnStartup(false)
             .keepsSpawnLoaded(false)
             .generatorModifiers(NormalGenModifier())
+            .randomSeed()
             .build("planet", "planet")
         private val netherArchetype = Sponge.getRegistry().getType(WorldArchetype::class.java, "planet_nether").orElse(null) ?: WorldArchetype.builder()
             .dimension(NETHER)
@@ -34,6 +35,7 @@ class PlanetHelper {
             .loadsOnStartup(false)
             .keepsSpawnLoaded(false)
             .generatorModifiers(NetherGenModifier())
+            .randomSeed()
             .build("planet_nether", "planet_nether")
 
         suspend fun createPlanet(name: String, type: PlanetType = NORMAL): Planet {

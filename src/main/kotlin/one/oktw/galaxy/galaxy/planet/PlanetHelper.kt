@@ -58,7 +58,7 @@ class PlanetHelper {
                 throw UncheckedIOException(e)
             }
 
-            return Planet(world = properties.uniqueId, name = name)
+            return Planet(world = properties.uniqueId, name = name, type = type)
         }
 
         fun removePlanet(worldUUID: UUID): CompletableFuture<Boolean> {

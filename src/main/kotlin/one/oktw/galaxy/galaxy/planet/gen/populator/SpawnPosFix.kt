@@ -9,7 +9,7 @@ import org.spongepowered.api.world.gen.Populator
 import org.spongepowered.api.world.gen.PopulatorType
 import java.util.*
 
-class SpawnPosFix(private val minY: Int = 64, private val maxY: Int = 256) : Populator {
+class SpawnPosFix(private val minY: Int = 64, private val maxY: Int = 255) : Populator {
     override fun getType() = object : PopulatorType {
         override fun getTranslation() = object : Translation {
             override fun getId() = "spawn_position_fix"

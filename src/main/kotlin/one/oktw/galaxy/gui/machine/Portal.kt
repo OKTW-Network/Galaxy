@@ -1,7 +1,6 @@
 package one.oktw.galaxy.gui.machine
 
 import com.flowpowered.math.vector.Vector3d
-import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.channels.toList
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.openSubscription
@@ -31,7 +30,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class Portal(private val portal: one.oktw.galaxy.machine.portal.data.Portal) : PageGUI() {
-    private val MAX_FRAME = 63
+    private val MAX_FRAME = 64
 
     private val lang = Main.languageService.getDefaultLanguage()
     private val list = PortalHelper.getAvailableTargets(portal)
@@ -64,8 +63,6 @@ class Portal(private val portal: one.oktw.galaxy.machine.portal.data.Portal) : P
             if (portal.uuid == targetPortal.uuid) continue
             val uuid = targetPortal.position.planet ?: continue
             val planet = Main.galaxyManager.get(null, uuid)?.getPlanet(uuid) ?: continue
-
-
 
             ItemStack.builder()
                 .itemType(ItemTypes.DIAMOND_BLOCK)
@@ -118,11 +115,9 @@ class Portal(private val portal: one.oktw.galaxy.machine.portal.data.Portal) : P
                     return@launch
                 }
 
-
                 val sourceEntities = player.world.entities.filter {
                     sourceFrames[Triple(it.location.blockX, it.location.blockY - 1, it.location.blockZ)] != null
                 }
-
 
                 val targetFrames = targetPortal.position
                     .let { Location(targetWorld, it.x, it.y, it.z) }
@@ -154,12 +149,12 @@ class Portal(private val portal: one.oktw.galaxy.machine.portal.data.Portal) : P
                         if (currentPlayer == player) return@forEach
 
                         TeleportHelper.teleport(
-                            it as Player,
+                            it,
                             // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
                             Location(targetWorld, target.x + 0.5, target.y + 1, target.z + 0.5)
                         )
                     } else {
-                        async(Main.serverThread) {
+                        launch (Main.serverThread) {
                             it.transferToWorld(
                                 targetWorld,
                                 Vector3d(target.x + 0.5, target.y + 1, target.z + 0.5)

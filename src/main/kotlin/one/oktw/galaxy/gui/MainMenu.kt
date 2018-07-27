@@ -25,10 +25,12 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.action.TextActions.executeCallback
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextColors.*
 import org.spongepowered.api.text.format.TextStyles
 import org.spongepowered.api.text.format.TextStyles.BOLD
+import org.spongepowered.api.text.format.TextStyles.UNDERLINE
 import java.util.*
 
 class MainMenu(player: Player) : GUI() {
@@ -108,8 +110,9 @@ class MainMenu(player: Player) : GUI() {
                         return@launch
                     }
 
-                    galaxyManager.createGalaxy(name, player)
+                    val galaxy = galaxyManager.createGalaxy(name, player)
                     player.sendMessage(Text.of(YELLOW, "星系創建成功！"))
+                    player.sendMessage(Text.of(UNDERLINE, AQUA, executeCallback { GUIHelper.open(player) { GalaxyManagement(galaxy) } }, "開啟管理介面"))
                 } else {
                     player.sendMessage(Text.of(RED, "已取消創建星系"))
                 }

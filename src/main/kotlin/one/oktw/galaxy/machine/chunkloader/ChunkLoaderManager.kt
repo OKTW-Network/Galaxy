@@ -26,20 +26,25 @@ class ChunkLoaderManager {
     private val logger = main.logger
     private val ticketManager = Sponge.getServer().chunkTicketManager
     private val collection = database.getCollection("ChunkLoader", ChunkLoader::class.java)
-    private val worldTickets: ConcurrentHashMap<UUID, ChunkTicketManager.LoadingTicket> = ConcurrentHashMap()
+    private val worldTickets = ConcurrentHashMap<UUID, ChunkTicketManager.LoadingTicket>()
 
     init {
         ticketManager.registerCallback(main) { tickets, world ->
             tickets.forEach { it.release() }
-            reloadChunkLoader(world)
+            reload(world)
         }
 
         logger.info("Loading world has ChunkLoader...")
 
         launch {
             collection.find().consumeEach {
-                val planet = galaxyManager.get(planet = it.position.planet!!)?.getPlanet(it.position.planet!!)
-                        ?: return@consumeEach
+                val planet = it.position.planet?.let { galaxyManager.get(planet = it)?.getPlanet(it) }
+
+                if (planet == null) {
+                    delete(it.uuid)
+                    return@consumeEach
+                }
+
                 val range = (it.upgrade.maxBy { it.level }?.level ?: 0) * 2 + 1
                 val world = planet.loadWorld() ?: return@launch
 
@@ -50,30 +55,27 @@ class ChunkLoaderManager {
 
     private fun loadChunk(location: Location<World>, range: Int): ChunkTicketManager.LoadingTicket {
         val ticket = ticketManager.createTicket(main, location.extent).get()
-
-        launch {
-            val chunkPos = location.chunkPosition
-            val chunkList = HashSet<Vector3i>()
-            for (x in chunkPos.x - range..chunkPos.x + range) {
-                for (z in chunkPos.z - range..chunkPos.z + range) {
-                    chunkList.add(Vector3i(x, 0, z))
-                }
+        val chunkPos = location.chunkPosition
+        val chunkList = HashSet<Vector3i>()
+        for (x in chunkPos.x - range..chunkPos.x + range) {
+            for (z in chunkPos.z - range..chunkPos.z + range) {
+                chunkList.add(Vector3i(x, 0, z))
             }
-            if (chunkList.size > ticket.numChunks) {
-                main.logger.warn(
-                    "ChunkLoader({}) level({} chunks) large then forge limit({} chunks)!",
-                    location.extent.toString(),
-                    chunkList.size,
-                    ticket.numChunks
-                )
-            }
-            chunkList.parallelStream().forEach(ticket::forceChunk)
         }
+        if (chunkList.size > ticket.numChunks) {
+            main.logger.warn(
+                "ChunkLoader({}) level({} chunks) large then forge limit({} chunks)!",
+                location.extent.toString(),
+                chunkList.size,
+                ticket.numChunks
+            )
+        }
+        chunkList.forEach(ticket::forceChunk)
 
         return ticket
     }
 
-    private fun reloadChunkLoader(world: World) = launch {
+    private fun reload(world: World) = launch {
         logger.info("Reloading ChunkLoader in \"{}\" ...", world.name)
 
         val planet = galaxyManager.get(world)?.getPlanet(world) ?: return@launch
@@ -87,10 +89,8 @@ class ChunkLoaderManager {
         }
     }
 
-    suspend fun addChunkLoader(location: Location<World>): ChunkLoader {
-        val chunkLoader = ChunkLoader(
-            position = Position(location.position, galaxyManager.get(location.extent)!!.uuid)
-        )
+    suspend fun add(location: Location<World>): ChunkLoader {
+        val chunkLoader = ChunkLoader(position = Position(location.position, location.extent.let { galaxyManager.get(it)?.getPlanet(it)?.uuid!! }))
         collection.insertOne(chunkLoader).awaitFirstOrNull()
 
         worldTickets[chunkLoader.uuid] = loadChunk(location, 1)
@@ -108,18 +108,16 @@ class ChunkLoaderManager {
         collection.deleteOne(eq("uuid", uuid)).awaitFirstOrNull()
     }
 
-    fun updateChunkLoader(chunkLoader: ChunkLoader, reload: Boolean = false) = launch {
+    fun update(chunkLoader: ChunkLoader, reload: Boolean = false) = launch {
         collection.replaceOne(eq("uuid", chunkLoader.uuid), chunkLoader).awaitFirstOrNull()
 
         if (reload) {
-            val planet = chunkLoader.position.planet?.let { galaxyManager.get(planet = it)?.getPlanet(it) }
-                    ?: return@launch
+            val planet = chunkLoader.position.planet?.let { galaxyManager.get(planet = it)?.getPlanet(it) } ?: return@launch
             val range = chunkLoader.upgrade.maxBy { it.level }?.level ?: 0
 
             worldTickets[chunkLoader.uuid]?.release()
             PlanetHelper.loadPlanet(planet)?.let {
-                worldTickets[chunkLoader.uuid] =
-                        loadChunk(it.getLocation(chunkLoader.position.toVector3d()), range * 2 + 1)
+                worldTickets[chunkLoader.uuid] = loadChunk(it.getLocation(chunkLoader.position.toVector3d()), range * 2 + 1)
             }
         }
     }

@@ -67,6 +67,9 @@ class CreatePlanet(private val galaxy: Galaxy) : GUI() {
             }
             .let { inventory.set(4, 0, it) }
 
+        // fill empty slot
+        GUIHelper.fillEmptySlot(inventory)
+
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
     }

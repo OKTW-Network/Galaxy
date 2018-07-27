@@ -29,16 +29,41 @@ class SpawnPosFix(private val minY: Int = 64, private val maxY: Int = 255) : Pop
 
         if (spawn.x !in volume.blockMin.x..volume.blockMax.x || spawn.z !in volume.blockMin.z..volume.blockMax.z) return
 
-        var pos = Vector3i(spawn.x, 0, spawn.z)
+        var currentBottom = 0
+        var maxLength = 0
+        // assume we start from a solid block
+        var currentInAir = false
+        var foundBottom = 0
+
+        val pos = Vector3i(spawn.x, 0, spawn.z)
+
         for (y in minY..maxY) {
             if (volume.getBlockType(pos.add(0, y, 0)) == BlockTypes.AIR) {
-                pos = pos.add(0, y, 0)
-                break
+                // if previous block is not air, then we st the new bottom
+                if (!currentInAir) {
+                    currentBottom = y
+                }
+
+                // this block is air
+                currentInAir = true
+
+                // if current air segment is longer than previous one
+                if (y - currentBottom + 1 > maxLength) {
+                    foundBottom = currentBottom
+                    maxLength = y - currentBottom + 1
+                }
+            } else {
+                // this block is not air
+                currentInAir = false
             }
         }
 
-        // fix spawn pos
-        world.properties.spawnPosition = pos
+        if (maxLength > 0) {
+            // fix spawn pos
+            world.properties.spawnPosition = pos.add(0, foundBottom, 0)
+        } else {
+            world.properties.spawnPosition = pos.add(0, minY, 0)
+        }
 
         // fix world border center
         world.spawnLocation.run {

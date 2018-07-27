@@ -7,14 +7,10 @@ import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.extensions.serialize
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.addMember
-import one.oktw.galaxy.galaxy.data.extensions.createPlanet
 import one.oktw.galaxy.galaxy.data.extensions.refresh
 import one.oktw.galaxy.galaxy.data.extensions.update
-import one.oktw.galaxy.galaxy.planet.TeleportHelper
-import one.oktw.galaxy.galaxy.planet.data.extensions.loadWorld
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
-import one.oktw.galaxy.util.Chat.Companion.confirm
 import one.oktw.galaxy.util.Chat.Companion.input
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
@@ -30,8 +26,6 @@ import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors.*
-import org.spongepowered.api.text.format.TextStyles
-import org.spongepowered.api.text.format.TextStyles.BOLD
 import java.util.*
 
 class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
@@ -109,37 +103,7 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
         val player = event.source as Player
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
-            buttonID[0] -> launch {
-                if (galaxy.planets.size >= 1) {
-                    player.sendMessage(Text.of(RED, "目前僅能創建一個星球！請等待日後開放"))
-                    return@launch
-                }
-
-                val name = input(player, Text.of(AQUA, "請輸入一個名稱來創建星球："))?.toPlain()
-
-                if (name == null) {
-                    player.sendMessage(Text.of(RED, "已取消創建星球"))
-                    return@launch
-                }
-
-                if (confirm(player, Text.of(AQUA, "確定要創建名為「", TextStyles.RESET, BOLD, name, TextStyles.RESET, AQUA, "」的星球嗎？")) == true) {
-                    val galaxy = galaxy.refresh()
-
-                    if (galaxy.planets.size >= 1) {
-                        player.sendMessage(Text.of(RED, "目前僅能創建一個星球！請等待日後開放"))
-                        return@launch
-                    }
-
-                    try {
-                        val planet = galaxy.createPlanet(name).apply { loadWorld() }
-
-                        player.sendMessage(Text.of(YELLOW, "星球創建成功！"))
-                        TeleportHelper.teleport(player, planet)
-                    } catch (e: IllegalArgumentException) {
-                        player.sendMessage(Text.of(RED, "星球創建失敗：", e.message))
-                    }
-                }
-            }
+            buttonID[0] -> GUIHelper.openAsync(player) { CreatePlanet(galaxy.refresh()) }
             buttonID[1] -> GUIHelper.openAsync(player) { BrowserMember(galaxy.refresh(), true) }
             buttonID[2] -> launch {
                 val input = input(player, Text.of(AQUA, "請輸入遊戲ID："))?.toPlain() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))

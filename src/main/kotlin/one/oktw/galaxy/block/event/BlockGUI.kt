@@ -21,9 +21,7 @@ class BlockGUI {
         when (event.targetBlock.location.orElse(null)?.get(DataBlockType.key)?.orElse(null) ?: return) {
             DUMMY -> Unit
             CONTROL_PANEL -> GUIHelper.open(player) { MainMenu(player) }
-            PLANET_TERMINAL -> launch {
-                galaxyManager.get(player.world)?.let { GUIHelper.open(player) { PlanetTerminal(it, player) } }
-            }
+            PLANET_TERMINAL -> launch { galaxyManager.get(player.world)?.let { GUIHelper.open(player) { PlanetTerminal(it, player) } } }
             HT_CRAFTING_TABLE -> Unit // TODO GUIHelper.open(player) { }
             else -> Unit
         }

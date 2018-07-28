@@ -9,10 +9,15 @@ buildscript {
             name = 'forge'
             url = 'https://files.minecraftforge.net/maven'
         }
+        maven {
+            name = 'sponge'
+            url = 'https://repo.spongepowered.org/maven'
+        }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
     }
 }
 
@@ -25,6 +30,7 @@ plugins {
 }
 apply plugin: 'kotlin'
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'org.spongepowered.mixin'
 
 group "one.oktw"
 version "1.0-SNAPSHOT"
@@ -43,6 +49,7 @@ minecraft {
 
 dependencies {
     compile "org.spongepowered:spongeapi:$sponge_version"
+    compile 'org.spongepowered:mixin:0.7.8-SNAPSHOT'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$Coroutines_version"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$Coroutines_version"
@@ -60,6 +67,22 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+// why not work?
+sourceSets {
+    main {
+        ext.refMap = "mixins.myplugin.refmap.json"
+    }
+}
+
+jar {
+    manifest.attributes(
+        'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+        'MixinConfigs': 'mixins.galaxy.json',
+        'FMLCorePluginContainsFMLMod': true,
+        'ForceLoadAsMod' : true
+    )
 }
 
 shadowJar {

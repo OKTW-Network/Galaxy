@@ -54,8 +54,19 @@ class PlanetHelper {
             logger.info("Create World [{}]", name)
 
             try {
-                properties = withContext(serverThread) { server.createWorldProperties(name, archetype) }
-                withContext(serverThread) { server.saveWorldProperties(properties) }
+                properties = withContext(serverThread) {
+                    server.createWorldProperties(name, archetype).also {
+                        server.loadWorld(it).get().apply {
+                            spawnLocation.chunkPosition.apply {
+                                for (x in x - 1..x + 1) {
+                                    for (z in z - 1..z + 1) {
+                                        loadChunk(x, 0, z, true)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             } catch (e: IOException) {
                 logger.error("Create world failed!", e)
                 throw UncheckedIOException(e)

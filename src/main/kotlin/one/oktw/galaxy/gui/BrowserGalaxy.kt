@@ -99,13 +99,18 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
-        event.isCancelled = true
+        if (view.disabled) return
+
+        // ignore prev and next page, because the are handled by the PageGUI
+        if (!isButton(event.cursorTransaction.default)) {
+            event.isCancelled = true
+        }
 
         val player = event.source as Player
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
-        if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
+        if (view.getNameOf(uuid)?.first == Companion.Slot.ITEMS) {
             launch {
                 galaxyManager.get(uuid)?.let {
                     GUIHelper.open(player) { GalaxyInfo(it, player) }

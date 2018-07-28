@@ -72,7 +72,7 @@ compileTestKotlin {
 // why not work?
 sourceSets {
     main {
-        ext.refMap = "mixins.myplugin.refmap.json"
+        ext.refMap = "mixins.galaxy.refmap.json"
     }
 }
 

@@ -106,8 +106,6 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
             event.isCancelled = true
         }
 
-        event.isCancelled = true
-
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 

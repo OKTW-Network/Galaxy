@@ -27,6 +27,7 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextColors.*
 import org.spongepowered.api.text.format.TextStyles
 import org.spongepowered.api.text.format.TextStyles.BOLD
@@ -113,7 +114,7 @@ class CreatePlanet(private val galaxy: Galaxy) : GUI() {
             return false
         }
 
-        if (confirm(player, Text.of(AQUA, "確定要創建名為「", TextStyles.RESET, BOLD, name, TextStyles.RESET, AQUA, "」的星球嗎？")) == true) {
+        if (confirm(player, Text.of(AQUA, "確定要創建名為「", TextColors.RESET, BOLD, name, TextStyles.RESET, AQUA, "」的星球嗎？")) == true) {
             val galaxy1 = galaxy.refresh()
 
             if (galaxy1.planets.any { it.type == type }) {

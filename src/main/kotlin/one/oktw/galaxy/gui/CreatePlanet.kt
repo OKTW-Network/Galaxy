@@ -102,7 +102,7 @@ class CreatePlanet(private val galaxy: Galaxy) : GUI() {
 
                 launch { if (createPlanet(player, galaxy, NETHER)) galaxy.update { takeStarDust(1000) } }
             }
-            buttonID[2] -> Unit // TODO planet type end
+            buttonID[2] -> player.sendMessage(Text.of(RED, "尚未開放！")) // TODO planet type end
         }
     }
 

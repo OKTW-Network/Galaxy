@@ -1,9 +1,10 @@
 package one.oktw.galaxy.gui
 
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.delay
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.gui.view.GridGUIView
+import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.enums.ButtonType.ARROW_LEFT
 import one.oktw.galaxy.item.enums.ButtonType.ARROW_RIGHT
 import one.oktw.galaxy.item.type.Button
@@ -17,6 +18,7 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 import java.util.Arrays.asList
+import kotlin.collections.ArrayList
 
 abstract class PageGUI : GUI() {
     companion object {
@@ -33,12 +35,14 @@ abstract class PageGUI : GUI() {
             PREV,
             NEXT,
             ITEMS,
+            NUMBER
         }
 
         private val X = Slot.NULL
         private val P = Slot.PREV
         private val N = Slot.NEXT
         private val O = Slot.ITEMS
+        private val V = Slot.NUMBER
 
         private const val WIDTH = 9
         private const val HEIGHT = 6
@@ -49,8 +53,13 @@ abstract class PageGUI : GUI() {
             O, O, O, O, O, O, O, O, O,
             O, O, O, O, O, O, O, O, O,
             O, O, O, O, O, O, O, O, O,
-            P, X, X, X, X, X, X, X, N
+            P, X, X, V, V, V, X, X, N
         )
+
+        private val numbers = asList(
+            ButtonType.NUMBER_0, ButtonType.NUMBER_1, ButtonType.NUMBER_2, ButtonType.NUMBER_3, ButtonType.NUMBER_4,
+            ButtonType.NUMBER_5, ButtonType.NUMBER_6, ButtonType.NUMBER_7, ButtonType.NUMBER_8, ButtonType.NUMBER_9
+        ).map { Button(it).createItemStack().apply { offer(DataUUID(UUID.randomUUID())) } }
     }
 
     private val lang = languageService.getDefaultLanguage()
@@ -68,6 +77,19 @@ abstract class PageGUI : GUI() {
 
     init {
         registerEvent(ClickInventoryEvent::class.java, ::clickEvent)
+    }
+
+    private fun getNumbers(number: Int, length: Int): List<ItemStack> {
+        val result = ArrayList<ItemStack>()
+        var remain = number
+
+        for (i in 0 until length) {
+            val digit = remain % 10
+            remain /= 10
+            result += numbers[digit]
+        }
+
+        return result.reversed()
     }
 
     protected abstract suspend fun get(number: Int, skip: Int): List<ItemStack>
@@ -92,6 +114,7 @@ abstract class PageGUI : GUI() {
 
         get(maxItem, pageNumber * maxItem).let { view.setSlots(Slot.ITEMS, ArrayList(it)) }
         offerButton(pageNumber != 0, !get(1, (pageNumber + 1) * maxItem).isEmpty())
+        offerNumber(pageNumber + 1) // make it start from one...
         view.disabled = false
     }
 
@@ -117,6 +140,12 @@ abstract class PageGUI : GUI() {
                 }
                 .let { view.setSlot(Slot.NEXT, it, Action.NextPage) }
         }
+    }
+
+    private fun offerNumber(pageNumber: Int) {
+        val length = view.countSlots(Slot.NUMBER)
+
+        view.setSlots(Slot.NUMBER, getNumbers(pageNumber, length))
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {

@@ -133,8 +133,9 @@ class CreatePlanet(private val galaxy: Galaxy) : GUI() {
             }
 
             return false
+        } else {
+            player.sendMessage(Text.of(RED, "已取消創建星球"))
+            return false
         }
-
-        return false
     }
 }

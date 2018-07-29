@@ -9,6 +9,7 @@ import one.oktw.galaxy.galaxy.enums.Group.MEMBER
 import one.oktw.galaxy.galaxy.enums.Group.VISITOR
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import one.oktw.galaxy.galaxy.planet.data.Planet
+import one.oktw.galaxy.galaxy.planet.enums.PlanetType
 import one.oktw.galaxy.galaxy.traveler.data.Traveler
 import one.oktw.galaxy.galaxy.traveler.extensions.getPlayer
 import one.oktw.galaxy.player.event.Viewer.Companion.setViewer
@@ -31,8 +32,8 @@ fun Galaxy.update(block: Galaxy.() -> Unit) = launch {
     refresh().also(block).save()
 }
 
-suspend fun Galaxy.createPlanet(name: String): Planet {
-    val planet = PlanetHelper.createPlanet(name)
+suspend fun Galaxy.createPlanet(name: String, type: PlanetType = PlanetType.NORMAL): Planet {
+    val planet = PlanetHelper.createPlanet(name, type)
     update { planets.add(planet) }
 
     return planet

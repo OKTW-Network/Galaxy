@@ -6,7 +6,8 @@ import kotlinx.coroutines.experimental.asCoroutineDispatcher
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
 import one.oktw.galaxy.galaxy.GalaxyManager
-import one.oktw.galaxy.galaxy.planet.gen.PlanetGenModifier
+import one.oktw.galaxy.galaxy.planet.gen.NetherGenModifier
+import one.oktw.galaxy.galaxy.planet.gen.NormalGenModifier
 import one.oktw.galaxy.internal.DatabaseManager
 import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.internal.register.CommandRegister
@@ -75,7 +76,8 @@ class Main {
 
     @Listener
     fun onRegister(event: GameRegistryEvent.Register<WorldGeneratorModifier>) {
-        event.register(PlanetGenModifier())
+        event.register(NormalGenModifier())
+        event.register(NetherGenModifier())
     }
 
     @Listener

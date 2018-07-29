@@ -100,7 +100,9 @@ class PlanetHelper {
                 it.worldBorderDiameter = (planet.size * 16).toDouble()
                 it.setGenerateSpawnOnLoad(false)
                 server.saveWorldProperties(it)
-                server.loadWorld(it).orElse(null)
+                server.loadWorld(it).orElse(null)?.apply {
+                    worldBorder.setDiameter(planet.size * 16.0, 0)
+                }
             }
         }
 

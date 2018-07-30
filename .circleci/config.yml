@@ -30,7 +30,7 @@ jobs:
       - run: gradle setupCiWorkspace
 
       # run build
-      - run: gradle build --build-cache
+      - run: gradle build
 
       - save_cache:
           paths: [~/.gradle]

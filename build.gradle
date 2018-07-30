@@ -47,10 +47,6 @@ minecraft {
     makeObfSourceJar = false
 }
 
-mixin {
-    add sourceSets.main, "mixins.galaxy.refmap.json"
-}
-
 dependencies {
     compile "org.spongepowered:spongeapi:$sponge_version"
     compile 'org.spongepowered:mixin:0.7.8-SNAPSHOT'

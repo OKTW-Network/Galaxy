@@ -1,11 +1,11 @@
 package one.oktw.galaxy.gui
 
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.delay
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.gui.view.GridGUIView
-import one.oktw.galaxy.item.enums.ButtonType.ARROW_LEFT
-import one.oktw.galaxy.item.enums.ButtonType.ARROW_RIGHT
+import one.oktw.galaxy.item.enums.ButtonType
+import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.util.OrderedLaunch
 import org.spongepowered.api.data.key.Keys
@@ -17,6 +17,7 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 import java.util.Arrays.asList
+import kotlin.collections.ArrayList
 
 abstract class PageGUI : GUI() {
     companion object {
@@ -33,12 +34,14 @@ abstract class PageGUI : GUI() {
             PREV,
             NEXT,
             ITEMS,
+            NUMBER
         }
 
         private val X = Slot.NULL
         private val P = Slot.PREV
         private val N = Slot.NEXT
         private val O = Slot.ITEMS
+        private val V = Slot.NUMBER
 
         private const val WIDTH = 9
         private const val HEIGHT = 6
@@ -49,8 +52,13 @@ abstract class PageGUI : GUI() {
             O, O, O, O, O, O, O, O, O,
             O, O, O, O, O, O, O, O, O,
             O, O, O, O, O, O, O, O, O,
-            P, X, X, X, X, X, X, X, N
+            X, X, P, V, V, V, N, X, X
         )
+
+        private val numbers = asList(
+            ButtonType.NUMBER_0, ButtonType.NUMBER_1, ButtonType.NUMBER_2, ButtonType.NUMBER_3, ButtonType.NUMBER_4,
+            ButtonType.NUMBER_5, ButtonType.NUMBER_6, ButtonType.NUMBER_7, ButtonType.NUMBER_8, ButtonType.NUMBER_9
+        ).map { Button(it).createItemStack().apply { offer(DataUUID(UUID.randomUUID())) } }
     }
 
     private val lang = languageService.getDefaultLanguage()
@@ -68,6 +76,19 @@ abstract class PageGUI : GUI() {
 
     init {
         registerEvent(ClickInventoryEvent::class.java, ::clickEvent)
+    }
+
+    private fun getNumbers(number: Int, length: Int): List<ItemStack> {
+        val result = ArrayList<ItemStack>()
+        var remain = number
+
+        for (i in 0 until length) {
+            val digit = remain % 10
+            remain /= 10
+            result += numbers[digit]
+        }
+
+        return result.reversed()
     }
 
     protected abstract suspend fun get(number: Int, skip: Int): List<ItemStack>
@@ -90,14 +111,28 @@ abstract class PageGUI : GUI() {
         // wait a moment to prevent race condition in sponge inventory handling
         delay(SET_ITEM_DELAY)
 
+        val showNextPage = !get(1, (pageNumber + 1) * maxItem).isEmpty()
+
         get(maxItem, pageNumber * maxItem).let { view.setSlots(Slot.ITEMS, ArrayList(it)) }
-        offerButton(pageNumber != 0, !get(1, (pageNumber + 1) * maxItem).isEmpty())
+        offerButton(pageNumber != 0, showNextPage)
+        offerNumber(pageNumber + 1) // make it start from one...
+        offerEmptySlot(pageNumber == 0, !showNextPage)
         view.disabled = false
     }
 
-    protected fun isButton(item: ItemStackSnapshot) = view.getNameOf(item)?.first in asList(Slot.NEXT, Slot.PREV)
+    protected fun isControl(item: ItemStackSnapshot) = view.getNameOf(item)?.first in asList(
+        Slot.NUMBER,
+        Slot.NEXT,
+        Slot.PREV,
+        Slot.NUMBER
+    )
 
-    protected fun isButton(uuid: UUID) = view.getNameOf(uuid)?.first in asList(Slot.NEXT, Slot.PREV)
+    protected fun isControl(uuid: UUID) = view.getNameOf(uuid)?.first in asList(
+        Slot.NUMBER,
+        Slot.NEXT,
+        Slot.PREV,
+        Slot.NUMBER
+    )
 
     private fun offerButton(previous: Boolean, next: Boolean) {
         if (previous) {
@@ -116,6 +151,34 @@ abstract class PageGUI : GUI() {
                     offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.NextPage"]))
                 }
                 .let { view.setSlot(Slot.NEXT, it, Action.NextPage) }
+        }
+    }
+
+    private fun offerNumber(pageNumber: Int) {
+        val length = view.countSlots(Slot.NUMBER)
+
+        view.setSlots(Slot.NUMBER, getNumbers(pageNumber, length))
+    }
+
+    private fun offerEmptySlot(fillPrev: Boolean, fillNext: Boolean) {
+        view.countSlots(Slot.NULL)
+            .let { (0 until it) }
+            .map {
+                Button(GUI_CENTER).createItemStack()
+                    .apply { offer(DataUUID(UUID.randomUUID())) }
+            }
+            .let { view.setSlots(Slot.NULL, it) }
+
+        if (fillPrev) {
+            Button(GUI_CENTER).createItemStack()
+                .apply { offer(DataUUID(UUID.randomUUID())) }
+                .let { view.setSlot(Slot.PREV, it, null) }
+        }
+
+        if (fillNext) {
+            Button(GUI_CENTER).createItemStack()
+                .apply { offer(DataUUID(UUID.randomUUID())) }
+                .let { view.setSlot(Slot.NEXT, it, null) }
         }
     }
 
@@ -141,12 +204,17 @@ abstract class PageGUI : GUI() {
         val item = event.cursorTransaction.default
 
         // handle only buttons, let gui extends this decide how to handle them
-        if (isButton(item)) {
+        if (isControl(item)) {
             val action = view.getDataOf(item)
 
-            // wipe it directly, because we don't want the button to be rollback
-            event.cursorTransaction.apply {
-                setCustom(ItemStackSnapshot.NONE)
+            if (action != null) {
+                // wipe it directly, because we are going to change page and we don't want the buttons to be rollback
+                event.cursorTransaction.apply {
+                    setCustom(ItemStackSnapshot.NONE)
+                }
+            } else {
+                // other gui elements
+                event.isCancelled = true
             }
 
             when (action) {

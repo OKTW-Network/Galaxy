@@ -101,8 +101,8 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
     private fun clickEvent(event: ClickInventoryEvent) {
         if (view.disabled) return
 
-        // ignore prev and next page, because the are handled by the PageGUI
-        if (!isButton(event.cursorTransaction.default)) {
+        // ignore gui elements, because they are handled by the PageGUI
+        if (!isControl(event.cursorTransaction.default)) {
             event.isCancelled = true
         }
 

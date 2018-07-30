@@ -9,8 +9,11 @@ import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
+import one.oktw.galaxy.galaxy.planet.enums.PlanetType
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.PageGUI
+import one.oktw.galaxy.item.enums.ButtonType
+import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.machine.transporter.TransporterHelper
 import one.oktw.galaxy.machine.transporter.data.Transporter
 import org.spongepowered.api.data.key.Keys
@@ -59,32 +62,36 @@ class Transporter(private val transporter: Transporter) : PageGUI() {
             .openSubscription()
             .toList()
 
-        for (targetPortal in portals) {
-            // don't tp to itset
-            if (transporter.uuid == targetPortal.uuid) continue
-            val uuid = targetPortal.position.planet ?: continue
+        for (targetTransporter in portals) {
+            // don't tp to itself
+            if (transporter.uuid == targetTransporter.uuid) continue
+            val uuid = targetTransporter.position.planet ?: continue
             val planet = Main.galaxyManager.get(null, uuid)?.getPlanet(uuid) ?: continue
 
-            ItemStack.builder()
-                .itemType(ItemTypes.DIAMOND_BLOCK)
-                .itemData(DataUUID(targetPortal.uuid))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, targetPortal.name))
-                .add(
-                    Keys.ITEM_LORE,
-                    Arrays.asList(
-                        Text.of(
-                            TextColors.GREEN,
-                            "Target: ${planet.name} ${targetPortal.position.x}, ${targetPortal.position.y}, ${targetPortal.position.z}",
-                            TextColors.RESET
-                        ),
-                        Text.of(
-                            TextColors.GREEN,
-                            "Cross Planet: ${targetPortal.crossPlanet}",
-                            TextColors.RESET
+            when (planet.type) {
+                PlanetType.NORMAL -> Button(ButtonType.PLANET_O)
+                PlanetType.NETHER -> Button(ButtonType.PLANET_N)
+                PlanetType.END -> Button(ButtonType.PLANET_E)
+            }.createItemStack()
+                .apply {
+                    offer(DataUUID(targetTransporter.uuid))
+                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, targetTransporter.name))
+                    offer(
+                        Keys.ITEM_LORE,
+                        Arrays.asList(
+                            Text.of(
+                                TextColors.GREEN,
+                                "Target: ${planet.name} ${targetTransporter.position.x}, ${targetTransporter.position.y}, ${targetTransporter.position.z}",
+                                TextColors.RESET
+                            ),
+                            Text.of(
+                                TextColors.GREEN,
+                                "Cross Planet: ${targetTransporter.crossPlanet}",
+                                TextColors.RESET
+                            )
                         )
                     )
-                )
-                .build()
+                }
                 .let { res.add(it) }
         }
 
@@ -102,8 +109,8 @@ class Transporter(private val transporter: Transporter) : PageGUI() {
 
         if (slot == Companion.Slot.ITEMS) {
             launch {
-                val targetPortal = TransporterHelper.get(uuid) ?: return@launch
-                val planetId = targetPortal.position.planet ?: return@launch
+                val targetTransporter = TransporterHelper.get(uuid) ?: return@launch
+                val planetId = targetTransporter.position.planet ?: return@launch
                 val targetPlanet = Main.galaxyManager.get(null, planetId)?.getPlanet(planetId) ?: return@launch
                 val targetWorld = PlanetHelper.loadPlanet(targetPlanet) ?: return@launch
 
@@ -120,7 +127,7 @@ class Transporter(private val transporter: Transporter) : PageGUI() {
                     sourceFrames[Triple(it.location.blockX, it.location.blockY - 1, it.location.blockZ)] != null
                 }
 
-                val targetFrames = targetPortal.position
+                val targetFrames = targetTransporter.position
                     .let { Location(targetWorld, it.x, it.y, it.z) }
                     .let { TransporterHelper.searchTransporterFrame(it, MAX_FRAME); }
                     ?.values
@@ -136,9 +143,9 @@ class Transporter(private val transporter: Transporter) : PageGUI() {
                 sourceEntities.forEach {
                     val target = if (targetFrames.size != 0) targetFrames[index % targetFrames.size] else Location(
                         targetWorld,
-                        targetPortal.position.x,
-                        targetPortal.position.y,
-                        targetPortal.position.z
+                        targetTransporter.position.x,
+                        targetTransporter.position.y,
+                        targetTransporter.position.z
                     )
 
                     index++
@@ -155,7 +162,7 @@ class Transporter(private val transporter: Transporter) : PageGUI() {
                             Location(targetWorld, target.x + 0.5, target.y + 1, target.z + 0.5)
                         )
                     } else {
-                        launch (Main.serverThread) {
+                        launch(Main.serverThread) {
                             it.transferToWorld(
                                 targetWorld,
                                 Vector3d(target.x + 0.5, target.y + 1, target.z + 0.5)
@@ -167,7 +174,7 @@ class Transporter(private val transporter: Transporter) : PageGUI() {
                 TeleportHelper.teleport(
                     player,
                     // offset y by 1, so you are on the top of block, offset x and z by 0.5, so you are on the center of block
-                    Location(targetWorld, targetPortal.position.x + 0.5, targetPortal.position.y + 1, targetPortal.position.z + 0.5)
+                    Location(targetWorld, targetTransporter.position.x + 0.5, targetTransporter.position.y + 1, targetTransporter.position.z + 0.5)
                 )
 
                 GUIHelper.closeAll(player)

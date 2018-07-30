@@ -15,12 +15,15 @@ import one.oktw.galaxy.machine.teleporter.TeleporterHelper
 import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData
+import org.spongepowered.api.data.type.HandType
 import org.spongepowered.api.data.type.HandTypes
 import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.block.InteractBlockEvent
 import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.item.ItemTypes
+import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.text.Text
 import java.util.Arrays.asList
 
@@ -130,7 +133,7 @@ class Teleporter {
                 if (itemOnHand.type == ItemTypes.NAME_TAG) {
                     val newStationName = itemOnHand[DisplayNameData::class.java].orElse(null)?.displayName()?.get()?.toPlain()?: return
 
-                    player.setItemInHand(HandTypes.MAIN_HAND, null)
+                    consumeItem(player, HandTypes.MAIN_HAND)
 
                     launch {
                         val position = event.targetBlock.location.orElse(null)?: return@launch
@@ -148,5 +151,15 @@ class Teleporter {
             }
             else -> Unit
         }
+    }
+
+    private fun consumeItem(player: Player, hand: HandType) {
+        if (player.gameMode().get() == GameModes.CREATIVE) return
+
+        val item = player.getItemInHand(hand).orElse(null) ?: return
+
+        item.quantity--
+
+        if (item.quantity <= 0) player.setItemInHand(hand, ItemStack.empty()) else player.setItemInHand(hand, item)
     }
 }

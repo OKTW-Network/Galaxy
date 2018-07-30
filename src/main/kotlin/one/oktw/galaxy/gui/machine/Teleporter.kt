@@ -41,7 +41,18 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
     override val token = "BrowserGalaxy-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.Teleporter"])))
+        .property(InventoryTitle.of(
+            teleporter.crossPlanet
+                .let {
+                    if (it) {
+                        lang["UI.Title.AdvancedTeleporter"]
+                    } else {
+                        lang["UI.Title.Teleporter"]
+                    }
+                }
+                .format(teleporter.name)
+                .let { Text.of(it) }
+        ))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
 

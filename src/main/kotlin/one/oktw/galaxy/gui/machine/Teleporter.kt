@@ -14,14 +14,13 @@ import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.PageGUI
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.type.Button
-import one.oktw.galaxy.machine.transporter.TransporterHelper
-import one.oktw.galaxy.machine.transporter.data.Transporter
+import one.oktw.galaxy.machine.teleporter.TeleporterHelper
+import one.oktw.galaxy.machine.teleporter.data.Teleporter
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
-import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
 import org.spongepowered.api.item.inventory.ItemStack
@@ -33,16 +32,16 @@ import org.spongepowered.api.world.Location
 import java.util.*
 import kotlin.collections.ArrayList
 
-class Transporter(private val transporter: Transporter) : PageGUI() {
+class Teleporter(private val teleporter: Teleporter) : PageGUI() {
     private val MAX_FRAME = 64
 
     private val lang = Main.languageService.getDefaultLanguage()
-    private val list = TransporterHelper.getAvailableTargets(transporter)
+    private val list = TeleporterHelper.getAvailableTargets(teleporter)
 
     override val token = "BrowserGalaxy-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.Transporter.Title"])))
+        .property(InventoryTitle.of(Text.of(lang["UI.Title.Teleporter"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
 
@@ -56,15 +55,15 @@ class Transporter(private val transporter: Transporter) : PageGUI() {
     override suspend fun get(number: Int, skip: Int): List<ItemStack> {
         val res = ArrayList<ItemStack>()
 
-        val portals = list
+        val teleporters = list
             .skip(skip)
             .limit(number)
             .openSubscription()
             .toList()
 
-        for (targetTransporter in portals) {
+        for (targetTransporter in teleporters) {
             // don't tp to itself
-            if (transporter.uuid == targetTransporter.uuid) continue
+            if (teleporter.uuid == targetTransporter.uuid) continue
             val uuid = targetTransporter.position.planet ?: continue
             val planet = Main.galaxyManager.get(null, uuid)?.getPlanet(uuid) ?: continue
 
@@ -81,12 +80,20 @@ class Transporter(private val transporter: Transporter) : PageGUI() {
                         Arrays.asList(
                             Text.of(
                                 TextColors.GREEN,
-                                "Target: ${planet.name} ${targetTransporter.position.x}, ${targetTransporter.position.y}, ${targetTransporter.position.z}",
+                                lang["UI.Tip.Target"].format(
+                                    "${planet.name} ${targetTransporter.position.x}, ${targetTransporter.position.y}, ${targetTransporter.position.z}"
+                                ),
                                 TextColors.RESET
                             ),
                             Text.of(
                                 TextColors.GREEN,
-                                "Cross Planet: ${targetTransporter.crossPlanet}",
+                                lang["UI.Tip.CanCrossPlanet"].format(
+                                    if (targetTransporter.crossPlanet) {
+                                        lang["UI.Tip.true"]
+                                    } else {
+                                        lang["UI.Tip.false"]
+                                    }
+                                ),
                                 TextColors.RESET
                             )
                         )
@@ -109,17 +116,17 @@ class Transporter(private val transporter: Transporter) : PageGUI() {
 
         if (slot == Companion.Slot.ITEMS) {
             launch {
-                val targetTransporter = TransporterHelper.get(uuid) ?: return@launch
-                val planetId = targetTransporter.position.planet ?: return@launch
+                val targetTeleporter = TeleporterHelper.get(uuid) ?: return@launch
+                val planetId = targetTeleporter.position.planet ?: return@launch
                 val targetPlanet = Main.galaxyManager.get(null, planetId)?.getPlanet(planetId) ?: return@launch
                 val targetWorld = PlanetHelper.loadPlanet(targetPlanet) ?: return@launch
 
-                val sourceFrames = transporter.position
+                val sourceFrames = teleporter.position
                     .let { Location(player.world, it.x, it.y, it.z) }
-                    .let { TransporterHelper.searchTransporterFrame(it, MAX_FRAME); }
+                    .let { TeleporterHelper.searchTeleporterFrame(it, MAX_FRAME); }
 
                 if (sourceFrames == null) {
-                    player.sendMessage(Text.of("You placed too much frames!"))
+                    player.sendMessage(Text.of(lang["Respond.TooMuchFramesThisSide"]))
                     return@launch
                 }
 
@@ -127,14 +134,14 @@ class Transporter(private val transporter: Transporter) : PageGUI() {
                     sourceFrames[Triple(it.location.blockX, it.location.blockY - 1, it.location.blockZ)] != null
                 }
 
-                val targetFrames = targetTransporter.position
+                val targetFrames = targetTeleporter.position
                     .let { Location(targetWorld, it.x, it.y, it.z) }
-                    .let { TransporterHelper.searchTransporterFrame(it, MAX_FRAME); }
+                    .let { TeleporterHelper.searchTeleporterFrame(it, MAX_FRAME); }
                     ?.values
                     ?.let { ArrayList(it) }
 
                 if (targetFrames == null) {
-                    player.sendMessage(Text.of("You placed too much frames on the other side!"))
+                    player.sendMessage(Text.of(lang["Respond.TooMuchFramesThatSide"]))
                     return@launch
                 }
 
@@ -143,9 +150,9 @@ class Transporter(private val transporter: Transporter) : PageGUI() {
                 sourceEntities.forEach {
                     val target = if (targetFrames.size != 0) targetFrames[index % targetFrames.size] else Location(
                         targetWorld,
-                        targetTransporter.position.x,
-                        targetTransporter.position.y,
-                        targetTransporter.position.z
+                        targetTeleporter.position.x,
+                        targetTeleporter.position.y,
+                        targetTeleporter.position.z
                     )
 
                     index++
@@ -174,7 +181,7 @@ class Transporter(private val transporter: Transporter) : PageGUI() {
                 TeleportHelper.teleport(
                     player,
                     // offset y by 1, so you are on the top of block, offset x and z by 0.5, so you are on the center of block
-                    Location(targetWorld, targetTransporter.position.x + 0.5, targetTransporter.position.y + 1, targetTransporter.position.z + 0.5)
+                    Location(targetWorld, targetTeleporter.position.x + 0.5, targetTeleporter.position.y + 1, targetTeleporter.position.z + 0.5)
                 )
 
                 GUIHelper.closeAll(player)

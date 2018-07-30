@@ -1,4 +1,4 @@
-package one.oktw.galaxy.machine.transporter
+package one.oktw.galaxy.machine.teleporter
 
 import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
@@ -13,20 +13,20 @@ import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.planet.data.Position
 import one.oktw.galaxy.internal.DatabaseManager
-import one.oktw.galaxy.machine.transporter.data.Transporter
+import one.oktw.galaxy.machine.teleporter.data.Teleporter
 import org.spongepowered.api.util.Direction
 import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
 import java.util.*
 import kotlin.collections.ArrayList
 
-class TransporterHelper {
+class TeleporterHelper {
     companion object {
-        private val collection = DatabaseManager.database.getCollection("Transporter", Transporter::class.java)
+        private val collection = DatabaseManager.database.getCollection("Teleporter", Teleporter::class.java)
 
 
         private fun isFrame(position: Location<World>): Boolean {
-            return position[DataBlockType.key].orElse(null) == CustomBlocks.TRANSPORTER_FRAME
+            return position[DataBlockType.key].orElse(null) == CustomBlocks.TELEPORTER_FRAME
         }
 
         private fun getNeighborFrames(center: Location<World>): List<Location<World>> {
@@ -46,7 +46,7 @@ class TransporterHelper {
             return list
         }
 
-        suspend fun searchTransporterFrame(center: Location<World>, maxCount: Int): HashMap<Triple<Int, Int, Int>, Location<World>>? {
+        suspend fun searchTeleporterFrame(center: Location<World>, maxCount: Int): HashMap<Triple<Int, Int, Int>, Location<World>>? {
             val list = HashMap<Triple<Int, Int, Int>, Location<World>>()
             var generation = ArrayList<Location<World>>()
 
@@ -92,7 +92,7 @@ class TransporterHelper {
         }
 
 
-        suspend fun get(uuid: UUID): Transporter? {
+        suspend fun get(uuid: UUID): Teleporter? {
             return collection.find(
                 and(
                     eq("uuid", uuid)
@@ -100,7 +100,7 @@ class TransporterHelper {
             ).awaitFirstOrNull()
         }
 
-        suspend fun get(planet: Planet, x: Int, y: Int, z: Int): Transporter? {
+        suspend fun get(planet: Planet, x: Int, y: Int, z: Int): Teleporter? {
             return collection.find(
                 and(
                     eq("position.planet", planet.uuid),
@@ -111,15 +111,15 @@ class TransporterHelper {
             ).awaitFirstOrNull()
         }
 
-        suspend fun getAvailableTargets(uuid: UUID): FindPublisher<Transporter>? {
+        suspend fun getAvailableTargets(uuid: UUID): FindPublisher<Teleporter>? {
             return get(uuid)?.let { getAvailableTargets(it) } ?: return null
         }
 
-        suspend fun getAvailableTargets(planet: Planet, x: Int, y: Int, z: Int): FindPublisher<Transporter>? {
+        suspend fun getAvailableTargets(planet: Planet, x: Int, y: Int, z: Int): FindPublisher<Teleporter>? {
             return get(planet, x, y, z)?.let { getAvailableTargets(it) } ?: return null
         }
 
-        fun getAvailableTargets(origin: Transporter): FindPublisher<Transporter> {
+        fun getAvailableTargets(origin: Teleporter): FindPublisher<Teleporter> {
             return if (origin.crossPlanet) {
                 collection.find(
                     eq("galaxy", origin.galaxy)
@@ -134,7 +134,7 @@ class TransporterHelper {
         suspend fun create(planet: Planet, x: Int, y: Int, z: Int, name: String, crossPlanet: Boolean): Boolean {
             val galaxy = galaxyManager.get(null, planet.uuid) ?: return false
 
-            val portal = Transporter(
+            val portal = Teleporter(
                 UUID.randomUUID(),
                 name,
                 galaxy.uuid,
@@ -143,6 +143,10 @@ class TransporterHelper {
             )
 
             return collection.insertOne(portal).awaitFirstOrNull() != null
+        }
+
+        suspend fun update(teleporter: Teleporter) {
+            collection.findOneAndReplace(eq("uuid", teleporter.uuid), teleporter).awaitFirstOrNull()
         }
 
         suspend fun remove(planet: Planet, x: Int, y: Int, z: Int): Boolean {

@@ -52,7 +52,7 @@ abstract class PageGUI : GUI() {
             O, O, O, O, O, O, O, O, O,
             O, O, O, O, O, O, O, O, O,
             O, O, O, O, O, O, O, O, O,
-            P, X, X, V, V, V, X, X, N
+            X, X, P, V, V, V, N, X, X
         )
 
         private val numbers = asList(

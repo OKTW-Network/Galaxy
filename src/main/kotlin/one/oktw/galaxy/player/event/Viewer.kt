@@ -171,11 +171,7 @@ class Viewer {
 
     @Listener(order = Order.FIRST)
     fun onCollideEntity(event: CollideEntityEvent) {
-        if (event.cause.first(Player::class.java).orElse(null)?.let { isViewer(it.uniqueId) } == true) {
-            event.isCancelled = true
-        } else {
-            event.entities.removeIf { it is Player && isViewer(it.uniqueId) }
-        }
+        event.isCancelled = event.cause.first(Player::class.java).orElse(null)?.let { isViewer(it.uniqueId) } == true
     }
 
     @Listener(order = Order.FIRST)

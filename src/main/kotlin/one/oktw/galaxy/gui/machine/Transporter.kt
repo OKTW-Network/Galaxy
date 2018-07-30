@@ -11,7 +11,8 @@ import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.PageGUI
-import one.oktw.galaxy.machine.portal.PortalHelper
+import one.oktw.galaxy.machine.transporter.TransporterHelper
+import one.oktw.galaxy.machine.transporter.data.Transporter
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
@@ -29,16 +30,16 @@ import org.spongepowered.api.world.Location
 import java.util.*
 import kotlin.collections.ArrayList
 
-class Portal(private val portal: one.oktw.galaxy.machine.portal.data.Portal) : PageGUI() {
+class Transporter(private val transporter: Transporter) : PageGUI() {
     private val MAX_FRAME = 64
 
     private val lang = Main.languageService.getDefaultLanguage()
-    private val list = PortalHelper.getAvailableTargets(portal)
+    private val list = TransporterHelper.getAvailableTargets(transporter)
 
     override val token = "BrowserGalaxy-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.Portal.Title"])))
+        .property(InventoryTitle.of(Text.of(lang["UI.Transporter.Title"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
 
@@ -60,7 +61,7 @@ class Portal(private val portal: one.oktw.galaxy.machine.portal.data.Portal) : P
 
         for (targetPortal in portals) {
             // don't tp to itset
-            if (portal.uuid == targetPortal.uuid) continue
+            if (transporter.uuid == targetPortal.uuid) continue
             val uuid = targetPortal.position.planet ?: continue
             val planet = Main.galaxyManager.get(null, uuid)?.getPlanet(uuid) ?: continue
 
@@ -101,14 +102,14 @@ class Portal(private val portal: one.oktw.galaxy.machine.portal.data.Portal) : P
 
         if (slot == Companion.Slot.ITEMS) {
             launch {
-                val targetPortal = PortalHelper.getPortal(uuid) ?: return@launch
+                val targetPortal = TransporterHelper.get(uuid) ?: return@launch
                 val planetId = targetPortal.position.planet ?: return@launch
                 val targetPlanet = Main.galaxyManager.get(null, planetId)?.getPlanet(planetId) ?: return@launch
                 val targetWorld = PlanetHelper.loadPlanet(targetPlanet) ?: return@launch
 
-                val sourceFrames = portal.position
+                val sourceFrames = transporter.position
                     .let { Location(player.world, it.x, it.y, it.z) }
-                    .let { PortalHelper.searchPortalFrame(it, MAX_FRAME); }
+                    .let { TransporterHelper.searchTransporterFrame(it, MAX_FRAME); }
 
                 if (sourceFrames == null) {
                     player.sendMessage(Text.of("You placed too much frames!"))
@@ -121,7 +122,7 @@ class Portal(private val portal: one.oktw.galaxy.machine.portal.data.Portal) : P
 
                 val targetFrames = targetPortal.position
                     .let { Location(targetWorld, it.x, it.y, it.z) }
-                    .let { PortalHelper.searchPortalFrame(it, MAX_FRAME); }
+                    .let { TransporterHelper.searchTransporterFrame(it, MAX_FRAME); }
                     ?.values
                     ?.let { ArrayList(it) }
 

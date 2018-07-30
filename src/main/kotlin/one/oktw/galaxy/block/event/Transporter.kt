@@ -1,16 +1,16 @@
-package one.oktw.galaxy.machine.portal
+package one.oktw.galaxy.block.event
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.block.enums.CustomBlocks.ADVANCED_PORTAL
-import one.oktw.galaxy.block.enums.CustomBlocks.PORTAL
+import one.oktw.galaxy.block.enums.CustomBlocks.TRANSPORTER_ADVANCED
+import one.oktw.galaxy.block.enums.CustomBlocks.TRANSPORTER
 import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.event.PlaceCustomBlockEvent
 import one.oktw.galaxy.event.RemoveCustomBlockEvent
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.gui.GUIHelper
-import one.oktw.galaxy.gui.machine.Portal
+import one.oktw.galaxy.machine.transporter.TransporterHelper
 import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData
@@ -20,7 +20,7 @@ import org.spongepowered.api.text.Text
 import java.util.Arrays.asList
 
 
-class PortalManager {
+class Transporter {
     private val logger = main.logger
 
     init {
@@ -31,18 +31,18 @@ class PortalManager {
             val location = player.location.sub(0.0, 1.0, 0.0)
 
             if (location.blockType != BlockTypes.MOB_SPAWNER) return@registerEvent
-            if (location[DataBlockType.key].orElse(null) !in asList(PORTAL, ADVANCED_PORTAL)) return@registerEvent
+            if (location[DataBlockType.key].orElse(null) !in asList(TRANSPORTER, TRANSPORTER_ADVANCED)) return@registerEvent
 
             launch {
                 galaxyManager.get(player.world)?.getPlanet(player.world)?.let {
-                    PortalHelper.getPortalAt(
+                    TransporterHelper.get(
                         it,
                         location.blockX,
                         location.blockY,
                         location.blockZ
                     )
                 }?.let {
-                    Portal(it)
+                    one.oktw.galaxy.gui.machine.Transporter(it)
                 }?.let {
                     GUIHelper.open(player) { it }
                 }
@@ -57,21 +57,21 @@ class PortalManager {
         event.item.let {
             val item = it[DataBlockType.key].get()
 
-            if (item == PORTAL || item == ADVANCED_PORTAL) {
+            if (item == TRANSPORTER || item == TRANSPORTER_ADVANCED) {
                 launch {
-                    val name = it[DisplayNameData::class.java].orElse(null)?.displayName()?.get()?.toPlain()?: "A Portal"
+                    val name = it[DisplayNameData::class.java].orElse(null)?.displayName()?.get()?.toPlain()?: "A Transporter"
 
                     galaxyManager.get(player.world)?.getPlanet(player.world)?.let {
-                        PortalHelper.createPortal(
+                        TransporterHelper.create(
                             it,
                             event.location.blockX,
                             event.location.blockY,
                             event.location.blockZ,
                             name,
-                            item == ADVANCED_PORTAL
+                            item == TRANSPORTER_ADVANCED
                         ).let {
                             if (!it) {
-                                player.sendMessage(Text.of("Portal creation failed at ${event.location.toString()}"))
+                                player.sendMessage(Text.of("Transporter creation failed at ${event.location}"))
                             }
                         }
                     }?: let {
@@ -90,7 +90,7 @@ class PortalManager {
         launch {
             event.location.let {
                 galaxyManager.get(player.world)?.getPlanet(player.world)?.let {
-                    PortalHelper.removePortal(
+                    TransporterHelper.remove(
                         it,
                         event.location.blockX,
                         event.location.blockY,
@@ -98,7 +98,7 @@ class PortalManager {
                     )
                 }?.let {
                     if (it) {
-                        player.sendMessage(Text.of("You removed a portal"))
+                        player.sendMessage(Text.of("You removed a transporter"))
                     }
                 }?: let {
                     player.sendMessage(Text.of("error: fail to get planet"))

@@ -299,8 +299,8 @@ class RecipeRegister {
                     .addIngredient(of(DIAMOND_BLOCK))
                     .addIngredient(of(ENDER_PEARL))
                     .addIngredient(of(IRON_BLOCK))
-                    .result(FakeBlockItem(PORTAL).createItemStack())
-                    .build("portal", main)
+                    .result(FakeBlockItem(TRANSPORTER).createItemStack())
+                    .build("transporter", main)
             )
 
             register(
@@ -308,7 +308,7 @@ class RecipeRegister {
                     .addIngredient(of(EMERALD_BLOCK))
                     .addIngredient(of(ENDER_PEARL))
                     .addIngredient(of(IRON_BLOCK))
-                    .result(FakeBlockItem(ADVANCED_PORTAL).createItemStack())
+                    .result(FakeBlockItem(TRANSPORTER_ADVANCED).createItemStack())
                     .build("advanced_portal", main)
             )
 
@@ -317,7 +317,7 @@ class RecipeRegister {
                     .addIngredient(of(GOLD_BLOCK))
                     .addIngredient(of(ENDER_PEARL))
                     .addIngredient(of(IRON_BLOCK))
-                    .result(FakeBlockItem(PORTAL_FRAME).createItemStack())
+                    .result(FakeBlockItem(TRANSPORTER_FRAME).createItemStack())
                     .build("portal_frame", main)
             )
         }

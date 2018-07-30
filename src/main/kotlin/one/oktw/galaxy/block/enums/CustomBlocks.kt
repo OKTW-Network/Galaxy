@@ -6,7 +6,7 @@ enum class CustomBlocks(val id: Int? = null, val hasGUI: Boolean = false) {
     PLANET_TERMINAL(null, true),
     HT_CRAFTING_TABLE(1, true),
     ELEVATOR(2),
-    PORTAL(3),
-    ADVANCED_PORTAL(4),
-    PORTAL_FRAME(5)
+    TRANSPORTER(3),
+    TRANSPORTER_ADVANCED(4),
+    TRANSPORTER_FRAME(5)
 }

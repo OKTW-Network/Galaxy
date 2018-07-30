@@ -1,4 +1,4 @@
-package one.oktw.galaxy.machine.portal
+package one.oktw.galaxy.machine.transporter
 
 import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
@@ -13,20 +13,20 @@ import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.planet.data.Position
 import one.oktw.galaxy.internal.DatabaseManager
-import one.oktw.galaxy.machine.portal.data.Portal
+import one.oktw.galaxy.machine.transporter.data.Transporter
 import org.spongepowered.api.util.Direction
 import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PortalHelper {
+class TransporterHelper {
     companion object {
-        private val collection = DatabaseManager.database.getCollection("Portal", Portal::class.java)
+        private val collection = DatabaseManager.database.getCollection("Transporter", Transporter::class.java)
 
 
         private fun isFrame(position: Location<World>): Boolean {
-            return position[DataBlockType.key].orElse(null) == CustomBlocks.PORTAL_FRAME
+            return position[DataBlockType.key].orElse(null) == CustomBlocks.TRANSPORTER_FRAME
         }
 
         private fun getNeighborFrames(center: Location<World>): List<Location<World>> {
@@ -46,7 +46,7 @@ class PortalHelper {
             return list
         }
 
-        suspend fun searchPortalFrame(center: Location<World>, maxCount: Int): HashMap<Triple<Int, Int, Int>, Location<World>>? {
+        suspend fun searchTransporterFrame(center: Location<World>, maxCount: Int): HashMap<Triple<Int, Int, Int>, Location<World>>? {
             val list = HashMap<Triple<Int, Int, Int>, Location<World>>()
             var generation = ArrayList<Location<World>>()
 
@@ -92,7 +92,7 @@ class PortalHelper {
         }
 
 
-        suspend fun getPortal(uuid: UUID): Portal? {
+        suspend fun get(uuid: UUID): Transporter? {
             return collection.find(
                 and(
                     eq("uuid", uuid)
@@ -100,7 +100,7 @@ class PortalHelper {
             ).awaitFirstOrNull()
         }
 
-        suspend fun getPortalAt(planet: Planet, x: Int, y: Int, z: Int): Portal? {
+        suspend fun get(planet: Planet, x: Int, y: Int, z: Int): Transporter? {
             return collection.find(
                 and(
                     eq("position.planet", planet.uuid),
@@ -111,30 +111,30 @@ class PortalHelper {
             ).awaitFirstOrNull()
         }
 
-        suspend fun getAvailableTargets(uuid: UUID): FindPublisher<Portal>? {
-            return getPortal(uuid)?.let { getAvailableTargets(it) } ?: return null
+        suspend fun getAvailableTargets(uuid: UUID): FindPublisher<Transporter>? {
+            return get(uuid)?.let { getAvailableTargets(it) } ?: return null
         }
 
-        suspend fun getAvailableTargets(planet: Planet, x: Int, y: Int, z: Int): FindPublisher<Portal>? {
-            return getPortalAt(planet, x, y, z)?.let { getAvailableTargets(it) } ?: return null
+        suspend fun getAvailableTargets(planet: Planet, x: Int, y: Int, z: Int): FindPublisher<Transporter>? {
+            return get(planet, x, y, z)?.let { getAvailableTargets(it) } ?: return null
         }
 
-        fun getAvailableTargets(origin: Portal): FindPublisher<Portal> {
-            if (origin.crossPlanet) {
-                return collection.find(
+        fun getAvailableTargets(origin: Transporter): FindPublisher<Transporter> {
+            return if (origin.crossPlanet) {
+                collection.find(
                     eq("galaxy", origin.galaxy)
                 )
             } else {
-                return collection.find(
+                collection.find(
                     eq("position.planet", origin.position.planet)
                 )
             }
         }
 
-        suspend fun createPortal(planet: Planet, x: Int, y: Int, z: Int, name: String, crossPlanet: Boolean): Boolean {
+        suspend fun create(planet: Planet, x: Int, y: Int, z: Int, name: String, crossPlanet: Boolean): Boolean {
             val galaxy = galaxyManager.get(null, planet.uuid) ?: return false
 
-            val portal = Portal(
+            val portal = Transporter(
                 UUID.randomUUID(),
                 name,
                 galaxy.uuid,
@@ -145,8 +145,8 @@ class PortalHelper {
             return collection.insertOne(portal).awaitFirstOrNull() != null
         }
 
-        suspend fun removePortal(planet: Planet, x: Int, y: Int, z: Int): Boolean {
-            val portal = getPortalAt(planet, x, y, z) ?: return false
+        suspend fun remove(planet: Planet, x: Int, y: Int, z: Int): Boolean {
+            val portal = get(planet, x, y, z) ?: return false
 
             return collection.deleteMany(eq("uuid", portal.uuid)).awaitFirst().deletedCount > 0
         }

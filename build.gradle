@@ -69,6 +69,12 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+sourceSets {
+    main {
+        ext.refMap = "mixins.galaxy.refmap.json"
+    }
+}
+
 reobf {
     shadowJar {
         classpath = sourceSets.main.compileClasspath

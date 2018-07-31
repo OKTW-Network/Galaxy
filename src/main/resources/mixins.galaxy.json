@@ -7,6 +7,8 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "MixinBiomeProviderSingle",
-    "MixinWorldProviderHell"
+    "MixinCommandBase",
+    "MixinWorldProviderHell",
+    "MixinWorldServer"
   ]
 }

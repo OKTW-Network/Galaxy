@@ -15,6 +15,7 @@ import java.util.UUID;
 public class MixinCommandBase {
     /**
      * @author james58899
+     * @reason Java 8 UUID.fromString vary slow
      */
     @Overwrite
     private static EntityPlayerMP getPlayer(MinecraftServer server, @Nullable EntityPlayerMP player, String input) throws CommandException {

@@ -23,7 +23,9 @@ public class MixinCommandBase {
             if (input.length() == 36) { // test length match UUID
                 try {
                     player = server.getPlayerList().getPlayerByUUID(UUID.fromString(input));
-                } catch (IllegalArgumentException ignored) { /* ignored */ }
+                } catch (IllegalArgumentException ex) {
+                    player = server.getPlayerList().getPlayerByUsername(input);
+                }
             } else {
                 player = server.getPlayerList().getPlayerByUsername(input);
             }

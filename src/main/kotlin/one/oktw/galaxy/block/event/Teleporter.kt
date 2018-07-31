@@ -1,12 +1,14 @@
 package one.oktw.galaxy.block.event
 
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.block.enums.CustomBlocks.TELEPORTER_ADVANCED
 import one.oktw.galaxy.block.enums.CustomBlocks.TELEPORTER
+import one.oktw.galaxy.block.enums.CustomBlocks.TELEPORTER_ADVANCED
 import one.oktw.galaxy.data.DataBlockType
+import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.event.PlaceCustomBlockEvent
 import one.oktw.galaxy.event.RemoveCustomBlockEvent
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
@@ -17,6 +19,7 @@ import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData
 import org.spongepowered.api.data.type.HandType
 import org.spongepowered.api.data.type.HandTypes
+import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.event.Listener
@@ -25,7 +28,15 @@ import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.format.TextColors
+import org.spongepowered.api.world.Location
+import org.spongepowered.api.world.World
+import java.util.*
 import java.util.Arrays.asList
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes
+import org.spongepowered.api.event.cause.EventContextKeys
+import org.spongepowered.api.Sponge
+import org.spongepowered.api.event.cause.entity.spawn.SpawnType
 
 
 class Teleporter {
@@ -75,9 +86,9 @@ class Teleporter {
                         lang["block.TELEPORTER"]
                     }
 
-                    galaxyManager.get(player.world)?.getPlanet(player.world)?.let {
+                    galaxyManager.get(player.world)?.getPlanet(player.world)?.let { planet ->
                         TeleporterHelper.create(
-                            it,
+                            planet,
                             event.location.blockX,
                             event.location.blockY,
                             event.location.blockZ,
@@ -86,9 +97,25 @@ class Teleporter {
                         ).let {
                             if (!it) {
                                 player.sendMessage(Text.of("Teleporter creation failed at ${event.location}"))
+                                return@launch
                             }
+
+                            TeleporterHelper.get(planet, event.location.blockX, event.location.blockY, event.location.blockZ)
+                                ?.let {
+                                    createOrUpdateArmorStand(
+                                        Location(
+                                            event.location.extent,
+                                            event.location.blockX + 0.5,
+                                            event.location.blockY + 2.0,
+                                            event.location.blockZ + 0.5
+                                        ),
+                                        it.uuid,
+                                        it.name
+                                    )
+                                }
+
                         }
-                    }?: let {
+                    } ?: let {
                         player.sendMessage(Text.of("error: fail to get planet"))
                     }
                 }
@@ -104,17 +131,22 @@ class Teleporter {
         launch {
             event.location.let {
                 galaxyManager.get(player.world)?.getPlanet(player.world)?.let {
+                    TeleporterHelper.get(
+                        it,
+                        event.location.blockX,
+                        event.location.blockY,
+                        event.location.blockZ
+                    )?.let {
+                        removeArmorStand(event.location, it.uuid)
+                    }
+
                     TeleporterHelper.remove(
                         it,
                         event.location.blockX,
                         event.location.blockY,
                         event.location.blockZ
                     )
-                }?.let {
-                    if (it) {
-                        player.sendMessage(Text.of("You removed a teleporter"))
-                    }
-                }?: let {
+                } ?: let {
                     player.sendMessage(Text.of("error: fail to get planet"))
                 }
             }
@@ -128,23 +160,35 @@ class Teleporter {
 
         when (event.targetBlock.location.orElse(null)?.get(DataBlockType.key)?.orElse(null) ?: return) {
             TELEPORTER, TELEPORTER_ADVANCED -> {
-                val itemOnHand = player.getItemInHand(HandTypes.MAIN_HAND).orElse(null)?: return
+                val itemOnHand = player.getItemInHand(HandTypes.MAIN_HAND).orElse(null) ?: return
 
                 if (itemOnHand.type == ItemTypes.NAME_TAG) {
-                    val newStationName = itemOnHand[DisplayNameData::class.java].orElse(null)?.displayName()?.get()?.toPlain()?: return
+                    val newStationName = itemOnHand[DisplayNameData::class.java].orElse(null)?.displayName()?.get()?.toPlain() ?: return
 
                     consumeItem(player, HandTypes.MAIN_HAND)
 
                     launch {
-                        val position = event.targetBlock.location.orElse(null)?: return@launch
+                        val position = event.targetBlock.location.orElse(null) ?: return@launch
                         galaxyManager.get(player.world)?.getPlanet(player.world)?.let {
-                            val site = TeleporterHelper.get(it,
+                            val site = TeleporterHelper.get(
+                                it,
                                 position.blockX,
                                 position.blockY,
                                 position.blockZ
-                            )?: return@launch
+                            ) ?: return@launch
 
                             TeleporterHelper.update(site.copy(name = newStationName))
+
+                            createOrUpdateArmorStand(
+                                Location(
+                                    position.extent,
+                                    position.blockX + 0.5,
+                                    position.blockY + 2.0,
+                                    position.blockZ + 0.5
+                                ),
+                                site.uuid,
+                                newStationName
+                            )
                         }
                     }
                 }
@@ -161,5 +205,40 @@ class Teleporter {
         item.quantity--
 
         if (item.quantity <= 0) player.setItemInHand(hand, ItemStack.empty()) else player.setItemInHand(hand, item)
+    }
+
+    private suspend fun removeArmorStand(position: Location<World>, uuid: UUID) = withContext (Main.serverThread) {
+        position.extent.entities.filter {
+            it.type == EntityTypes.ARMOR_STAND
+        }.filter {
+            it[DataUUID.key].orElse(null) == uuid
+        } .forEach {
+            it.remove()
+        }
+    }
+
+    private suspend fun createOrUpdateArmorStand(position: Location<World>, uuid: UUID, name: String) = withContext (Main.serverThread) {
+        // remove the old one
+        removeArmorStand(position, uuid)
+
+        val armor = try {
+            position.createEntity(EntityTypes.ARMOR_STAND)
+        } catch (err: Throwable) {
+            return@withContext
+        }
+
+        armor.offer(Keys.DISPLAY_NAME, Text.of(TextColors.AQUA, name))
+        armor.offer(Keys.CUSTOM_NAME_VISIBLE, true)
+        armor.offer(Keys.INVULNERABLE, true)
+        armor.offer(Keys.INVISIBLE, true)
+        armor.offer(Keys.ARMOR_STAND_MARKER, true)
+        armor.offer(Keys.HAS_GRAVITY, false)
+
+        armor.offer(DataUUID(uuid))
+
+        Sponge.getCauseStackManager().pushCauseFrame().use { frame ->
+            frame.addContext<SpawnType>(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN)
+            position.spawnEntity(armor)
+        }
     }
 }

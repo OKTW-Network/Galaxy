@@ -15,6 +15,7 @@ import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.machine.teleporter.TeleporterHelper
 import one.oktw.galaxy.util.CountDown
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData
@@ -25,6 +26,9 @@ import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.block.InteractBlockEvent
+import org.spongepowered.api.event.cause.EventContextKeys
+import org.spongepowered.api.event.cause.entity.spawn.SpawnType
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes
 import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
@@ -34,10 +38,6 @@ import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
 import java.util.*
 import java.util.Arrays.asList
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes
-import org.spongepowered.api.event.cause.EventContextKeys
-import org.spongepowered.api.Sponge
-import org.spongepowered.api.event.cause.entity.spawn.SpawnType
 
 
 class Teleporter {

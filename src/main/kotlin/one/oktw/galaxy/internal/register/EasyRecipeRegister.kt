@@ -169,6 +169,7 @@ class EasyRecipeRegister {
                 )
             }
 
+            // Color WOOL
             DyeList.forEach { color ->
                 register(
                     ShapelessCraftingRecipe.builder()
@@ -179,12 +180,13 @@ class EasyRecipeRegister {
                 )
             }
 
+            //STAINED GLASS
             DyeList.forEach { color ->
                 register(
                     ShapedCraftingRecipe.builder().aisle("sss", "sds","sss")
                         .where('s',Ingredient.builder().with { it.type in asList(STAINED_GLASS,GLASS) }.build())
                         .where('d',Ingredient.builder().with { it.type == DYE && it[Keys.DYE_COLOR].get() == color }.build())
-                        .result(WOOL.template.createStack().apply { quantity = 8 ; offer(Keys.COLOR,color.getColor()) })
+                        .result(STAINED_GLASS.template.createStack().apply { quantity = 8 ; offer(Keys.COLOR,color.getColor()) })
                         .build("stained_glass_" + color.name, main)
                 )
             }

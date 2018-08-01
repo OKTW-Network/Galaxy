@@ -179,6 +179,8 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
                     return@launch
                 }
 
+                Sponge.getEventManager().unregisterListeners(moveEventListener)
+
                 val targetTeleporter = TeleporterHelper.get(uuid) ?: return@launch
                 val planetId = targetTeleporter.position.planet ?: return@launch
                 val targetPlanet = Main.galaxyManager.get(null, planetId)?.getPlanet(planetId) ?: return@launch

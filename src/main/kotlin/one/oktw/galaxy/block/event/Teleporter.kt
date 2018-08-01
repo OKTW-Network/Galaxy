@@ -14,6 +14,7 @@ import one.oktw.galaxy.event.RemoveCustomBlockEvent
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.machine.teleporter.TeleporterHelper
+import one.oktw.galaxy.util.CountDown
 import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData
@@ -53,6 +54,11 @@ class Teleporter {
 
             if (location.blockType != BlockTypes.MOB_SPAWNER) return@registerEvent
             if (location[DataBlockType.key].orElse(null) !in asList(TELEPORTER, TELEPORTER_ADVANCED)) return@registerEvent
+
+
+            if (CountDown.instance.isCounting(player)) {
+                return@registerEvent
+            }
 
             launch {
                 galaxyManager.get(player.world)?.getPlanet(player.world)?.let {

@@ -1,10 +1,14 @@
 package one.oktw.galaxy.gui.machine
 
 import com.flowpowered.math.vector.Vector3d
+import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.channels.toList
+import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.openSubscription
 import one.oktw.galaxy.Main
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
@@ -16,9 +20,15 @@ import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.machine.teleporter.TeleporterHelper
 import one.oktw.galaxy.machine.teleporter.data.Teleporter
+import one.oktw.galaxy.player.data.ActionBarData
+import one.oktw.galaxy.player.service.ActionBar
+import one.oktw.galaxy.util.CountDown
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.event.EventListener
+import org.spongepowered.api.event.entity.MoveEntityEvent
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
@@ -32,11 +42,25 @@ import org.spongepowered.api.world.Location
 import java.util.*
 import kotlin.collections.ArrayList
 
+
 class Teleporter(private val teleporter: Teleporter) : PageGUI() {
+    companion object {
+        class MoveEventListener(private val teleporter: one.oktw.galaxy.gui.machine.Teleporter) : EventListener<MoveEntityEvent> {
+            override fun handle(event: MoveEntityEvent) {
+                teleporter.moveEvent(event)
+            }
+        }
+    }
+
     private val MAX_FRAME = 64
 
     private val lang = Main.languageService.getDefaultLanguage()
     private val list = TeleporterHelper.getAvailableTargets(teleporter)
+
+    private var job: Job? = null
+    private var waitTingPlayer: Player? = null
+
+    private val moveEventListener = MoveEventListener(this)
 
     override val token = "BrowserGalaxy-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
@@ -61,6 +85,10 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
+        registerEvent(InteractInventoryEvent.Close::class.java, this::closeInventoryEvent)
+
+        Sponge.getEventManager().registerListener(main, MoveEntityEvent::class.java, moveEventListener)
+        main.logger.info("event registered")
     }
 
     override suspend fun get(number: Int, skip: Int): List<ItemStack> {
@@ -125,8 +153,32 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
 
         val (slot) = view.getNameOf(event) ?: return
 
-        if (slot == Companion.Slot.ITEMS) {
+        if (slot == PageGUI.Companion.Slot.ITEMS) {
             launch {
+                waitTingPlayer = player
+
+                GUIHelper.closeAll(player)
+
+                job = async {
+                    (5 downTo 1).forEach {
+                        ActionBar.setActionBar(player, ActionBarData(Text.of(TextColors.GREEN, "請等待 $it 秒後傳送"), 3))
+                        delay(1000)
+                    }
+                }
+
+                CountDown.instance.countDown(player, 5000) {
+                    job?.cancel()
+                    ActionBar.setActionBar(player, ActionBarData(Text.of("傳送已取消")))
+                    main.logger.info("event unregistered")
+                    Sponge.getEventManager().unregisterListeners(moveEventListener)
+                }
+
+                job?.join()
+
+                if (job?.isCancelled == true) {
+                    return@launch
+                }
+
                 val targetTeleporter = TeleporterHelper.get(uuid) ?: return@launch
                 val planetId = targetTeleporter.position.planet ?: return@launch
                 val targetPlanet = Main.galaxyManager.get(null, planetId)?.getPlanet(planetId) ?: return@launch
@@ -181,6 +233,9 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
                         )
                     } else {
                         launch(Main.serverThread) {
+                            // ignore special entities
+                            if (it[DataUUID.key].orElse(null) != null) return@launch
+
                             it.transferToWorld(
                                 targetWorld,
                                 Vector3d(target.x + 0.5, target.y + 1, target.z + 0.5)
@@ -194,9 +249,35 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
                     // offset y by 1, so you are on the top of block, offset x and z by 0.5, so you are on the center of block
                     Location(targetWorld, targetTeleporter.position.x + 0.5, targetTeleporter.position.y + 1, targetTeleporter.position.z + 0.5)
                 )
-
-                GUIHelper.closeAll(player)
             }
+        }
+    }
+
+    private fun closeInventoryEvent(event: InteractInventoryEvent.Close) {
+        if (waitTingPlayer == null) {
+            main.logger.info("event unregistered")
+            Sponge.getEventManager().unregisterListeners(moveEventListener)
+        }
+    }
+
+    private fun moveEvent(event: MoveEntityEvent) {
+        if (waitTingPlayer == null) return
+
+        val player = event.source as? Player ?: return
+        main.logger.info("event detect")
+
+        if (player != waitTingPlayer) return
+        main.logger.info("user match")
+
+        val position = event.toTransform.position
+
+        if (
+            position.floorX != teleporter.position.x.toInt() ||
+            position.floorY != (teleporter.position.y.toInt() + 1) ||
+            position.floorZ != teleporter.position.z.toInt()
+        ) {
+            main.logger.info("cancelled")
+            CountDown.instance.cancel(player)
         }
     }
 }

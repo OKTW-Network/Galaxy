@@ -175,11 +175,11 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
 
                 job?.join()
 
+                Sponge.getEventManager().unregisterListeners(moveEventListener)
+
                 if (job?.isCancelled == true) {
                     return@launch
                 }
-
-                Sponge.getEventManager().unregisterListeners(moveEventListener)
 
                 val targetTeleporter = TeleporterHelper.get(uuid) ?: return@launch
                 val planetId = targetTeleporter.position.planet ?: return@launch

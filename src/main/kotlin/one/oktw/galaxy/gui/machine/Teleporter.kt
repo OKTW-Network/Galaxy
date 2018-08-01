@@ -1,11 +1,8 @@
 package one.oktw.galaxy.gui.machine
 
 import com.flowpowered.math.vector.Vector3d
-import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.channels.toList
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.openSubscription
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.main
@@ -87,8 +84,7 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
         registerEvent(InteractInventoryEvent.Close::class.java, this::closeInventoryEvent)
 
-        Sponge.getEventManager().registerListener(main, MoveEntityEvent::class.java, moveEventListener)
-        main.logger.info("event registered")
+        // main.logger.info("event registered")
     }
 
     override suspend fun get(number: Int, skip: Int): List<ItemStack> {
@@ -159,23 +155,27 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
 
                 GUIHelper.closeAll(player)
 
+                // delay listener register to here to prevent listener leak
+                Sponge.getEventManager().registerListener(main, MoveEntityEvent::class.java, moveEventListener)
+
                 job = async {
                     (5 downTo 1).forEach {
-                        ActionBar.setActionBar(player, ActionBarData(Text.of(TextColors.GREEN, "請等待 $it 秒後傳送"), 3))
+                        ActionBar.setActionBar(player, ActionBarData(Text.of(TextColors.GREEN, lang["Respond.TeleportCountDown"].format(it)), 3))
                         delay(1000)
                     }
+
+                    ActionBar.setActionBar(player, ActionBarData(Text.of(TextColors.GREEN, lang["Respond.TeleportStart"]), 3))
                 }
 
                 CountDown.instance.countDown(player, 5000) {
                     job?.cancel()
-                    ActionBar.setActionBar(player, ActionBarData(Text.of("傳送已取消")))
-                    main.logger.info("event unregistered")
-                    Sponge.getEventManager().unregisterListeners(moveEventListener)
+                    ActionBar.setActionBar(player, ActionBarData(Text.of(TextColors.RED, lang["Respond.TeleportCancelled"])))
                 }
 
                 job?.join()
 
                 Sponge.getEventManager().unregisterListeners(moveEventListener)
+                // main.logger.info("event unregistered")
 
                 if (job?.isCancelled == true) {
                     return@launch
@@ -234,9 +234,9 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
                             Location(targetWorld, target.x + 0.5, target.y + 1, target.z + 0.5)
                         )
                     } else {
-                        launch(Main.serverThread) {
+                        withContext(Main.serverThread) {
                             // ignore special entities
-                            if (it[DataUUID.key].orElse(null) != null) return@launch
+                            if (it[DataUUID.key].orElse(null) != null) return@withContext
 
                             it.transferToWorld(
                                 targetWorld,
@@ -255,9 +255,10 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
         }
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun closeInventoryEvent(event: InteractInventoryEvent.Close) {
         if (waitTingPlayer == null) {
-            main.logger.info("event unregistered")
+            // main.logger.info("event unregistered")
             Sponge.getEventManager().unregisterListeners(moveEventListener)
         }
     }
@@ -266,10 +267,10 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
         if (waitTingPlayer == null) return
 
         val player = event.source as? Player ?: return
-        main.logger.info("event detect")
+        // main.logger.info("event detect")
 
         if (player != waitTingPlayer) return
-        main.logger.info("user match")
+        // main.logger.info("user match")
 
         val position = event.toTransform.position
 
@@ -278,7 +279,7 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
             position.floorY != (teleporter.position.y.toInt() + 1) ||
             position.floorZ != teleporter.position.z.toInt()
         ) {
-            main.logger.info("cancelled")
+            // main.logger.info("cancelled")
             CountDown.instance.cancel(player)
         }
     }

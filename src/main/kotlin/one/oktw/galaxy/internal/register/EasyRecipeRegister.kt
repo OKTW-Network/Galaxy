@@ -123,7 +123,25 @@ class EasyRecipeRegister {
                     .build("chest_minecart_ingot", main)
             )
 
-            //Coo
+            // Carrot On a Stick
+            register(
+                ShapedCraftingRecipe.builder().aisle("  s", " st","sct")
+                    .where('s', of(STICK))
+                    .where('t', of(STRING))
+                    .where('c', of(CARROT))
+                    .result(CARROT_ON_A_STICK.template.createStack())
+                    .build("carrot_rod", main)
+            )
+
+            // Redstone Repeater
+            register(
+                ShapedCraftingRecipe.builder().aisle("r r", "srs","ttt")
+                    .where('r', of(REDSTONE))
+                    .where('s', of(STICK))
+                    .where('t', of(STONE))
+                    .result(REPEATER.template.createStack())
+                    .build("redstone_repeater_stick", main)
+            )
 
             // Slab (Log)
             WoodList.forEach { type ->
@@ -161,6 +179,15 @@ class EasyRecipeRegister {
                 )
             }
 
+            DyeList.forEach { color ->
+                register(
+                    ShapedCraftingRecipe.builder().aisle("sss", "sds","sss")
+                        .where('s',Ingredient.builder().with { it.type in asList(STAINED_GLASS,GLASS) }.build())
+                        .where('d',Ingredient.builder().with { it.type == DYE && it[Keys.DYE_COLOR].get() == color }.build())
+                        .result(WOOL.template.createStack().apply { quantity = 8 ; offer(Keys.COLOR,color.getColor()) })
+                        .build("stained_glass_" + color.name, main)
+                )
+            }
 
         }
     }

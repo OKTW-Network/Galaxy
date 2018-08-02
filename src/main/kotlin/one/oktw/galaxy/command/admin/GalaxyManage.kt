@@ -9,6 +9,8 @@ import one.oktw.galaxy.galaxy.data.extensions.*
 import one.oktw.galaxy.galaxy.enums.Group
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
+import one.oktw.galaxy.galaxy.planet.enums.PlanetType
+import one.oktw.galaxy.galaxy.planet.enums.PlanetType.NORMAL
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
@@ -67,6 +69,10 @@ class GalaxyManage : CommandBase {
                 .permission("oktw.command.admin.galaxyManage.createPlanet")
                 .arguments(
                     GenericArguments.string(Text.of("name")),
+                    GenericArguments.optional(
+                        GenericArguments.enumValue(Text.of("Type"), PlanetType::class.java),
+                        NORMAL
+                    ),
                     GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
                 )
                 .build()
@@ -88,7 +94,7 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                val planet = galaxy.createPlanet(args.getOne<String>("name").get())
+                val planet = galaxy.createPlanet(args.getOne<String>("name").get(), args.getOne<PlanetType>("Type").get())
                 src.sendMessage(Text.of(TextColors.GREEN, planet.uuid))
             }
             return CommandResult.success()

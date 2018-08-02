@@ -94,8 +94,14 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                val planet = galaxy.createPlanet(args.getOne<String>("name").get(), args.getOne<PlanetType>("Type").get())
-                src.sendMessage(Text.of(TextColors.GREEN, planet.uuid))
+                try {
+                    val planet = galaxy.createPlanet(args.getOne<String>("name").get(), args.getOne<PlanetType>("Type").get())
+                    src.sendMessage(Text.of(TextColors.GREEN, planet.uuid))
+                } catch (e: IllegalArgumentException) {
+                    src.sendMessage(Text.of(TextColors.RED, "Error：", e.message))
+                } catch (e: NotImplementedError) {
+                    src.sendMessage(Text.of(TextColors.RED, "Error：", e.message))
+                }
             }
             return CommandResult.success()
         }

@@ -4,6 +4,7 @@ import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.extensions.deserialize
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.*
 import one.oktw.galaxy.galaxy.enums.Group.*
@@ -98,7 +99,7 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
                     offer(Keys.DISPLAY_NAME, Text.of(YELLOW, lang["UI.Button.GalaxyNotice"]))
                     offer(
                         Keys.ITEM_LORE,
-                        galaxy.notice.split('\n').map(TextSerializers.FORMATTING_CODE::deserialize)
+                        galaxy.notice.split("\\n").map { Text.of(WHITE, it.deserialize()) }
                     )
                 }
         }

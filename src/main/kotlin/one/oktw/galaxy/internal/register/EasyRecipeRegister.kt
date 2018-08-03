@@ -190,7 +190,6 @@ class EasyRecipeRegister {
                         .build("stained_glass_" + color.name, main)
                 )
             }
-
         }
     }
 }

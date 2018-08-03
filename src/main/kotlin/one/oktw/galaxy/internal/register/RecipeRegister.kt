@@ -288,7 +288,6 @@ class RecipeRegister {
                     .result(FakeBlockItem(ELEVATOR).createItemStack())
                     .build("elevator", main)
             )
-
         }
     }
 }

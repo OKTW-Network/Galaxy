@@ -88,7 +88,11 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
     override val token: String = "HiTechCraftingTableRecipe-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.HiTechCraftingTableRecipe"])))
+        .property(InventoryTitle.of(Text.of(lang["UI.Title.HiTechCraftingTableRecipe"].let {
+            val result = recipe.result()
+            val name = result[Keys.DISPLAY_NAME].orElse(null)?.toPlain() ?: result.translation.toString()
+            it.format(name)
+        })))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
 
@@ -104,9 +108,9 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
     }
 
     private fun offerPage(player: Player, traveler: Traveler) {
-        offerDust()
+        offerDust(traveler)
         offerIngredient(player)
-        offerResult()
+        offerResult(player, traveler)
         offerConfirm(player, traveler)
         offerBorder()
         offerEmpty()
@@ -132,8 +136,14 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
         return result.reversed()
     }
 
-    private fun offerDust() {
-        view.setSlot(Slot.DUST, getGUIItem(ButtonType.STARS))
+    private fun offerDust(traveler: Traveler) {
+        view.setSlot(Slot.DUST, getGUIItem(ButtonType.STARS).apply {
+            offer(
+                Keys.ITEM_LORE, asList<Text>(
+                    Text.of(lang["UI.Tip.haveItemCount"].format(traveler.starDust))
+                )
+            )
+        })
 
         getNumbers(recipe.getCost(), view.countSlots(Slot.NUMBER))
             .let {
@@ -151,18 +161,17 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
         }
     }
 
-    private fun offerResult() {
-        recipe.result().apply {
+    private fun offerResult(player: Player, traveler: Traveler) {
+        recipe.previewResult(player, traveler).apply {
             offer(DataUUID(UUID.randomUUID()))
         }.let {
             view.setSlot(Slot.RESULT, it, null)
         }
-
     }
 
     private fun offerConfirm(player: Player, traveler: Traveler) {
-        recipe.hasEnoughDust(traveler)
-            .and(recipe.hasEnoughIngredient(player))
+        recipe.haveEnoughDust(traveler)
+            .and(recipe.haveEnoughIngredient(player))
             .let {
                 if (it) {
                     view.setSlot(Slot.CRAFT, getGUIItem(ButtonType.OK), Action.CRAFT)
@@ -201,7 +210,7 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
                 launch {
                     val traveler = TravelerHelper.getTraveler(player).await() ?: return@launch
 
-                    if (recipe.hasEnoughIngredient(player) && recipe.hasEnoughDust(traveler)) {
+                    if (recipe.haveEnoughIngredient(player) && recipe.haveEnoughDust(traveler)) {
                         if (recipe.consume(player, traveler)) {
                             val stack = recipe.result()
                             val item = player.world.createEntity(EntityTypes.ITEM, player.position)
@@ -210,7 +219,7 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
 
                             player.world.spawnEntity(item)
 
-                            val galaxy = Main.galaxyManager.get(player.world)?: return@launch
+                            val galaxy = Main.galaxyManager.get(player.world) ?: return@launch
                             galaxy.saveMember(traveler).join()
 
                             val newTraveler = TravelerHelper.getTraveler(player).await() ?: return@launch

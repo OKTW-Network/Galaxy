@@ -1,5 +1,6 @@
 package one.oktw.galaxy.recipe
 
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.block.data.FakeBlockItem
 import one.oktw.galaxy.block.enums.CustomBlocks
 import one.oktw.galaxy.item.enums.MaterialType
@@ -13,6 +14,8 @@ import java.util.Arrays.asList
 
 class Recipes {
     companion object {
+        private val lang = Main.languageService.getDefaultLanguage()
+
         enum class Type {
             TOOL,
             MATERIAL,
@@ -68,9 +71,9 @@ class Recipes {
         )
 
         val names: Map<Type, String> = mapOf(
-            Type.TOOL to "工具",
-            Type.MATERIAL to "材料",
-            Type.MACHINE to "機器"
+            Type.TOOL to lang["recipe.catalog.TOOL"],
+            Type.MATERIAL to lang["recipe.catalog.MATERIAL"],
+            Type.MACHINE to lang["recipe.catalog.MACHINE"]
         )
 
         val types: List<Type> = asList(Type.MACHINE, Type.TOOL, Type.MATERIAL)

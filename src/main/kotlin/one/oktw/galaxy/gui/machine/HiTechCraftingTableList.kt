@@ -27,7 +27,7 @@ import java.util.*
 import java.util.Arrays.asList
 import kotlin.collections.ArrayList
 
-class HiTechCraftingTableList : GUI() {
+class HiTechCraftingTableList(private val player: Player) : GUI() {
     companion object {
         private const val CHANGE_PAGE_DELAY = 100
         private const val OFFER_ITEM_DELAY = 100
@@ -164,10 +164,12 @@ class HiTechCraftingTableList : GUI() {
         view.setSlots(Slot.CATALOG_BOTTOM, bottomRow, null)
     }
 
-    private fun offerRecipes(page: Recipes.Companion.Type) {
+    private suspend fun offerRecipes(page: Recipes.Companion.Type) {
+        val traveler = TravelerHelper.getTraveler(player).await() ?: return
         val recipes = Recipes.catalog[page] ?: return
+
         recipes.map {
-            it.result()
+            it.previewResult(player, traveler)
         }.mapIndexed { index, item ->
             item.offer(DataUUID(UUID.randomUUID()))
             Pair(item, Data(action = Action.CRAFT, index = index, catalog = page))
@@ -229,12 +231,11 @@ class HiTechCraftingTableList : GUI() {
                 // player.sendMessage(Text.of("recipe $catalog $index"))
 
                 launch {
-                    val traveler = TravelerHelper.getTraveler(player).await()?: return@launch
+                    val traveler = TravelerHelper.getTraveler(player).await() ?: return@launch
 
                     GUIHelper.open(player) { HiTechCraftingTableRecipe(player, traveler, Recipes.catalog[catalog]!![index]) }
                 }
             }
-
 
             else -> {
                 event.isCancelled = true

@@ -25,7 +25,7 @@ class BlockGUI {
             DUMMY -> Unit
             CONTROL_PANEL -> GUIHelper.open(player) { MainMenu(player) }
             PLANET_TERMINAL -> launch { galaxyManager.get(player.world)?.let { GUIHelper.open(player) { PlanetTerminal(it, player) } } }
-            HT_CRAFTING_TABLE -> GUIHelper.open(player) { HiTechCraftingTableList() }
+            HT_CRAFTING_TABLE -> GUIHelper.open(player) { HiTechCraftingTableList(player) }
             else -> Unit
         }
 

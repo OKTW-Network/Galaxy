@@ -1,10 +1,10 @@
 package one.oktw.galaxy.recipe
 
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.galaxy.traveler.data.Traveler
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.ItemType
-import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.inventory.Slot
@@ -13,11 +13,15 @@ import org.spongepowered.api.item.inventory.entity.MainPlayerInventory
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
+import java.util.Arrays.asList
 
 
 class HiTechCraftingRecipe {
     companion object {
+        private val lang = Main.languageService.getDefaultLanguage()
+
         class Builder {
+
             private val recipe = HiTechCraftingRecipe()
 
             fun add(item: Ingredient, count: Int): Builder {
@@ -25,7 +29,7 @@ class HiTechCraftingRecipe {
                 return this
             }
 
-            fun cost(price: Int): Builder  {
+            fun cost(price: Int): Builder {
                 recipe.price(price)
                 return this
             }
@@ -46,7 +50,7 @@ class HiTechCraftingRecipe {
             }
 
             fun build(): HiTechCraftingRecipe {
-                return  recipe
+                return recipe
             }
         }
 
@@ -58,7 +62,7 @@ class HiTechCraftingRecipe {
     private var result: ItemStackSnapshot = ItemStackSnapshot.NONE
 
     private fun add(item: Ingredient, count: Int) {
-        toMatch[item] = toMatch[item]?: 0 + count
+        toMatch[item] = toMatch[item] ?: 0 + count
     }
 
     private fun price(price: Int) {
@@ -81,7 +85,6 @@ class HiTechCraftingRecipe {
         return cost
     }
 
-    @Suppress("unused")
     fun previewRequirement(player: Player): List<ItemStack> {
         val list = ArrayList<ItemStack>()
 
@@ -90,15 +93,23 @@ class HiTechCraftingRecipe {
                 ?.apply {
                     quantity = item.value
 
-                    if (!hasEnoughIngredient(player, item.key, item.value)) {
-                        val originalName= this[Keys.DISPLAY_NAME].orElse(null)?.toPlain()
+                    if (!haveEnoughIngredient(player, item.key, item.value)) {
+                        val originalName = this[Keys.DISPLAY_NAME].orElse(null)?.toPlain()
 
                         if (originalName != null) {
                             offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, originalName))
                         } else {
                             offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, this.translation))
                         }
+
                     }
+
+                    offer(
+                        Keys.ITEM_LORE, asList(
+                            Text.of(lang["UI.Tip.needItemCount"].format(item.value)),
+                            Text.of(lang["UI.Tip.haveItemCount"].format(haveIngredient(player, item.key)))
+                        ) as List<Text>
+                    )
                 }
                 ?.let {
                     list += it
@@ -108,12 +119,11 @@ class HiTechCraftingRecipe {
         return list
     }
 
-    @Suppress("unused")
-    fun hasEnoughDust(traveler: Traveler): Boolean {
+    fun haveEnoughDust(traveler: Traveler): Boolean {
         return traveler.starDust >= cost
     }
 
-    private fun hasEnoughIngredient(player: Player, ingredient: Ingredient, count: Int): Boolean {
+    private fun haveIngredient(player: Player, ingredient: Ingredient): Int {
         val inv = player.inventory.query<MainPlayerInventory>(QueryOperationTypes.INVENTORY_TYPE.of(MainPlayerInventory::class.java))
 
         var has = 0
@@ -126,13 +136,18 @@ class HiTechCraftingRecipe {
             }
         }
 
+        return has
+    }
+
+    private fun haveEnoughIngredient(player: Player, ingredient: Ingredient, count: Int): Boolean {
+        val has = haveIngredient(player, ingredient)
+
         return has >= count
     }
 
-    @Suppress("unused")
-    fun hasEnoughIngredient(player: Player): Boolean {
+    fun haveEnoughIngredient(player: Player): Boolean {
         for (item in toMatch) {
-            if (!hasEnoughIngredient(player, item.key, item.value)) {
+            if (!haveEnoughIngredient(player, item.key, item.value)) {
                 return false
             }
         }
@@ -164,9 +179,8 @@ class HiTechCraftingRecipe {
         }
     }
 
-    @Suppress("unused")
     fun consume(player: Player, traveler: Traveler): Boolean {
-        if (!hasEnoughDust(traveler) || !hasEnoughIngredient(player)) {
+        if (!haveEnoughDust(traveler) || !haveEnoughIngredient(player)) {
             return false
         }
 
@@ -179,8 +193,60 @@ class HiTechCraftingRecipe {
         return true
     }
 
-    @Suppress("unused")
     fun result(): ItemStack {
         return result.createStack()
+    }
+
+    fun previewResult(player: Player, traveler: Traveler): ItemStack {
+        return result.createStack().apply {
+            val list = ArrayList<Text>()
+            var enough = true
+
+            toMatch.forEach { ingredient, count ->
+                val has = haveIngredient(player, ingredient)
+                val item = ingredient.displayedItems()[0]!!
+
+                if (has < count) {
+                    enough = false
+                }
+
+                list += Text.of(
+                    if (has < count) {
+                        TextColors.RED
+                    } else {
+                        TextColors.GREEN
+                    },
+                    "$has / $count ",
+                    item[Keys.DISPLAY_NAME].orElse(null)?.toPlain() ?: item.translation
+                )
+            }
+
+            if (traveler.starDust < cost) {
+                enough = false
+            }
+
+            list += Text.of(
+                if (traveler.starDust < cost) {
+                    TextColors.RED
+                } else {
+                    TextColors.GREEN
+                },
+                "${traveler.starDust} / $cost ${lang["UI.Tip.StarDust"]}"
+            )
+
+            offer(Keys.ITEM_LORE, list)
+
+            if (!enough) {
+                val originalName = this[Keys.DISPLAY_NAME].orElse(null)?.toPlain()
+
+                offer(
+                    Keys.DISPLAY_NAME, if (originalName != null) {
+                        Text.of(TextColors.RED, originalName)
+                    } else {
+                        Text.of(TextColors.RED, this.translation)
+                    }
+                )
+            }
+        }
     }
 }

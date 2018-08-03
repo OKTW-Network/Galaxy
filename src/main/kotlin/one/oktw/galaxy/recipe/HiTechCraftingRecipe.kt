@@ -176,7 +176,7 @@ class HiTechCraftingRecipe {
             consume(player, item.key, item.value)
         }
 
-        return false
+        return true
     }
 
     @Suppress("unused")

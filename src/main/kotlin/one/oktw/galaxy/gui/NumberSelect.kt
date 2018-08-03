@@ -38,7 +38,7 @@ class NumberSelect(content: Text, tip: List<Text> = emptyList(), private val cal
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.CHEST)
         .property(InventoryTitle.of(content))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 
     init {

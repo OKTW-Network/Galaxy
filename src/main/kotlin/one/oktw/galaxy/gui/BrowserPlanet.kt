@@ -31,7 +31,7 @@ class BrowserPlanet(private val galaxy: Galaxy) : PageGUI() {
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
         .property(InventoryTitle.of(Text.of(lang["UI.Title.PlanetList"])))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 
     init {

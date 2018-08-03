@@ -37,7 +37,7 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
         .property(InventoryTitle.of(Text.of(lang["UI.Title.GalaxyList"])))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 
     init {

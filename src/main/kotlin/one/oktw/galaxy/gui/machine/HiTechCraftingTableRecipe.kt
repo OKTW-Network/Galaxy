@@ -3,11 +3,11 @@ package one.oktw.galaxy.gui.machine
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.galaxy.data.extensions.saveMember
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper
 import one.oktw.galaxy.galaxy.traveler.data.Traveler
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUIHelper
-import one.oktw.galaxy.gui.PageGUI
 import one.oktw.galaxy.gui.view.GridGUIView
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.type.Button
@@ -25,7 +25,7 @@ import org.spongepowered.api.text.Text
 import java.util.*
 import java.util.Arrays.asList
 
-class HiTechCraftingTableRecipe(private val player: Player, private val traveler: Traveler, private val recipe: HiTechCraftingRecipe) : GUI() {
+class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, private val recipe: HiTechCraftingRecipe) : GUI() {
     companion object {
         private val lang = Main.languageService.getDefaultLanguage()
 
@@ -190,7 +190,7 @@ class HiTechCraftingTableRecipe(private val player: Player, private val traveler
     private fun clickEvent(event: ClickInventoryEvent) {
         event.isCancelled = true
 
-        val action = view.getDataOf(event)?: return
+        val action = view.getDataOf(event) ?: return
 
         when (action) {
             Action.CANCEL -> {
@@ -199,22 +199,27 @@ class HiTechCraftingTableRecipe(private val player: Player, private val traveler
 
             Action.CRAFT -> {
                 launch {
-                    val traveler = TravelerHelper.getTraveler(player).await()?: return@launch
+                    val traveler = TravelerHelper.getTraveler(player).await() ?: return@launch
 
                     if (recipe.hasEnoughIngredient(player) && recipe.hasEnoughDust(traveler)) {
                         if (recipe.consume(player, traveler)) {
                             val stack = recipe.result()
-                            val item = player.world.createEntity(EntityTypes.ITEM,  player.position)
+                            val item = player.world.createEntity(EntityTypes.ITEM, player.position)
 
                             item.offer(Keys.REPRESENTED_ITEM, stack.createSnapshot())
 
                             player.world.spawnEntity(item)
 
-                            offerPage(player, traveler)
+                            val galaxy = Main.galaxyManager.get(player.world)?: return@launch
+                            galaxy.saveMember(traveler).join()
+
+                            val newTraveler = TravelerHelper.getTraveler(player).await() ?: return@launch
+                            offerPage(player, newTraveler)
                         }
                     }
                 }
             }
+            else -> Unit
         }
     }
 }

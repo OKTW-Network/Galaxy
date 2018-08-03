@@ -226,7 +226,7 @@ class HiTechCraftingTableList : GUI() {
             Action.CRAFT -> {
                 event.isCancelled = true
 
-                player.sendMessage(Text.of("recipe $catalog $index"))
+                // player.sendMessage(Text.of("recipe $catalog $index"))
 
                 launch {
                     val traveler = TravelerHelper.getTraveler(player).await()?: return@launch

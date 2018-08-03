@@ -16,7 +16,15 @@ class EasyRecipeRegister {
     init {
         Sponge.getRegistry().craftingRecipeRegistry.apply {
 
-            val WoodList = listOf(TreeTypes.OAK, TreeTypes.SPRUCE, TreeTypes.BIRCH, TreeTypes.JUNGLE, TreeTypes.ACACIA, TreeTypes.DARK_OAK)
+            val WoodList = listOf(
+                TreeTypes.OAK,
+                TreeTypes.SPRUCE,
+                TreeTypes.BIRCH,
+                TreeTypes.JUNGLE,
+                TreeTypes.ACACIA,
+                TreeTypes.DARK_OAK
+            )
+
             val DyeList = listOf(
                 DyeColors.BLACK,
                 DyeColors.BLUE,
@@ -125,7 +133,7 @@ class EasyRecipeRegister {
 
             // Carrot On a Stick
             register(
-                ShapedCraftingRecipe.builder().aisle("  s", " st","sct")
+                ShapedCraftingRecipe.builder().aisle("  s", " st", "sct")
                     .where('s', of(STICK))
                     .where('t', of(STRING))
                     .where('c', of(CARROT))
@@ -135,7 +143,7 @@ class EasyRecipeRegister {
 
             // Redstone Repeater
             register(
-                ShapedCraftingRecipe.builder().aisle("r r", "srs","ttt")
+                ShapedCraftingRecipe.builder().aisle("r r", "srs", "ttt")
                     .where('r', of(REDSTONE))
                     .where('s', of(STICK))
                     .where('t', of(STONE))
@@ -144,52 +152,72 @@ class EasyRecipeRegister {
             )
 
             // Slab (Log)
-            WoodList.forEach { type ->
+            WoodList.forEach { tree_type ->
                 register(
                     ShapedCraftingRecipe.builder().aisle("lll")
                         .where(
-                            'l',
-                            Ingredient.builder().with { it.type in asList(LOG, LOG2) && it[Keys.TREE_TYPE].get() == type }.build()
+                            'l', Ingredient.builder().with { it.type in asList(LOG, LOG2) && it[Keys.TREE_TYPE].get() == tree_type }.build()
                         )
-                        .result(WOODEN_SLAB.template.createStack().apply { quantity = 24; offer(Keys.TREE_TYPE, type) })
-                        .build("log_" + type.name.toLowerCase() + "_slab", main)
+                        .result(WOODEN_SLAB.template.createStack().apply { quantity = 24; offer(Keys.TREE_TYPE, tree_type) })
+                        .build("log_" + tree_type.name.toLowerCase() + "_slab", main)
                 )
             }
 
             // Slab To Block
-            WoodList.forEach { type ->
+            WoodList.forEach { tree_type ->
                 register(
                     ShapedCraftingRecipe.builder().aisle("s", "s")
                         .where(
-                            's',
-                            Ingredient.builder().with { it.type == WOODEN_SLAB }.build()
+                            's', Ingredient.builder().with { it.type == WOODEN_SLAB && it[Keys.TREE_TYPE].get() == tree_type }.build()
                         )
-                        .result(PLANKS.template.createStack().apply { offer(Keys.TREE_TYPE, type) })
-                        .build(type.name.toLowerCase() + "slab_to_block", main)
+                        .result(PLANKS.template.createStack().apply { offer(Keys.TREE_TYPE, tree_type) })
+                        .build(tree_type.name.toLowerCase() + "_slab_to_block", main)
                 )
             }
 
             // Color WOOL
-            DyeList.forEach { color ->
+            DyeList.forEach { dye_color ->
                 register(
                     ShapelessCraftingRecipe.builder()
-                        .addIngredient(Ingredient.builder().with { it.type == DYE && it[Keys.DYE_COLOR].get() == color }.build())
-                        .addIngredient(of(WOOL))
-                        .result(WOOL.template.createStack().apply { offer(Keys.COLOR, color.getColor()) })
-                        .build("dye_wool_" + color.name, main)
+                        .addIngredient(Ingredient.builder().with { it.type == DYE && it[Keys.DYE_COLOR].get() == dye_color }.build())
+                        .addIngredient(Ingredient.builder().with { it.type == WOOL }.build())
+                        .result(WOOL.template.createStack().apply { offer(Keys.DYE_COLOR, dye_color) })
+                        .build("dye_wool_" + dye_color.name, main)
                 )
             }
 
             //STAINED GLASS
-            DyeList.forEach { color ->
+            DyeList.forEach { dye_color ->
                 register(
-                    ShapedCraftingRecipe.builder().aisle("sss", "sds","sss")
-                        .where('s',Ingredient.builder().with { it.type in asList(STAINED_GLASS,GLASS) }.build())
-                        .where('d',Ingredient.builder().with { it.type == DYE && it[Keys.DYE_COLOR].get() == color }.build())
-                        .result(STAINED_GLASS.template.createStack().apply { quantity = 8 ; offer(Keys.COLOR,color.getColor()) })
-                        .build("stained_glass_" + color.name, main)
+                    ShapedCraftingRecipe.builder().aisle("sss", "sds", "sss")
+                        .where('s', Ingredient.builder().with { it.type == STAINED_GLASS }.build())
+                        .where('d', Ingredient.builder().with { it.type == DYE && it[Keys.DYE_COLOR].get() == dye_color }.build())
+                        .result(STAINED_GLASS.template.createStack().apply {
+                            quantity = 8; offer(Keys.COLOR, dye_color.color); offer(
+                            Keys.DYE_COLOR,
+                            dye_color
+                        )
+                        })
+                        .build("stained_glass_" + dye_color.name, main)
                 )
             }
+
+            //STAINED GLASS PANE
+            DyeList.forEach { dye_color ->
+                register(
+                    ShapedCraftingRecipe.builder().aisle("sss", "sds", "sss")
+                        .where('s', Ingredient.builder().with { it.type == STAINED_GLASS_PANE }.build())
+                        .where('d', Ingredient.builder().with { it.type == DYE && it[Keys.DYE_COLOR].get() == dye_color }.build())
+                        .result(STAINED_GLASS_PANE.template.createStack().apply {
+                            quantity = 8; offer(Keys.COLOR, dye_color.color); offer(
+                            Keys.DYE_COLOR,
+                            dye_color
+                        )
+                        })
+                        .build("stained_glass_pane_" + dye_color.name, main)
+                )
+            }
+
         }
     }
 }

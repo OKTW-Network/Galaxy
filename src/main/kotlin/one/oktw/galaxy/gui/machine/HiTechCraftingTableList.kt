@@ -1,9 +1,12 @@
 package one.oktw.galaxy.gui.machine
 
 import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.galaxy.traveler.TravelerHelper
 import one.oktw.galaxy.gui.GUI
+import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.view.GridGUIView
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.type.Button
@@ -13,7 +16,6 @@ import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
-import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
 import org.spongepowered.api.item.inventory.ItemStack
@@ -68,10 +70,10 @@ class HiTechCraftingTableList : GUI() {
         )
     }
 
-    override val token: String = "HiTechCraftingTable-${UUID.randomUUID()}"
+    override val token: String = "HiTechCraftingTableList-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.GalaxyList"])))
+        .property(InventoryTitle.of(Text.of(lang["UI.Title.HiTechCraftingTableList"])))
         .listener(InteractInventoryEvent::class.java, this::eventProcess)
         .build(Main.main)
 
@@ -130,7 +132,13 @@ class HiTechCraftingTableList : GUI() {
                             offer(Keys.DISPLAY_NAME, Text.of(TextColors.AQUA, Recipes.names[it]!!))
                         }
                         .let { stack ->
-                            upRow.add(Pair(stack, Data(action = Action.SELECT_CATALOG, catalog = it)))
+                            upRow.add(
+                                if (it == page) {
+                                    Pair(stack, null)
+                                } else {
+                                    Pair(stack, Data(action = Action.SELECT_CATALOG, catalog = it))
+                                }
+                            )
                         }
 
                     bottomRow.add(
@@ -162,7 +170,7 @@ class HiTechCraftingTableList : GUI() {
             it.result()
         }.mapIndexed { index, item ->
             item.offer(DataUUID(UUID.randomUUID()))
-            Pair(item, Data(action = Action.CRAFT, index = index))
+            Pair(item, Data(action = Action.CRAFT, index = index, catalog = page))
         }.let {
             view.setSlotPairs(Slot.RECIPE, it)
         }
@@ -218,7 +226,13 @@ class HiTechCraftingTableList : GUI() {
             Action.CRAFT -> {
                 event.isCancelled = true
 
-                player.sendMessage(Text.of("recipe $index"))
+                player.sendMessage(Text.of("recipe $catalog $index"))
+
+                launch {
+                    val traveler = TravelerHelper.getTraveler(player).await()?: return@launch
+
+                    GUIHelper.open(player) { HiTechCraftingTableRecipe(player, traveler, Recipes.catalog[catalog]!![index]) }
+                }
             }
 
 

@@ -7,6 +7,7 @@ import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
+import org.spongepowered.api.item.inventory.Slot
 import org.spongepowered.api.item.recipe.crafting.Ingredient
 import org.spongepowered.api.item.inventory.entity.MainPlayerInventory
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
@@ -76,6 +77,10 @@ class HiTechCraftingRecipe {
         result = newResult
     }
 
+    fun getCost(): Int {
+        return cost
+    }
+
     @Suppress("unused")
     fun previewRequirement(player: Player): List<ItemStack> {
         val list = ArrayList<ItemStack>()
@@ -86,8 +91,13 @@ class HiTechCraftingRecipe {
                     quantity = item.value
 
                     if (!hasEnoughIngredient(player, item.key, item.value)) {
-                        val originalName= this[Keys.DISPLAY_NAME].orElse(Text.of("unnamed")).toPlain()
-                        offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, originalName))
+                        val originalName= this[Keys.DISPLAY_NAME].orElse(null)?.toPlain()
+
+                        if (originalName != null) {
+                            offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, originalName))
+                        } else {
+                            offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, this.translation))
+                        }
                     }
                 }
                 ?.let {
@@ -106,9 +116,9 @@ class HiTechCraftingRecipe {
     private fun hasEnoughIngredient(player: Player, ingredient: Ingredient, count: Int): Boolean {
         val inv = player.inventory.query<MainPlayerInventory>(QueryOperationTypes.INVENTORY_TYPE.of(MainPlayerInventory::class.java))
 
-        var has = 0;
+        var has = 0
 
-        for (item in inv.iterator()) {
+        for (item in inv.slots<Slot>()) {
             item.peek().orElse(null)?.let {
                 if (ingredient.test(it)) {
                     has += it.quantity
@@ -133,9 +143,9 @@ class HiTechCraftingRecipe {
     private fun consume(player: Player, ingredient: Ingredient, count: Int) {
         val inv = player.inventory.query<MainPlayerInventory>(QueryOperationTypes.INVENTORY_TYPE.of(MainPlayerInventory::class.java))
 
-        var remain = count;
+        var remain = count
 
-        for (item in inv.iterator()) {
+        for (item in inv.slots<Slot>()) {
             item.peek().orElse(null)?.let {
                 if (ingredient.test(it)) {
                     if (it.quantity >= remain) {

@@ -297,7 +297,7 @@ class RecipeRegister {
             register(
                 Material(MaterialType.PART_RAW_BASE).createSmeltingRecipe(
                     Material(MaterialType.PART_BASE).createItemStack().createSnapshot(),
-                    999.0
+                    5.0
                 )
             )
         }

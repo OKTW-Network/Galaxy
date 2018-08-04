@@ -37,8 +37,15 @@ class FakeBlock {
         val location = event.targetBlock.location.orElse(null)?.getRelative(event.targetSide) ?: return
         var hand: HandType = MAIN_HAND
         val blockItem = player.getItemInHand(MAIN_HAND).orElse(null)
-                ?: player.getItemInHand(OFF_HAND).orElse(null)?.apply { hand = OFF_HAND }
-                ?: return
+            ?: player.getItemInHand(OFF_HAND).orElse(null)?.apply { hand = OFF_HAND }
+            ?: return
+
+        if (event.targetBlock.location.orElse(null)?.get(DataBlockType.key)?.isPresent == true) {
+            if (player[IS_SNEAKING].orElse(false) == false) {
+                // it is opening custom gui of custom block
+                return
+            }
+        }
 
         if (!isBlock(blockItem) || !checkCanPlace(location)) return
 

@@ -25,5 +25,7 @@ class BlockGUI {
             HT_CRAFTING_TABLE -> Unit // TODO GUIHelper.open(player) { }
             else -> Unit
         }
+
+        event.isCancelled = true
     }
 }

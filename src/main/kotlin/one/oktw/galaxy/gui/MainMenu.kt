@@ -39,7 +39,7 @@ class MainMenu(player: Player) : GUI() {
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
         .property(InventoryTitle.of(Text.of(lang["UI.Title.StarShipController"])))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
     private val buttonID = Array(3) { UUID.randomUUID() }
 

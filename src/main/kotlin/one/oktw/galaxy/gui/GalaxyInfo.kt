@@ -31,7 +31,7 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
         .property(InventoryTitle.of(Text.of(galaxy.name)))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
     // Todo get player lang
     private val lang = languageService.getDefaultLanguage()

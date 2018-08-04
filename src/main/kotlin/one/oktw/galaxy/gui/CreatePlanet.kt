@@ -40,7 +40,7 @@ class CreatePlanet(private val galaxy: Galaxy) : GUI() {
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
         .property(InventoryTitle.of(Text.of(lang["UI.Title.CreatePlanet"])))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 
     init {

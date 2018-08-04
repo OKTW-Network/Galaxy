@@ -34,7 +34,7 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
         .property(InventoryTitle.of(Text.of(user.name)))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
     private val buttonID = Array(3) { UUID.randomUUID() }
 

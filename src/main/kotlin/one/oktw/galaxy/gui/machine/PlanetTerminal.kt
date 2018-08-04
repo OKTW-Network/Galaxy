@@ -38,7 +38,7 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
     override val inventory: Inventory = Inventory.builder()
         .of(if (galaxy.getGroup(player) == VISITOR) CHEST else DOUBLE_CHEST)
         .property(InventoryTitle.of(Text.of(lang["UI.Title.PlanetTerminal"])))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 
     init {

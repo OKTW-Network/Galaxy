@@ -40,7 +40,7 @@ class FakeBlock {
             ?: player.getItemInHand(OFF_HAND).orElse(null)?.apply { hand = OFF_HAND }
             ?: return
 
-        if (event.targetBlock.location.orElse(null)?.get(DataBlockType.key)?.isPresent == true) {
+        if (event.targetBlock.location.orElse(null)?.get(DataBlockType.key)?.orElse(null)?.hasGUI == true) {
             if (player[IS_SNEAKING].orElse(false) == false) {
                 // it is opening custom gui of custom block
                 return

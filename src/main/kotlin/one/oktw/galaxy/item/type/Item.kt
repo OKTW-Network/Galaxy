@@ -1,10 +1,7 @@
 package one.oktw.galaxy.item.type
 
-import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.item.enums.ItemType
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
-import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.recipe.crafting.Ingredient
@@ -35,8 +32,6 @@ interface Item : Ingredient {
 
             override fun isValid(toTest: ItemStackSnapshot?): Boolean {
                 val stack = toTest?.createStack() ?: return false
-                main.logger.info(stack[DataItemType.key].toString())
-                main.logger.info(stack[Keys.ITEM_DURABILITY].toString())
 
                 return ingredient.test(stack)
             }

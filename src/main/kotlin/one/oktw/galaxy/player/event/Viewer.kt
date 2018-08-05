@@ -49,7 +49,12 @@ class Viewer {
 
         fun setViewer(uuid: UUID) {
             viewer += uuid
-            launch(serverThread) { Sponge.getServer().getPlayer(uuid).ifPresent { it.offer(GAME_MODE, ADVENTURE) } }
+            launch(serverThread) {
+                Sponge.getServer().getPlayer(uuid).ifPresent {
+                    it.offer(GAME_MODE, ADVENTURE)
+                    it.isSleepingIgnored = true
+                }
+            }
         }
 
         fun isViewer(uuid: UUID): Boolean {
@@ -58,6 +63,11 @@ class Viewer {
 
         fun removeViewer(uuid: UUID) {
             viewer -= uuid
+            launch(serverThread) {
+                Sponge.getServer().getPlayer(uuid).ifPresent {
+                    it.isSleepingIgnored = false
+                }
+            }
         }
     }
 

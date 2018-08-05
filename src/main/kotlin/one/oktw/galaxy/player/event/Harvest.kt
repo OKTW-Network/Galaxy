@@ -48,6 +48,7 @@ class Harvest {
         val max = when (block.state.type) {
             COCOA -> 2
             BEETROOTS -> 3
+            NETHER_WART -> 3
             PUMPKIN_STEM -> 8 // don't harvest it, we harvest block instead
             MELON_STEM -> 8 // don't harvest it, we harvest block instead
             else -> 7

@@ -36,8 +36,8 @@ import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource
 import org.spongepowered.api.event.data.ChangeDataHolderEvent
 import org.spongepowered.api.event.filter.Getter
+import org.spongepowered.api.event.filter.cause.Root
 import org.spongepowered.api.event.filter.data.Has
-import org.spongepowered.api.event.filter.type.Include
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
 import org.spongepowered.api.item.ItemTypes.DIAMOND_SWORD
@@ -113,9 +113,13 @@ class Gun {
     }
 
     @Listener
-    @Include(ChangeInventoryEvent.Held::class, ChangeInventoryEvent.SwapHand::class)
+    fun onSwapHand(event: ChangeInventoryEvent.SwapHand, @Root player: Player) = onChangeInventory(event, player)
+
+    @Listener
+    fun onHeld(event: ChangeInventoryEvent.Held, @Root player: Player) = onChangeInventory(event, player)
+
     @Suppress("unused", "UNUSED_PARAMETER")
-    fun onChangeInventory(event: ChangeInventoryEvent, @Getter("getSource") player: Player) {
+    private fun onChangeInventory(event: ChangeInventoryEvent, @Getter("getSource") player: Player) {
         val mainHand = player.getItemInHand(MAIN_HAND).filter { it[DataEnable.key].isPresent }.orElse(null)
         mainHand?.let {
             val sneak = player[IS_SNEAKING].get()

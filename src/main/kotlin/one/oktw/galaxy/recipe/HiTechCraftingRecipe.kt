@@ -64,11 +64,16 @@ class HiTechCraftingRecipe {
         fun builder() = Builder()
     }
 
+    private val ingredientList: ArrayList<Ingredient> =  ArrayList()
     private val toMatch: HashMap<Ingredient, Int> = HashMap()
     private var cost: Int = 0
     private var result: ItemStackSnapshot = ItemStackSnapshot.NONE
 
     private fun add(item: Ingredient, count: Int) {
+        if (!ingredientList.contains(item)) {
+            ingredientList.add(item)
+        }
+
         toMatch[item] = toMatch[item] ?: 0 + count
     }
 
@@ -95,12 +100,12 @@ class HiTechCraftingRecipe {
     fun previewRequirement(player: Player): List<ItemStack> {
         val list = ArrayList<ItemStack>()
 
-        for (item in toMatch) {
-            item.key.displayedItems()[0]?.createStack()
+        for (item in ingredientList) {
+            item.displayedItems()[0]?.createStack()
                 ?.apply {
-                    quantity = item.value
+                    quantity = toMatch[item]?: return@apply
 
-                    if (!haveEnoughIngredient(player, item.key, item.value)) {
+                    if (!haveEnoughIngredient(player, item, quantity)) {
                         val originalName = this[Keys.DISPLAY_NAME].orElse(null)?.toPlain()
 
                         if (originalName != null) {
@@ -113,8 +118,8 @@ class HiTechCraftingRecipe {
 
                     offer(
                         Keys.ITEM_LORE, asList(
-                            Text.of(lang["UI.Tip.needItemCount"].format(item.value)),
-                            Text.of(lang["UI.Tip.haveItemCount"].format(haveIngredient(player, item.key)))
+                            Text.of(lang["UI.Tip.needItemCount"].format(quantity)),
+                            Text.of(lang["UI.Tip.haveItemCount"].format(haveIngredient(player, item)))
                         ) as List<Text>
                     )
                 }
@@ -209,7 +214,9 @@ class HiTechCraftingRecipe {
             val list = ArrayList<Text>()
             var enough = true
 
-            toMatch.forEach { ingredient, count ->
+            ingredientList.forEach { ingredient ->
+                val count = toMatch[ingredient]?: return@forEach
+
                 val has = haveIngredient(player, ingredient)
                 val item = ingredient.displayedItems()[0]!!
 

@@ -74,7 +74,7 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
         .property(InventoryTitle.of(Text.of(lang["UI.Title.HiTechCraftingTableList"])))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 
     private val view: GridGUIView<Slot, Data> = GridGUIView(

@@ -93,7 +93,7 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
             val name = result[Keys.DISPLAY_NAME].orElse(null)?.toPlain() ?: result.translation.toString()
             it.format(name)
         })))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 
     private val view: GridGUIView<Slot, Action> = GridGUIView(

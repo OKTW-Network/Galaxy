@@ -139,6 +139,10 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
     private fun offerDust(traveler: Traveler) {
         view.setSlot(Slot.DUST, getGUIItem(ButtonType.STARS).apply {
             offer(
+                Keys.DISPLAY_NAME, Text.of(lang["UI.Tip.StarDust"])
+            )
+
+            offer(
                 Keys.ITEM_LORE, asList<Text>(
                     Text.of(lang["UI.Tip.haveItemCount"].format(traveler.starDust))
                 )

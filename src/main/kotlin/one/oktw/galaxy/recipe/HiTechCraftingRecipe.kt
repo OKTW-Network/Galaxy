@@ -13,12 +13,19 @@ import org.spongepowered.api.item.inventory.entity.MainPlayerInventory
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
+import org.spongepowered.api.text.translation.Translatable
+import org.spongepowered.api.text.translation.Translation
 import java.util.Arrays.asList
 
 
 class HiTechCraftingRecipe {
     companion object {
         private val lang = Main.languageService.getDefaultLanguage()
+        private val langVanilla = Main.vanillaLanguageService.getDefaultLanguage()
+
+        private fun translateVanilla(translatable: Translatable): String {
+            return langVanilla[translatable.translation.id]
+        }
 
         class Builder {
 
@@ -99,7 +106,7 @@ class HiTechCraftingRecipe {
                         if (originalName != null) {
                             offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, originalName))
                         } else {
-                            offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, this.translation))
+                            offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, translateVanilla(this)))
                         }
 
                     }
@@ -217,7 +224,7 @@ class HiTechCraftingRecipe {
                         TextColors.GREEN
                     },
                     "$has / $count ",
-                    item[Keys.DISPLAY_NAME].orElse(null)?.toPlain() ?: item.translation
+                    item[Keys.DISPLAY_NAME].orElse(null)?.toPlain() ?: translateVanilla(item)
                 )
             }
 
@@ -243,7 +250,7 @@ class HiTechCraftingRecipe {
                     Keys.DISPLAY_NAME, if (originalName != null) {
                         Text.of(TextColors.RED, originalName)
                     } else {
-                        Text.of(TextColors.RED, this.translation)
+                        Text.of(TextColors.RED, translateVanilla(this))
                     }
                 )
             }

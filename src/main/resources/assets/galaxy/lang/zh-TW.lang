@@ -1,3 +1,4 @@
+# suppress inspection "UnusedProperty" for whole file
 armor.effect.jump_boost=跳躍增強
 armor.effect.night_vision=夜視鏡
 armor.effect.speed_boost=速度增強

@@ -53,6 +53,8 @@ class Main {
             private set
         lateinit var delay: DelayedExecute
             private set
+        lateinit var vanillaLanguageService: LanguageService
+            private set
     }
 
     @Inject
@@ -85,6 +87,7 @@ class Main {
         serverThread = Sponge.getScheduler().createSyncExecutor(this).asCoroutineDispatcher()
         delay = DelayedExecute(plugin)
         languageService = LanguageService()
+        vanillaLanguageService = LanguageService("vanilla")
         DataRegister()
         RecipeRegister()
         EasyRecipeRegister()

@@ -26,7 +26,13 @@ interface Item : Ingredient {
                 return result
             }
 
-            override fun getResult(ingredient: ItemStackSnapshot?): Optional<SmeltingResult> {
+            override fun getResult(toTest: ItemStackSnapshot?): Optional<SmeltingResult> {
+                val stack = toTest?.createStack() ?: return Optional.empty()
+
+                if (!ingredient.test(stack)) {
+                    return Optional.empty()
+                }
+
                 return Optional.of(SmeltingResult(result, experience))
             }
 

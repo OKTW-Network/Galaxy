@@ -102,7 +102,7 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
         if (view.disabled) return
 
         // ignore gui elements, because they are handled by the PageGUI
-        if (!isControl(event.cursorTransaction.default)) {
+        if (!isControl(event)) {
             event.isCancelled = true
         }
 
@@ -110,7 +110,7 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
-        if (view.getNameOf(uuid)?.first == Companion.Slot.ITEMS) {
+        if (view.getNameOf(event)?.first == Companion.Slot.ITEMS) {
             launch {
                 galaxyManager.get(uuid)?.let {
                     GUIHelper.open(player) { GalaxyInfo(it, player) }

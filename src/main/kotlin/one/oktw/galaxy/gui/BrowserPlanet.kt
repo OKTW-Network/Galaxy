@@ -78,7 +78,7 @@ class BrowserPlanet(private val galaxy: Galaxy) : PageGUI() {
         if (view.disabled) return
 
         // ignore gui elements, because they are handled by the PageGUI
-        if (!isControl(event.cursorTransaction.default)) {
+        if (!isControl(event)) {
             event.isCancelled = true
         }
 
@@ -86,7 +86,7 @@ class BrowserPlanet(private val galaxy: Galaxy) : PageGUI() {
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
-        if (view.getNameOf(uuid)?.first == Companion.Slot.ITEMS) {
+        if (view.getNameOf(event)?.first == Companion.Slot.ITEMS) {
             launch {
                 val planet = galaxyManager.get(planet = uuid)?.getPlanet(uuid) ?: return@launch
 

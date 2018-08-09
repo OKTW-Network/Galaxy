@@ -63,7 +63,6 @@ abstract class PageGUI : GUI() {
 
     private val lang = languageService.getDefaultLanguage()
     private var pageNumber = 0
-    private val buttonID = Array(2) { UUID.randomUUID() }
     private val lock = OrderedLaunch()
 
     val view: GridGUIView<Slot, Action> by lazy {
@@ -120,14 +119,7 @@ abstract class PageGUI : GUI() {
         view.disabled = false
     }
 
-    protected fun isControl(item: ItemStackSnapshot) = view.getNameOf(item)?.first in asList(
-        Slot.NUMBER,
-        Slot.NEXT,
-        Slot.PREV,
-        Slot.NUMBER
-    )
-
-    protected fun isControl(uuid: UUID) = view.getNameOf(uuid)?.first in asList(
+    protected fun isControl(event: ClickInventoryEvent) = view.getNameOf(event)?.first in asList(
         Slot.NUMBER,
         Slot.NEXT,
         Slot.PREV,
@@ -138,7 +130,6 @@ abstract class PageGUI : GUI() {
         if (previous) {
             Button(ARROW_LEFT).createItemStack()
                 .apply {
-                    offer(DataUUID(buttonID[0]))
                     offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.PreviousPage"]))
                 }
                 .let { view.setSlot(Slot.PREV, it, Action.PrevPage) }
@@ -147,7 +138,6 @@ abstract class PageGUI : GUI() {
         if (next) {
             Button(ARROW_RIGHT).createItemStack()
                 .apply {
-                    offer(DataUUID(buttonID[1]))
                     offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.NextPage"]))
                 }
                 .let { view.setSlot(Slot.NEXT, it, Action.NextPage) }
@@ -165,19 +155,16 @@ abstract class PageGUI : GUI() {
             .let { (0 until it) }
             .map {
                 Button(GUI_CENTER).createItemStack()
-                    .apply { offer(DataUUID(UUID.randomUUID())) }
             }
             .let { view.setSlots(Slot.NULL, it) }
 
         if (fillPrev) {
             Button(GUI_CENTER).createItemStack()
-                .apply { offer(DataUUID(UUID.randomUUID())) }
                 .let { view.setSlot(Slot.PREV, it, null) }
         }
 
         if (fillNext) {
             Button(GUI_CENTER).createItemStack()
-                .apply { offer(DataUUID(UUID.randomUUID())) }
                 .let { view.setSlot(Slot.NEXT, it, null) }
         }
     }
@@ -201,11 +188,9 @@ abstract class PageGUI : GUI() {
             return
         }
 
-        val item = event.cursorTransaction.default
-
         // handle only buttons, let gui extends this decide how to handle them
-        if (isControl(item)) {
-            val action = view.getDataOf(item)
+        if (isControl(event)) {
+            val action = view.getDataOf(event)
 
             if (action != null) {
                 // wipe it directly, because we are going to change page and we don't want the buttons to be rollback

@@ -6,6 +6,7 @@ import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
+import org.spongepowered.api.item.inventory.property.SlotIndex
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import java.util.*
@@ -17,6 +18,7 @@ open class GridGUIView<EnumValue, Data>(
     override val layout: List<EnumValue>,
     private val dimension: Pair<Int, Int>
 ) : GUIView<EnumValue, Data> {
+
     override var disabled = false
 
     private val map = HashMap<Int, Data>()
@@ -213,7 +215,33 @@ open class GridGUIView<EnumValue, Data>(
     }
 
     override fun getNameOf(event: ClickInventoryEvent): Pair<EnumValue, Int>? {
-        return event.cursorTransaction.default[DataUUID.key].orElse(null)?.let { getNameOf(it) }
+        return event.cursorTransaction.default[DataUUID.key].orElse(null)?.let { getNameOf(it) }?: let {
+            if (event.transactions.size != 1) {
+                null
+            } else {
+                val slotIndex = event.transactions[0]!!.slot.getProperty(SlotIndex::class.java, "slotindex").orElse(null)?: return null
+                val index = slotIndex.value?: return null
+
+                if (index < dimension.first * dimension.second) {
+                    val type = layout[index]
+                    var indexOfName = -1
+
+                    layout.mapIndexed { layoutIndex, enumValue ->
+                        if (enumValue == type) {
+                            indexOfName += 1
+                        }
+
+                        if (layoutIndex == index) {
+                            return Pair(type, indexOfName)
+                        }
+                    }
+
+                    null
+                } else {
+                    null
+                }
+            }
+        }
     }
 
     override fun getNameOf(stack: ItemStack): Pair<EnumValue, Int>? {
@@ -223,7 +251,6 @@ open class GridGUIView<EnumValue, Data>(
     override fun getNameOf(stack: ItemStackSnapshot): Pair<EnumValue, Int>? {
         return stack[DataUUID.key].orElse(null)?.let { getNameOf(it) }
     }
-
 
     override fun getDataOf(id: UUID): Data? {
         for (y in 0 until dimension.second) {
@@ -240,7 +267,20 @@ open class GridGUIView<EnumValue, Data>(
     }
 
     override fun getDataOf(event: ClickInventoryEvent): Data? {
-        return event.cursorTransaction.default[DataUUID.key].orElse(null)?.let { getDataOf(it) }
+        return event.cursorTransaction.default[DataUUID.key].orElse(null)?.let { getDataOf(it) }?: let {
+            if (event.transactions.size != 1) {
+                null
+            } else {
+                val slotIndex = event.transactions[0]!!.slot.getProperty(SlotIndex::class.java, "slotindex").orElse(null)?: return null
+                val index = slotIndex.value?: return null
+
+                if (index < dimension.first * dimension.second) {
+                    map[index]
+                } else {
+                    null
+                }
+            }
+        }
     }
 
     override fun getDataOf(stack: ItemStack): Data? {
@@ -249,5 +289,9 @@ open class GridGUIView<EnumValue, Data>(
 
     override fun getDataOf(stack: ItemStackSnapshot): Data? {
         return stack[DataUUID.key].orElse(null)?.let { getDataOf(it) }
+    }
+
+    override fun getTypeOf(event: ClickInventoryEvent): GUIView.Companion.Action {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

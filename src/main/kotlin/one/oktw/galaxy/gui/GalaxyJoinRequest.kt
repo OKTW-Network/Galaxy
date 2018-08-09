@@ -68,8 +68,13 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
 
         // ignore gui elements, because they are handled by the PageGUI
         if (!isControl(event)) {
-            event.isCancelled = true
+            val detail = view.getDetail(event)
+
+            if (detail.affectedGUI) {
+                event.isCancelled = true
+            }
         }
+
 
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return

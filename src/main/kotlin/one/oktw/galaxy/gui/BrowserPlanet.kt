@@ -79,7 +79,11 @@ class BrowserPlanet(private val galaxy: Galaxy) : PageGUI() {
 
         // ignore gui elements, because they are handled by the PageGUI
         if (!isControl(event)) {
-            event.isCancelled = true
+            val detail = view.getDetail(event)
+
+            if (detail.affectedGUI) {
+                event.isCancelled = true
+            }
         }
 
         val player = event.source as Player

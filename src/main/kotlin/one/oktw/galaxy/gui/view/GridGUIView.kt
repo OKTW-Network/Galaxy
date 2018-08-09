@@ -12,17 +12,29 @@ import org.spongepowered.api.item.inventory.type.GridInventory
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 open class GridGUIView<EnumValue, Data>(
     override val inventory: Inventory,
     override val layout: List<EnumValue>,
     private val dimension: Pair<Int, Int>
 ) : GUIView<EnumValue, Data> {
-
     override var disabled = false
 
     private val map = HashMap<Int, Data>()
     private val cache = ConcurrentHashMap<Int, UUID>() // workaround for the messy sponge api
+
+    private val nameIndex = HashMap<Int, Pair<EnumValue, Int>>()
+
+    init {
+        var map = HashMap<EnumValue, Int>()
+
+        layout.mapIndexed { index, item->
+            map[item] = (map[item]?: -1) + 1
+
+            nameIndex[index] = Pair(item, map[item]!!)
+        }
+    }
 
     private fun getOffset(x: Int, y: Int): Int {
         return y * dimension.first + x
@@ -197,16 +209,12 @@ open class GridGUIView<EnumValue, Data>(
     }
 
     override fun getNameOf(id: UUID): Pair<EnumValue, Int>? {
-        val hashMap = HashMap<EnumValue, Int>()
-
         for (y in 0 until dimension.second) {
             for (x in 0 until dimension.first) {
-                val name = layout[getOffset(x, y)]
                 val idOfSlot = cache[getOffset(x, y)] ?: continue
-                hashMap[name] = (hashMap[name] ?: -1) + 1
 
                 if (id == idOfSlot) {
-                    return hashMap[name]?.let { Pair(name, it) }
+                    return nameIndex[getOffset(x, y)]
                 }
             }
         }
@@ -215,28 +223,18 @@ open class GridGUIView<EnumValue, Data>(
     }
 
     override fun getNameOf(event: ClickInventoryEvent): Pair<EnumValue, Int>? {
-        return event.cursorTransaction.default[DataUUID.key].orElse(null)?.let { getNameOf(it) }?: let {
+        return event.cursorTransaction.default[DataUUID.key].orElse(null)?.let { getNameOf(it) } ?: let {
             if (event.transactions.size != 1) {
                 null
             } else {
-                val slotIndex = event.transactions[0]!!.slot.getProperty(SlotIndex::class.java, "slotindex").orElse(null)?: return null
-                val index = slotIndex.value?: return null
+                val slotIndex = event.transactions[0]!!.slot.getProperty(SlotIndex::class.java, "slotindex").orElse(null) ?: return null
+                val index = slotIndex.value ?: return null
 
                 if (index < dimension.first * dimension.second) {
                     val type = layout[index]
                     var indexOfName = -1
 
-                    layout.mapIndexed { layoutIndex, enumValue ->
-                        if (enumValue == type) {
-                            indexOfName += 1
-                        }
-
-                        if (layoutIndex == index) {
-                            return Pair(type, indexOfName)
-                        }
-                    }
-
-                    null
+                    nameIndex[index]
                 } else {
                     null
                 }
@@ -267,12 +265,12 @@ open class GridGUIView<EnumValue, Data>(
     }
 
     override fun getDataOf(event: ClickInventoryEvent): Data? {
-        return event.cursorTransaction.default[DataUUID.key].orElse(null)?.let { getDataOf(it) }?: let {
+        return event.cursorTransaction.default[DataUUID.key].orElse(null)?.let { getDataOf(it) } ?: let {
             if (event.transactions.size != 1) {
                 null
             } else {
-                val slotIndex = event.transactions[0]!!.slot.getProperty(SlotIndex::class.java, "slotindex").orElse(null)?: return null
-                val index = slotIndex.value?: return null
+                val slotIndex = event.transactions[0]!!.slot.getProperty(SlotIndex::class.java, "slotindex").orElse(null) ?: return null
+                val index = slotIndex.value ?: return null
 
                 if (index < dimension.first * dimension.second) {
                     map[index]
@@ -291,7 +289,39 @@ open class GridGUIView<EnumValue, Data>(
         return stack[DataUUID.key].orElse(null)?.let { getDataOf(it) }
     }
 
-    override fun getTypeOf(event: ClickInventoryEvent): GUIView.Companion.Action {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun getDetail(event: ClickInventoryEvent): EventDetail<EnumValue, Data> {
+        val list = ArrayList<SlotAffected<EnumValue, Data>>()
+        var touchedGUI = false
+        var primary:  SlotAffected<EnumValue, Data>? = null
+
+        event.transactions.forEach {
+            val slotIndex = it.slot.getProperty(SlotIndex::class.java, "slotindex").orElse(null)
+            var position: Pair<EnumValue, Int>? = null
+            var data: Data? = null
+
+            if (slotIndex?.value != null && (slotIndex.value!! < dimension.first * dimension.second)) {
+                position = nameIndex[slotIndex.value!!]
+                data = map[slotIndex.value!!]
+                touchedGUI = true
+            }
+
+            list.add(SlotAffected(it, position?.first, position?.second, data))
+        }
+
+        // search for the main clicked slot, which is the user trying to click
+        if (event.cursorTransaction.original.isEmpty && !event.cursorTransaction.default.isEmpty) {
+            // ok, it seems the player is try to pick something.
+
+            val picking = event.cursorTransaction.default
+            list.forEach {
+                if (!it.transaction.original.isEmpty && it.transaction.default.isEmpty) {
+                    if (it.transaction.original == picking) {
+                        primary = it
+                    }
+                }
+            }
+        }
+
+        return EventDetail(touchedGUI, primary, event.cursorTransaction, list)
     }
 }

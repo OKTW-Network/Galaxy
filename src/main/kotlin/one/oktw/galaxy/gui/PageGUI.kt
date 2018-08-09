@@ -119,7 +119,7 @@ abstract class PageGUI : GUI() {
         view.disabled = false
     }
 
-    protected fun isControl(event: ClickInventoryEvent) = view.getNameOf(event)?.first in asList(
+    protected fun isControl(event: ClickInventoryEvent) = view.getDetail(event).primary?.type in asList(
         Slot.NUMBER,
         Slot.NEXT,
         Slot.PREV,
@@ -170,9 +170,11 @@ abstract class PageGUI : GUI() {
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
+        val info = view.getDetail(event)
+
         // we trap everything when gui is disabled
         if (view.disabled) {
-            if (view.getNameOf(event) != null) {
+            if (info.affectedGUI) {
                 // item on the gui
                 // because we are going to wipe the gui, items should not be rollback by the sponge
                 event.cursorTransaction.apply {
@@ -190,7 +192,7 @@ abstract class PageGUI : GUI() {
 
         // handle only buttons, let gui extends this decide how to handle them
         if (isControl(event)) {
-            val action = view.getDataOf(event)
+            val action = info.primary?.data
 
             if (action != null) {
                 // wipe it directly, because we are going to change page and we don't want the buttons to be rollback

@@ -7,15 +7,6 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import java.util.*
 
 interface GUIView<EnumValue, Data> {
-    companion object {
-        enum class Action {
-            PICK,
-            DROP,
-            DROP_AND_PICK,
-            SWAP,
-            UNKNOWN
-        }
-    }
 
     val inventory: Inventory
     val layout: List<EnumValue>
@@ -73,6 +64,7 @@ interface GUIView<EnumValue, Data> {
     // get name from a ItemStack
     fun getDataOf(id: UUID): Data?
 
-    // get type of event
-    fun getTypeOf(event: ClickInventoryEvent): Action
+    // get detail of event
+    fun getDetail(event: ClickInventoryEvent): EventDetail<EnumValue, Data>
+
 }

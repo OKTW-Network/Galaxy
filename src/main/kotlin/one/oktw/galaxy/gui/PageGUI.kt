@@ -119,13 +119,15 @@ abstract class PageGUI : GUI() {
         view.disabled = false
     }
 
-    protected fun isControl(event: ClickInventoryEvent) = view.getDetail(event).primary?.type in asList(
-        Slot.NUMBER,
-        Slot.NEXT,
-        Slot.PREV,
-        Slot.NUMBER
-    )
+    protected fun isControl(event: ClickInventoryEvent): Boolean {
+        view.getDetail(event).affectedSlots.forEach {
+            if (it.type in asList(Slot.NEXT, Slot.PREV, Slot.NUMBER, Slot.NULL)) {
+                return true
+            }
+        }
 
+        return false
+    }
     private fun offerButton(previous: Boolean, next: Boolean) {
         if (previous) {
             Button(ARROW_LEFT).createItemStack()

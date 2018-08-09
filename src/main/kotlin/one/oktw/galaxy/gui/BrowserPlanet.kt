@@ -77,20 +77,22 @@ class BrowserPlanet(private val galaxy: Galaxy) : PageGUI() {
     private fun clickEvent(event: ClickInventoryEvent) {
         if (view.disabled) return
 
-        // ignore gui elements, because they are handled by the PageGUI
-        if (!isControl(event)) {
-            val detail = view.getDetail(event)
+        val detail = view.getDetail(event)
 
-            if (detail.affectedGUI) {
-                event.isCancelled = true
-            }
+        // ignore gui elements, because they are handled by the PageGUI
+        if (isControl(event)) {
+            return
+        }
+
+        if (detail.affectedGUI) {
+            event.isCancelled = true
         }
 
         val player = event.source as Player
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
-        if (view.getNameOf(event)?.first == Companion.Slot.ITEMS) {
+        if (detail.primary?.type == Companion.Slot.ITEMS) {
             launch {
                 val planet = galaxyManager.get(planet = uuid)?.getPlanet(uuid) ?: return@launch
 

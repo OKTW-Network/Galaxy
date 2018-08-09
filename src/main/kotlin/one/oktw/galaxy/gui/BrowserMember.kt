@@ -101,20 +101,22 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
     private fun clickEvent(event: ClickInventoryEvent) {
         if (view.disabled) return
 
-        // ignore gui elements, because they are handled by the PageGUI
-        if (!isControl(event)) {
-            val detail = view.getDetail(event)
+        val detail = view.getDetail(event)
 
-            if (detail.affectedGUI) {
-                event.isCancelled = true
-            }
+        // ignore gui elements, because they are handled by the PageGUI
+        if (isControl(event)) {
+            return
+        }
+
+        if (detail.affectedGUI) {
+            event.isCancelled = true
         }
 
 
         val item = event.cursorTransaction.default
         val uuid = item[DataUUID.key].orElse(null) ?: return
 
-        if (view.getNameOf(event)?.first == Companion.Slot.ITEMS) {
+        if (detail.primary?.type == Companion.Slot.ITEMS) {
             if (!manage) return
 
             launch {

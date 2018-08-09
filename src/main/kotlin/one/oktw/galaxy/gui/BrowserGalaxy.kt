@@ -108,7 +108,7 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
             return
         }
 
-        if (detail.affectedGUI) {
+        if (detail.affectGUI) {
             event.isCancelled = true
         }
 

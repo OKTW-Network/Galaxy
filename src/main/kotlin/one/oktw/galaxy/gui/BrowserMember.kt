@@ -108,7 +108,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
             return
         }
 
-        if (detail.affectedGUI) {
+        if (detail.affectGUI) {
             event.isCancelled = true
         }
 

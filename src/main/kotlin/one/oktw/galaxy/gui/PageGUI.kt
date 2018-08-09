@@ -176,7 +176,7 @@ abstract class PageGUI : GUI() {
 
         // we trap everything when gui is disabled
         if (view.disabled) {
-            if (info.affectedGUI) {
+            if (info.affectGUI) {
                 // item on the gui
                 // because we are going to wipe the gui, items should not be rollback by the sponge
                 event.cursorTransaction.apply {

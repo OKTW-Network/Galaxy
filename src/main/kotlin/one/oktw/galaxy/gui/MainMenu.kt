@@ -7,9 +7,9 @@ import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.serverThread
-import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.extensions.getGroup
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
+import one.oktw.galaxy.gui.view.GridGUIView
 import one.oktw.galaxy.item.enums.ButtonType.GALAXY
 import one.oktw.galaxy.item.enums.ButtonType.PLUS
 import one.oktw.galaxy.item.type.Button
@@ -31,9 +31,35 @@ import org.spongepowered.api.text.format.TextColors.*
 import org.spongepowered.api.text.format.TextStyles
 import org.spongepowered.api.text.format.TextStyles.BOLD
 import org.spongepowered.api.text.format.TextStyles.UNDERLINE
-import java.util.*
+import java.util.Arrays.asList
 
 class MainMenu(player: Player) : GUI() {
+    companion object {
+        enum class Slot {
+            LEFT,
+            MIDDLE,
+            RIGHT,
+            NULL
+        }
+
+        enum class Action {
+            OWN_GALAXY,
+            ALL_GALAXY,
+            CREATE_GALAXY
+        }
+
+        const val WIDTH = 5
+        const val HEIGHT = 1
+
+        val layout: List<Slot> = asList(
+            Slot.LEFT,
+            Slot.NULL,
+            Slot.MIDDLE,
+            Slot.NULL,
+            Slot.RIGHT
+        )
+    }
+
     private val lang = languageService.getDefaultLanguage()
     override val token = "MainMenu-${player.uniqueId}"
     override val inventory: Inventory = Inventory.builder()
@@ -41,7 +67,14 @@ class MainMenu(player: Player) : GUI() {
         .property(InventoryTitle.of(Text.of(lang["UI.Title.StarShipController"])))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
-    private val buttonID = Array(3) { UUID.randomUUID() }
+
+    val view: GridGUIView<Slot, Action> by lazy {
+        GridGUIView<Slot, Action>(
+            inventory,
+            layout,
+            Pair(WIDTH, HEIGHT)
+        )
+    }
 
     init {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
@@ -49,34 +82,31 @@ class MainMenu(player: Player) : GUI() {
         // button
         Button(GALAXY).createItemStack()
             .apply {
-                offer(DataUUID(buttonID[0]))
                 offer(
                     Keys.DISPLAY_NAME,
                     Text.of(GREEN, BOLD, lang["UI.Button.ListJoinedGalaxy"])
                 )
             }
-            .let { inventory.set(0, 0, it) }
+            .let { view.setSlot(Slot.LEFT, it, Action.OWN_GALAXY) }
 
         launch(serverThread) {
             if (galaxyManager.get(player).openSubscription().any { it.getGroup(player) == OWNER }) return@launch
 
             Button(PLUS).createItemStack()
                 .apply {
-                    offer(DataUUID(buttonID[1]))
                     offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.Button.CreateGalaxy"]))
                 }
-                .let { inventory.set(2, 0, it) }
+                .let { view.setSlot(Slot.MIDDLE, it, Action.CREATE_GALAXY) }
         }
 
         Button(GALAXY).createItemStack()
             .apply {
-                offer(DataUUID(buttonID[2]))
                 offer(
                     Keys.DISPLAY_NAME,
                     Text.of(GREEN, BOLD, lang["UI.Button.ListAllGalaxy"])
                 )
             }
-            .let { inventory.set(4, 0, it) }
+            .let { view.setSlot(Slot.RIGHT, it, Action.ALL_GALAXY)  }
 
         GUIHelper.fillEmptySlot(inventory)
 
@@ -86,12 +116,15 @@ class MainMenu(player: Player) : GUI() {
 
     private fun clickEvent(event: ClickInventoryEvent) {
         val player = event.source as Player
+        val detail = view.getDetail(event)
 
-        event.isCancelled = true
+        if (detail.affectGUI) {
+            event.isCancelled = true
+        }
 
-        when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
-            buttonID[0] -> GUIHelper.open(player) { BrowserGalaxy(player) }
-            buttonID[1] -> launch {
+        when (detail.primary?.data ?: return) {
+            Action.OWN_GALAXY -> GUIHelper.open(player) { BrowserGalaxy(player) }
+            Action.CREATE_GALAXY -> launch {
                 if (galaxyManager.get(player).openSubscription().any { it.getGroup(player) == OWNER }) {
                     player.sendMessage(Text.of(RED, "你只能擁有一個星系"))
                     return@launch
@@ -117,7 +150,7 @@ class MainMenu(player: Player) : GUI() {
                     player.sendMessage(Text.of(RED, "已取消創建星系"))
                 }
             }
-            buttonID[2] -> GUIHelper.open(player) { BrowserGalaxy() }
+            Action.ALL_GALAXY -> GUIHelper.open(player) { BrowserGalaxy() }
         }
     }
 }

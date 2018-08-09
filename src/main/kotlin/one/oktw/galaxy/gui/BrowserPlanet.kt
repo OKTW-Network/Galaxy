@@ -84,7 +84,7 @@ class BrowserPlanet(private val galaxy: Galaxy) : PageGUI() {
             return
         }
 
-        if (detail.affectedGUI) {
+        if (detail.affectGUI) {
             event.isCancelled = true
         }
 

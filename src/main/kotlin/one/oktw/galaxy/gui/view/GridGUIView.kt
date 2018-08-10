@@ -24,7 +24,7 @@ open class GridGUIView<EnumValue, Data>(
     private val nameIndex = HashMap<Int, Pair<EnumValue, Int>>()
 
     private var scheduled: Job? = null
-    private val concurrentLinkedQueue = ConcurrentLinkedQueue<() -> Unit>()
+    private val pendingTasks = ConcurrentLinkedQueue<() -> Unit>()
 
     init {
         val map = HashMap<EnumValue, Int>()
@@ -37,14 +37,14 @@ open class GridGUIView<EnumValue, Data>(
     }
 
     private fun queueAndRun(op: () -> Unit) {
-        concurrentLinkedQueue.add(op)
+        pendingTasks.add(op)
 
         if (scheduled == null) {
             synchronized(this) {
                 if (scheduled == null) {
                     scheduled = launch(Main.nextTick) {
-                        while (concurrentLinkedQueue.size > 0) {
-                            val task = concurrentLinkedQueue.poll()
+                        while (pendingTasks.size > 0) {
+                            val task = pendingTasks.poll()
                             task.invoke()
                         }
 
@@ -136,7 +136,7 @@ open class GridGUIView<EnumValue, Data>(
     }
 
     override fun getDatas(name: EnumValue): List<Data?> {
-        val list: ArrayList<Data?> = ArrayList<Data?>()
+        val list: ArrayList<Data?> = ArrayList()
 
         layout.mapIndexed { index, enumValue ->
             if (enumValue == name) {
@@ -180,15 +180,13 @@ open class GridGUIView<EnumValue, Data>(
             for (x in 0 until dimension.first) {
                 if (layout[getOffset(x, y)] == name) {
                     if (iterator.hasNext()) {
-                        iterator.next().let { pair ->
-                            setSlot(x, y, pair.first)
+                        iterator.next().let { (item, data) ->
+                            setSlot(x, y, item)
 
-                            pair.second.let {
-                                if (it != null) {
-                                    map[getOffset(x, y)] = it
-                                } else {
-                                    map.remove(getOffset(x, y))
-                                }
+                            if (data != null) {
+                                map[getOffset(x, y)] = data
+                            } else {
+                                map.remove(getOffset(x, y))
                             }
                         }
                     } else {
@@ -230,11 +228,7 @@ open class GridGUIView<EnumValue, Data>(
             val slotIndex = event.transactions[0]!!.slot.getProperty(SlotIndex::class.java, "slotindex").orElse(null) ?: return null
             val index = slotIndex.value ?: return null
 
-            return if (index < dimension.first * dimension.second) {
-                nameIndex[index]
-            } else {
-                null
-            }
+            return nameIndex[index]
         }
     }
 
@@ -245,11 +239,7 @@ open class GridGUIView<EnumValue, Data>(
             val slotIndex = event.transactions[0]!!.slot.getProperty(SlotIndex::class.java, "slotindex").orElse(null) ?: return null
             val index = slotIndex.value ?: return null
 
-            return if (index < dimension.first * dimension.second) {
-                map[index]
-            } else {
-                null
-            }
+            return map[index]
         }
     }
 

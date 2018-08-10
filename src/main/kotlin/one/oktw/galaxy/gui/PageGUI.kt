@@ -3,6 +3,7 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.delay
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.gui.view.EventDetail
 import one.oktw.galaxy.gui.view.GridGUIView
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.enums.ButtonType.*
@@ -133,8 +134,8 @@ abstract class PageGUI<Data> : GUI() {
         view.disabled = false
     }
 
-    protected fun isControl(event: ClickInventoryEvent): Boolean {
-        view.getDetail(event).affectedSlots.forEach {
+    protected fun isControl(detail: EventDetail<Slot, Operation<Data>>): Boolean {
+        detail.affectedSlots.forEach {
             if (it.type in asList(Slot.NEXT, Slot.PREV, Slot.NUMBER, Slot.NULL)) {
                 return true
             }
@@ -208,7 +209,7 @@ abstract class PageGUI<Data> : GUI() {
         }
 
         // handle only buttons, let gui extends this decide how to handle them
-        if (isControl(event)) {
+        if (isControl(info)) {
             val action = info.primary?.data?.action
 
             if (action != null) {

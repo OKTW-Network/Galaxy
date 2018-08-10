@@ -104,7 +104,7 @@ class BrowserGalaxy(player: Player? = null) : PageGUI<UUID>() {
         val detail = view.getDetail(event)
 
         // ignore gui elements, because they are handled by the PageGUI
-        if (isControl(event)) {
+        if (isControl(detail)) {
             return
         }
 

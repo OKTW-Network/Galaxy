@@ -2,8 +2,6 @@ package one.oktw.galaxy.util
 
 import kotlinx.coroutines.experimental.CoroutineDispatcher
 import kotlinx.coroutines.experimental.Runnable
-// import one.oktw.galaxy.Main.Companion.main
-// import org.spongepowered.api.Sponge
 import org.spongepowered.api.scheduler.Task
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.experimental.CoroutineContext
@@ -30,8 +28,6 @@ open class DelayedSpongeDispatcher(private val delay: Long, private val plugin: 
     }
 
     override fun dispatch(context: CoroutineContext, block: Runnable) {
-        // main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when schedule")
-
         Task.builder()
             .execute(block)
             .delayTicks(delay)

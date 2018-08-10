@@ -66,12 +66,10 @@ open class GridGUIView<EnumValue, Data>(
     private fun setSlot(x: Int, y: Int, item: ItemStack?) {
         if (item != null) {
             queueAndRun {
-                // Main.main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when edit")
                 grid.set(x, y, item)
             }
         } else {
             queueAndRun {
-                // Main.main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when edit")
                 grid.poll(x, y)
             }
         }
@@ -216,7 +214,6 @@ open class GridGUIView<EnumValue, Data>(
         map.clear()
 
         queueAndRun {
-            // Main.main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when clear")
             inventory.clear()
         }
     }

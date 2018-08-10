@@ -19,14 +19,21 @@ import java.util.*
 import java.util.Arrays.asList
 import kotlin.collections.ArrayList
 
-abstract class PageGUI : GUI() {
+abstract class PageGUI<Data> : GUI() {
     companion object {
         private const val CHANGE_PAGE_INTERVAL = 100
         private const val SET_ITEM_DELAY = 20
 
+        data class Operation<Data>(
+            val action: Action = Action.Null,
+            val data: Data? = null
+        )
+
         enum class Action {
             PrevPage,
-            NextPage
+            NextPage,
+            Item,
+            Null
         }
 
         enum class Slot {
@@ -65,8 +72,8 @@ abstract class PageGUI : GUI() {
     private var pageNumber = 0
     private val lock = OrderedLaunch()
 
-    val view: GridGUIView<Slot, Action> by lazy {
-        GridGUIView<Slot, Action>(
+    val view: GridGUIView<Slot, Operation<Data>> by lazy {
+        GridGUIView<Slot, Operation<Data>>(
             inventory,
             layout,
             Pair(WIDTH, HEIGHT)
@@ -90,7 +97,7 @@ abstract class PageGUI : GUI() {
         return result.reversed()
     }
 
-    protected abstract suspend fun get(number: Int, skip: Int): List<ItemStack>
+    protected abstract suspend fun get(number: Int, skip: Int): List<Pair<ItemStack, Data?>>
 
     // There should be only one offerPage processed at same time, or the pages will be merged all together
     protected fun offerPage(pageNumber: Int) = lock.launch {
@@ -112,7 +119,14 @@ abstract class PageGUI : GUI() {
 
         val showNextPage = !get(1, (pageNumber + 1) * maxItem).isEmpty()
 
-        get(maxItem, pageNumber * maxItem).let { view.setSlots(Slot.ITEMS, ArrayList(it)) }
+        get(maxItem, pageNumber * maxItem)
+            .map {
+                Pair(it.first, Operation(Action.Item, it.second))
+            }
+            .let {
+                view.setSlotPairs(Slot.ITEMS, it)
+            }
+
         offerButton(pageNumber != 0, showNextPage)
         offerNumber(pageNumber + 1) // make it start from one...
         offerEmptySlot(pageNumber == 0, !showNextPage)
@@ -128,13 +142,14 @@ abstract class PageGUI : GUI() {
 
         return false
     }
+
     private fun offerButton(previous: Boolean, next: Boolean) {
         if (previous) {
             Button(ARROW_LEFT).createItemStack()
                 .apply {
                     offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.PreviousPage"]))
                 }
-                .let { view.setSlot(Slot.PREV, it, Action.PrevPage) }
+                .let { view.setSlot(Slot.PREV, it, Operation(Action.PrevPage)) }
         }
 
         if (next) {
@@ -142,7 +157,7 @@ abstract class PageGUI : GUI() {
                 .apply {
                     offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.NextPage"]))
                 }
-                .let { view.setSlot(Slot.NEXT, it, Action.NextPage) }
+                .let { view.setSlot(Slot.NEXT, it, Operation(Action.NextPage)) }
         }
     }
 
@@ -194,7 +209,7 @@ abstract class PageGUI : GUI() {
 
         // handle only buttons, let gui extends this decide how to handle them
         if (isControl(event)) {
-            val action = info.primary?.data
+            val action = info.primary?.data?.action
 
             if (action != null) {
                 // wipe it directly, because we are going to change page and we don't want the buttons to be rollback
@@ -209,6 +224,7 @@ abstract class PageGUI : GUI() {
             when (action) {
                 Action.PrevPage -> if (pageNumber > 0) offerPage(--pageNumber)
                 Action.NextPage -> offerPage(++pageNumber)
+                else -> Unit
             }
         }
     }

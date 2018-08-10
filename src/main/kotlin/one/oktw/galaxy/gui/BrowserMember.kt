@@ -6,7 +6,6 @@ import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataItemType
-import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.data.extensions.refresh
@@ -27,10 +26,11 @@ import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors.*
 import org.spongepowered.api.text.format.TextStyles
+import java.util.*
 import java.util.Arrays.asList
 import kotlin.streams.toList
 
-class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = false) : PageGUI() {
+class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = false) : PageGUI<UUID>() {
     private val lang = languageService.getDefaultLanguage()
     override val token = "BrowserMember-${galaxy.uuid}${if (manage) "-manage" else ""}"
     override val inventory: Inventory = Inventory.builder()
@@ -46,7 +46,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
     }
 
-    override suspend fun get(number: Int, skip: Int): List<ItemStack> {
+    override suspend fun get(number: Int, skip: Int): List<Pair<ItemStack, UUID>> {
         return galaxy.refresh().members
             .parallelStream()
             .skip(skip.toLong())
@@ -74,11 +74,10 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
                         ")"
                     )
                 }
-
+                Pair(
                 ItemStack.builder()
                     .itemType(ItemTypes.SKULL)
                     .itemData(DataItemType(BUTTON))
-                    .itemData(DataUUID(it.uuid))
                     .add(Keys.DISPLAY_NAME, Text.of(AQUA, TextStyles.BOLD, user.name))
                     .add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
                     .add(Keys.REPRESENTED_PLAYER, user.profile)
@@ -93,7 +92,8 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
                             Text.of(YELLOW, "${lang["UI.Tip.PermissionGroup"]}: ", RESET, it.group.toString())
                         )
                     )
-                    .build()
+                    .build(), it.uuid
+                )
             }
             .toList()
     }
@@ -112,13 +112,9 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
             event.isCancelled = true
         }
 
-
-        val item = event.cursorTransaction.default
-        val uuid = item[DataUUID.key].orElse(null) ?: return
-
         if (detail.primary?.type == Companion.Slot.ITEMS) {
             if (!manage) return
-
+            val uuid = detail.primary.data?.data?: return
             launch {
                 GUIHelper.openAsync(event.source as Player) { ManageMember(galaxy.refresh(), uuid) }.await()
                     .registerEvent(InteractInventoryEvent.Close::class.java) { offerPage(0) }

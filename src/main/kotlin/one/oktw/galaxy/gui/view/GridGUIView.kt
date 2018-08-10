@@ -4,7 +4,7 @@ import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataUUID
-import org.spongepowered.api.Sponge
+// import org.spongepowered.api.Sponge
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStack
@@ -84,14 +84,14 @@ open class GridGUIView<EnumValue, Data>(
             }
 
             queueAndRun {
-                Main.main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when edit")
+                // Main.main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when edit")
                 grid.set(x, y, item)
             }
         } else {
             cache.remove(getOffset(x, y))
 
             queueAndRun {
-                Main.main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when edit")
+                // Main.main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when edit")
                 grid.poll(x, y)
             }
         }
@@ -235,7 +235,7 @@ open class GridGUIView<EnumValue, Data>(
         map.clear()
 
         queueAndRun {
-            Main.main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when clear")
+            // Main.main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when clear")
             inventory.clear()
         }
     }

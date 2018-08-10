@@ -1,7 +1,10 @@
 package one.oktw.galaxy.gui.view
 
+import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataUUID
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStack
@@ -11,12 +14,13 @@ import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 open class GridGUIView<EnumValue, Data>(
     override val inventory: Inventory,
-    override val layout: List<EnumValue>,
+    final override val layout: List<EnumValue>,
     private val dimension: Pair<Int, Int>
 ) : GUIView<EnumValue, Data> {
     override var disabled = false
@@ -26,13 +30,35 @@ open class GridGUIView<EnumValue, Data>(
 
     private val nameIndex = HashMap<Int, Pair<EnumValue, Int>>()
 
-    init {
-        var map = HashMap<EnumValue, Int>()
+    private var scheduiled: Job? = null
+    private val concurrentLinkedQueue = ConcurrentLinkedQueue<()->Unit>()
 
-        layout.mapIndexed { index, item->
-            map[item] = (map[item]?: -1) + 1
+    init {
+        val map = HashMap<EnumValue, Int>()
+
+        layout.mapIndexed { index, item ->
+            map[item] = (map[item] ?: -1) + 1
 
             nameIndex[index] = Pair(item, map[item]!!)
+        }
+    }
+
+    private fun queueAndRun(op: ()->Unit) {
+        concurrentLinkedQueue.add(op)
+
+        if (scheduiled == null) {
+            synchronized(this) {
+                if (scheduiled == null) {
+                    scheduiled = launch(Main.nextTick) {
+                        while (concurrentLinkedQueue.size > 0) {
+                            val task = concurrentLinkedQueue.poll()
+                            task.invoke()
+                        }
+
+                        scheduiled = null
+                    }
+                }
+            }
         }
     }
 
@@ -49,18 +75,24 @@ open class GridGUIView<EnumValue, Data>(
         // also invalidate the button immediately when item being removed
         cache.remove(getOffset(x, y))
 
-        launch {
-            if (item != null) {
-                grid.set(x, y, item)
+        if (item != null) {
 
-                item[DataUUID.key].orElse(null)?.let {
-                    cache[getOffset(x, y)] = it
-                } ?: let {
-                    cache.remove(getOffset(x, y))
-                }
-            } else {
-                grid.poll(x, y)
+            item[DataUUID.key].orElse(null)?.let {
+                cache[getOffset(x, y)] = it
+            } ?: let {
                 cache.remove(getOffset(x, y))
+            }
+
+            queueAndRun {
+                Main.main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when edit")
+                grid.set(x, y, item)
+            }
+        } else {
+            cache.remove(getOffset(x, y))
+
+            queueAndRun {
+                Main.main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when edit")
+                grid.poll(x, y)
             }
         }
     }
@@ -126,9 +158,7 @@ open class GridGUIView<EnumValue, Data>(
             for (x in 0 until dimension.first) {
                 if (layout[getOffset(x, y)] == name) {
                     if (iterator.hasNext()) {
-                        iterator.next().let {
-                            setSlot(x, y, it)
-                        }
+                        setSlot(x, y, iterator.next())
                     } else {
                         setSlot(x, y, null)
                     }
@@ -144,9 +174,7 @@ open class GridGUIView<EnumValue, Data>(
             for (x in 0 until dimension.first) {
                 if (layout[getOffset(x, y)] == name) {
                     if (iterator.hasNext()) {
-                        iterator.next().let {
-                            setSlot(x, y, it)
-                        }
+                        setSlot(x, y, iterator.next())
                     } else {
                         setSlot(x, y, null)
                     }
@@ -203,9 +231,13 @@ open class GridGUIView<EnumValue, Data>(
     }
 
     override fun clear() {
-        inventory.clear()
         cache.clear()
         map.clear()
+
+        queueAndRun {
+            Main.main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when clear")
+            inventory.clear()
+        }
     }
 
     override fun getNameOf(id: UUID): Pair<EnumValue, Int>? {
@@ -231,9 +263,6 @@ open class GridGUIView<EnumValue, Data>(
                 val index = slotIndex.value ?: return null
 
                 if (index < dimension.first * dimension.second) {
-                    val type = layout[index]
-                    var indexOfName = -1
-
                     nameIndex[index]
                 } else {
                     null
@@ -292,7 +321,7 @@ open class GridGUIView<EnumValue, Data>(
     override fun getDetail(event: ClickInventoryEvent): EventDetail<EnumValue, Data> {
         val list = ArrayList<SlotAffected<EnumValue, Data>>()
         var touchedGUI = false
-        var primary:  SlotAffected<EnumValue, Data>? = null
+        var primary: SlotAffected<EnumValue, Data>? = null
 
         event.transactions.forEach {
             val slotIndex = it.slot.getProperty(SlotIndex::class.java, "slotindex").orElse(null)

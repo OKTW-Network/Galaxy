@@ -114,12 +114,11 @@ class BrowserGalaxy(player: Player? = null) : PageGUI<UUID>() {
 
         if (detail.primary?.type == Companion.Slot.ITEMS) {
             val player = event.source as Player
-            val uuid = detail.primary.data?.data
-            if (uuid != null) {
-                launch {
-                    galaxyManager.get(uuid)?.let {
-                        GUIHelper.open(player) { GalaxyInfo(it, player) }
-                    }
+            val uuid = detail.primary.data?.data ?: return
+
+            launch {
+                galaxyManager.get(uuid)?.let {
+                    GUIHelper.open(player) { GalaxyInfo(it, player) }
                 }
             }
         }

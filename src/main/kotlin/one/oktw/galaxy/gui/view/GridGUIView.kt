@@ -1,6 +1,9 @@
 package one.oktw.galaxy.gui.view
 
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
+import one.oktw.galaxy.Main
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
@@ -37,7 +40,9 @@ open class GridGUIView<EnumValue, Data>(
 
         launch {
             if (item != null) {
-                grid.set(x, y, item)
+                withContext(Main.serverThread) {
+                    grid.set(x, y, item)
+                }
 
                 item[DataUUID.key].orElse(null)?.let {
                     cache[getOffset(x, y)] = it
@@ -45,7 +50,10 @@ open class GridGUIView<EnumValue, Data>(
                     cache.remove(getOffset(x, y))
                 }
             } else {
-                grid.poll(x, y)
+                withContext(Main.serverThread) {
+                    grid.poll(x, y)
+                }
+
                 cache.remove(getOffset(x, y))
             }
         }
@@ -189,7 +197,10 @@ open class GridGUIView<EnumValue, Data>(
     }
 
     override fun clear() {
-        inventory.clear()
+        launch(Main.serverThread) {
+            inventory.clear()
+        }
+
         cache.clear()
         map.clear()
     }

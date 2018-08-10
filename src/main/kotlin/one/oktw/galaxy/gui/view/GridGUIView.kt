@@ -30,7 +30,7 @@ open class GridGUIView<EnumValue, Data>(
 
     private val nameIndex = HashMap<Int, Pair<EnumValue, Int>>()
 
-    private var scheduiled: Job? = null
+    private var scheduled: Job? = null
     private val concurrentLinkedQueue = ConcurrentLinkedQueue<()->Unit>()
 
     init {
@@ -46,16 +46,16 @@ open class GridGUIView<EnumValue, Data>(
     private fun queueAndRun(op: ()->Unit) {
         concurrentLinkedQueue.add(op)
 
-        if (scheduiled == null) {
+        if (scheduled == null) {
             synchronized(this) {
-                if (scheduiled == null) {
-                    scheduiled = launch(Main.nextTick) {
+                if (scheduled == null) {
+                    scheduled = launch(Main.nextTick) {
                         while (concurrentLinkedQueue.size > 0) {
                             val task = concurrentLinkedQueue.poll()
                             task.invoke()
                         }
 
-                        scheduiled = null
+                        scheduled = null
                     }
                 }
             }

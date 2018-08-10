@@ -3,35 +3,28 @@ package one.oktw.galaxy.gui.view
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
-import one.oktw.galaxy.data.DataUUID
-// import org.spongepowered.api.Sponge
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.inventory.property.SlotIndex
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 open class GridGUIView<EnumValue, Data>(
     override val inventory: Inventory,
     final override val layout: List<EnumValue>,
     private val dimension: Pair<Int, Int>
 ) : GUIView<EnumValue, Data> {
+
     override var disabled = false
 
     private val map = HashMap<Int, Data>()
-    private val cache = ConcurrentHashMap<Int, UUID>() // workaround for the messy sponge api
 
     private val nameIndex = HashMap<Int, Pair<EnumValue, Int>>()
 
     private var scheduled: Job? = null
-    private val concurrentLinkedQueue = ConcurrentLinkedQueue<()->Unit>()
+    private val concurrentLinkedQueue = ConcurrentLinkedQueue<() -> Unit>()
 
     init {
         val map = HashMap<EnumValue, Int>()
@@ -43,7 +36,7 @@ open class GridGUIView<EnumValue, Data>(
         }
     }
 
-    private fun queueAndRun(op: ()->Unit) {
+    private fun queueAndRun(op: () -> Unit) {
         concurrentLinkedQueue.add(op)
 
         if (scheduled == null) {
@@ -71,25 +64,12 @@ open class GridGUIView<EnumValue, Data>(
     }
 
     private fun setSlot(x: Int, y: Int, item: ItemStack?) {
-        // drop cache first, so it won't messy up when you click to fast
-        // also invalidate the button immediately when item being removed
-        cache.remove(getOffset(x, y))
-
         if (item != null) {
-
-            item[DataUUID.key].orElse(null)?.let {
-                cache[getOffset(x, y)] = it
-            } ?: let {
-                cache.remove(getOffset(x, y))
-            }
-
             queueAndRun {
                 // Main.main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when edit")
                 grid.set(x, y, item)
             }
         } else {
-            cache.remove(getOffset(x, y))
-
             queueAndRun {
                 // Main.main.logger.info("tick ${Sponge.getServer().defaultWorld.orElse(null)?.totalTime} when edit")
                 grid.poll(x, y)
@@ -98,13 +78,7 @@ open class GridGUIView<EnumValue, Data>(
     }
 
     override fun setSlot(name: EnumValue, item: ItemStack?) {
-        for (y in 0 until dimension.second) {
-            for (x in 0 until dimension.first) {
-                if (layout[getOffset(x, y)] == name) {
-                    setSlot(x, y, item)
-                }
-            }
-        }
+        setSlot(name, item, null)
     }
 
     override fun setSlot(name: EnumValue, item: ItemStack?, data: Data?) {
@@ -135,6 +109,16 @@ open class GridGUIView<EnumValue, Data>(
         return null
     }
 
+    override fun getData(name: EnumValue): Data? {
+        layout.mapIndexed { index, enumValue ->
+            if (enumValue == name) {
+                return map[index]
+            }
+        }
+
+        return null
+    }
+
     override fun getSlots(name: EnumValue): List<ItemStack> {
         val listToReturn = ArrayList<ItemStack>()
 
@@ -151,20 +135,20 @@ open class GridGUIView<EnumValue, Data>(
         return listToReturn
     }
 
-    override fun setSlots(name: EnumValue, listToAdd: List<ItemStack?>) {
-        val iterator = listToAdd.iterator()
+    override fun getDatas(name: EnumValue): List<Data?> {
+        val list: ArrayList<Data?> = ArrayList<Data?>()
 
-        for (y in 0 until dimension.second) {
-            for (x in 0 until dimension.first) {
-                if (layout[getOffset(x, y)] == name) {
-                    if (iterator.hasNext()) {
-                        setSlot(x, y, iterator.next())
-                    } else {
-                        setSlot(x, y, null)
-                    }
-                }
+        layout.mapIndexed { index, enumValue ->
+            if (enumValue == name) {
+                list.add(map[index])
             }
         }
+
+        return list
+    }
+
+    override fun setSlots(name: EnumValue, listToAdd: List<ItemStack?>) {
+        setSlots(name, listToAdd, null)
     }
 
     override fun setSlots(name: EnumValue, listToAdd: List<ItemStack?>, data: Data?) {
@@ -196,10 +180,10 @@ open class GridGUIView<EnumValue, Data>(
             for (x in 0 until dimension.first) {
                 if (layout[getOffset(x, y)] == name) {
                     if (iterator.hasNext()) {
-                        iterator.next().let {
-                            setSlot(x, y, it.first)
+                        iterator.next().let { pair ->
+                            setSlot(x, y, pair.first)
 
-                            it.second.let {
+                            pair.second.let {
                                 if (it != null) {
                                     map[getOffset(x, y)] = it
                                 } else {
@@ -231,7 +215,6 @@ open class GridGUIView<EnumValue, Data>(
     }
 
     override fun clear() {
-        cache.clear()
         map.clear()
 
         queueAndRun {
@@ -240,82 +223,34 @@ open class GridGUIView<EnumValue, Data>(
         }
     }
 
-    override fun getNameOf(id: UUID): Pair<EnumValue, Int>? {
-        for (y in 0 until dimension.second) {
-            for (x in 0 until dimension.first) {
-                val idOfSlot = cache[getOffset(x, y)] ?: continue
-
-                if (id == idOfSlot) {
-                    return nameIndex[getOffset(x, y)]
-                }
-            }
-        }
-
-        return null
-    }
-
     override fun getNameOf(event: ClickInventoryEvent): Pair<EnumValue, Int>? {
-        return event.cursorTransaction.default[DataUUID.key].orElse(null)?.let { getNameOf(it) } ?: let {
-            if (event.transactions.size != 1) {
-                null
+        if (event.transactions.size != 1) {
+            return null
+        } else {
+            val slotIndex = event.transactions[0]!!.slot.getProperty(SlotIndex::class.java, "slotindex").orElse(null) ?: return null
+            val index = slotIndex.value ?: return null
+
+            return if (index < dimension.first * dimension.second) {
+                nameIndex[index]
             } else {
-                val slotIndex = event.transactions[0]!!.slot.getProperty(SlotIndex::class.java, "slotindex").orElse(null) ?: return null
-                val index = slotIndex.value ?: return null
-
-                if (index < dimension.first * dimension.second) {
-                    nameIndex[index]
-                } else {
-                    null
-                }
+                null
             }
         }
-    }
-
-    override fun getNameOf(stack: ItemStack): Pair<EnumValue, Int>? {
-        return stack[DataUUID.key].orElse(null)?.let { getNameOf(it) }
-    }
-
-    override fun getNameOf(stack: ItemStackSnapshot): Pair<EnumValue, Int>? {
-        return stack[DataUUID.key].orElse(null)?.let { getNameOf(it) }
-    }
-
-    override fun getDataOf(id: UUID): Data? {
-        for (y in 0 until dimension.second) {
-            for (x in 0 until dimension.first) {
-                val idOfSlot = cache[getOffset(x, y)] ?: continue
-
-                if (id == idOfSlot) {
-                    return map[getOffset(x, y)]
-                }
-            }
-        }
-
-        return null
     }
 
     override fun getDataOf(event: ClickInventoryEvent): Data? {
-        return event.cursorTransaction.default[DataUUID.key].orElse(null)?.let { getDataOf(it) } ?: let {
-            if (event.transactions.size != 1) {
-                null
-            } else {
-                val slotIndex = event.transactions[0]!!.slot.getProperty(SlotIndex::class.java, "slotindex").orElse(null) ?: return null
-                val index = slotIndex.value ?: return null
+        if (event.transactions.size != 1) {
+            return null
+        } else {
+            val slotIndex = event.transactions[0]!!.slot.getProperty(SlotIndex::class.java, "slotindex").orElse(null) ?: return null
+            val index = slotIndex.value ?: return null
 
-                if (index < dimension.first * dimension.second) {
-                    map[index]
-                } else {
-                    null
-                }
+            return if (index < dimension.first * dimension.second) {
+                map[index]
+            } else {
+                null
             }
         }
-    }
-
-    override fun getDataOf(stack: ItemStack): Data? {
-        return stack[DataUUID.key].orElse(null)?.let { getDataOf(it) }
-    }
-
-    override fun getDataOf(stack: ItemStackSnapshot): Data? {
-        return stack[DataUUID.key].orElse(null)?.let { getDataOf(it) }
     }
 
     override fun getDetail(event: ClickInventoryEvent): EventDetail<EnumValue, Data> {

@@ -18,12 +18,18 @@ class BlockGUI {
     fun onClickBlock(event: InteractBlockEvent.Secondary.MainHand, @First player: Player) {
         if (player[Keys.IS_SNEAKING].orElse(false) == true) return
 
-        when (event.targetBlock.location.orElse(null)?.get(DataBlockType.key)?.orElse(null) ?: return) {
+        val blockType = event.targetBlock.location.orElse(null)?.get(DataBlockType.key)?.orElse(null) ?: return
+
+        when (blockType) {
             DUMMY -> Unit
             CONTROL_PANEL -> GUIHelper.open(player) { MainMenu(player) }
             PLANET_TERMINAL -> launch { galaxyManager.get(player.world)?.let { GUIHelper.open(player) { PlanetTerminal(it, player) } } }
             HT_CRAFTING_TABLE -> Unit // TODO GUIHelper.open(player) { }
             else -> Unit
+        }
+
+        if (blockType.hasGUI) {
+            event.isCancelled = true
         }
     }
 }

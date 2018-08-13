@@ -27,7 +27,7 @@ class GroupSelect(private val callback: (Group) -> Unit) : GUI() {
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
         .property(InventoryTitle.of(Text.of(languageService.getDefaultLanguage()["UI.Title.SelectPermissionGroup"]))) // TODO get player language
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
     private val buttonID = Array(3) { UUID.randomUUID() }
 

@@ -36,7 +36,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
         .property(InventoryTitle.of(Text.of(lang["UI.Title.MemberList"])))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 
     init {

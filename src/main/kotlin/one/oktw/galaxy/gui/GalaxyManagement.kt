@@ -33,7 +33,7 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.CHEST)
         .property(InventoryTitle.of(Text.of(galaxy.name)))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
     private val lang = languageService.getDefaultLanguage()
     private val buttonID = Array(7) { UUID.randomUUID() }

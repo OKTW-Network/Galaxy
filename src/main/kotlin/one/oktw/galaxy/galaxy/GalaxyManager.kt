@@ -3,6 +3,7 @@ package one.oktw.galaxy.galaxy
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.reactivestreams.client.FindPublisher
 import kotlinx.coroutines.experimental.reactive.awaitFirstOrNull
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
@@ -30,7 +31,12 @@ class GalaxyManager {
     }
 
     suspend fun saveGalaxy(galaxy: Galaxy) {
-        collection.findOneAndReplace(eq("uuid", galaxy.uuid), galaxy).awaitFirstOrNull()
+        try {
+            collection.findOneAndReplace(eq("uuid", galaxy.uuid), galaxy).awaitFirstOrNull()
+        } catch (exception: Exception) {
+            main.logger.error("Failed save galaxy: {}({})", galaxy.uuid, galaxy.name)
+            throw exception
+        }
     }
 
     suspend fun deleteGalaxy(uuid: UUID) {
@@ -43,7 +49,7 @@ class GalaxyManager {
 
     suspend fun get(uuid: UUID? = null, planet: UUID? = null): Galaxy? {
         return uuid?.let { collection.find(eq("uuid", uuid)).first().awaitFirstOrNull() }
-                ?: planet?.let { collection.find(eq("planets.uuid", planet)).first().awaitFirstOrNull() }
+            ?: planet?.let { collection.find(eq("planets.uuid", planet)).first().awaitFirstOrNull() }
     }
 
 

@@ -12,6 +12,7 @@ import one.oktw.galaxy.data.DataItemType
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.block.BlockTypes.STANDING_SIGN
 import org.spongepowered.api.block.BlockTypes.WALL_SIGN
+import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.key.Keys.GAME_MODE
 import org.spongepowered.api.data.key.Keys.POTION_EFFECTS
 import org.spongepowered.api.effect.potion.PotionEffect
@@ -119,11 +120,14 @@ class Viewer {
     @Listener(order = Order.FIRST)
     fun onInteractBlock(event: InteractBlockEvent, @Root player: Player) {
         if (isViewer(player.uniqueId)) {
-            // whitelist some custom blocks
-            if (event.targetBlock.state.type in asList(STANDING_SIGN, WALL_SIGN)) return
+            // only allow event if it is going to open gui
+            if (player[Keys.IS_SNEAKING].orElse(false) == false) {
+                // whitelist some custom blocks
+                if (event.targetBlock.state.type in asList(STANDING_SIGN, WALL_SIGN)) return
 
-            event.targetBlock.location.orElse(null)?.get(DataBlockType.key)?.orElse(null)?.let {
-                if (it in asList(PLANET_TERMINAL, CONTROL_PANEL)) return
+                event.targetBlock.location.orElse(null)?.get(DataBlockType.key)?.orElse(null)?.let {
+                    if (it in asList(PLANET_TERMINAL, CONTROL_PANEL)) return
+                }
             }
 
             event.isCancelled = true

@@ -1,9 +1,7 @@
 package one.oktw.galaxy
 
 import com.google.inject.Inject
-import kotlinx.coroutines.experimental.CloseableCoroutineDispatcher
-import kotlinx.coroutines.experimental.Delay
-import kotlinx.coroutines.experimental.asCoroutineDispatcher
+import kotlinx.coroutines.experimental.*
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
 import one.oktw.galaxy.galaxy.GalaxyManager
@@ -16,7 +14,7 @@ import one.oktw.galaxy.internal.register.DataRegister
 import one.oktw.galaxy.internal.register.EventRegister
 import one.oktw.galaxy.internal.register.RecipeRegister
 import one.oktw.galaxy.machine.chunkloader.ChunkLoaderManager
-import one.oktw.galaxy.util.DelayedSpongeDispatcher
+import one.oktw.galaxy.util.DelayedExecute
 import org.slf4j.Logger
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.config.ConfigDir
@@ -49,14 +47,13 @@ class Main {
             private set
         lateinit var serverThread: CloseableCoroutineDispatcher
             private set
-        lateinit var nextTick: DelayedSpongeDispatcher.Companion.DispatcherFactory
-            private set
         lateinit var galaxyManager: GalaxyManager
             private set
         lateinit var chunkLoaderManager: ChunkLoaderManager
             private set
         lateinit var languageService: LanguageService
             private set
+        private lateinit var delayedExecute: DelayedExecute
     }
 
     @Inject
@@ -87,7 +84,7 @@ class Main {
     @Listener
     fun onPreInit(event: GamePreInitializationEvent) {
         serverThread = Sponge.getScheduler().createSyncExecutor(this).asCoroutineDispatcher()
-        nextTick = DelayedSpongeDispatcher.factory(this)
+        delayedExecute = DelayedExecute(plugin)
         languageService = LanguageService()
         DataRegister()
         RecipeRegister()
@@ -112,4 +109,7 @@ class Main {
     fun onReload(event: GameReloadEvent) {
         //TODO
     }
+
+    // schedule task on main thread
+    fun nextTick(delay: Long = 1, block: suspend CoroutineScope.() -> Unit): Job = delayedExecute.delay(delay, block)
 }

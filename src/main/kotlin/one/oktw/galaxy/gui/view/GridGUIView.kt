@@ -1,8 +1,7 @@
 package one.oktw.galaxy.gui.view
 
 import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.launch
-import one.oktw.galaxy.Main
+import one.oktw.galaxy.Main.Companion.main
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStack
@@ -39,10 +38,10 @@ open class GridGUIView<EnumValue, Data>(
     private fun queueAndRun(op: () -> Unit) {
         pendingTasks.add(op)
 
-        if (scheduled == null) {
-            synchronized(this) {
-                if (scheduled == null) {
-                    scheduled = launch(Main.nextTick) {
+        synchronized(this) {
+            if (scheduled == null) {
+                scheduled = main.nextTick {
+                    synchronized(this@GridGUIView) {
                         while (pendingTasks.size > 0) {
                             val task = pendingTasks.poll()
                             task.invoke()
@@ -50,6 +49,10 @@ open class GridGUIView<EnumValue, Data>(
 
                         scheduled = null
                     }
+                }
+
+                if (scheduled?.isCompleted == true) {
+                    scheduled = null
                 }
             }
         }

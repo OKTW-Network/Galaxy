@@ -55,7 +55,8 @@ class Main {
             private set
         lateinit var languageService: LanguageService
             private set
-        private lateinit var delayedExecute: DelayedExecute
+        lateinit var delay: DelayedExecute
+            private set
     }
 
     @Inject
@@ -86,7 +87,7 @@ class Main {
     @Listener
     fun onPreInit(event: GamePreInitializationEvent) {
         serverThread = Sponge.getScheduler().createSyncExecutor(this).asCoroutineDispatcher()
-        delayedExecute = DelayedExecute(plugin)
+        delay = DelayedExecute(plugin)
         languageService = LanguageService()
         DataRegister()
         RecipeRegister()
@@ -111,8 +112,4 @@ class Main {
     fun onReload(event: GameReloadEvent) {
         //TODO
     }
-
-    // schedule task on main thread
-    suspend fun <T> delayRun(tick: Long = 1, block: () -> T): T = delayedExecute.delay(tick, block)
-    fun <T> delayLaunch(tick: Long = 1, block: () -> T): Job = delayedExecute.delayLaunch(tick, block)
 }

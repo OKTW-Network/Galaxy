@@ -4,11 +4,11 @@ import kotlinx.coroutines.experimental.*
 import org.spongepowered.api.scheduler.Task
 
 class DelayedExecute(private val plugin: Any) {
-    fun <T> delayLaunch(tick: Long, block: () -> T): Job = launch(start = CoroutineStart.UNDISPATCHED) {
-        delay(tick, block)
+    fun <T> launch(tick: Long = 1, block: () -> T): Job = launch(start = CoroutineStart.UNDISPATCHED) {
+        run(tick, block)
     }
 
-    suspend fun <T> delay(tick: Long, block: () -> T) = suspendCancellableCoroutine<T> { cont ->
+    suspend fun <T> run(tick: Long = 1, block: () -> T) = suspendCancellableCoroutine<T> { cont ->
         val task = Task.builder()
             .execute { _ ->
                 try {

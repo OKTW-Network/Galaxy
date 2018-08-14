@@ -1,7 +1,7 @@
 package one.oktw.galaxy.gui.view
 
 import kotlinx.coroutines.experimental.Job
-import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.Main
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStack
@@ -40,7 +40,7 @@ open class GridGUIView<EnumValue, Data>(
 
         synchronized(this) {
             if (scheduled == null) {
-                scheduled = main.delayLaunch {
+                scheduled = Main.delay.launch {
                     synchronized(this@GridGUIView) {
                         while (pendingTasks.size > 0) {
                             val task = pendingTasks.poll()

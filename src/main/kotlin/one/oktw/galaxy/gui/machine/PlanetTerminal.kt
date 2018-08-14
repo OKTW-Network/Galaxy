@@ -27,7 +27,6 @@ import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors.*
 import org.spongepowered.api.text.format.TextStyles.BOLD
-import org.spongepowered.api.text.serializer.TextSerializers
 import java.util.*
 import java.util.Arrays.asList
 
@@ -112,6 +111,7 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
                 offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.Button.Info"]))
                 offer(
                     Keys.ITEM_LORE, asList(
+                        Text.of(BOLD, YELLOW, lang["UI.Tip.StarDust"], RESET, ":", galaxy.starDust),
                         Text.of(BOLD, YELLOW, lang["UI.Tip.PlanetLevel"], RESET, ":", planet.level),
                         Text.of(BOLD, YELLOW, lang["UI.Tip.PlanetRange"], RESET, ":", planet.size),
                         Text.of(BOLD, YELLOW, lang["UI.Tip.PlanetEffect"], RESET, ":")

@@ -7,7 +7,6 @@ import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataItemType
-import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import org.spongepowered.api.Sponge
@@ -29,7 +28,7 @@ import java.util.*
 import java.util.Arrays.asList
 import kotlin.streams.toList
 
-class BrowserGalaxy(player: Player? = null) : PageGUI() {
+class BrowserGalaxy(player: Player? = null) : PageGUI<UUID>() {
     private val lang = languageService.getDefaultLanguage()
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
     private val list = galaxyManager.run { player?.let { get(it) } ?: listGalaxy() }
@@ -47,53 +46,54 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
     }
 
-    override suspend fun get(number: Int, skip: Int): List<ItemStack> {
+    override suspend fun get(number: Int, skip: Int): List<Pair<ItemStack, UUID>> {
         return list
             .skip(skip)
             .limit(number)
             .openSubscription()
             .toList()
             .parallelStream()
-            .map {
-                val owner = userStorage.get(it.members.first { it.group == OWNER }.uuid).get()
+            .map { galaxy ->
+                val owner = userStorage.get(galaxy.members.first { it.group == OWNER }.uuid).get()
 
-                ItemStack.builder()
-                    .itemType(ItemTypes.SKULL)
-                    .itemData(DataItemType(BUTTON))
-                    .itemData(DataUUID(it.uuid))
-                    .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, it.name))
-                    .add(SKULL_TYPE, SkullTypes.PLAYER)
-                    .add(REPRESENTED_PLAYER, owner.profile)
-                    .add(
-                        ITEM_LORE,
-                        asList(
-                            Text.of(
-                                TextColors.GREEN,
-                                "${lang["UI.Tip.Info"]}: ",
-                                TextColors.RESET,
-                                it.info
-                            ),
-                            Text.of(
-                                TextColors.GREEN,
-                                "${lang["UI.Tip.Owner"]}: ",
-                                TextColors.RESET,
-                                owner.name
-                            ),
-                            Text.of(
-                                TextColors.GREEN,
-                                "${lang["UI.Tip.MemberCount"]}: ",
-                                TextColors.RESET,
-                                it.members.size
-                            ),
-                            Text.of(
-                                TextColors.GREEN,
-                                "${lang["UI.Tip.PlanetCount"]}: ",
-                                TextColors.RESET,
-                                it.planets.size
+                Pair(
+                    ItemStack.builder()
+                        .itemType(ItemTypes.SKULL)
+                        .itemData(DataItemType(BUTTON))
+                        .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, galaxy.name))
+                        .add(SKULL_TYPE, SkullTypes.PLAYER)
+                        .add(REPRESENTED_PLAYER, owner.profile)
+                        .add(
+                            ITEM_LORE,
+                            asList(
+                                Text.of(
+                                    TextColors.GREEN,
+                                    "${lang["UI.Tip.Info"]}: ",
+                                    TextColors.RESET,
+                                    galaxy.info
+                                ),
+                                Text.of(
+                                    TextColors.GREEN,
+                                    "${lang["UI.Tip.Owner"]}: ",
+                                    TextColors.RESET,
+                                    owner.name
+                                ),
+                                Text.of(
+                                    TextColors.GREEN,
+                                    "${lang["UI.Tip.MemberCount"]}: ",
+                                    TextColors.RESET,
+                                    galaxy.members.size
+                                ),
+                                Text.of(
+                                    TextColors.GREEN,
+                                    "${lang["UI.Tip.PlanetCount"]}: ",
+                                    TextColors.RESET,
+                                    galaxy.planets.size
+                                )
                             )
                         )
-                    )
-                    .build()
+                        .build(), galaxy.uuid
+                )
             }
             .toList()
     }
@@ -101,16 +101,21 @@ class BrowserGalaxy(player: Player? = null) : PageGUI() {
     private fun clickEvent(event: ClickInventoryEvent) {
         if (view.disabled) return
 
+        val detail = view.getDetail(event)
+
         // ignore gui elements, because they are handled by the PageGUI
-        if (!isControl(event.cursorTransaction.default)) {
+        if (isControl(detail)) {
+            return
+        }
+
+        if (detail.affectGUI) {
             event.isCancelled = true
         }
 
-        val player = event.source as Player
-        val item = event.cursorTransaction.default
-        val uuid = item[DataUUID.key].orElse(null) ?: return
+        if (detail.primary?.type == Companion.Slot.ITEMS) {
+            val player = event.source as Player
+            val uuid = detail.primary.data?.data ?: return
 
-        if (view.getNameOf(uuid)?.first == Companion.Slot.ITEMS) {
             launch {
                 galaxyManager.get(uuid)?.let {
                     GUIHelper.open(player) { GalaxyInfo(it, player) }

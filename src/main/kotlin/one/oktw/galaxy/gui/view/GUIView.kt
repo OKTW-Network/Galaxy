@@ -3,10 +3,9 @@ package one.oktw.galaxy.gui.view
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.item.inventory.ItemStackSnapshot
-import java.util.*
 
 interface GUIView<EnumValue, Data> {
+
     val inventory: Inventory
     val layout: List<EnumValue>
 
@@ -22,6 +21,9 @@ interface GUIView<EnumValue, Data> {
     // retrieve first slot of the given named slots
     fun getSlot(name: EnumValue): ItemStack?
 
+    // get data of first slot that have the name
+    fun getData(name: EnumValue): Data?
+
     // override all item of the given names slots
     fun setSlots(name: EnumValue, listToAdd: List<ItemStack?>)
 
@@ -34,32 +36,21 @@ interface GUIView<EnumValue, Data> {
     // retrieve all slots of the given named slots
     fun getSlots(name: EnumValue): List<ItemStack>
 
+    // get data slots that have the name
+    fun getDatas(name: EnumValue): List<Data?>
+
     // retrieve counts of a named slot
     fun countSlots(name: EnumValue): Int
 
+    // clear the whole view
     fun clear()
 
     // get the name of field from event
     fun getNameOf(event: ClickInventoryEvent): Pair<EnumValue, Int>?
 
-    // get name from a ItemStack
-    fun getNameOf(stack: ItemStack): Pair<EnumValue, Int>?
-
-    // get name from a ItemStack
-    fun getNameOf(stack: ItemStackSnapshot): Pair<EnumValue, Int>?
-
-    // get name from a ItemStack
-    fun getNameOf(id: UUID): Pair<EnumValue, Int>?
-
     // get the data of field from event
     fun getDataOf(event: ClickInventoryEvent): Data?
 
-    // get name from a ItemStack
-    fun getDataOf(stack: ItemStack): Data?
-
-    // get name from a ItemStack
-    fun getDataOf(stack: ItemStackSnapshot): Data?
-
-    // get name from a ItemStack
-    fun getDataOf(id: UUID): Data?
+    // get detail of event
+    fun getDetail(event: ClickInventoryEvent): EventDetail<EnumValue, Data>
 }

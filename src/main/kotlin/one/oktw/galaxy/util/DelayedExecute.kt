@@ -11,7 +11,11 @@ class DelayedExecute(private val plugin: Any) {
     suspend fun <T> delay(tick: Long, block: () -> T) = suspendCancellableCoroutine<T> { cont ->
         val task = Task.builder()
             .execute { _ ->
-                cont.resume(block.invoke())
+                try {
+                    cont.resume(block.invoke())
+                } catch (err: Throwable) {
+                    cont.resumeWithException(err)
+                }
             }
             .delayTicks(tick)
             .name("Galaxy - delayed task after $tick tick")

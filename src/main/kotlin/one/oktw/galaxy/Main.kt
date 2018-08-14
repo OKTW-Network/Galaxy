@@ -1,7 +1,9 @@
 package one.oktw.galaxy
 
 import com.google.inject.Inject
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.CloseableCoroutineDispatcher
+import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.experimental.asCoroutineDispatcher
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
 import one.oktw.galaxy.galaxy.GalaxyManager
@@ -111,5 +113,6 @@ class Main {
     }
 
     // schedule task on main thread
-    fun nextTick(delay: Long = 1, block: suspend CoroutineScope.() -> Unit): Job = delayedExecute.delay(delay, block)
+    suspend fun <T> delayRun(tick: Long = 1, block: () -> T): T = delayedExecute.delay(tick, block)
+    fun <T> delayLaunch(tick: Long = 1, block: () -> T): Job = delayedExecute.delayLaunch(tick, block)
 }

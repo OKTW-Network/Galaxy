@@ -40,7 +40,7 @@ open class GridGUIView<EnumValue, Data>(
 
         synchronized(this) {
             if (scheduled == null) {
-                scheduled = main.nextTick {
+                scheduled = main.delayLaunch {
                     synchronized(this@GridGUIView) {
                         while (pendingTasks.size > 0) {
                             val task = pendingTasks.poll()

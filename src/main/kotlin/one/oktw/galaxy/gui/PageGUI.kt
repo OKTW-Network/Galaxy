@@ -3,6 +3,7 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.delay
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.gui.view.EventDetail
 import one.oktw.galaxy.gui.view.GridGUIView
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.enums.ButtonType.*
@@ -19,14 +20,21 @@ import java.util.*
 import java.util.Arrays.asList
 import kotlin.collections.ArrayList
 
-abstract class PageGUI : GUI() {
+abstract class PageGUI<Data> : GUI() {
     companion object {
         private const val CHANGE_PAGE_INTERVAL = 100
         private const val SET_ITEM_DELAY = 20
 
+        data class Operation<Data>(
+            val action: Action = Action.Null,
+            val data: Data? = null
+        )
+
         enum class Action {
             PrevPage,
-            NextPage
+            NextPage,
+            Item,
+            Null
         }
 
         enum class Slot {
@@ -63,11 +71,10 @@ abstract class PageGUI : GUI() {
 
     private val lang = languageService.getDefaultLanguage()
     private var pageNumber = 0
-    private val buttonID = Array(2) { UUID.randomUUID() }
     private val lock = OrderedLaunch()
 
-    val view: GridGUIView<Slot, Action> by lazy {
-        GridGUIView<Slot, Action>(
+    val view: GridGUIView<Slot, Operation<Data>> by lazy {
+        GridGUIView<Slot, Operation<Data>>(
             inventory,
             layout,
             Pair(WIDTH, HEIGHT)
@@ -91,7 +98,7 @@ abstract class PageGUI : GUI() {
         return result.reversed()
     }
 
-    protected abstract suspend fun get(number: Int, skip: Int): List<ItemStack>
+    protected abstract suspend fun get(number: Int, skip: Int): List<Pair<ItemStack, Data?>>
 
     // There should be only one offerPage processed at same time, or the pages will be merged all together
     protected fun offerPage(pageNumber: Int) = lock.launch {
@@ -113,44 +120,45 @@ abstract class PageGUI : GUI() {
 
         val showNextPage = !get(1, (pageNumber + 1) * maxItem).isEmpty()
 
-        get(maxItem, pageNumber * maxItem).let { view.setSlots(Slot.ITEMS, ArrayList(it)) }
+        get(maxItem, pageNumber * maxItem)
+            .map {
+                Pair(it.first, Operation(Action.Item, it.second))
+            }
+            .let {
+                view.setSlotPairs(Slot.ITEMS, it)
+            }
+
         offerButton(pageNumber != 0, showNextPage)
         offerNumber(pageNumber + 1) // make it start from one...
         offerEmptySlot(pageNumber == 0, !showNextPage)
         view.disabled = false
     }
 
-    protected fun isControl(item: ItemStackSnapshot) = view.getNameOf(item)?.first in asList(
-        Slot.NUMBER,
-        Slot.NEXT,
-        Slot.PREV,
-        Slot.NUMBER
-    )
+    protected fun isControl(detail: EventDetail<Slot, Operation<Data>>): Boolean {
+        detail.affectedSlots.forEach {
+            if (it.type in asList(Slot.NEXT, Slot.PREV, Slot.NUMBER, Slot.NULL)) {
+                return true
+            }
+        }
 
-    protected fun isControl(uuid: UUID) = view.getNameOf(uuid)?.first in asList(
-        Slot.NUMBER,
-        Slot.NEXT,
-        Slot.PREV,
-        Slot.NUMBER
-    )
+        return false
+    }
 
     private fun offerButton(previous: Boolean, next: Boolean) {
         if (previous) {
             Button(ARROW_LEFT).createItemStack()
                 .apply {
-                    offer(DataUUID(buttonID[0]))
                     offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.PreviousPage"]))
                 }
-                .let { view.setSlot(Slot.PREV, it, Action.PrevPage) }
+                .let { view.setSlot(Slot.PREV, it, Operation(Action.PrevPage)) }
         }
 
         if (next) {
             Button(ARROW_RIGHT).createItemStack()
                 .apply {
-                    offer(DataUUID(buttonID[1]))
                     offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.NextPage"]))
                 }
-                .let { view.setSlot(Slot.NEXT, it, Action.NextPage) }
+                .let { view.setSlot(Slot.NEXT, it, Operation(Action.NextPage)) }
         }
     }
 
@@ -165,27 +173,26 @@ abstract class PageGUI : GUI() {
             .let { (0 until it) }
             .map {
                 Button(GUI_CENTER).createItemStack()
-                    .apply { offer(DataUUID(UUID.randomUUID())) }
             }
             .let { view.setSlots(Slot.NULL, it) }
 
         if (fillPrev) {
             Button(GUI_CENTER).createItemStack()
-                .apply { offer(DataUUID(UUID.randomUUID())) }
                 .let { view.setSlot(Slot.PREV, it, null) }
         }
 
         if (fillNext) {
             Button(GUI_CENTER).createItemStack()
-                .apply { offer(DataUUID(UUID.randomUUID())) }
                 .let { view.setSlot(Slot.NEXT, it, null) }
         }
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
+        val info = view.getDetail(event)
+
         // we trap everything when gui is disabled
         if (view.disabled) {
-            if (view.getNameOf(event) != null) {
+            if (info.affectGUI) {
                 // item on the gui
                 // because we are going to wipe the gui, items should not be rollback by the sponge
                 event.cursorTransaction.apply {
@@ -201,11 +208,9 @@ abstract class PageGUI : GUI() {
             return
         }
 
-        val item = event.cursorTransaction.default
-
         // handle only buttons, let gui extends this decide how to handle them
-        if (isControl(item)) {
-            val action = view.getDataOf(item)
+        if (isControl(info)) {
+            val action = info.primary?.data?.action
 
             if (action != null) {
                 // wipe it directly, because we are going to change page and we don't want the buttons to be rollback
@@ -220,6 +225,7 @@ abstract class PageGUI : GUI() {
             when (action) {
                 Action.PrevPage -> if (pageNumber > 0) offerPage(--pageNumber)
                 Action.NextPage -> offerPage(++pageNumber)
+                else -> Unit
             }
         }
     }

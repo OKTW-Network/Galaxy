@@ -10,11 +10,9 @@ import one.oktw.galaxy.galaxy.planet.gen.NetherGenModifier
 import one.oktw.galaxy.galaxy.planet.gen.NormalGenModifier
 import one.oktw.galaxy.internal.DatabaseManager
 import one.oktw.galaxy.internal.LanguageService
-import one.oktw.galaxy.internal.register.CommandRegister
-import one.oktw.galaxy.internal.register.DataRegister
-import one.oktw.galaxy.internal.register.EventRegister
-import one.oktw.galaxy.internal.register.RecipeRegister
+import one.oktw.galaxy.internal.register.*
 import one.oktw.galaxy.machine.chunkloader.ChunkLoaderManager
+import one.oktw.galaxy.util.DelayedExecute
 import org.slf4j.Logger
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.config.ConfigDir
@@ -53,6 +51,8 @@ class Main {
             private set
         lateinit var languageService: LanguageService
             private set
+        lateinit var delay: DelayedExecute
+            private set
     }
 
     @Inject
@@ -83,9 +83,11 @@ class Main {
     @Listener
     fun onPreInit(event: GamePreInitializationEvent) {
         serverThread = Sponge.getScheduler().createSyncExecutor(this).asCoroutineDispatcher()
+        delay = DelayedExecute(plugin)
         languageService = LanguageService()
         DataRegister()
         RecipeRegister()
+        EasyRecipeRegister()
     }
 
     @Listener

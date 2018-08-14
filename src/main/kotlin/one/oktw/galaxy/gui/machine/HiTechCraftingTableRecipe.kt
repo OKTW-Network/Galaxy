@@ -1,5 +1,6 @@
 package one.oktw.galaxy.gui.machine
 
+import kotlinx.coroutines.experimental.CoroutineStart
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataUUID
@@ -201,9 +202,13 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
-        event.isCancelled = true
+        val detail = view.getDetail(event)
 
-        val action = view.getDataOf(event) ?: return
+        if (detail.affectGUI) {
+            event.isCancelled = true
+        }
+
+        val action = detail.primary?.data ?: return
 
         when (action) {
             Action.CANCEL -> {
@@ -211,7 +216,8 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
             }
 
             Action.CRAFT -> {
-                launch {
+                // we don't need to switch thread now
+                launch (Main.serverThread, start = CoroutineStart.UNDISPATCHED) {
                     val traveler = TravelerHelper.getTraveler(player).await() ?: return@launch
 
                     if (recipe.haveEnoughIngredient(player) && recipe.haveEnoughDust(traveler)) {

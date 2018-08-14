@@ -234,33 +234,21 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
-        // we trap everything when gui is disabled
-        if (view.disabled) {
-            if (view.getNameOf(event) != null) {
-                // item on the gui
-                // because we are going to wipe the gui, items should not be rollback by the sponge
-                event.cursorTransaction.apply {
-                    setCustom(ItemStackSnapshot.NONE)
-                    // isValid = false
-                }
-            } else {
-                // item in the user's inventory
-                // should be rollback
-                event.isCancelled = true
-            }
+        val detail = view.getDetail(event)
 
-            return
-        }
-
-        val data = view.getDataOf(event)
-        val player = event.source as Player
-
-        if (data == null) {
+        // don't let user move items in gui
+        if (detail.affectGUI) {
             event.isCancelled = true
+        }
+
+        // we are updating gui
+        if (view.disabled) {
             return
         }
 
-        val (action, index, catalog) = data
+        val player = event.source as? Player ?: return
+
+        val (action, index, catalog) = detail.primary?.data ?: return
 
         when (action) {
             Action.SELECT_CATALOG -> {

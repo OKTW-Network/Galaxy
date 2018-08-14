@@ -24,6 +24,7 @@ open class GridGUIView<EnumValue, Data>(
 
     private var scheduled: Job? = null
     private val pendingTasks = ConcurrentLinkedQueue<() -> Unit>()
+    private val lock = object {}
 
     init {
         val map = HashMap<EnumValue, Int>()
@@ -38,10 +39,10 @@ open class GridGUIView<EnumValue, Data>(
     private fun queueAndRun(op: () -> Unit) {
         pendingTasks.add(op)
 
-        synchronized(this) {
+        synchronized(lock) {
             if (scheduled == null) {
                 scheduled = Main.delay.launch {
-                    synchronized(this@GridGUIView) {
+                    synchronized(lock) {
                         while (pendingTasks.size > 0) {
                             val task = pendingTasks.poll()
                             task.invoke()

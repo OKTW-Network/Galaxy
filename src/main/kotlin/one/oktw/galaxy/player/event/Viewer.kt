@@ -59,16 +59,14 @@ class Viewer {
         }
 
         fun isViewer(uuid: UUID): Boolean {
+            if (viewer.isEmpty()) return false
+
             return viewer.contains(uuid)
         }
 
         fun removeViewer(uuid: UUID) {
             viewer -= uuid
-            launch(serverThread) {
-                Sponge.getServer().getPlayer(uuid).ifPresent {
-                    it.isSleepingIgnored = false
-                }
-            }
+            launch(serverThread) { Sponge.getServer().getPlayer(uuid).ifPresent { it.isSleepingIgnored = false } }
         }
     }
 
@@ -76,10 +74,10 @@ class Viewer {
         Task.builder()
             .interval(1, TimeUnit.MINUTES)
             .execute { _ ->
-                Sponge.getServer().onlinePlayers.forEach {
-                    if (!isViewer(it.uniqueId)) return@forEach
+                Sponge.getServer().onlinePlayers.forEach { player ->
+                    if (!isViewer(player.uniqueId)) return@forEach
 
-                    it.transform(POTION_EFFECTS) {
+                    player.transform(POTION_EFFECTS) {
                         (it ?: ArrayList()).apply { add(PotionEffect.of(PotionEffectTypes.SATURATION, 100, 1)) }
                     }
                 }
@@ -185,7 +183,7 @@ class Viewer {
 
     @Listener(order = Order.FIRST)
     fun onCollideEntity(event: CollideEntityEvent) {
-        event.isCancelled = event.cause.first(Player::class.java).orElse(null)?.let { isViewer(it.uniqueId) } == true
+        event.entities.removeIf { it is Player && isViewer(it.uniqueId) }
     }
 
     @Listener(order = Order.FIRST)

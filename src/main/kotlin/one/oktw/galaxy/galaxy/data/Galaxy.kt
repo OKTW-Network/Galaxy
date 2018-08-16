@@ -16,6 +16,6 @@ data class Galaxy(
     val joinRequest: ArrayList<UUID> = ArrayList()
 ) : StarDustKeeper() {
     init {
-        interestRate = 0.03
+        interestRate = 0.004
     }
 }

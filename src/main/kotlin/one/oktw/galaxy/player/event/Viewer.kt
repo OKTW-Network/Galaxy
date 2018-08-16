@@ -40,13 +40,13 @@ import org.spongepowered.api.item.ItemTypes.*
 import org.spongepowered.api.scheduler.Task
 import java.util.*
 import java.util.Arrays.asList
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArraySet
 import java.util.concurrent.TimeUnit
 
 @Suppress("unused")
 class Viewer {
     companion object {
-        private val viewer = ConcurrentHashMap.newKeySet<UUID>()
+        private val viewer = CopyOnWriteArraySet<UUID>()
 
         fun setViewer(uuid: UUID) {
             viewer += uuid
@@ -183,7 +183,12 @@ class Viewer {
 
     @Listener(order = Order.FIRST)
     fun onCollideEntity(event: CollideEntityEvent) {
-        event.entities.removeIf { it is Player && isViewer(it.uniqueId) }
+        val cause = event.cause.firstOrNull()
+        if (cause is Player && isViewer(cause.uniqueId)) {
+            event.isCancelled = true
+        } else {
+            event.entities.removeIf { it is Player && isViewer(it.uniqueId) }
+        }
     }
 
     @Listener(order = Order.FIRST)

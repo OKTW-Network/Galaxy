@@ -33,15 +33,6 @@ class Recipes {
         }
 
         private val materials: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>().apply {
-            add(
-                HiTechCraftingRecipe.builder()
-                    .add(of(ItemTypes.CLAY), 8)
-                    .add(of(ItemTypes.OBSIDIAN), 8)
-                    .cost(100)
-                    .result(Material(MaterialType.PART_RAW_BASE).createItemStack())
-                    .build()
-            )
-
             // Upgrade base
             add(
                 HiTechCraftingRecipe.builder()
@@ -311,6 +302,16 @@ class Recipes {
                     .build()
             )
 
+            // part base
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.CLAY), 8)
+                    .add(of(ItemTypes.OBSIDIAN), 8)
+                    .cost(100)
+                    .result(Material(MaterialType.PART_RAW_BASE).createItemStack())
+                    .build()
+            )
+
             // cpu
             add(
                 HiTechCraftingRecipe.builder()
@@ -320,6 +321,90 @@ class Recipes {
                     .add(Material(MaterialType.PART_BASE), 1)
                     .cost(100)
                     .result(Material(MaterialType.CPU).createItemStack())
+                    .build()
+            )
+
+            // cooling
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(Upgrade(UpgradeType.COOLING, 1).createItemStack()), 1)
+                    .add(of(ItemTypes.LAPIS_BLOCK), 1)
+                    .add(of(ItemTypes.IRON_INGOT), 6)
+                    .add(Material(MaterialType.PART_BASE), 1)
+                    .cost(100)
+                    .result(Material(MaterialType.COOLANT).createItemStack())
+                    .build()
+            )
+
+            // laser
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.REDSTONE_LAMP), 1)
+                    .add(of(ItemTypes.EMERALD), 1)
+                    .add(of(ItemTypes.GOLD_INGOT), 1)
+                    .add(of(ItemTypes.IRON_INGOT), 1)
+                    .add(of(ItemTypes.OBSIDIAN), 1)
+                    .cost(100)
+                    .result(Material(MaterialType.LASER).createItemStack())
+                    .build()
+            )
+
+            // Battery
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.REDSTONE_BLOCK), 4)
+                    .add(of(ItemTypes.IRON_INGOT), 4)
+                    .add(of(ItemTypes.OBSIDIAN), 8)
+                    .cost(100)
+                    .result(Material(MaterialType.BATTERY).createItemStack())
+                    .build()
+            )
+
+
+            // Scope
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.IRON_INGOT), 4)
+                    .add(of(ItemTypes.OBSIDIAN), 1)
+                    .add(of(ItemTypes.GLASS_PANE), 1)
+                    .add(of(ItemTypes.STRING), 4)
+                    .add(of(ItemStack.of(ItemTypes.DYE, 1).apply { offer(Keys.DYE_COLOR, DyeColors.RED) }), 4)
+                    .cost(100)
+                    .result(Material(MaterialType.SCOPE).createItemStack())
+                    .build()
+            )
+
+            // barrel
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.IRON_INGOT), 18)
+                    .add(of(ItemTypes.GOLD_INGOT), 4)
+                    .add(of(ItemTypes.OBSIDIAN), 1)
+                    .cost(100)
+                    .result(Material(MaterialType.BARREL).createItemStack())
+                    .build()
+            )
+
+            // handle
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.IRON_INGOT), 18)
+                    .add(of(ItemTypes.GOLD_INGOT), 4)
+                    .add(Ingredient.builder().with { it.type == ItemTypes.WOOL }
+                        .withDisplay(ItemStack.of(ItemTypes.WOOL, 1)).build(), 1)
+                    .cost(100)
+                    .result(Material(MaterialType.HANDLE).createItemStack())
+                    .build()
+            )
+
+            // trigger
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.IRON_INGOT), 4)
+                    .add(of(ItemTypes.GOLD_INGOT), 4)
+                    .add(of(ItemTypes.REDSTONE), 2)
+                    .cost(100)
+                    .result(Material(MaterialType.TRIGGER).createItemStack())
                     .build()
             )
         }
@@ -353,7 +438,22 @@ class Recipes {
                 .build()
         )
 
-        private val weapons: List<HiTechCraftingRecipe> = asList()
+        private val weapons: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe> ().apply {
+            // gun
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(Material(MaterialType.BARREL), 1)
+                    .add(Material(MaterialType.HANDLE), 1)
+                    .add(Material(MaterialType.TRIGGER), 1)
+                    .add(Material(MaterialType.COOLANT), 1)
+                    .add(Material(MaterialType.LASER), 1)
+                    .add(Material(MaterialType.BATTERY), 1)
+                    .add(Material(MaterialType.CPU), 1)
+                    .cost(99999999)
+                    .result(Gun().createItemStack())
+                    .build()
+            )
+        }
 
         private val all: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>().plus(tools).plus(materials).plus(machines).plus(weapons)
 

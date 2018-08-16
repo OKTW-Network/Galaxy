@@ -28,6 +28,6 @@ open class StarDustKeeper {
     }
 
     fun giveInterest() {
-        starDust += (starDust * interestRate).roundToLong()
+        starDust = (starDust * interestRate).roundToLong()
     }
 }

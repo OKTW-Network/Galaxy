@@ -95,7 +95,7 @@ fun Galaxy.requestJoin(uuid: UUID) = update {
 fun Galaxy.removeJoinRequest(uuid: UUID) = update { joinRequest.remove(uuid) }
 
 fun Galaxy.dividends(number: Long) = update {
-    takeStarDust(number * members.size).also {
-        if (it) members.forEach { it.giveStarDust(number) }
+    takeStarDust(number * members.size).also { success ->
+        if (success) members.forEach { it.giveStarDust(number) }
     }
 }

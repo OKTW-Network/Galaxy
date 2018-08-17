@@ -1,5 +1,6 @@
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
@@ -27,7 +28,6 @@ import java.util.*
 import java.util.Arrays.asList
 
 class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI() {
-    // Todo get player lang
     private val lang = languageService.getDefaultLanguage()
     private val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(member).get()
     override val token = "ManageMember-${galaxy.uuid}-$member"
@@ -78,12 +78,12 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
             buttonID[0] -> GUIHelper.open(player) {
                 Confirm(Text.of(lang["UI.Button.ConfirmRemoveMember"])) {
                     if (it) {
-                        galaxy.delMember(member)
+                        launch { galaxy.delMember(member) }
                         GUIHelper.close(token)
                     }
                 }
             }
-            buttonID[1] -> GUIHelper.open(player) { GroupSelect { galaxy.setGroup(member, it) } }
+            buttonID[1] -> GUIHelper.open(player) { GroupSelect { launch { galaxy.setGroup(member, it) } } }
         }
     }
 }

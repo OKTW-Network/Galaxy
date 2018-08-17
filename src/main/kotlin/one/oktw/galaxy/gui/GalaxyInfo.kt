@@ -1,5 +1,6 @@
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
@@ -33,7 +34,6 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
         .property(InventoryTitle.of(Text.of(galaxy.name)))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
-    // Todo get player lang
     private val lang = languageService.getDefaultLanguage()
     private val buttonID = Array(4) { UUID.randomUUID() }
 
@@ -116,7 +116,7 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
             buttonID[1] -> GUIHelper.openAsync(player) { BrowserPlanet(galaxy.refresh()) }
             buttonID[2] -> GUIHelper.openAsync(player) { GalaxyManagement(galaxy.refresh()) }
             buttonID[3] -> {
-                galaxy.requestJoin(player.uniqueId)
+                launch { galaxy.requestJoin(player.uniqueId) }
 
                 event.isCancelled = false
                 event.cursorTransaction.setCustom(ItemStackSnapshot.NONE)

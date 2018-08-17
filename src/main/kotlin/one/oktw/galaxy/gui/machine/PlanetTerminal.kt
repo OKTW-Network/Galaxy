@@ -174,8 +174,8 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
                         val member = galaxy.getMember(player.uniqueId) ?: return@launch
 
                         if (member.takeStarDust(it)) {
-                            galaxy.saveMember(member).join()
-                            galaxy.update { giveStarDust(it) }.join()
+                            galaxy.saveMember(member)
+                            galaxy.update { giveStarDust(it) }
 
                             player.sendMessage(Text.of(AQUA, lang["Respond.DonateStarDustTip"].format(it)))
                         } else {
@@ -188,17 +188,17 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
             buttonID[4] -> Unit // TODO ECS
             buttonID[5] -> GUIHelper.openAsync(player) { GalaxyManagement(galaxy.refresh()) }
             buttonID[6] -> {
-                galaxy.requestJoin(player.uniqueId)
+                launch { galaxy.requestJoin(player.uniqueId) }
 
                 event.isCancelled = false
                 event.cursorTransaction.setCustom(ItemStackSnapshot.NONE)
 
                 inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java)).apply {
-                    Button(PLUS).createItemStack()
-                        .apply {
-                            offer(Keys.DISPLAY_NAME, Text.of(GRAY, lang["UI.Button.JoinRequestSent"]))
-                        }
-                        .let { set(2, 2, it) }
+                    set(
+                        2,
+                        2,
+                        Button(PLUS).createItemStack().apply { offer(Keys.DISPLAY_NAME, Text.of(GRAY, lang["UI.Button.JoinRequestSent"])) }
+                    )
                 }
             }
         }

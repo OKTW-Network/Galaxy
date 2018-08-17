@@ -71,7 +71,7 @@ class PlayerControl {
                     if (!player.isOnline) continue
 
                     galaxy.getMember(player.uniqueId)?.also {
-                        galaxy.saveMember(saveTraveler(it, player)).join()
+                        galaxy.saveMember(saveTraveler(it, player))
                         delay(10, TimeUnit.SECONDS)
                     }
                 } catch (e: RuntimeException) {
@@ -150,7 +150,7 @@ class PlayerControl {
             if (from?.uuid != to?.uuid) {
                 // save and clean player data
                 from?.getMember(player.uniqueId)?.also {
-                    from.saveMember(saveTraveler(it, player)).join()
+                    from.saveMember(saveTraveler(it, player))
                     cleanPlayer(player)
                 } ?: cleanPlayer(player)
 
@@ -186,7 +186,7 @@ class PlayerControl {
     fun onServerStop(event: GameStoppingServerEvent) {
         Sponge.getServer().onlinePlayers.forEach { player ->
             runBlocking {
-                galaxyManager.get(player.world)?.run { getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)).join() } }
+                galaxyManager.get(player.world)?.run { getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)) } }
             }
         }
     }

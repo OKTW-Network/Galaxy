@@ -21,9 +21,12 @@ import one.oktw.galaxy.player.event.Viewer.Companion.isViewer
 import one.oktw.galaxy.player.event.Viewer.Companion.removeViewer
 import one.oktw.galaxy.player.event.Viewer.Companion.setViewer
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.block.BlockTypes.END_PORTAL
+import org.spongepowered.api.block.BlockTypes.PORTAL
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
+import org.spongepowered.api.event.block.CollideBlockEvent
 import org.spongepowered.api.event.entity.MoveEntityEvent
 import org.spongepowered.api.event.filter.Getter
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent
@@ -32,6 +35,7 @@ import org.spongepowered.api.resourcepack.ResourcePack
 import org.spongepowered.api.resourcepack.ResourcePacks
 import org.spongepowered.api.service.user.UserStorageService
 import java.net.URI
+import java.util.Arrays.asList
 import java.util.concurrent.TimeUnit
 
 class PlayerControl {
@@ -175,8 +179,8 @@ class PlayerControl {
     }
 
     @Listener
-    fun disablePortal(event: MoveEntityEvent.Teleport.Portal) {
-        event.toTransform = event.fromTransform
+    fun disablePortal(event: CollideBlockEvent) {
+        if (event.targetBlock.type in asList(PORTAL, END_PORTAL)) event.isCancelled = true
     }
 
     @Listener

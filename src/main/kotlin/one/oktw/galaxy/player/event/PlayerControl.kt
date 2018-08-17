@@ -66,14 +66,13 @@ class PlayerControl {
 
                 try {
                     val player = players.next()
+                    val galaxy = galaxyManager.get(player.world) ?: continue
 
-                    if (!player.isOnline || isViewer(player.uniqueId)) continue
+                    if (!player.isOnline) continue
 
-                    galaxyManager.get(player.world)?.run {
-                        getMember(player.uniqueId)?.also {
-                            saveMember(saveTraveler(it, player)).join()
-                            delay(10, TimeUnit.SECONDS)
-                        }
+                    galaxy.getMember(player.uniqueId)?.also {
+                        galaxy.saveMember(saveTraveler(it, player)).join()
+                        delay(10, TimeUnit.SECONDS)
                     }
                 } catch (e: RuntimeException) {
                     main.logger.error("Saving player data error", e)
@@ -156,7 +155,7 @@ class PlayerControl {
                 } ?: cleanPlayer(player)
 
                 // restore player data
-                to?.let { it.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }
+                to?.let { galaxy -> galaxy.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }
             }
 
             // check permission
@@ -187,8 +186,7 @@ class PlayerControl {
     fun onServerStop(event: GameStoppingServerEvent) {
         Sponge.getServer().onlinePlayers.forEach { player ->
             runBlocking {
-                galaxyManager.get(player.world)
-                    ?.run { getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)).join() } }
+                galaxyManager.get(player.world)?.run { getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)).join() } }
             }
         }
     }

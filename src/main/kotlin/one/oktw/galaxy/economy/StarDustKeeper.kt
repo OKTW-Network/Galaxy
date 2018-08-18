@@ -3,7 +3,7 @@ package one.oktw.galaxy.economy
 import kotlin.math.roundToLong
 
 open class StarDustKeeper {
-    var interestRate = 0.0
+    open var interestRate = 0.0
     var starDust = 0L
         private set
 

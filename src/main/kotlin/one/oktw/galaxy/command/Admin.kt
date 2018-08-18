@@ -17,6 +17,7 @@ class Admin : CommandBase {
         .child(GalaxyInfo().spec, "galaxyInfo")
         .child(GalaxyManage().spec, "galaxyManage")
         .child(Block().spec, "block")
+        .child(DeleteWorld().spec, "deleteWorld")
         .executor(this)
         .build()
 

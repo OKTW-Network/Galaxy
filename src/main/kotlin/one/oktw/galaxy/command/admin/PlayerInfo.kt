@@ -32,7 +32,8 @@ class PlayerInfo : CommandBase {
                     Text.of("UUID: ", player.uniqueId),
                     Text.of("Viewer mode: ", isViewer(player.uniqueId)),
                     Text.of("Galaxy: ${galaxy?.name} (${galaxy?.uuid})"),
-                    Text.of("Planet: ", galaxy?.getPlanet(player.world))
+                    Text.of("Planet: ", galaxy?.getPlanet(player.world)),
+                    Text.of("World: ${player.world.name} (${player.world.uniqueId})")
                 )
                 .title(Text.of("Player Info"))
                 .sendTo(src)

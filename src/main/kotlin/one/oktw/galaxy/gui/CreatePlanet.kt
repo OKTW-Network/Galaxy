@@ -128,8 +128,17 @@ class CreatePlanet(private val galaxy: Galaxy) : GUI() {
                 player.sendMessage(Text.of(YELLOW, "星球創建成功！"))
                 TeleportHelper.teleport(player, planet)
                 return true
-            } catch (e: IllegalArgumentException) {
-                player.sendMessage(Text.of(RED, "星球創建失敗：", e.message))
+            } catch (e: RuntimeException) {
+                var message = e.message
+
+                if (e is IllegalArgumentException) {
+                    when (e.message) {
+                        "Name contains characters that are not allowed" -> message = lang["Respond.WorldCharNotAllow"]
+                        "World already exists" -> message = lang["Respond.WorldNameDup"]
+                    }
+                }
+
+                player.sendMessage(Text.of(RED, "星球創建失敗：", message))
             }
 
             return false

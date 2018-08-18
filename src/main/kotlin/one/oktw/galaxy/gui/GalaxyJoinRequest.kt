@@ -29,7 +29,7 @@ import kotlin.streams.toList
 
 class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI<UUID>() {
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
-    private val lang = languageService.getDefaultLanguage() // Todo get player lang
+    private val lang = languageService.getDefaultLanguage()
     override val token = "InviteManagement-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
@@ -83,9 +83,9 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI<UUID>() {
             GUIHelper.open(event.source as Player) {
                 Confirm(Text.of(lang["UI.Title.ConfirmJoinRequest"])) {
                     launch {
-                        if (it) galaxy.addMember(uuid).join()
+                        if (it) galaxy.addMember(uuid)
 
-                        galaxy.removeJoinRequest(uuid).join()
+                        galaxy.removeJoinRequest(uuid)
 
                         offerPage(0)
                     }

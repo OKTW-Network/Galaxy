@@ -21,9 +21,12 @@ import one.oktw.galaxy.player.event.Viewer.Companion.isViewer
 import one.oktw.galaxy.player.event.Viewer.Companion.removeViewer
 import one.oktw.galaxy.player.event.Viewer.Companion.setViewer
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.block.BlockTypes.END_PORTAL
+import org.spongepowered.api.block.BlockTypes.PORTAL
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
+import org.spongepowered.api.event.block.CollideBlockEvent
 import org.spongepowered.api.event.entity.MoveEntityEvent
 import org.spongepowered.api.event.filter.Getter
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent
@@ -32,6 +35,7 @@ import org.spongepowered.api.resourcepack.ResourcePack
 import org.spongepowered.api.resourcepack.ResourcePacks
 import org.spongepowered.api.service.user.UserStorageService
 import java.net.URI
+import java.util.Arrays.asList
 import java.util.concurrent.TimeUnit
 
 class PlayerControl {
@@ -62,14 +66,13 @@ class PlayerControl {
 
                 try {
                     val player = players.next()
+                    val galaxy = galaxyManager.get(player.world) ?: continue
 
-                    if (!player.isOnline || isViewer(player.uniqueId)) continue
+                    if (!player.isOnline) continue
 
-                    galaxyManager.get(player.world)?.run {
-                        getMember(player.uniqueId)?.also {
-                            saveMember(saveTraveler(it, player)).join()
-                            delay(10, TimeUnit.SECONDS)
-                        }
+                    galaxy.getMember(player.uniqueId)?.also {
+                        galaxy.saveMember(saveTraveler(it, player))
+                        delay(10, TimeUnit.SECONDS)
                     }
                 } catch (e: RuntimeException) {
                     main.logger.error("Saving player data error", e)
@@ -147,12 +150,12 @@ class PlayerControl {
             if (from?.uuid != to?.uuid) {
                 // save and clean player data
                 from?.getMember(player.uniqueId)?.also {
-                    from.saveMember(saveTraveler(it, player)).join()
+                    from.saveMember(saveTraveler(it, player))
                     cleanPlayer(player)
                 } ?: cleanPlayer(player)
 
                 // restore player data
-                to?.let { it.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }
+                to?.let { galaxy -> galaxy.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }
             }
 
             // check permission
@@ -175,16 +178,15 @@ class PlayerControl {
     }
 
     @Listener
-    fun disablePortal(event: MoveEntityEvent.Teleport.Portal) {
-        event.toTransform = event.fromTransform
+    fun disablePortal(event: CollideBlockEvent) {
+        if (event.targetBlock.type in asList(PORTAL, END_PORTAL)) event.isCancelled = true
     }
 
     @Listener
     fun onServerStop(event: GameStoppingServerEvent) {
         Sponge.getServer().onlinePlayers.forEach { player ->
             runBlocking {
-                galaxyManager.get(player.world)
-                    ?.run { getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)).join() } }
+                galaxyManager.get(player.world)?.run { getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)) } }
             }
         }
     }

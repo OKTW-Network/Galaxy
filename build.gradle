@@ -52,6 +52,7 @@ dependencies {
     compile 'org.spongepowered:mixin:0.7.10-SNAPSHOT'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$Coroutines_version"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$Coroutines_version"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$Coroutines_version"
     compile "org.mongodb:mongodb-driver-reactivestreams:1.9.0"
 }

@@ -112,7 +112,7 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
                     val user: User? = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(input).orElse(null)
 
                     if (user != null) {
-                        galaxy.addMember(user.uniqueId).join()
+                        galaxy.addMember(user.uniqueId)
                         player.sendMessage(Text.of(GREEN, "已成功將 ", RESET, user.name, GREEN, " 加入星系！"))
                     } else {
                         player.sendMessage(Text.of(RED, "找不到玩家"))
@@ -125,19 +125,19 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
             buttonID[4] -> launch {
                 val input = input(player, Text.of(AQUA, "請輸入新名稱："))?.toPlain() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
 
-                galaxy.update { name = input }.join()
+                galaxy.update { name = input }
                 player.sendMessage(Text.of(GREEN, "重新命名成功！"))
             }
             buttonID[5] -> launch {
                 val input = input(player, Text.of(AQUA, "請輸入星系資訊："))?.serialize() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
 
-                galaxy.update { info = input }.join()
+                galaxy.update { info = input }
                 player.sendMessage(Text.of(GREEN, "設定成功！"))
             }
             buttonID[6] -> launch {
                 val input = input(player, Text.of(AQUA, "請輸入星系通知："))?.serialize() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
 
-                galaxy.update { notice = input }.join()
+                galaxy.update { notice = input }
                 player.sendMessage(Text.of(GREEN, "設定成功！"))
             }
         }

@@ -343,7 +343,7 @@ class GalaxyManage : CommandBase {
                 src.sendMessage(Text.of(TextColors.RED, "Size must be between $minChunkSize and $maxChunkSize"))
                 return CommandResult.empty()
             }
-            val uuid = args.getOne<UUID>("galaxy").orElse(null)
+            val uuid = args.getOne<UUID>("planet").orElse(null)
             launch {
                 var planet = galaxyManager.get(planet = uuid)?.getPlanet(uuid)
                 //If planet(uuid) is null then get player planet

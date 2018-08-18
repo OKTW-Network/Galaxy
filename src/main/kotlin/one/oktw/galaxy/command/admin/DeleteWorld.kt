@@ -4,7 +4,6 @@ import kotlinx.coroutines.experimental.future.await
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
-import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -24,20 +23,9 @@ class DeleteWorld : CommandBase {
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         launch {
             if (PlanetHelper.removePlanet(args.getOne<UUID>("galaxy").get()).await()) {
-                src.sendMessage(
-                    Text.of(
-                        TextColors.RED,
-                        "World deleted!\n",
-                        Sponge.getCommandManager().getUsage(src)
-                    )
-                )
+                src.sendMessage(Text.of(TextColors.RED, "World deleted!"))
             } else {
-                src.sendMessage(
-                    Text.of(
-                        TextColors.RED,
-                        "Failed!"
-                    )
-                )
+                src.sendMessage(Text.of(TextColors.RED,"Failed!"))
             }
         }
         return CommandResult.success()

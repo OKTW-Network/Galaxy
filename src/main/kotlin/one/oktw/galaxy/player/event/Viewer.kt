@@ -183,10 +183,10 @@ class Viewer {
 
     @Listener(order = Order.FIRST)
     fun onCollideEntity(event: CollideEntityEvent) {
-        val cause = event.cause.firstOrNull()
-
-        if ((cause is Player && isViewer(cause.uniqueId)) || event.entities.any { it is Player && isViewer(it.uniqueId) }) {
+        if (event.cause.firstOrNull().let { it is Player && isViewer(it.uniqueId) }) {
             event.isCancelled = true
+        } else {
+            event.entities.removeIf { it is Player && isViewer(it.uniqueId) }
         }
     }
 

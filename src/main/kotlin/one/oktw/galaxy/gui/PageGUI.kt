@@ -34,6 +34,7 @@ abstract class PageGUI<Data> : GUI() {
             PrevPage,
             NextPage,
             Item,
+            Function,
             Null
         }
 
@@ -42,7 +43,8 @@ abstract class PageGUI<Data> : GUI() {
             PREV,
             NEXT,
             ITEMS,
-            NUMBER
+            NUMBER,
+            FUNCTION
         }
 
         private val X = Slot.NULL
@@ -50,6 +52,7 @@ abstract class PageGUI<Data> : GUI() {
         private val N = Slot.NEXT
         private val O = Slot.ITEMS
         private val V = Slot.NUMBER
+        private val F = Slot.FUNCTION
 
         private const val WIDTH = 9
         private const val HEIGHT = 6
@@ -63,12 +66,22 @@ abstract class PageGUI<Data> : GUI() {
             X, X, P, V, V, V, N, X, X
         )
 
+        private val layoutWithFunction = listOf(
+            O, O, O, O, O, O, O, O, F,
+            O, O, O, O, O, O, O, O, F,
+            O, O, O, O, O, O, O, O, F,
+            O, O, O, O, O, O, O, O, F,
+            O, O, O, O, O, O, O, O, F,
+            X, X, P, V, V, V, N, X, X
+        )
+
         private val numbers = asList(
             ButtonType.NUMBER_0, ButtonType.NUMBER_1, ButtonType.NUMBER_2, ButtonType.NUMBER_3, ButtonType.NUMBER_4,
             ButtonType.NUMBER_5, ButtonType.NUMBER_6, ButtonType.NUMBER_7, ButtonType.NUMBER_8, ButtonType.NUMBER_9
         ).map { Button(it).createItemStack().apply { offer(DataUUID(UUID.randomUUID())) } }
     }
 
+    protected open val hasFunctionButtons: Boolean = false
     private val lang = languageService.getDefaultLanguage()
     private var pageNumber = 0
     private val lock = OrderedLaunch()
@@ -76,7 +89,11 @@ abstract class PageGUI<Data> : GUI() {
     val view: GridGUIView<Slot, Operation<Data>> by lazy {
         GridGUIView<Slot, Operation<Data>>(
             inventory,
-            layout,
+            if (hasFunctionButtons) {
+                layoutWithFunction
+            } else {
+                layout
+            },
             Pair(WIDTH, HEIGHT)
         )
     }
@@ -99,6 +116,12 @@ abstract class PageGUI<Data> : GUI() {
     }
 
     protected abstract suspend fun get(number: Int, skip: Int): List<Pair<ItemStack, Data?>>
+
+    protected open suspend fun getFunctionButtons(count: Int): List<Pair<ItemStack, Data?>> {
+        return (0 until count).map {
+            Pair(Button(GUI_CENTER).createItemStack(), null)
+        }
+    }
 
     // There should be only one offerPage processed at same time, or the pages will be merged all together
     protected fun offerPage(pageNumber: Int) = lock.launch {
@@ -131,12 +154,17 @@ abstract class PageGUI<Data> : GUI() {
         offerButton(pageNumber != 0, showNextPage)
         offerNumber(pageNumber + 1) // make it start from one...
         offerEmptySlot(pageNumber == 0, !showNextPage)
+
+        if (hasFunctionButtons) {
+            offerFunction()
+        }
+
         view.disabled = false
     }
 
     protected fun isControl(detail: EventDetail<Slot, Operation<Data>>): Boolean {
         detail.affectedSlots.forEach {
-            if (it.type in asList(Slot.NEXT, Slot.PREV, Slot.NUMBER, Slot.NULL)) {
+            if (it.type in asList(Slot.NEXT, Slot.PREV, Slot.NUMBER, Slot.NULL, Slot.FUNCTION)) {
                 return true
             }
         }
@@ -184,6 +212,20 @@ abstract class PageGUI<Data> : GUI() {
         if (fillNext) {
             Button(GUI_CENTER).createItemStack()
                 .let { view.setSlot(Slot.NEXT, it, null) }
+        }
+    }
+
+    private suspend fun offerFunction() {
+        getFunctionButtons(view.countSlots(Slot.FUNCTION)).map { (item, data) ->
+            Pair(
+                item,
+                Operation(
+                    Action.Function,
+                    data
+                )
+            )
+        }.let {
+            view.setSlotPairs(Slot.FUNCTION, it)
         }
     }
 

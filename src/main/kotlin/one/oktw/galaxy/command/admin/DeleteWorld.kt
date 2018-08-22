@@ -22,7 +22,7 @@ class DeleteWorld : CommandBase {
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         launch {
-            if (PlanetHelper.removePlanet(args.getOne<UUID>("galaxy").get()).await()) {
+            if (PlanetHelper.removePlanet(args.getOne<UUID>("world").get()).await()) {
                 src.sendMessage(Text.of(TextColors.RED, "World deleted!"))
             } else {
                 src.sendMessage(Text.of(TextColors.RED,"Failed!"))

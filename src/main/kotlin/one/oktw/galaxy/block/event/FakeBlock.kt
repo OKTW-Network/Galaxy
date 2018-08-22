@@ -23,6 +23,7 @@ import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.event.Listener
+import org.spongepowered.api.event.block.ChangeBlockEvent
 import org.spongepowered.api.event.block.InteractBlockEvent
 import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.event.world.ExplosionEvent
@@ -60,12 +61,30 @@ class FakeBlock {
     }
 
     @Listener
-    fun onBreakBlock(event: InteractBlockEvent.Primary) {
+    fun onUserBreakBlock(event: InteractBlockEvent.Primary) {
         if (event.targetBlock[DataBlockType.key].isPresent) {
             event.isCancelled = true
 
             event.targetBlock.location.ifPresent {
                 (it.extent as WorldServer).playerChunkMap.markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))
+            }
+        }
+    }
+
+    @Listener
+    fun onChangeBlockBreak(event: ChangeBlockEvent.Break) = onChangeBlock(event)
+
+    @Listener
+    fun onChangeBlockModify(event: ChangeBlockEvent.Modify) = onChangeBlock(event)
+
+    private fun onChangeBlock(event: ChangeBlockEvent) {
+        event.transactions.forEach { transaction ->
+            if (transaction.original[DataBlockType.key].isPresent) {
+                transaction.isValid = false
+
+                transaction.original.location.ifPresent {
+                    (it.extent as WorldServer).playerChunkMap.markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))
+                }
             }
         }
     }
@@ -86,6 +105,7 @@ class FakeBlock {
         val item = FakeBlockItem(block).createItemStack().createSnapshot()
 
         entity.offer(REPRESENTED_ITEM, item)
+        location.remove(DataBlockType::class.java)
         location.removeBlock()
         location.spawnEntity(entity)
 

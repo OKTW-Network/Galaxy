@@ -1,7 +1,7 @@
 package one.oktw.galaxy.command.admin
 
 import one.oktw.galaxy.book.BookUtil
-import one.oktw.galaxy.book.enums.BooksInSpawn
+import one.oktw.galaxy.book.enums.BooksInLobby
 import one.oktw.galaxy.command.CommandBase
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
@@ -35,7 +35,7 @@ class Book : CommandBase {
                 .permission("oktw.command.admin.book.saveBook")
                 .arguments(
                     GenericArguments.firstParsing(
-                        GenericArguments.enumValue(Text.of("Type"), BooksInSpawn::class.java),
+                        GenericArguments.enumValue(Text.of("Type"), BooksInLobby::class.java),
                         GenericArguments.string(Text.of("key"))
                     )
                 )
@@ -46,7 +46,7 @@ class Book : CommandBase {
 
             val bookUtil = BookUtil()
             val key = when {
-                args.hasAny("Type") -> args.getOne<BooksInSpawn>("Type").get().key
+                args.hasAny("Type") -> args.getOne<BooksInLobby>("Type").get().key
                 args.hasAny("key") -> args.getOne<String>("key").get()
                 else -> ""
             }
@@ -68,7 +68,7 @@ class Book : CommandBase {
                 .permission("oktw.command.admin.book.getBook")
                 .arguments(
                     GenericArguments.firstParsing(
-                        GenericArguments.enumValue(Text.of("Type"), BooksInSpawn::class.java),
+                        GenericArguments.enumValue(Text.of("Type"), BooksInLobby::class.java),
                         GenericArguments.string(Text.of("key"))
                     )
                 )
@@ -79,7 +79,7 @@ class Book : CommandBase {
 
             val bookUtil = BookUtil()
             val key = when {
-                args.hasAny("Type") -> args.getOne<BooksInSpawn>("Type").get().key
+                args.hasAny("Type") -> args.getOne<BooksInLobby>("Type").get().key
                 args.hasAny("key") -> args.getOne<String>("key").get()
                 else -> ""
             }

@@ -35,7 +35,7 @@ class GalaxyManage : CommandBase {
             .child(SetSize().spec, "setSize")
             .child(SetVisit().spec, "setVisit")
             .child(RemoveGalaxy().spec, "removeGalaxy")
-            .child(RemovePlanet().spec, "setPlanet")
+            .child(RemovePlanet().spec, "removePlanet")
             .child(Dividends().spec, "dividends")
             .build()
 

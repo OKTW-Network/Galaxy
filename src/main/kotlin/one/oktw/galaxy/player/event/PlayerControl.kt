@@ -89,8 +89,8 @@ class PlayerControl {
         val user = userService.get(event.profile).orElse(null) ?: return
 
         // check world load else send to default world
-        user.worldUniqueId.orElse(null)?.let(server::getWorld)?.run {
-            if (!isPresent) {
+        user.worldUniqueId.orElse(null)?.let(server::getWorld).run {
+            if (this?.isPresent != true) {
                 server.defaultWorld.get().run { user.setLocation(spawnPosition.toDouble(), uniqueId) }
             }
         }

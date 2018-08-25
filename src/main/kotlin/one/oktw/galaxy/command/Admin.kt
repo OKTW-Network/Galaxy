@@ -17,6 +17,7 @@ class Admin : CommandBase {
         .child(GalaxyInfo().spec, "galaxy_info")
         .child(GalaxyManage().spec, "galaxy_manage")
         .child(Block().spec, "block")
+        .child(Book().spec, "book")
         .executor(this)
         .build()
 

@@ -153,7 +153,7 @@ class BrowserGalaxy(player: Player? = null) : PageGUI<BrowserGalaxy.Companion.Wr
         val detail = view.getDetail(event)
 
         // ignore gui elements, because they are handled by the PageGUI
-        if (isControl(detail)) {
+        if (isControl(detail) && detail.primary?.type != PageGUI.Companion.Slot.FUNCTION) {
             return
         }
 

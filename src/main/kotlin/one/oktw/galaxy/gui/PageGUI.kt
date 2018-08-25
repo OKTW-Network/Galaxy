@@ -254,7 +254,7 @@ abstract class PageGUI<Data> : GUI() {
         if (isControl(info)) {
             val action = info.primary?.data?.action
 
-            if (action != null) {
+            if (action in asList(Action.PrevPage, Action.NextPage)) {
                 // wipe it directly, because we are going to change page and we don't want the buttons to be rollback
                 event.cursorTransaction.apply {
                     setCustom(ItemStackSnapshot.NONE)

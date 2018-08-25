@@ -9,7 +9,13 @@ import java.nio.file.Files.notExists
 import java.nio.file.Paths
 import java.util.*
 
-class LanguageService {
+class LanguageService private constructor() {
+    companion object {
+        private val instance = LanguageService()
+
+        fun getInstance() = instance
+    }
+
     private val translationStorage = HashMap<String, ConfigurationNode>()
 
     fun getDefaultLanguage() = Translation(Locale.forLanguageTag(config.getNode("language").string))

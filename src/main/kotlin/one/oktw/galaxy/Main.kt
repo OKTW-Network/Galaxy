@@ -84,7 +84,7 @@ class Main {
     fun onPreInit(event: GamePreInitializationEvent) {
         serverThread = Sponge.getScheduler().createSyncExecutor(this).asCoroutineDispatcher()
         delay = DelayedExecute(plugin)
-        languageService = LanguageService()
+        languageService = LanguageService.getInstance()
         DataRegister()
         RecipeRegister()
         EasyRecipeRegister()
@@ -94,14 +94,14 @@ class Main {
     fun onInit(event: GameInitializationEvent) {
         logger.info("Initializing...")
         DatabaseManager()
-        galaxyManager = GalaxyManager()
+        galaxyManager = GalaxyManager.getInstance()
         EventRegister()
         logger.info("Plugin initialized!")
     }
 
     @Listener
     fun onStarting(event: GameStartingServerEvent) {
-        chunkLoaderManager = ChunkLoaderManager()
+        chunkLoaderManager = ChunkLoaderManager.getInstance()
         CommandRegister()
     }
 

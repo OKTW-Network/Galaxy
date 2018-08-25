@@ -22,7 +22,13 @@ import org.spongepowered.api.world.World
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class ChunkLoaderManager {
+class ChunkLoaderManager private constructor() {
+    companion object {
+        private val instance = ChunkLoaderManager()
+
+        fun getInstance() = instance
+    }
+
     private val logger = main.logger
     private val ticketManager = Sponge.getServer().chunkTicketManager
     private val collection = database.getCollection("ChunkLoader", ChunkLoader::class.java)

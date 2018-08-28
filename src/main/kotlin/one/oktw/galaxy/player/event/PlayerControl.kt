@@ -6,6 +6,9 @@ import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.serverThread
+import one.oktw.galaxy.book.BookUtil
+import one.oktw.galaxy.book.enums.BooksInLobby.MAGICAL
+import one.oktw.galaxy.book.enums.BooksInLobby.MANUAL
 import one.oktw.galaxy.galaxy.data.extensions.getMember
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.data.extensions.saveMember
@@ -41,7 +44,7 @@ import java.util.concurrent.TimeUnit
 class PlayerControl {
     private val lobbyResourcePack: ResourcePack?
     private val planetResourcePack: ResourcePack?
-
+    val bookUtil = BookUtil()
     init {
         val config = config.getNode("resource-pack")
 
@@ -89,8 +92,8 @@ class PlayerControl {
         val user = userService.get(event.profile).orElse(null) ?: return
 
         // check world load else send to default world
-        user.worldUniqueId.orElse(null)?.let(server::getWorld)?.run {
-            if (!isPresent) {
+        user.worldUniqueId.orElse(null)?.let(server::getWorld).run {
+            if (this?.isPresent != true) {
                 server.defaultWorld.get().run { user.setLocation(spawnPosition.toDouble(), uniqueId) }
             }
         }
@@ -117,8 +120,20 @@ class PlayerControl {
                 DENY -> player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() })
             }
 
-            // send resource pack
-            if (galaxy == null) lobbyResourcePack?.let(player::sendResourcePack) else planetResourcePack?.let(player::sendResourcePack)
+            // send resource pack and offer book(s)
+            if (galaxy == null) {
+                // offer book(s)
+                val manual = bookUtil.getBook(MANUAL.key)
+                if (manual != null) player.inventory.offer(manual)
+                if (player.hasPermission("oktw.book.magical")) {
+                    val magical = bookUtil.getBook(MAGICAL.key)
+                    if (magical != null) player.inventory.offer(magical)
+                }
+                // send resource pack
+                lobbyResourcePack?.let(player::sendResourcePack)
+            } else {
+                planetResourcePack?.let(player::sendResourcePack)
+            }
         }
     }
 
@@ -168,8 +183,16 @@ class PlayerControl {
                 DENY -> player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() })
             }
 
-            // send resource pack
+            // send resource pack and offer book(s)
             if (to == null) {
+                // offer book(s)
+                val manual = bookUtil.getBook(MANUAL.key)
+                if (manual != null) player.inventory.offer(manual)
+                if (player.hasPermission("oktw.book.magical")) {
+                    val magical = bookUtil.getBook(MAGICAL.key)
+                    if (magical != null) player.inventory.offer(magical)
+                }
+                // send resource pack
                 lobbyResourcePack?.let(player::sendResourcePack)
             } else if (from == null) {
                 planetResourcePack?.let(player::sendResourcePack)

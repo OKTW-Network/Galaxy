@@ -112,6 +112,6 @@ enum class ButtonType(val id: Int) {
     NUMBER_9(109),
     PLANET_ADD(110),
     SETTING(111),
-	GALAXY_SETTING(112),
-	MEMBER_SETTING(113)
+    GALAXY_SETTING(112),
+    MEMBER_SETTING(113)
 }

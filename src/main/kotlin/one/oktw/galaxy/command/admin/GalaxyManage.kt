@@ -1,7 +1,9 @@
 package one.oktw.galaxy.command.admin
 
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.galaxy.data.extensions.*
 import one.oktw.galaxy.galaxy.enums.Group
@@ -592,7 +594,7 @@ class GalaxyManage : CommandBase {
                     return@launch
                 }
                 if (confirm(src, Text.of(TextColors.AQUA, "Are you sure you want to remove the planet ${galaxy.getPlanet(uuid)!!.name}?")) == true) {
-                    galaxy.removePlanet(uuid)
+                    withContext(serverThread) { galaxy.removePlanet(uuid) }
                     src.sendMessage(Text.of(TextColors.GREEN, "Planet on ${galaxy.name} (${galaxy.uuid}) deleted!"))
                 }
             }

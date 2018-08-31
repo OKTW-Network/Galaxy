@@ -9,6 +9,7 @@ import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType.NORMAL
+import one.oktw.galaxy.util.Chat.Companion.confirm
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
@@ -520,10 +521,12 @@ class GalaxyManage : CommandBase {
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+            if (src !is Player) return CommandResult.empty()
+
             var uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
                 //If uuid is null then get player galaxy uuid
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world)?.uuid
+                if (uuid == null) uuid = galaxyManager.get(src.world)?.uuid
                 //If it is still null then return
                 if (uuid == null) {
                     src.sendMessage(
@@ -535,8 +538,10 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                galaxyManager.deleteGalaxy(uuid)
-                src.sendMessage(Text.of(TextColors.GREEN, "Galaxy deleted!"))
+                if (confirm(src, Text.of(TextColors.AQUA, "Are you sure you want to remove the galaxy ${galaxyManager.get(uuid)!!.name}?")) == true) {
+                    galaxyManager.deleteGalaxy(uuid)
+                    src.sendMessage(Text.of(TextColors.GREEN, "Galaxy deleted!"))
+                }
             }
             return CommandResult.success()
         }
@@ -553,10 +558,12 @@ class GalaxyManage : CommandBase {
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+            if (src !is Player) return CommandResult.empty()
+
             var uuid = args.getOne<UUID>("planet").orElse(null)
             launch {
                 //If uuid is null then get player planet uuid
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world)?.getPlanet(src.world)?.uuid
+                if (uuid == null) uuid = galaxyManager.get(src.world)?.getPlanet(src.world)?.uuid
                 //If it is still null then return
                 if (uuid == null) {
                     src.sendMessage(
@@ -579,8 +586,10 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                galaxy.removePlanet(uuid)
-                src.sendMessage(Text.of(TextColors.GREEN, "Planet deleted!"))
+                if (confirm(src, Text.of(TextColors.AQUA, "Are you sure you want to remove the planet ${galaxy.getPlanet(uuid)!!.name}?")) == true) {
+                    galaxy.removePlanet(uuid)
+                    src.sendMessage(Text.of(TextColors.GREEN, "Planet on ${galaxy.name} (${galaxy.uuid}) deleted!"))
+                }
             }
             return CommandResult.success()
         }

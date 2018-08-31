@@ -44,7 +44,6 @@ class Book : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src !is Player) return CommandResult.empty()
 
-            val bookUtil = BookUtil()
             val key = when {
                 args.hasAny("Type") -> args.getOne<BooksInLobby>("Type").get().key
                 args.hasAny("key") -> args.getOne<String>("key").get()
@@ -52,7 +51,7 @@ class Book : CommandBase {
             }
             val item = src.getItemInHand(MAIN_HAND).get()
             try {
-                bookUtil.writeBook(item, key)
+                BookUtil.writeBook(item, key)
                 src.sendMessage(Text.of(TextColors.GREEN, "Book successfully saved as $key."))
             } catch (e: IllegalArgumentException) {
                 src.sendMessage(Text.of(TextColors.RED, "Error： ", e.message))
@@ -77,13 +76,12 @@ class Book : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src !is Player) return CommandResult.empty()
 
-            val bookUtil = BookUtil()
             val key = when {
                 args.hasAny("Type") -> args.getOne<BooksInLobby>("Type").get().key
                 args.hasAny("key") -> args.getOne<String>("key").get()
                 else -> ""
             }
-            val backBook = bookUtil.getBook(key)
+            val backBook = BookUtil.getBook(key)
             if (backBook == null) {
                 src.sendMessage(Text.of(TextColors.RED, "Error： Book $key not found."))
                 return CommandResult.success()

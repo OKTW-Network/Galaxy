@@ -45,7 +45,7 @@ class Recipes {
 
         private val machines: List<HiTechCraftingRecipe> = asList(
             HiTechCraftingRecipe.builder()
-                .add(of(ItemTypes.EMERALD_BLOCK), 1)
+                .add(of(ItemTypes.IRON_BLOCK), 1)
                 .add(of(ItemTypes.ENDER_PEARL), 1)
                 .cost(0)
                 .result(FakeBlockItem(CustomBlocks.ELEVATOR).createItemStack())

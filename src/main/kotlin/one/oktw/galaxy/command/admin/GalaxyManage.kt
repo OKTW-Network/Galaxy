@@ -486,13 +486,12 @@ class GalaxyManage : CommandBase {
                 return CommandResult.success()
             }
 
-            val uuid = args.getOne<UUID>("planet").orElse(null)
+            var uuid = args.getOne<UUID>("planet").orElse(null)
             launch {
-                var planet = galaxyManager.get(planet = uuid)?.getPlanet(uuid)
                 //If planet(uuid) is null then get player planet
-                if (planet == null && src is Player) planet = galaxyManager.get(src.world)?.getPlanet(src.world)
+                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world)?.getPlanet(src.world)?.uuid
                 //If it is still null then return
-                if (planet == null) {
+                if (uuid == null) {
                     src.sendMessage(
                         Text.of(
                             TextColors.RED,
@@ -502,9 +501,15 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                planet.visitable = args.getOne<Boolean>("visitable").get()
-                PlanetHelper.updatePlanet(planet)
-                src.sendMessage(Text.of(TextColors.GREEN, "Visibility set to ", planet.visitable, "!"))
+                val galaxy = galaxyManager.get(planet = uuid)
+                if (galaxy == null) {
+                    src.sendMessage(Text.of(TextColors.RED, "Can not find the related galaxy from db!"))
+                    return@launch
+                }
+                galaxy.update {
+                    this.getPlanet(uuid)!!.visitable = args.getOne<Boolean>("visitable").get()
+                }
+                src.sendMessage(Text.of(TextColors.GREEN, "Visibility set to ", galaxy.getPlanet(uuid)!!.visitable, "!"))
             }
             return CommandResult.success()
         }

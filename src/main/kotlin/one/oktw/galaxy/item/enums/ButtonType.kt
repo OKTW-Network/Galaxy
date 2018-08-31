@@ -113,5 +113,7 @@ enum class ButtonType(val id: Int) {
     PLANET_ADD(110),
     SETTING(111),
     GALAXY_SETTING(112),
-    MEMBER_SETTING(113)
+    MEMBER_SETTING(113),
+    GALAXY_JOINED(114),
+	PLANET_list(115)
 }

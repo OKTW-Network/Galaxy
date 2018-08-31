@@ -574,7 +574,7 @@ class GalaxyManage : CommandBase {
                     src.sendMessage(
                         Text.of(
                             TextColors.RED,
-                            "Galaxy not found!"
+                            "Planet not found!"
                         )
                     )
                     return@launch

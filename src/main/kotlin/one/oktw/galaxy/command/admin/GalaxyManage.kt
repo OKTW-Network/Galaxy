@@ -10,7 +10,6 @@ import one.oktw.galaxy.galaxy.enums.Group
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType
-import one.oktw.galaxy.galaxy.planet.enums.PlanetType.NORMAL
 import one.oktw.galaxy.util.Chat.Companion.confirm
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
@@ -76,19 +75,16 @@ class GalaxyManage : CommandBase {
                 .permission("oktw.command.admin.galaxyManage.createPlanet")
                 .arguments(
                     GenericArguments.firstParsing(
-                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.uuid(Text.of("galaxy")),
                         GenericArguments.string(Text.of("name")),
-                        GenericArguments.optional(
-                            GenericArguments.enumValue(Text.of("Type"), PlanetType::class.java),
-                            NORMAL
-                        )
+                        GenericArguments.enumValue(Text.of("Type"), PlanetType::class.java)
                     )
                 )
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             //Check arguments
-            if (!args.hasAny("name")) {
+            if (!args.hasAny("name") || !args.hasAny("Type")) {
                 src.sendMessage(
                     Text.of(
                         TextColors.RED,
@@ -135,7 +131,7 @@ class GalaxyManage : CommandBase {
                 .permission("oktw.command.admin.galaxyManage.addMember")
                 .arguments(
                     GenericArguments.firstParsing(
-                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.uuid(Text.of("galaxy")),
                         GenericArguments.playerOrSource(Text.of("player"))
                     )
                 )
@@ -173,7 +169,7 @@ class GalaxyManage : CommandBase {
                 .permission("oktw.command.admin.galaxyManage.SetGroup")
                 .arguments(
                     GenericArguments.firstParsing(
-                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.uuid(Text.of("galaxy")),
                         GenericArguments.playerOrSource(Text.of("player")),
                         GenericArguments.enumValue(Text.of("Group"), Group::class.java)
                     )
@@ -224,7 +220,7 @@ class GalaxyManage : CommandBase {
                 .permission("oktw.command.admin.galaxyManage.removeMember")
                 .arguments(
                     GenericArguments.firstParsing(
-                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.uuid(Text.of("galaxy")),
                         GenericArguments.playerOrSource(Text.of("player"))
                     )
                 )
@@ -266,7 +262,7 @@ class GalaxyManage : CommandBase {
                 .permission("oktw.command.admin.galaxyManage.rename")
                 .arguments(
                     GenericArguments.firstParsing(
-                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.uuid(Text.of("galaxy")),
                         GenericArguments.string(Text.of("name"))
                     )
                 )
@@ -315,7 +311,7 @@ class GalaxyManage : CommandBase {
                 .permission("oktw.command.admin.galaxyManage.info")
                 .arguments(
                     GenericArguments.firstParsing(
-                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.uuid(Text.of("galaxy")),
                         GenericArguments.string(Text.of("text"))
                     )
                 )
@@ -364,7 +360,7 @@ class GalaxyManage : CommandBase {
                 .permission("oktw.command.admin.galaxyManage.notice")
                 .arguments(
                     GenericArguments.firstParsing(
-                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.uuid(Text.of("galaxy")),
                         GenericArguments.string(Text.of("text"))
                     )
                 )
@@ -413,7 +409,7 @@ class GalaxyManage : CommandBase {
                 .permission("oktw.command.admin.galaxyManage.setSize")
                 .arguments(
                     GenericArguments.firstParsing(
-                        GenericArguments.optional(GenericArguments.uuid(Text.of("planet"))),
+                        GenericArguments.uuid(Text.of("planet")),
                         GenericArguments.integer(Text.of("size"))
                     )
                 )
@@ -469,7 +465,7 @@ class GalaxyManage : CommandBase {
                 .permission("oktw.command.admin.galaxyManage.setVisit")
                 .arguments(
                     GenericArguments.firstParsing(
-                        GenericArguments.optional(GenericArguments.uuid(Text.of("planet"))),
+                        GenericArguments.uuid(Text.of("planet")),
                         GenericArguments.bool(Text.of("visitable"))
                     )
                 )
@@ -523,7 +519,7 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.removeGalaxy")
                 .arguments(
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
+                    GenericArguments.uuid(Text.of("galaxy"))
                 )
                 .build()
 
@@ -560,7 +556,7 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.removePlanet")
                 .arguments(
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("planet")))
+                    GenericArguments.uuid(Text.of("planet"))
                 )
                 .build()
 
@@ -609,7 +605,7 @@ class GalaxyManage : CommandBase {
                 .permission("oktw.command.admin.galaxyManage.dividends")
                 .arguments(
                     GenericArguments.firstParsing(
-                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.uuid(Text.of("galaxy")),
                         GenericArguments.longNum(Text.of("number"))
                     )
                 )

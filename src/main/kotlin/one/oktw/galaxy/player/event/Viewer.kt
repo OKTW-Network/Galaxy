@@ -101,6 +101,11 @@ class Viewer {
     }
 
     @Listener(order = Order.FIRST)
+    fun onCollideBlock(event: CollideBlockEvent, @Root player: Player) {
+        if (isViewer(player.uniqueId)) event.isCancelled = true
+    }
+
+    @Listener(order = Order.FIRST)
     fun onSpawnEntity(event: SpawnEntityEvent, @All players: Array<Player>) {
         if (players.any { isViewer(it.uniqueId) }) event.isCancelled = true
     }
@@ -137,10 +142,12 @@ class Viewer {
 
     @Listener(order = Order.FIRST)
     fun onInteractEntity(event: InteractEntityEvent, @Getter("getTargetEntity") entity: Entity) {
-        val target = entity is Player && isViewer(entity.uniqueId)
-        val source = event.cause.allOf(Player::class.java).any { isViewer(it.uniqueId) }
+        event.isCancelled = entity is Player && isViewer(entity.uniqueId) || event.cause.any { it is Player && isViewer(it.uniqueId) }
+    }
 
-        if (target || source) event.isCancelled = true
+    @Listener(order = Order.FIRST)
+    fun onDamageEntity(event: DamageEntityEvent) {
+        event.isCancelled = event.targetEntity.let { it is Player && isViewer(it.uniqueId) } || event.cause.any { it is Player && isViewer(it.uniqueId) }
     }
 
     @Listener(order = Order.FIRST)
@@ -174,25 +181,12 @@ class Viewer {
     }
 
     @Listener(order = Order.FIRST)
-    fun onDamageEntity(event: DamageEntityEvent) {
-        val target = event.targetEntity is Player && isViewer(event.targetEntity.uniqueId)
-        val source = event.cause.allOf(Player::class.java).any { isViewer(it.uniqueId) }
-
-        if (target || source) event.isCancelled = true
-    }
-
-    @Listener(order = Order.FIRST)
     fun onCollideEntity(event: CollideEntityEvent) {
-        val cause = event.cause.firstOrNull()
-
-        if ((cause is Player && isViewer(cause.uniqueId)) || event.entities.any { it is Player && isViewer(it.uniqueId) }) {
+        if (event.cause.firstOrNull().let { it is Player && isViewer(it.uniqueId) }) {
             event.isCancelled = true
+        } else {
+            event.entities.removeIf { it is Player && isViewer(it.uniqueId) }
         }
-    }
-
-    @Listener(order = Order.FIRST)
-    fun onCollideBlock(event: CollideBlockEvent, @Root player: Player) {
-        if (isViewer(player.uniqueId)) event.isCancelled = true
     }
 
 // TODO add more Listener

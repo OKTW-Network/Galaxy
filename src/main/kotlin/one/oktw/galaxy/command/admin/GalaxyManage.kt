@@ -72,16 +72,30 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.createPlanet")
                 .arguments(
-                    GenericArguments.string(Text.of("name")),
-                    GenericArguments.optional(
-                        GenericArguments.enumValue(Text.of("Type"), PlanetType::class.java),
-                        NORMAL
-                    ),
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
+                    GenericArguments.firstParsing(
+                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.string(Text.of("name")),
+                        GenericArguments.optional(
+                            GenericArguments.enumValue(Text.of("Type"), PlanetType::class.java),
+                            NORMAL
+                        )
+                    )
                 )
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+            //Check arguments
+            if (!args.hasAny("name")) {
+                src.sendMessage(
+                    Text.of(
+                        TextColors.RED,
+                        "Not enough arguments!\n",
+                        Sponge.getCommandManager().getUsage(src)
+                    )
+                )
+                return CommandResult.success()
+            }
+
             val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
                 var galaxy = galaxyManager.get(uuid)
@@ -117,8 +131,10 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.addMember")
                 .arguments(
-                    GenericArguments.playerOrSource(Text.of("player")),
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
+                    GenericArguments.firstParsing(
+                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.playerOrSource(Text.of("player"))
+                    )
                 )
                 .build()
 
@@ -153,13 +169,27 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.SetGroup")
                 .arguments(
-                    GenericArguments.playerOrSource(Text.of("player")),
-                    GenericArguments.enumValue(Text.of("Group"), Group::class.java),
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
+                    GenericArguments.firstParsing(
+                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.playerOrSource(Text.of("player")),
+                        GenericArguments.enumValue(Text.of("Group"), Group::class.java)
+                    )
                 )
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+            //Check arguments
+            if (!args.hasAny("Group")) {
+                src.sendMessage(
+                    Text.of(
+                        TextColors.RED,
+                        "Not enough arguments!\n",
+                        Sponge.getCommandManager().getUsage(src)
+                    )
+                )
+                return CommandResult.success()
+            }
+
             val player = args.getOne<Player>("player").get()
             val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
@@ -190,8 +220,10 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.removeMember")
                 .arguments(
-                    GenericArguments.playerOrSource(Text.of("player")),
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
+                    GenericArguments.firstParsing(
+                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.playerOrSource(Text.of("player"))
+                    )
                 )
                 .build()
 
@@ -230,12 +262,26 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.rename")
                 .arguments(
-                    GenericArguments.string(Text.of("name")),
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
+                    GenericArguments.firstParsing(
+                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.string(Text.of("name"))
+                    )
                 )
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+            //Check arguments
+            if (!args.hasAny("name")) {
+                src.sendMessage(
+                    Text.of(
+                        TextColors.RED,
+                        "Not enough arguments!\n",
+                        Sponge.getCommandManager().getUsage(src)
+                    )
+                )
+                return CommandResult.success()
+            }
+
             val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
                 var galaxy = galaxyManager.get(uuid)
@@ -265,12 +311,26 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.info")
                 .arguments(
-                    GenericArguments.string(Text.of("text")),
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
+                    GenericArguments.firstParsing(
+                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.string(Text.of("text"))
+                    )
                 )
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+            //Check arguments
+            if (!args.hasAny("text")) {
+                src.sendMessage(
+                    Text.of(
+                        TextColors.RED,
+                        "Not enough arguments!\n",
+                        Sponge.getCommandManager().getUsage(src)
+                    )
+                )
+                return CommandResult.success()
+            }
+
             val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
                 var galaxy = galaxyManager.get(uuid)
@@ -300,12 +360,26 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.notice")
                 .arguments(
-                    GenericArguments.string(Text.of("text")),
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
+                    GenericArguments.firstParsing(
+                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.string(Text.of("text"))
+                    )
                 )
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+            //Check arguments
+            if (!args.hasAny("text")) {
+                src.sendMessage(
+                    Text.of(
+                        TextColors.RED,
+                        "Not enough arguments!\n",
+                        Sponge.getCommandManager().getUsage(src)
+                    )
+                )
+                return CommandResult.success()
+            }
+
             val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
                 var galaxy = galaxyManager.get(uuid)
@@ -335,12 +409,26 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.setSize")
                 .arguments(
-                    GenericArguments.integer(Text.of("size")),
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("planet")))
+                    GenericArguments.firstParsing(
+                        GenericArguments.optional(GenericArguments.uuid(Text.of("planet"))),
+                        GenericArguments.integer(Text.of("size"))
+                    )
                 )
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+            //Check arguments
+            if (!args.hasAny("size")) {
+                src.sendMessage(
+                    Text.of(
+                        TextColors.RED,
+                        "Not enough arguments!\n",
+                        Sponge.getCommandManager().getUsage(src)
+                    )
+                )
+                return CommandResult.success()
+            }
+
             val maxChunkSize = 375000
             val minChunkSize = 0
             if (args.getOne<Int>("size").get() > maxChunkSize || args.getOne<Int>("size").get() < minChunkSize) {
@@ -377,12 +465,26 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.setVisit")
                 .arguments(
-                    GenericArguments.bool(Text.of("visitable")),
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("planet")))
+                    GenericArguments.firstParsing(
+                        GenericArguments.optional(GenericArguments.uuid(Text.of("planet"))),
+                        GenericArguments.bool(Text.of("visitable"))
+                    )
                 )
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+            //Check arguments
+            if (!args.hasAny("visitable")) {
+                src.sendMessage(
+                    Text.of(
+                        TextColors.RED,
+                        "Not enough arguments!\n",
+                        Sponge.getCommandManager().getUsage(src)
+                    )
+                )
+                return CommandResult.success()
+            }
+
             val uuid = args.getOne<UUID>("planet").orElse(null)
             launch {
                 var planet = galaxyManager.get(planet = uuid)?.getPlanet(uuid)
@@ -490,12 +592,26 @@ class GalaxyManage : CommandBase {
                 .executor(this)
                 .permission("oktw.command.admin.galaxyManage.dividends")
                 .arguments(
-                    GenericArguments.longNum(Text.of("number")),
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
+                    GenericArguments.firstParsing(
+                        GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                        GenericArguments.longNum(Text.of("number"))
+                    )
                 )
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+            //Check arguments
+            if (!args.hasAny("number")) {
+                src.sendMessage(
+                    Text.of(
+                        TextColors.RED,
+                        "Not enough arguments!\n",
+                        Sponge.getCommandManager().getUsage(src)
+                    )
+                )
+                return CommandResult.success()
+            }
+
             val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
                 var galaxy = galaxyManager.get(uuid)

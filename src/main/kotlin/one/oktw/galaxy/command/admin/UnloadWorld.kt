@@ -21,8 +21,11 @@ class UnloadWorld : CommandBase {
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         val server = Sponge.getServer()
         server.getWorld(args.getOne<UUID>("world").get()).ifPresent {
-            server.unloadWorld(it)
-            src.sendMessage(Text.of(TextColors.RED, "World unloaded!"))
+            if (server.unloadWorld(it)) {
+                src.sendMessage(Text.of(TextColors.GREEN, "World unloaded!"))
+            } else {
+                src.sendMessage(Text.of(TextColors.RED, "World unload failed!"))
+            }
         }
         return CommandResult.success()
     }

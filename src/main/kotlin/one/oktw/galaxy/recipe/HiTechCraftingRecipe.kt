@@ -8,13 +8,12 @@ import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.inventory.Slot
-import org.spongepowered.api.item.recipe.crafting.Ingredient
 import org.spongepowered.api.item.inventory.entity.MainPlayerInventory
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
+import org.spongepowered.api.item.recipe.crafting.Ingredient
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.translation.Translatable
-import org.spongepowered.api.text.translation.Translation
 import java.util.Arrays.asList
 
 

@@ -230,7 +230,7 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
                             player.world.spawnEntity(item)
 
                             val galaxy = Main.galaxyManager.get(player.world) ?: return@launch
-                            galaxy.saveMember(traveler).join()
+                            galaxy.saveMember(traveler)
 
                             val newTraveler = TravelerHelper.getTraveler(player).await() ?: return@launch
                             offerPage(player, newTraveler)

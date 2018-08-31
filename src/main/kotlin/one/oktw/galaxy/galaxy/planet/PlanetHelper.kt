@@ -84,8 +84,7 @@ class PlanetHelper {
             logger.info("Deleting World [{}]", properties.worldName)
             if (server.getWorld(worldUUID).isPresent) {
                 val world = server.getWorld(worldUUID).get()
-                world.players.parallelStream()
-                    .forEach { it.setLocationSafely(server.getWorld(server.defaultWorldName).get().spawnLocation) }
+                world.players.forEach { it.setLocationSafely(server.getWorld(server.defaultWorldName).get().spawnLocation) }
                 server.unloadWorld(world)
             }
 

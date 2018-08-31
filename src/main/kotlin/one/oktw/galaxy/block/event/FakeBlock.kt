@@ -11,6 +11,7 @@ import one.oktw.galaxy.item.enums.ItemType
 import one.oktw.galaxy.item.enums.ToolType.WRENCH
 import one.oktw.galaxy.item.type.Tool
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.block.BlockTypes.COMMAND_BLOCK
 import org.spongepowered.api.block.tileentity.CommandBlock
 import org.spongepowered.api.data.key.Keys.*
@@ -79,12 +80,18 @@ class FakeBlock {
 
     private fun onChangeBlock(event: ChangeBlockEvent) {
         event.transactions.forEach { transaction ->
-            if (transaction.original[DataBlockType.key].isPresent) {
-                transaction.isValid = false
+            val original = transaction.original
 
-                transaction.original.location.ifPresent {
-                    (it.extent as WorldServer).playerChunkMap.markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))
-                }
+            // fast check, due to data uuid is slow
+            if (original.state.type != BlockTypes.MOB_SPAWNER) return@forEach
+
+            // skip it if it is not a custom block
+            if (!original[DataBlockType.key].isPresent) return@forEach
+
+            transaction.isValid = false
+
+            transaction.original.location.ifPresent {
+                (it.extent as WorldServer).playerChunkMap.markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))
             }
         }
     }

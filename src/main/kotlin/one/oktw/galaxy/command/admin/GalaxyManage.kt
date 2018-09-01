@@ -549,8 +549,11 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                galaxy.dividends(args.getOne<Long>("number").get())
-                src.sendMessage(Text.of(TextColors.GREEN, "Notice set to ", galaxy.notice, "!"))
+                if (galaxy.dividends(args.getOne<Long>("number").get())) {
+                    src.sendMessage(Text.of(TextColors.GREEN, "Dividend successful!"))
+                } else {
+                    src.sendMessage(Text.of(TextColors.RED, "Dividend failed!"))
+                }
             }
             return CommandResult.success()
         }

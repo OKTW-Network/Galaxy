@@ -1,6 +1,8 @@
 package one.oktw.galaxy.item.type
 
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main.Companion.translationService
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.item.ItemUtil.Companion.removeCoolDown
 import one.oktw.galaxy.item.ItemUtil.Companion.removeDamage
@@ -17,12 +19,14 @@ import org.spongepowered.api.text.format.TextStyles.BOLD
 
 @BsonDiscriminator
 data class Material(val type: MaterialType = DUMMY) : Item {
+    val lang = Main.translationService
+
     override val itemType = MATERIAL
 
     override fun createItemStack(): ItemStack = ItemStack.builder()
         .itemType(STONE_SWORD)
         .itemData(DataItemType(MATERIAL))
-        .add(DISPLAY_NAME, Text.of(BOLD, WHITE, languageService.getDefaultLanguage()["item.Material.${type.name}"]))
+        .add(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, WHITE, lang.translation("item.Material.${type.name}")))
         .add(UNBREAKABLE, true)
         .add(HIDE_UNBREAKABLE, true)
         .add(HIDE_MISCELLANEOUS, true)

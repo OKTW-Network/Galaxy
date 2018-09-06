@@ -12,7 +12,9 @@ import one.oktw.galaxy.internal.DatabaseManager
 import one.oktw.galaxy.internal.LanguageService
 import one.oktw.galaxy.internal.register.*
 import one.oktw.galaxy.machine.chunkloader.ChunkLoaderManager
+import one.oktw.galaxy.translation.GalaxyTranslationProvider
 import one.oktw.galaxy.util.DelayedExecute
+import one.oktw.i18n.api.service.TranslationService
 import org.slf4j.Logger
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.config.ConfigDir
@@ -24,6 +26,7 @@ import org.spongepowered.api.event.game.state.GameConstructionEvent
 import org.spongepowered.api.event.game.state.GameInitializationEvent
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent
 import org.spongepowered.api.event.game.state.GameStartingServerEvent
+import org.spongepowered.api.plugin.Dependency
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.world.gen.WorldGeneratorModifier
@@ -35,7 +38,8 @@ import java.util.*
     id = "galaxy",
     name = "OKTW Galaxy",
     description = "OKTW Galaxy Project",
-    version = "1.0-SNAPSHOT"
+    version = "1.0-SNAPSHOT",
+    dependencies = [Dependency(id = "i18n", version = "0.1.1")]
 )
 class Main {
     companion object {
@@ -52,6 +56,8 @@ class Main {
         lateinit var languageService: LanguageService
             private set
         lateinit var delay: DelayedExecute
+            private set
+        lateinit var translationService: TranslationService
             private set
     }
 
@@ -88,6 +94,10 @@ class Main {
         DataRegister()
         RecipeRegister()
         EasyRecipeRegister()
+
+        Sponge.getServiceManager().provide(one.oktw.i18n.api.I18n::class.java).get().let {
+            translationService = it.register("galaxy", GalaxyTranslationProvider(languageService), false)
+        }
     }
 
     @Listener

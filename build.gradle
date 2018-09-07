@@ -55,7 +55,7 @@ dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$Coroutines_version"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$Coroutines_version"
     compile "org.mongodb:mongodb-driver-reactivestreams:1.9.0"
-    compileOnly "com.github.OKTW-Network:sponge-i18n:0.1.2:api"
+    compile "com.github.OKTW-Network:sponge-i18n:0.1.2:api"
 }
 
 kotlin {

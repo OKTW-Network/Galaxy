@@ -1,7 +1,6 @@
 package one.oktw.galaxy.item.type
 
 import one.oktw.galaxy.Main
-import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUpgrade
 import one.oktw.galaxy.item.enums.ItemType
@@ -13,7 +12,6 @@ import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import org.spongepowered.api.data.key.Keys.DISPLAY_NAME
 import org.spongepowered.api.item.ItemTypes.ENCHANTED_BOOK
 import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles.BOLD
 

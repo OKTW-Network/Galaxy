@@ -1,7 +1,8 @@
 package one.oktw.galaxy.command
 
-import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.player.event.Viewer.Companion.isViewer
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.block.BlockTypes.STANDING_SIGN
 import org.spongepowered.api.block.BlockTypes.WALL_SIGN
 import org.spongepowered.api.command.CommandResult
@@ -29,7 +30,7 @@ class Sign : CommandBase {
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src !is Player || isViewer(src.uniqueId)) return CommandResult.empty()
-        val lang = languageService.getDefaultLanguage() // Todo get player lang
+        val lang = Main.translationService
 
         val blockRay = BlockRay.from(src)
             .distanceLimit(7.0)
@@ -44,20 +45,20 @@ class Sign : CommandBase {
             val lines = block[Keys.SIGN_LINES].orElse(ArrayList<Text>())
 
             if (line < 1 || line > 4) {
-                src.sendMessage(Text.of(TextColors.RED, lang["command.Sign.line_invalid"]))
+                src.sendMessage(Text.of(TextColors.RED, lang.of("command.Sign.line_invalid")).toLegacyText(src))
                 return CommandResult.empty()
             }
 
             if (text.toPlain().length > 16) {
-                src.sendMessage(Text.of(TextColors.RED, lang["command.Sign.too_many_words"]))
+                src.sendMessage(Text.of(TextColors.RED, lang.of("command.Sign.too_many_words")).toLegacyText(src))
                 return CommandResult.empty()
             }
 
             lines[line - 1] = text
             block.offer(Keys.SIGN_LINES, lines)
-            src.sendMessage(Text.of(TextColors.GREEN, lang["command.Sign.success"]))
+            src.sendMessage(Text.of(TextColors.GREEN, lang.of("command.Sign.success")).toLegacyText(src))
         } else {
-            src.sendMessage(Text.of(TextColors.RED, lang["command.Sign.not_sign"]))
+            src.sendMessage(Text.of(TextColors.RED, lang.of("command.Sign.not_sign")).toLegacyText(src))
         }
 
         return CommandResult.success()

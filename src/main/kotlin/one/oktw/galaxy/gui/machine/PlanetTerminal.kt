@@ -9,7 +9,7 @@ import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.*
 import one.oktw.galaxy.galaxy.enums.Group.*
 import one.oktw.galaxy.galaxy.enums.Group.MEMBER
-import one.oktw.galaxy.translation.Util.Companion.toLegacyText
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import one.oktw.galaxy.gui.*
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button

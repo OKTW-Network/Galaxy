@@ -39,7 +39,7 @@ import java.util.*
     name = "OKTW Galaxy",
     description = "OKTW Galaxy Project",
     version = "1.0-SNAPSHOT",
-    dependencies = [Dependency(id = "i18n", version = "0.1.1")]
+    dependencies = [Dependency(id = "i18n", version = "0.1.2")]
 )
 class Main {
     companion object {
@@ -55,9 +55,8 @@ class Main {
             private set
 
         @Deprecated("use translation service instead")
-        lateinit var languageService: LanguageService
+        private lateinit var languageService: LanguageService
 
-            private set
         lateinit var delay: DelayedExecute
             private set
         lateinit var translationService: TranslationService

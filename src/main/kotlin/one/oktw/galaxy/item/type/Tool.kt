@@ -1,7 +1,6 @@
 package one.oktw.galaxy.item.type
 
 import one.oktw.galaxy.Main
-import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.item.ItemUtil.Companion.removeCoolDown
 import one.oktw.galaxy.item.ItemUtil.Companion.removeDamage
@@ -12,7 +11,6 @@ import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import org.spongepowered.api.data.key.Keys.*
 import org.spongepowered.api.item.ItemTypes.IRON_SWORD
 import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors.YELLOW
 import org.spongepowered.api.text.format.TextStyles.BOLD
 

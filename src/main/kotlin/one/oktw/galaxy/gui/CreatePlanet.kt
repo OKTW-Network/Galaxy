@@ -1,7 +1,7 @@
 package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.launch
-import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
@@ -17,6 +17,7 @@ import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.util.Chat.Companion.confirm
 import one.oktw.galaxy.util.Chat.Companion.input
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.data.key.Keys.DISPLAY_NAME
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
@@ -33,13 +34,13 @@ import org.spongepowered.api.text.format.TextStyles
 import org.spongepowered.api.text.format.TextStyles.BOLD
 import java.util.*
 
-class CreatePlanet(private val galaxy: Galaxy) : GUI() {
-    private val lang = languageService.getDefaultLanguage()
+class CreatePlanet(viewer: Player, private val galaxy: Galaxy) : GUI() {
+    private val lang = Main.translationService
     private val buttonID = Array(3) { UUID.randomUUID() }
     override val token = "CreatePlanet-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.CreatePlanet"])))
+        .property(InventoryTitle.of(lang.of("UI.Title.CreatePlanet").toLegacyText(viewer)))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 
@@ -50,21 +51,21 @@ class CreatePlanet(private val galaxy: Galaxy) : GUI() {
         Button(PLANET_O).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.PlanetTypeNormal"]))
+                offer(DISPLAY_NAME, lang.ofPlaceHolder(GREEN, lang.of("UI.Button.PlanetTypeNormal")))
             }
             .let { inventory.set(0, 0, it) }
 
         Button(PLANET_N).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.PlanetTypeNether"]))
+                offer(DISPLAY_NAME, lang.ofPlaceHolder(GREEN, lang.of("UI.Button.PlanetTypeNether")))
             }
             .let { inventory.set(2, 0, it) }
 
         Button(PLANET_E).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[2]))
-                offer(DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.PlanetTypeEnd"]))
+                offer(DISPLAY_NAME, lang.ofPlaceHolder(GREEN, lang.of("UI.Button.PlanetTypeEnd")))
             }
             .let { inventory.set(4, 0, it) }
 
@@ -129,12 +130,12 @@ class CreatePlanet(private val galaxy: Galaxy) : GUI() {
                 TeleportHelper.teleport(player, planet)
                 return true
             } catch (e: RuntimeException) {
-                var message = e.message
+                var message: Text = Text.of(e.message?: "unknown error")
 
                 if (e is IllegalArgumentException) {
                     when (e.message) {
-                        "Name contains characters that are not allowed" -> message = lang["Respond.WorldCharNotAllow"]
-                        "World already exists" -> message = lang["Respond.WorldNameDup"]
+                        "Name contains characters that are not allowed" -> message = lang.of("Respond.WorldCharNotAllow").toLegacyText(player)
+                        "World already exists" -> message = lang.of("Respond.WorldNameDup").toLegacyText(player)
                     }
                 }
 

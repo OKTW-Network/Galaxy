@@ -5,7 +5,7 @@ import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.openSubscription
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.translation.Util.Companion.toLegacyText
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.galaxy.enums.Group.OWNER

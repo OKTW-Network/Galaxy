@@ -15,7 +15,7 @@ import one.oktw.galaxy.item.enums.ButtonType.PLUS
 import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.util.Chat.Companion.confirm
 import one.oktw.galaxy.util.Chat.Companion.input
-import one.oktw.galaxy.translation.Util.Companion.toLegacyText
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent

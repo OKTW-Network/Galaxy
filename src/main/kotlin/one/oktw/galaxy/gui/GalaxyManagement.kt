@@ -103,7 +103,7 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
         val player = event.source as Player
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
-            buttonID[0] -> GUIHelper.openAsync(player) { CreatePlanet(galaxy.refresh()) }
+            buttonID[0] -> GUIHelper.openAsync(player) { CreatePlanet(player, galaxy.refresh()) }
             buttonID[1] -> GUIHelper.openAsync(player) { BrowserMember(player, galaxy.refresh(), true) }
             buttonID[2] -> launch {
                 val input = input(player, Text.of(AQUA, "請輸入遊戲ID："))?.toPlain() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
@@ -121,7 +121,7 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
                     player.sendMessage(Text.of(RED, "參數錯誤"))
                 }
             }
-            buttonID[3] -> GUIHelper.openAsync(player) { GalaxyJoinRequest(galaxy.refresh()) }
+            buttonID[3] -> GUIHelper.openAsync(player) { GalaxyJoinRequest(player, galaxy.refresh()) }
             buttonID[4] -> launch {
                 val input = input(player, Text.of(AQUA, "請輸入新名稱："))?.toPlain() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
 

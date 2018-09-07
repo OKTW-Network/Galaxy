@@ -1,7 +1,7 @@
 package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.launch
-import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
@@ -10,6 +10,7 @@ import one.oktw.galaxy.galaxy.data.extensions.setGroup
 import one.oktw.galaxy.item.enums.ButtonType.MEMBER_CHANGE
 import one.oktw.galaxy.item.enums.ButtonType.MEMBER_REMOVE
 import one.oktw.galaxy.item.type.Button
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
@@ -28,7 +29,7 @@ import java.util.*
 import java.util.Arrays.asList
 
 class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI() {
-    private val lang = languageService.getDefaultLanguage()
+    private val lang = Main.translationService
     private val user = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(member).get()
     override val token = "ManageMember-${galaxy.uuid}-$member"
     override val inventory: Inventory = Inventory.builder()
@@ -47,9 +48,9 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
                 offer(DataUUID(buttonID[0]))
                 offer(
                     Keys.DISPLAY_NAME,
-                    Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.RemoveMember"])
+                    lang.ofPlaceHolder(TextColors.GREEN, TextStyles.BOLD, lang.of("UI.Button.RemoveMember"))
                 )
-                offer(Keys.ITEM_LORE, asList(Text.of(TextColors.RED, lang["UI.removeMemberNotify"])))
+                offer(Keys.ITEM_LORE, asList(lang.ofPlaceHolder(TextColors.RED, lang.of("UI.removeMemberNotify"))))
             }
             .let { inventory.set(1, 0, it) }
 
@@ -58,7 +59,7 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
                 offer(DataUUID(buttonID[1]))
                 offer(
                     Keys.DISPLAY_NAME,
-                    Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.ChangePermissionGroup"])
+                    lang.ofPlaceHolder(TextColors.GREEN, TextStyles.BOLD, lang.of("UI.Button.ChangePermissionGroup"))
                 )
             }
             .let { inventory.set(3, 0, it) }
@@ -76,14 +77,14 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
             buttonID[0] -> GUIHelper.open(player) {
-                Confirm(Text.of(lang["UI.Button.ConfirmRemoveMember"])) {
+                Confirm(lang.of("UI.Button.ConfirmRemoveMember").toLegacyText(player)) {
                     if (it) {
                         launch { galaxy.delMember(member) }
                         GUIHelper.close(token)
                     }
                 }
             }
-            buttonID[1] -> GUIHelper.open(player) { GroupSelect { launch { galaxy.setGroup(member, it) } } }
+            buttonID[1] -> GUIHelper.open(player) { GroupSelect(player) { launch { galaxy.setGroup(member, it) } } }
         }
     }
 }

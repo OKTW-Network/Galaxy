@@ -5,7 +5,7 @@ import kotlinx.coroutines.experimental.withContext
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED
 import net.minecraft.entity.ai.attributes.AttributeModifier
-import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.armor.ArmorEffect.Companion.offerEffect
 import one.oktw.galaxy.armor.ArmorEffect.Companion.removeEffect
@@ -24,7 +24,6 @@ import org.spongepowered.api.item.enchantment.Enchantment
 import org.spongepowered.api.item.enchantment.EnchantmentTypes.AQUA_AFFINITY
 import org.spongepowered.api.item.enchantment.EnchantmentTypes.FIRE_PROTECTION
 import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.Arrays.asList
@@ -32,7 +31,7 @@ import java.util.Arrays.asList
 class ArmorHelper {
     companion object {
         fun offerArmor(player: Player) = launch {
-            val lang = languageService.getDefaultLanguage() // TODO set language
+            val lang = Main.translationService
             val upgrade = getTraveler(player).await()?.armor ?: return@launch
             val helmet: ItemStack = getArmor(DIAMOND_HELMET)
             val chestplate: ItemStack = getArmor(DIAMOND_CHESTPLATE)
@@ -44,7 +43,7 @@ class ArmorHelper {
                     offer(DataEnable())
                     offer(
                         ITEM_LORE,
-                        asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang["armor.effect.night_vision"]))
+                        asList(lang.ofPlaceHolder(TextColors.RED, TextStyles.UNDERLINE, lang.of("armor.effect.night_vision")))
                     )
                 }
             }
@@ -77,7 +76,7 @@ class ArmorHelper {
                     offer(DataEnable())
                     offer(
                         ITEM_LORE,
-                        asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang["armor.effect.jump_boost"]))
+                        asList(lang.ofPlaceHolder(TextColors.RED, TextStyles.UNDERLINE, lang.of("armor.effect.jump_boost")))
                     )
                 }
 
@@ -85,7 +84,7 @@ class ArmorHelper {
                     offer(DataEnable())
                     offer(
                         ITEM_LORE,
-                        asList(Text.of(TextColors.RED, TextStyles.UNDERLINE, lang["armor.effect.speed_boost"]))
+                        asList(lang.ofPlaceHolder(TextColors.RED, TextStyles.UNDERLINE, lang.of("armor.effect.speed_boost")))
                     )
                 }
             }
@@ -156,13 +155,15 @@ class ArmorHelper {
         }
 
         private fun getArmor(itemType: ItemType): ItemStack {
+            val lang = Main.translationService
+
             val item = ItemStack.builder()
                 .itemType(itemType)
                 .itemData(DataItemType.Immutable(ARMOR))
                 .itemData(DataUUID.Immutable())
                 .add(
                     DISPLAY_NAME,
-                    Text.of(TextColors.YELLOW, TextStyles.BOLD, languageService.getDefaultLanguage()["armor.item.name"])
+                    lang.ofPlaceHolder(TextColors.YELLOW, TextStyles.BOLD, lang.of("armor.item.name"))
                 )
                 .add(UNBREAKABLE, true)
                 .add(HIDE_UNBREAKABLE, true)
@@ -182,11 +183,19 @@ class ArmorHelper {
         }
 
         private fun toggleArmorStatus(item: ItemStack): ItemStack {
+            val lang = Main.translationService
+
             item.transform(DataEnable.key) {
                 if (it) {
-                    item.transform(ITEM_LORE) { it[0] = it[0].toBuilder().color(TextColors.RED).build();it }
+                    item.transform(ITEM_LORE) {
+                        it[0] = lang.ofPlaceHolder(lang.fromText(it[0]).toBuilder().color(TextColors.RED).build())
+                        it
+                    }
                 } else {
-                    item.transform(ITEM_LORE) { it[0] = it[0].toBuilder().color(TextColors.GREEN).build();it }
+                    item.transform(ITEM_LORE) {
+                        it[0] = lang.ofPlaceHolder(lang.fromText(it[0]).toBuilder().color(TextColors.GREEN).build())
+                        it
+                    }
                 }
 
                 !it

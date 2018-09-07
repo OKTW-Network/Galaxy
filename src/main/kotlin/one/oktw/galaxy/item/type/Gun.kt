@@ -1,7 +1,6 @@
 package one.oktw.galaxy.item.type
 
 import one.oktw.galaxy.Main
-import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataUUID
@@ -16,7 +15,6 @@ import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import org.spongepowered.api.data.key.Keys.*
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors.GREEN
 import org.spongepowered.api.text.format.TextStyles.BOLD
 import java.util.*

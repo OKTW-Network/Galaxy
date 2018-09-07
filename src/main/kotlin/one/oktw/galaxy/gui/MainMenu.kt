@@ -3,8 +3,8 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.channels.any
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.openSubscription
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.data.extensions.getGroup
@@ -15,6 +15,7 @@ import one.oktw.galaxy.item.enums.ButtonType.PLUS
 import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.util.Chat.Companion.confirm
 import one.oktw.galaxy.util.Chat.Companion.input
+import one.oktw.galaxy.translation.Util.Companion.toLegacyText
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
@@ -60,11 +61,11 @@ class MainMenu(player: Player) : GUI() {
         )
     }
 
-    private val lang = languageService.getDefaultLanguage()
+    private val lang = Main.translationService
     override val token = "MainMenu-${player.uniqueId}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.StarShipController"])))
+        .property(InventoryTitle.of(lang.of("UI.Title.StarShipController").toLegacyText(player)))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 
@@ -84,7 +85,7 @@ class MainMenu(player: Player) : GUI() {
             .apply {
                 offer(
                     Keys.DISPLAY_NAME,
-                    Text.of(GREEN, BOLD, lang["UI.Button.ListJoinedGalaxy"])
+                    lang.ofPlaceHolder(GREEN, BOLD, lang.of("UI.Button.ListJoinedGalaxy"))
                 )
             }
             .let { view.setSlot(Slot.LEFT, it, Action.OWN_GALAXY) }
@@ -94,7 +95,7 @@ class MainMenu(player: Player) : GUI() {
 
             Button(PLUS).createItemStack()
                 .apply {
-                    offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.Button.CreateGalaxy"]))
+                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, BOLD, lang.of("UI.Button.CreateGalaxy")))
                 }
                 .let { view.setSlot(Slot.MIDDLE, it, Action.CREATE_GALAXY) }
         }
@@ -103,7 +104,7 @@ class MainMenu(player: Player) : GUI() {
             .apply {
                 offer(
                     Keys.DISPLAY_NAME,
-                    Text.of(GREEN, BOLD, lang["UI.Button.ListAllGalaxy"])
+                    lang.ofPlaceHolder(GREEN, BOLD, lang.of("UI.Button.ListAllGalaxy"))
                 )
             }
             .let { view.setSlot(Slot.RIGHT, it, Action.ALL_GALAXY)  }
@@ -123,7 +124,7 @@ class MainMenu(player: Player) : GUI() {
         }
 
         when (detail.primary?.data ?: return) {
-            Action.OWN_GALAXY -> GUIHelper.open(player) { BrowserGalaxy(player) }
+            Action.OWN_GALAXY -> GUIHelper.open(player) { BrowserGalaxy(player, player) }
             Action.CREATE_GALAXY -> launch {
                 if (galaxyManager.get(player).openSubscription().any { it.getGroup(player) == OWNER }) {
                     player.sendMessage(Text.of(RED, "你只能擁有一個星系"))
@@ -150,7 +151,7 @@ class MainMenu(player: Player) : GUI() {
                     player.sendMessage(Text.of(RED, "已取消創建星系"))
                 }
             }
-            Action.ALL_GALAXY -> GUIHelper.open(player) { BrowserGalaxy() }
+            Action.ALL_GALAXY -> GUIHelper.open(player) { BrowserGalaxy(player) }
         }
     }
 }

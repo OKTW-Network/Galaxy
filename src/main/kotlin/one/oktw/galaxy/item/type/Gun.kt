@@ -1,5 +1,6 @@
 package one.oktw.galaxy.item.type
 
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataOverheat
@@ -48,7 +49,7 @@ data class Gun(
     var upgrade: ArrayList<Upgrade> = ArrayList()
 ) : Item, Overheat {
     override fun createItemStack(): ItemStack {
-        val lang = languageService.getDefaultLanguage() // TODO player lang
+        val lang = Main.translationService
         val item = ItemStack.builder()
             .itemType(ItemTypes.DIAMOND_SWORD)
             .itemData(DataUUID.Immutable(uuid))
@@ -61,10 +62,10 @@ data class Gun(
             .add(ITEM_DURABILITY, style.id.toInt())
 
         when (itemType) {
-            PISTOL -> item.add(DISPLAY_NAME, Text.of(BOLD, GREEN, lang["item.Gun.PISTOL"]))
+            PISTOL -> item.add(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, GREEN, lang.of("item.Gun.PISTOL")))
             SNIPER -> {
                 item.itemData(DataEnable())
-                item.add(DISPLAY_NAME, Text.of(BOLD, GREEN, lang["item.Gun.SNIPER"]))
+                item.add(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, GREEN, lang.of("item.Gun.SNIPER")))
             }
             else -> Unit
         }

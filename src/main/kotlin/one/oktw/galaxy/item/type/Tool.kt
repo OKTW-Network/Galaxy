@@ -1,5 +1,6 @@
 package one.oktw.galaxy.item.type
 
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.item.ItemUtil.Companion.removeCoolDown
@@ -17,12 +18,14 @@ import org.spongepowered.api.text.format.TextStyles.BOLD
 
 @BsonDiscriminator
 data class Tool(val type: ToolType = DUMMY) : Item {
+    val lang = Main.translationService
+
     override val itemType = TOOL
 
     override fun createItemStack(): ItemStack = ItemStack.builder()
         .itemType(IRON_SWORD)
         .itemData(DataItemType(TOOL))
-        .add(DISPLAY_NAME, Text.of(BOLD, YELLOW, languageService.getDefaultLanguage()["item.Tool.${type.name}"]))
+        .add(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, YELLOW, lang.of("item.Tool.${type.name}")))
         .add(UNBREAKABLE, true)
         .add(HIDE_UNBREAKABLE, true)
         .add(HIDE_MISCELLANEOUS, true)

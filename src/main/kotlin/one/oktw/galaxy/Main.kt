@@ -53,7 +53,10 @@ class Main {
             private set
         lateinit var chunkLoaderManager: ChunkLoaderManager
             private set
+
+        @Deprecated("use translation service instead")
         lateinit var languageService: LanguageService
+
             private set
         lateinit var delay: DelayedExecute
             private set
@@ -86,18 +89,19 @@ class Main {
         event.register(NetherGenModifier())
     }
 
+    @Suppress("DEPRECATION")
     @Listener
     fun onPreInit(event: GamePreInitializationEvent) {
         serverThread = Sponge.getScheduler().createSyncExecutor(this).asCoroutineDispatcher()
         delay = DelayedExecute(plugin)
         languageService = LanguageService()
-        DataRegister()
-        RecipeRegister()
-        EasyRecipeRegister()
-
         Sponge.getServiceManager().provide(one.oktw.i18n.api.I18n::class.java).get().let {
             translationService = it.register("galaxy", GalaxyTranslationProvider(languageService), false)
         }
+
+        DataRegister()
+        RecipeRegister()
+        EasyRecipeRegister()
     }
 
     @Listener

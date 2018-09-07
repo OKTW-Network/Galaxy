@@ -3,7 +3,6 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.data.extensions.refresh
@@ -11,6 +10,7 @@ import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType.*
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
+import one.oktw.galaxy.translation.Util.Companion.toLegacyText
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
@@ -25,12 +25,12 @@ import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 import java.util.Arrays.asList
 
-class BrowserPlanet(private val galaxy: Galaxy) : PageGUI<UUID>() {
-    private val lang = languageService.getDefaultLanguage()
+class BrowserPlanet(viewer: Player, private val galaxy: Galaxy) : PageGUI<UUID>() {
+    private val lang = Main.translationService
     override val token = "BrowserPlanet-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.PlanetList"])))
+        .property(InventoryTitle.of(lang.of("UI.Title.PlanetList").toLegacyText(viewer)))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 
@@ -56,17 +56,18 @@ class BrowserPlanet(private val galaxy: Galaxy) : PageGUI<UUID>() {
                     offer(
                         Keys.ITEM_LORE,
                         asList(
-                            Text.of(
+                            lang.ofPlaceHolder(
                                 TextColors.AQUA,
-                                "${lang["UI.Tip.PlayerCount"]}: ",
+                                lang.of("UI.Tip.PlayerCount"),
+                                ": ",
                                 TextColors.RESET,
                                 0 // TODO player on planet
                             ),
-                            Text.of(
+                            lang.ofPlaceHolder(
                                 TextColors.AQUA,
-                                "${lang["UI.Tip.AllowVisit"]}: ",
-                                TextColors.RESET,
-                                lang["UI.Tip.${it.visitable}"]
+                                lang.of("UI.Tip.AllowVisit"),
+                                ": ",
+                                lang.of("UI.Tip.${it.visitable}")
                             )
                         )
                     )

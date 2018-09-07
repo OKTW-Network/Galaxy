@@ -404,12 +404,15 @@ class GalaxyManage : CommandBase {
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-            var uuid = args.getOne<UUID>("planet").orElse(null)
+            val uuid = args.getOne<UUID>("planet").orElse(null)
             launch {
-                //If planet(uuid) is null then get player planet
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world)?.getPlanet(src.world)?.uuid
+                var galaxy = galaxyManager.get(planet = uuid)
+                //If uuid is null then get player planet uuid
+                if (galaxy == null && src is Player) {
+                    galaxy = galaxyManager.get(src.world)
+                }
                 //If it is still null then return
-                if (uuid == null) {
+                if (galaxy == null) {
                     src.sendMessage(
                         Text.of(
                             TextColors.RED,
@@ -418,16 +421,20 @@ class GalaxyManage : CommandBase {
                         )
                     )
                     return@launch
-                }
-                val galaxy = galaxyManager.get(planet = uuid)
-                if (galaxy == null) {
-                    src.sendMessage(Text.of(TextColors.RED, "Can not find the related galaxy from db!"))
+                } else if (galaxy.getPlanet(uuid) == null) {
+                    src.sendMessage(
+                        Text.of(
+                            TextColors.RED,
+                            "Planet not found"
+                        )
+                    )
                     return@launch
                 }
                 galaxy.update {
-                    this.getPlanet(uuid)!!.visitable = args.getOne<Boolean>("visitable").get()
+                    val planet = this.getPlanet(uuid)!!
+                    planet.visitable = args.getOne<Boolean>("visitable").get()
+                    src.sendMessage(Text.of(TextColors.GREEN, "Visibility set to ", planet.visitable, "!"))
                 }
-                src.sendMessage(Text.of(TextColors.GREEN, "Visibility set to ", galaxy.getPlanet(uuid)!!.visitable, "!"))
             }
             return CommandResult.success()
         }
@@ -446,12 +453,13 @@ class GalaxyManage : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src !is Player) return CommandResult.empty()
 
-            var uuid = args.getOne<UUID>("galaxy").orElse(null)
+            val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
+                var galaxy = galaxyManager.get(uuid)
                 //If uuid is null then get player galaxy uuid
-                if (uuid == null) uuid = galaxyManager.get(src.world)?.uuid
+                if (galaxy == null) galaxy = galaxyManager.get(src.world)
                 //If it is still null then return
-                if (uuid == null) {
+                if (galaxy == null) {
                     src.sendMessage(
                         Text.of(
                             TextColors.RED,
@@ -461,7 +469,7 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
-                if (confirm(src, Text.of(TextColors.AQUA, "Are you sure you want to remove the galaxy ${galaxyManager.get(uuid)!!.name}?")) == true) {
+                if (confirm(src, Text.of(TextColors.AQUA, "Are you sure you want to remove the galaxy ${galaxy.name}?")) == true) {
                     galaxyManager.deleteGalaxy(uuid)
                     src.sendMessage(Text.of(TextColors.GREEN, "Galaxy deleted!"))
                 }
@@ -483,12 +491,17 @@ class GalaxyManage : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src !is Player) return CommandResult.empty()
 
-            var uuid = args.getOne<UUID>("planet").orElse(null)
+            val uuid = args.getOne<UUID>("planet").orElse(null)
             launch {
+                var galaxy = galaxyManager.get(planet = uuid)
+                var planet = galaxy?.getPlanet(uuid)
                 //If uuid is null then get player planet uuid
-                if (uuid == null) uuid = galaxyManager.get(src.world)?.getPlanet(src.world)?.uuid
+                if (planet == null) {
+                    galaxy = galaxyManager.get(src.world)
+                    planet = galaxy?.getPlanet(src.world)
+                }
                 //If it is still null then return
-                if (uuid == null) {
+                if (galaxy == null) {
                     src.sendMessage(
                         Text.of(
                             TextColors.RED,
@@ -497,19 +510,12 @@ class GalaxyManage : CommandBase {
                         )
                     )
                     return@launch
-                }
-                //fetch galaxy from planet
-                val galaxy = galaxyManager.get(planet = uuid)
-                if (galaxy == null) {
-                    src.sendMessage(
-                        Text.of(
-                            TextColors.RED,
-                            "Planet not found!"
-                        )
-                    )
+                } else if (planet == null) {
+                    src.sendMessage(Text.of(TextColors.RED, "Planet not found"))
                     return@launch
                 }
-                if (confirm(src, Text.of(TextColors.AQUA, "Are you sure you want to remove the planet ${galaxy.getPlanet(uuid)!!.name}?")) == true) {
+
+                if (confirm(src, Text.of(TextColors.AQUA, "Are you sure you want to remove the planet ${planet.name}?")) == true) {
                     withContext(serverThread) { galaxy.removePlanet(uuid) }
                     src.sendMessage(Text.of(TextColors.GREEN, "Planet on ${galaxy.name} (${galaxy.uuid}) deleted!"))
                 }

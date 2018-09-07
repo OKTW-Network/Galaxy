@@ -37,9 +37,8 @@ class DeleteWorld : CommandBase {
                 val galaxy = galaxyManager.get(world)
                 if (galaxy != null) {
                     //src.sendMessage(Text.of(TextColors.GREEN, "Planet found!Removing planet instead."))
-                    val planet = galaxy.getPlanet(world)?.uuid
-                    if (planet != null) {
-                        withContext(serverThread) { galaxy.removePlanet(planet) }
+                    galaxy.getPlanet(world)?.uuid?.let {
+                        withContext(serverThread) { galaxy.removePlanet(it) }
                         src.sendMessage(Text.of(TextColors.GREEN, "Planet on ${galaxy.name} (${galaxy.uuid}) deleted!"))
                         return@launch
                     }

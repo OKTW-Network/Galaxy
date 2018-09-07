@@ -10,7 +10,6 @@ import one.oktw.galaxy.galaxy.data.extensions.setGroup
 import one.oktw.galaxy.item.enums.ButtonType.MEMBER_CHANGE
 import one.oktw.galaxy.item.enums.ButtonType.MEMBER_REMOVE
 import one.oktw.galaxy.item.type.Button
-import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
@@ -77,14 +76,14 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
             buttonID[0] -> GUIHelper.open(player) {
-                Confirm(lang.of("UI.Button.ConfirmRemoveMember").toLegacyText(player)) {
+                Confirm(lang.ofPlaceHolder("UI.Button.ConfirmRemoveMember")) {
                     if (it) {
                         launch { galaxy.delMember(member) }
                         GUIHelper.close(token)
                     }
                 }
             }
-            buttonID[1] -> GUIHelper.open(player) { GroupSelect(player) { launch { galaxy.setGroup(member, it) } } }
+            buttonID[1] -> GUIHelper.open(player) { GroupSelect() { launch { galaxy.setGroup(member, it) } } }
         }
     }
 }

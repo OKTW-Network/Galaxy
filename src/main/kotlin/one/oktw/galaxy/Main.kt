@@ -39,7 +39,7 @@ import java.util.*
     name = "OKTW Galaxy",
     description = "OKTW Galaxy Project",
     version = "1.0-SNAPSHOT",
-    dependencies = [Dependency(id = "i18n", version = "0.1.2")]
+    dependencies = [Dependency(id = "i18n", version = "0.1.3")]
 )
 class Main {
     companion object {

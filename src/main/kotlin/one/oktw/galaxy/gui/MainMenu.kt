@@ -15,7 +15,6 @@ import one.oktw.galaxy.item.enums.ButtonType.PLUS
 import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.util.Chat.Companion.confirm
 import one.oktw.galaxy.util.Chat.Companion.input
-import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
@@ -65,7 +64,7 @@ class MainMenu(player: Player) : GUI() {
     override val token = "MainMenu-${player.uniqueId}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(lang.of("UI.Title.StarShipController").toLegacyText(player)))
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.StarShipController")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 
@@ -124,7 +123,7 @@ class MainMenu(player: Player) : GUI() {
         }
 
         when (detail.primary?.data ?: return) {
-            Action.OWN_GALAXY -> GUIHelper.open(player) { BrowserGalaxy(player, player) }
+            Action.OWN_GALAXY -> GUIHelper.open(player) { BrowserGalaxy(player) }
             Action.CREATE_GALAXY -> launch {
                 if (galaxyManager.get(player).openSubscription().any { it.getGroup(player) == OWNER }) {
                     player.sendMessage(Text.of(RED, "你只能擁有一個星系"))
@@ -151,7 +150,7 @@ class MainMenu(player: Player) : GUI() {
                     player.sendMessage(Text.of(RED, "已取消創建星系"))
                 }
             }
-            Action.ALL_GALAXY -> GUIHelper.open(player) { BrowserGalaxy(player) }
+            Action.ALL_GALAXY -> GUIHelper.open(player) { BrowserGalaxy() }
         }
     }
 }

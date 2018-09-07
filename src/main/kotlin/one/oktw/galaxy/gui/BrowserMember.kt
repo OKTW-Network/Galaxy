@@ -10,7 +10,6 @@ import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.data.extensions.refresh
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
-import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.SkullTypes
@@ -30,12 +29,12 @@ import java.util.*
 import java.util.Arrays.asList
 import kotlin.streams.toList
 
-class BrowserMember(viewer: Player, private val galaxy: Galaxy, private val manage: Boolean = false) : PageGUI<UUID>() {
+class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = false) : PageGUI<UUID>() {
     private val lang = Main.translationService
     override val token = "BrowserMember-${galaxy.uuid}${if (manage) "-manage" else ""}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(lang.of("UI.Title.MemberList").toLegacyText(viewer)))
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.MemberList")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 

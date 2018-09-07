@@ -9,9 +9,7 @@ import one.oktw.galaxy.galaxy.enums.Group.MEMBER
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.enums.ButtonType.MANAGER
 import one.oktw.galaxy.item.type.Button
-import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.data.key.Keys
-import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
@@ -23,12 +21,12 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-class GroupSelect(viewer: Player, private val callback: (Group) -> Unit) : GUI() {
+class GroupSelect(private val callback: (Group) -> Unit) : GUI() {
     private val lang = Main.translationService
     override val token = "GroupSelect-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(lang.of("UI.Title.SelectPermissionGroup").toLegacyText(viewer)))
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.SelectPermissionGroup")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
     private val buttonID = Array(3) { UUID.randomUUID() }

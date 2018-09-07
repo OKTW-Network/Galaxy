@@ -112,8 +112,8 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
         val player = event.source as Player
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
-            buttonID[0] -> GUIHelper.openAsync(player) { BrowserMember(player, galaxy.refresh()) }
-            buttonID[1] -> GUIHelper.openAsync(player) { BrowserPlanet(player, galaxy.refresh()) }
+            buttonID[0] -> GUIHelper.openAsync(player) { BrowserMember(galaxy.refresh()) }
+            buttonID[1] -> GUIHelper.openAsync(player) { BrowserPlanet(galaxy.refresh()) }
             buttonID[2] -> GUIHelper.openAsync(player) { GalaxyManagement(galaxy.refresh()) }
             buttonID[3] -> {
                 launch { galaxy.requestJoin(player.uniqueId) }

@@ -10,7 +10,6 @@ import one.oktw.galaxy.galaxy.planet.TeleportHelper
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType.*
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
-import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
@@ -25,12 +24,12 @@ import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 import java.util.Arrays.asList
 
-class BrowserPlanet(viewer: Player, private val galaxy: Galaxy) : PageGUI<UUID>() {
+class BrowserPlanet(private val galaxy: Galaxy) : PageGUI<UUID>() {
     private val lang = Main.translationService
     override val token = "BrowserPlanet-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(lang.of("UI.Title.PlanetList").toLegacyText(viewer)))
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.PlanetList")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 

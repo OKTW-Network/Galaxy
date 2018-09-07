@@ -9,10 +9,10 @@ import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.*
 import one.oktw.galaxy.galaxy.enums.Group.*
 import one.oktw.galaxy.galaxy.enums.Group.MEMBER
-import one.oktw.galaxy.translation.extensions.toLegacyText
 import one.oktw.galaxy.gui.*
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
@@ -37,7 +37,7 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
     override val token = "PlanetTerminal-${galaxy.uuid}-${player.uniqueId}"
     override val inventory: Inventory = Inventory.builder()
         .of(if (galaxy.getGroup(player) == VISITOR) CHEST else DOUBLE_CHEST)
-        .property(InventoryTitle.of(lang.of("UI.Title.PlanetTerminal").toLegacyText(player)))
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.PlanetTerminal")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 
@@ -153,16 +153,14 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
-        val viewer = event.source as Player
-
         event.isCancelled = true
 
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
             buttonID[0] -> player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() })
-            buttonID[1] -> GUIHelper.openAsync(player) { BrowserPlanet(viewer, galaxy.refresh()) }
+            buttonID[1] -> GUIHelper.openAsync(player) { BrowserPlanet(galaxy.refresh()) }
             buttonID[2] -> GUIHelper.openAsync(player) {
                 NumberSelect(
-                    lang.of("UI.Title.SelectStarDustCount").toLegacyText(player),
+                    lang.ofPlaceHolder("UI.Title.SelectStarDustCount"),
                     asList(
                         lang.ofPlaceHolder(
                             GREEN,
@@ -187,7 +185,7 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
                     }
                 }
             }
-            buttonID[3] -> GUIHelper.openAsync(player) { BrowserMember(player, galaxy.refresh()) }
+            buttonID[3] -> GUIHelper.openAsync(player) { BrowserMember(galaxy.refresh()) }
             buttonID[4] -> Unit // TODO ECS
             buttonID[5] -> GUIHelper.openAsync(player) { GalaxyManagement(galaxy.refresh()) }
             buttonID[6] -> {

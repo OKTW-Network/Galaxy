@@ -38,7 +38,7 @@ class ChunkLoader {
     @Listener
     @Suppress("UNUSED_PARAMETER")
     fun onInteractEntity(event: InteractEntityEvent.Secondary.MainHand, @First player: Player, @Getter("getTargetEntity") enderCrystal: EnderCrystal) {
-        if (enderCrystal[DataUUID.key].isPresent) GUIHelper.open(player) { ChunkLoader(player, enderCrystal) }
+        if (enderCrystal[DataUUID.key].isPresent) GUIHelper.open(player) { ChunkLoader(enderCrystal) }
     }
 
     @Listener

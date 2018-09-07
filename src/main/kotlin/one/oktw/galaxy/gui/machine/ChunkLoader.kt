@@ -14,7 +14,6 @@ import one.oktw.galaxy.item.enums.UpgradeType
 import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.item.type.Upgrade
 import one.oktw.galaxy.machine.chunkloader.data.ChunkLoader
-import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityTypes
@@ -33,7 +32,7 @@ import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
-class ChunkLoader(viewer: Player, private val entity: Entity) : GUI() {
+class ChunkLoader(private val entity: Entity) : GUI() {
     private val uuid = entity[DataUUID.key].orElse(null)
     private lateinit var chunkLoader: ChunkLoader
     private lateinit var upgradeGUI: GUI
@@ -42,7 +41,7 @@ class ChunkLoader(viewer: Player, private val entity: Entity) : GUI() {
     override val token = "ChunkLoader-$uuid"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(lang.of("UI.Title.ChunkLoader").toLegacyText(viewer)))
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.ChunkLoader")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 
@@ -93,7 +92,7 @@ class ChunkLoader(viewer: Player, private val entity: Entity) : GUI() {
         if (!this::chunkLoader.isInitialized) return
 
         upgradeGUI = GUIHelper.open(player) {
-            UpgradeSlot(player,this, chunkLoader.upgrade, UpgradeType.RANGE)
+            UpgradeSlot(this, chunkLoader.upgrade, UpgradeType.RANGE)
                 .onClose {
                     val originLevel = chunkLoader.upgrade.maxBy { it.level }?.level ?: 0
                     val newLevel = it.maxBy { it.level }?.level ?: 0

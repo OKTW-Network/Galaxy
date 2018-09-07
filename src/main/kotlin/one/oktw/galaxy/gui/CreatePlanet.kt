@@ -34,13 +34,13 @@ import org.spongepowered.api.text.format.TextStyles
 import org.spongepowered.api.text.format.TextStyles.BOLD
 import java.util.*
 
-class CreatePlanet(viewer: Player, private val galaxy: Galaxy) : GUI() {
+class CreatePlanet(private val galaxy: Galaxy) : GUI() {
     private val lang = Main.translationService
     private val buttonID = Array(3) { UUID.randomUUID() }
     override val token = "CreatePlanet-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(lang.of("UI.Title.CreatePlanet").toLegacyText(viewer)))
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.CreatePlanet")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 

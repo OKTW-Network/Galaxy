@@ -5,7 +5,6 @@ import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.openSubscription
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.translation.extensions.toLegacyText
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
@@ -32,7 +31,7 @@ import java.util.Arrays.asList
 import kotlin.collections.ArrayList
 import kotlin.streams.toList
 
-class BrowserGalaxy(viewer: Player, player: Player? = null) : PageGUI<BrowserGalaxy.Companion.Wrapper>() {
+class BrowserGalaxy(player: Player? = null) : PageGUI<BrowserGalaxy.Companion.Wrapper>() {
     companion object {
         enum class Function(val icon: ButtonType) {
             SORT_NUMBER(ButtonType.SORT_NUMBER),
@@ -66,7 +65,7 @@ class BrowserGalaxy(viewer: Player, player: Player? = null) : PageGUI<BrowserGal
     override val token = "BrowserGalaxy-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(lang.of("UI.Title.GalaxyList").toLegacyText(viewer)))
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.GalaxyList")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
     override val hasFunctionButtons: Boolean = true

@@ -5,10 +5,12 @@ import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.command.CommandBase
+import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.*
 import one.oktw.galaxy.galaxy.enums.Group
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
+import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType.NORMAL
 import one.oktw.galaxy.util.Chat.Companion.confirm
@@ -404,15 +406,21 @@ class GalaxyManage : CommandBase {
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-            val uuid = args.getOne<UUID>("planet").orElse(null)
+            var uuid = args.getOne<UUID>("planet").orElse(null)
             launch {
-                var galaxy = galaxyManager.get(planet = uuid)
+                val galaxy: Galaxy?
+                val planet: Planet?
                 //If uuid is null then get player planet uuid
-                if (galaxy == null && src is Player) {
+                if (uuid == null && src is Player) {
                     galaxy = galaxyManager.get(src.world)
+                    planet = galaxy?.getPlanet(src.world)
+                    uuid = planet?.uuid
+                } else {
+                    galaxy = galaxyManager.get(planet = uuid)
+                    planet = galaxy?.getPlanet(uuid)
                 }
                 //If it is still null then return
-                if (galaxy == null) {
+                if (uuid == null) {
                     src.sendMessage(
                         Text.of(
                             TextColors.RED,
@@ -421,7 +429,7 @@ class GalaxyManage : CommandBase {
                         )
                     )
                     return@launch
-                } else if (galaxy.getPlanet(uuid) == null) {
+                } else if (planet == null || galaxy == null) {
                     src.sendMessage(
                         Text.of(
                             TextColors.RED,
@@ -430,10 +438,12 @@ class GalaxyManage : CommandBase {
                     )
                     return@launch
                 }
+
                 galaxy.update {
-                    val planet = this.getPlanet(uuid)!!
-                    planet.visitable = args.getOne<Boolean>("visitable").get()
-                    src.sendMessage(Text.of(TextColors.GREEN, "Visibility set to ", planet.visitable, "!"))
+                    this.getPlanet(uuid)!!.let {
+                        it.visitable = args.getOne<Boolean>("visitable").get()
+                        src.sendMessage(Text.of(TextColors.GREEN, "Visibility set to ", it.visitable, "!"))
+                    }
                 }
             }
             return CommandResult.success()
@@ -491,17 +501,21 @@ class GalaxyManage : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src !is Player) return CommandResult.empty()
 
-            val uuid = args.getOne<UUID>("planet").orElse(null)
+            var uuid = args.getOne<UUID>("planet").orElse(null)
             launch {
-                var galaxy = galaxyManager.get(planet = uuid)
-                var planet = galaxy?.getPlanet(uuid)
+                val galaxy: Galaxy?
+                val planet: Planet?
                 //If uuid is null then get player planet uuid
-                if (planet == null) {
+                if (uuid == null) {
                     galaxy = galaxyManager.get(src.world)
                     planet = galaxy?.getPlanet(src.world)
+                    uuid = planet?.uuid
+                } else {
+                    galaxy = galaxyManager.get(planet = uuid)
+                    planet = galaxy?.getPlanet(uuid)
                 }
                 //If it is still null then return
-                if (galaxy == null) {
+                if (uuid == null) {
                     src.sendMessage(
                         Text.of(
                             TextColors.RED,
@@ -510,8 +524,13 @@ class GalaxyManage : CommandBase {
                         )
                     )
                     return@launch
-                } else if (planet == null) {
-                    src.sendMessage(Text.of(TextColors.RED, "Planet not found"))
+                } else if (planet == null || galaxy == null) {
+                    src.sendMessage(
+                        Text.of(
+                            TextColors.RED,
+                            "Planet not found"
+                        )
+                    )
                     return@launch
                 }
 

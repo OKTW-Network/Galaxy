@@ -21,7 +21,7 @@ class CommandHelper {
                 }
                 val user: User? = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(offlinePlayer).orElse(null)
                 if (user == null) {
-                    throw IllegalArgumentException("Player not found")
+                    throw IllegalArgumentException("Player not found!")
                 } else {
                     return user.player.get()
                 }
@@ -56,7 +56,7 @@ class CommandHelper {
             if (uuid1 == null) {
                 throw IllegalArgumentException("Not enough arguments!")
             } else if (planet == null || galaxy == null) {
-                throw IllegalArgumentException("Planet not found")
+                throw IllegalArgumentException("Planet not found!")
             }
             return GalaxyAndPlanet(galaxy, planet, uuid1)
         }

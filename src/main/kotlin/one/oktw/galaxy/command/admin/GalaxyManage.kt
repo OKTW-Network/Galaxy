@@ -175,6 +175,8 @@ class GalaxyManage : CommandBase {
                     galaxy.setGroup(player.uniqueId, group)
                     src.sendMessage(Text.of(TextColors.GREEN, "Group of ${player.name} in ${galaxy.name} was set to ${group.name}!"))
                 }
+            } catch (e: RuntimeException) {
+                src.sendMessage(Text.of(TextColors.RED, "Error: Illegal arguments!\n", Sponge.getCommandManager().getUsage(src)))
             } catch (e: IllegalArgumentException) {
                 src.sendMessage(Text.of(TextColors.RED, "Error: ", e.message))
                 if (e.message == "Not enough arguments!") {
@@ -221,6 +223,8 @@ class GalaxyManage : CommandBase {
                     galaxy.delMember(player.uniqueId)
                     src.sendMessage(Text.of(TextColors.GREEN, "${player.name} was removed from ${galaxy.name}!"))
                 }
+            } catch (e: RuntimeException) {
+                src.sendMessage(Text.of(TextColors.RED, "Error: Illegal arguments!\n", Sponge.getCommandManager().getUsage(src)))
             } catch (e: IllegalArgumentException) {
                 src.sendMessage(Text.of(TextColors.RED, "Error: ", e.message))
                 if (e.message == "Not enough arguments!") {

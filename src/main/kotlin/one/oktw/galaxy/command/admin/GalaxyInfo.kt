@@ -1,18 +1,15 @@
 package one.oktw.galaxy.command.admin
 
 import kotlinx.coroutines.experimental.launch
-import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.command.CommandBase
-import org.spongepowered.api.Sponge
+import one.oktw.galaxy.command.CommandHelper
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
 import org.spongepowered.api.command.args.GenericArguments
 import org.spongepowered.api.command.spec.CommandSpec
-import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.service.pagination.PaginationList
 import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.format.TextColors
 import java.util.*
 
 class GalaxyInfo : CommandBase {
@@ -25,20 +22,7 @@ class GalaxyInfo : CommandBase {
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         val uuid = args.getOne<UUID>("galaxy").orElse(null)
         launch {
-            var galaxy = galaxyManager.get(uuid)
-            //If galaxy(uuid) is null then get player galaxy
-            if (galaxy == null && src is Player) galaxy = galaxyManager.get(src.world)
-            //If it is still null then return
-            if (galaxy == null) {
-                src.sendMessage(
-                    Text.of(
-                        TextColors.RED,
-                        "Not enough arguments!\n",
-                        Sponge.getCommandManager().getUsage(src)
-                    )
-                )
-                return@launch
-            }
+            val galaxy = CommandHelper.getGalaxy(uuid, src)
 
             PaginationList.builder()
                 .contents(

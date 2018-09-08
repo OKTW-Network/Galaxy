@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.2.60'
+    ext.kotlin_version = '1.2.61'
     ext.sponge_version = "7.1.0-SNAPSHOT"
     ext.Coroutines_version = "0.24.0"
 
@@ -95,7 +95,7 @@ jar {
 
 shadowJar {
     classifier = null
-    exclude "META-INF/*"
+//    exclude "META-INF/*"
     exclude "dummyThing"
     dependencies {
         include dependency("org.mongodb:")

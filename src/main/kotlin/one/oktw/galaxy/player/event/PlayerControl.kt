@@ -44,7 +44,6 @@ import java.util.concurrent.TimeUnit
 class PlayerControl {
     private val lobbyResourcePack: ResourcePack?
     private val planetResourcePack: ResourcePack?
-    val bookUtil = BookUtil()
     init {
         val config = config.getNode("resource-pack")
 
@@ -123,10 +122,10 @@ class PlayerControl {
             // send resource pack and offer book(s)
             if (galaxy == null) {
                 // offer book(s)
-                val manual = bookUtil.getBook(MANUAL.key)
+                val manual = BookUtil.getBook(MANUAL.key)
                 if (manual != null) player.inventory.offer(manual)
                 if (player.hasPermission("oktw.book.magical")) {
-                    val magical = bookUtil.getBook(MAGICAL.key)
+                    val magical = BookUtil.getBook(MAGICAL.key)
                     if (magical != null) player.inventory.offer(magical)
                 }
                 // send resource pack
@@ -186,10 +185,10 @@ class PlayerControl {
             // send resource pack and offer book(s)
             if (to == null) {
                 // offer book(s)
-                val manual = bookUtil.getBook(MANUAL.key)
+                val manual = BookUtil.getBook(MANUAL.key)
                 if (manual != null) player.inventory.offer(manual)
                 if (player.hasPermission("oktw.book.magical")) {
-                    val magical = bookUtil.getBook(MAGICAL.key)
+                    val magical = BookUtil.getBook(MAGICAL.key)
                     if (magical != null) player.inventory.offer(magical)
                 }
                 // send resource pack

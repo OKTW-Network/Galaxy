@@ -2,6 +2,7 @@ package one.oktw.galaxy.command
 
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.command.data.GalaxyAndPlanet
+import one.oktw.galaxy.command.data.PlayerOrUser
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.planet.data.Planet
@@ -14,7 +15,7 @@ import java.util.*
 
 class CommandHelper {
     companion object {
-        fun getPlayer(player: Player?, offlinePlayer: String?): Player {
+        fun getPlayer(player: Player?, offlinePlayer: String?): PlayerOrUser {
             if (player == null) {
                 if (offlinePlayer == null) {
                     throw IllegalArgumentException("Not enough arguments!")
@@ -23,10 +24,10 @@ class CommandHelper {
                 if (user == null) {
                     throw IllegalArgumentException("Player not found!")
                 } else {
-                    return user.player.get()
+                    return PlayerOrUser(user.name, user.uniqueId)
                 }
             }
-            return player
+            return PlayerOrUser(player.name, player.uniqueId)
         }
 
         suspend fun getGalaxy(uuid: UUID?, src: CommandSource): Galaxy {

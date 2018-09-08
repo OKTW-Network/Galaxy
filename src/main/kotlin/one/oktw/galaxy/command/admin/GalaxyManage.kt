@@ -2,7 +2,6 @@ package one.oktw.galaxy.command.admin
 
 import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.command.admin.galaxyManage.*
-import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -28,7 +27,7 @@ class GalaxyManage : CommandBase {
             .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-        src.sendMessage(Sponge.getCommandManager().getUsage(src))
+        src.sendMessage(spec.getUsage(src))
 
         return CommandResult.success()
     }

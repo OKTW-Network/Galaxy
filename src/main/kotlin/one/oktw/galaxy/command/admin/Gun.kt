@@ -15,7 +15,6 @@ import one.oktw.galaxy.item.enums.ItemType.SNIPER
 import one.oktw.galaxy.item.enums.UpgradeType.THROUGH
 import one.oktw.galaxy.item.type.Gun
 import one.oktw.galaxy.item.type.Upgrade
-import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -36,7 +35,7 @@ class Gun : CommandBase {
             .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-        src.sendMessage(Sponge.getCommandManager().getUsage(src))
+        src.sendMessage(spec.getUsage(src))
 
         return CommandResult.success()
     }
@@ -77,7 +76,7 @@ class Gun : CommandBase {
                 args.getOne<Int>("Through").ifPresent { gun.upgrade.add(Upgrade(THROUGH, it)) }
 
                 traveler.item.add(gun)
-                launch{
+                launch {
                     galaxyManager.get(src.world)?.run {
                         getMember(src.uniqueId)?.also {
                             saveMember(traveler)

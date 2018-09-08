@@ -5,7 +5,6 @@ import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.command.CommandHelper
 import one.oktw.galaxy.galaxy.data.extensions.setGroup
 import one.oktw.galaxy.galaxy.enums.Group
-import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -45,11 +44,11 @@ class SetGroup : CommandBase {
                 src.sendMessage(Text.of(TextColors.GREEN, "Group of ${player.name} in ${galaxy.name} was set to ${group.name}!"))
             }
         } catch (e: RuntimeException) {
-            src.sendMessage(Text.of(TextColors.RED, "Error: Illegal arguments!\n", Sponge.getCommandManager().getUsage(src)))
+            src.sendMessage(Text.of(TextColors.RED, "Error: Illegal arguments!\n", spec.getUsage(src)))
         } catch (e: IllegalArgumentException) {
             src.sendMessage(Text.of(TextColors.RED, "Error: ", e.message))
             if (e.message == "Not enough arguments!") {
-                src.sendMessage(Text.of(TextColors.RED, Sponge.getCommandManager().getUsage(src)))
+                src.sendMessage(Text.of(TextColors.RED, spec.getUsage(src)))
             }
         }
         return CommandResult.success()

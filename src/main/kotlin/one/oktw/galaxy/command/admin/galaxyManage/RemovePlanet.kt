@@ -7,7 +7,6 @@ import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.command.CommandHelper
 import one.oktw.galaxy.galaxy.data.extensions.removePlanet
 import one.oktw.galaxy.util.Chat
-import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -45,7 +44,7 @@ class RemovePlanet : CommandBase {
         } catch (e: IllegalArgumentException) {
             src.sendMessage(Text.of(TextColors.RED, "Error: ", e.message))
             if (e.message == "Not enough arguments!") {
-                src.sendMessage(Text.of(TextColors.RED, Sponge.getCommandManager().getUsage(src)))
+                src.sendMessage(Text.of(TextColors.RED, spec.getUsage(src)))
             }
         }
         return CommandResult.success()

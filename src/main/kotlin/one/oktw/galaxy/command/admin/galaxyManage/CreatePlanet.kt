@@ -5,7 +5,6 @@ import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.command.CommandHelper
 import one.oktw.galaxy.galaxy.data.extensions.createPlanet
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType
-import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -37,7 +36,7 @@ class CreatePlanet : CommandBase {
             } catch (e: IllegalArgumentException) {
                 src.sendMessage(Text.of(TextColors.RED, "Error: ", e.message))
                 if (e.message == "Not enough arguments!") {
-                    src.sendMessage(Text.of(TextColors.RED, Sponge.getCommandManager().getUsage(src)))
+                    src.sendMessage(Text.of(TextColors.RED, spec.getUsage(src)))
                 }
             } catch (e: NotImplementedError) {
                 src.sendMessage(Text.of(TextColors.RED, "Error: ", e.message))

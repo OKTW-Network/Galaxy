@@ -240,7 +240,7 @@ class GalaxyManage : CommandBase {
                         GenericArguments.uuid(Text.of("galaxy")),
                         GenericArguments.string(Text.of("name"))
                     ),
-                    GenericArguments.string(Text.of("name"))
+                    GenericArguments.optional(GenericArguments.string(Text.of("name")))
                 )
                 .build()
 

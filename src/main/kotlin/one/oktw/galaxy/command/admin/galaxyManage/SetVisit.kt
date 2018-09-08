@@ -31,15 +31,14 @@ class SetVisit : CommandBase {
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         try {
             launch {
-                val (galaxy, _, uuid) = CommandHelper.getGalaxyAndPlanet(
+                var (galaxy, planet, uuid) = CommandHelper.getGalaxyAndPlanet(
                     args.getOne<UUID>("planet").orElse(null), src
                 )
                 galaxy.update {
-                    this.getPlanet(uuid)!!.let {
-                        it.visitable = args.getOne<Boolean>("visitable").get()
-                        src.sendMessage(Text.of(TextColors.GREEN, "Visibility of ${it.name} was set to ${it.visitable}!"))
-                    }
+                    planet = this.getPlanet(uuid)!!
+                    planet.visitable = args.getOne<Boolean>("visitable").get()
                 }
+                src.sendMessage(Text.of(TextColors.GREEN, "Visibility of ${planet.name} was set to ${planet.visitable}!"))
             }
         } catch (e: IllegalArgumentException) {
             src.sendMessage(Text.of(TextColors.RED, "Error: ", e.message))

@@ -32,10 +32,8 @@ class Info : CommandBase {
         try {
             launch {
                 val galaxy = CommandHelper.getGalaxy(uuid, src)
-                galaxy.update {
-                    info = args.getOne<String>("text").get()
-                    src.sendMessage(Text.of(TextColors.GREEN, "Info of ${galaxy.name} was set to ${this.info}!"))
-                }
+                galaxy.update { info = args.getOne<String>("text").get() }
+                src.sendMessage(Text.of(TextColors.GREEN, "Info of ${galaxy.name} was set to ${galaxy.info}!"))
             }
 
         } catch (e: IllegalArgumentException) {

@@ -32,10 +32,8 @@ class Rename : CommandBase {
         try {
             launch {
                 val galaxy = CommandHelper.getGalaxy(uuid, src)
-                galaxy.update {
-                    name = args.getOne<String>("name").get()
-                    src.sendMessage(Text.of(TextColors.GREEN, "${galaxy.name} was renamed to ${this.name}!"))
-                }
+                galaxy.update { name = args.getOne<String>("name").get() }
+                src.sendMessage(Text.of(TextColors.GREEN, "Galaxy was renamed to ${galaxy.name}!"))
             }
         } catch (e: IllegalArgumentException) {
             src.sendMessage(Text.of(TextColors.RED, "Error: ", e.message))

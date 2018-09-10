@@ -1,8 +1,8 @@
 package one.oktw.galaxy.command.admin.galaxyManage
 
 import kotlinx.coroutines.experimental.launch
+import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.command.CommandBase
-import one.oktw.galaxy.command.CommandHelper
 import one.oktw.galaxy.galaxy.data.extensions.addMember
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
@@ -10,8 +10,10 @@ import org.spongepowered.api.command.args.CommandContext
 import org.spongepowered.api.command.args.GenericArguments
 import org.spongepowered.api.command.spec.CommandSpec
 import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.entity.living.player.User
 import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.format.TextColors
+import org.spongepowered.api.text.format.TextColors.GREEN
+import org.spongepowered.api.text.format.TextColors.RED
 import java.util.*
 
 class AddMember : CommandBase {
@@ -20,39 +22,26 @@ class AddMember : CommandBase {
             .executor(this)
             .permission("oktw.command.admin.galaxyManage.addMember")
             .arguments(
-                GenericArguments.firstParsing(
-                    GenericArguments.uuid(Text.of("galaxy")),
-                    GenericArguments.player(Text.of("player")),
-                    GenericArguments.string(Text.of("offlinePlayer"))
-                ),
-                GenericArguments.optional(
-                    GenericArguments.firstParsing(
-                        GenericArguments.player(Text.of("player")),
-                        GenericArguments.string(Text.of("offlinePlayer"))
-                    )
-                )
+                GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                GenericArguments.user(Text.of("player"))
             )
             .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-        val uuid = args.getOne<UUID>("galaxy").orElse(null)
-        try {
-            val player = CommandHelper.getPlayer(
-                args.getOne<Player>("player").orElse(null),
-                args.getOne<String>("offlinePlayer").orElse(null)
-            )
-            //Fetch Galaxy
-            launch {
-                val galaxy = CommandHelper.getGalaxy(uuid, src)
-                galaxy.addMember(player.uniqueId)
-                src.sendMessage(Text.of(TextColors.GREEN, "${player.name} was added to ${galaxy.name}!"))
+        val user = args.getOne<User>("player").get()
+        var galaxyUUID: UUID? = args.getOne<UUID>("galaxy").orElse(null)
+        launch {
+            val galaxy = galaxyUUID?.let { galaxyManager.get(it) } ?: (src as? Player)?.world?.let { galaxyManager.get(it) }
+
+            if (galaxyUUID == null) {
+                galaxyUUID = galaxy?.uuid
             }
-        } catch (e: RuntimeException) {
-            src.sendMessage(Text.of(TextColors.RED, "Error: Illegal arguments!\n", spec.getUsage(src)))
-        } catch (e: IllegalArgumentException) {
-            src.sendMessage(Text.of(TextColors.RED, "Error: ", e.message))
-            if (e.message == "Not enough arguments!") {
-                src.sendMessage(Text.of(TextColors.RED, spec.getUsage(src)))
+
+            if (galaxyUUID != null) {
+                galaxy!!.addMember(user.uniqueId)
+                src.sendMessage(Text.of(GREEN, "${user.name} was added to ${galaxy.name}!"))
+            } else {
+                src.sendMessage(Text.of(RED, "Not enough argument: galaxy not found or missing."))
             }
         }
         return CommandResult.success()

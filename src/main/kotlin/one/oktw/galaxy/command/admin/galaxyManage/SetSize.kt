@@ -1,16 +1,20 @@
 package one.oktw.galaxy.command.admin.galaxyManage
 
 import kotlinx.coroutines.experimental.launch
+import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.command.CommandBase
-import one.oktw.galaxy.command.CommandHelper
+import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
 import org.spongepowered.api.command.args.GenericArguments
 import org.spongepowered.api.command.spec.CommandSpec
+import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
+import org.spongepowered.api.text.format.TextColors.GREEN
+import org.spongepowered.api.text.format.TextColors.RED
 import java.util.*
 
 class SetSize : CommandBase {
@@ -35,18 +39,21 @@ class SetSize : CommandBase {
             src.sendMessage(Text.of(TextColors.RED, "Error: Size must be between $minChunkSize and $maxChunkSize"))
             return CommandResult.empty()
         }
-        val uuid = args.getOne<UUID>("planet").orElse(null)
-        try {
-            launch {
-                val planet = CommandHelper.getGalaxyAndPlanet(uuid, src).planet
-                planet.size = size
-                PlanetHelper.updatePlanet(planet)
-                src.sendMessage(Text.of(TextColors.GREEN, "Size of ${planet.name} was set to ${planet.size}!"))
+        var planetUUID: UUID? = args.getOne<UUID>("planet").orElse(null)
+        launch {
+            val galaxy = planetUUID?.let { galaxyManager.get(planet = it) } ?: (src as? Player)?.world?.let { galaxyManager.get(it) }
+            val planet = planetUUID?.let { galaxy?.getPlanet(it) } ?: (src as? Player)?.world?.let { galaxy?.getPlanet(it) }
+
+            if (planetUUID == null) {
+                planetUUID = planet?.uuid
             }
-        } catch (e: IllegalArgumentException) {
-            src.sendMessage(Text.of(TextColors.RED, "Error: ", e.message))
-            if (e.message == "Not enough arguments!") {
-                src.sendMessage(Text.of(TextColors.RED, spec.getUsage(src)))
+
+            if (planetUUID != null) {
+                planet!!.size = size
+                PlanetHelper.updatePlanet(planet)
+                src.sendMessage(Text.of(GREEN, "Size of ${planet.name} was set to ${planet.size}!"))
+            } else {
+                src.sendMessage(Text.of(RED, "Not enough argument: Planet not found or missing."))
             }
         }
         return CommandResult.success()

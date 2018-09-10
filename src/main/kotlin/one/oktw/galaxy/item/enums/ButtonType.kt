@@ -115,7 +115,7 @@ enum class ButtonType(val id: Int) {
     GALAXY_SETTING(112),
     MEMBER_SETTING(113),
     GALAXY_JOINED(114),
-    PLANET_list(115),
+    PLANET_LIST(115),
     ALL(116),
     GUI_HTCT_TAB_1(117),
     GUI_HTCT_TAB_2(118),

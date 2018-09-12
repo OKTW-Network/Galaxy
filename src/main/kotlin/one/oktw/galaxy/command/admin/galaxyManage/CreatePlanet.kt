@@ -22,7 +22,7 @@ class CreatePlanet : CommandBase {
             .executor(this)
             .permission("oktw.command.admin.galaxyManage.createPlanet")
             .arguments(
-                GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                GenericArguments.optionalWeak(GenericArguments.uuid(Text.of("galaxy"))),
                 GenericArguments.string(Text.of("name")),
                 GenericArguments.optional(GenericArguments.enumValue(Text.of("Type"), PlanetType::class.java), PlanetType.NORMAL)
             )

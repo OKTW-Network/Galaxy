@@ -22,7 +22,7 @@ class AddMember : CommandBase {
             .executor(this)
             .permission("oktw.command.admin.galaxyManage.addMember")
             .arguments(
-                GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                GenericArguments.optionalWeak(GenericArguments.uuid(Text.of("galaxy"))),
                 GenericArguments.user(Text.of("player"))
             )
             .build()

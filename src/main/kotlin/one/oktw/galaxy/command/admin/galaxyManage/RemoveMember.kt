@@ -24,7 +24,7 @@ class RemoveMember : CommandBase {
             .executor(this)
             .permission("oktw.command.admin.galaxyManage.removeMember")
             .arguments(
-                GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                GenericArguments.optionalWeak(GenericArguments.uuid(Text.of("galaxy"))),
                 GenericArguments.user(Text.of("member"))
             )
             .build()

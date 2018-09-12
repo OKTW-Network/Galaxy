@@ -23,7 +23,7 @@ class SetGroup : CommandBase {
             .executor(this)
             .permission("oktw.command.admin.galaxyManage.setGroup")
             .arguments(
-                GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                GenericArguments.optionalWeak(GenericArguments.uuid(Text.of("galaxy"))),
                 GenericArguments.user(Text.of("member")),
                 GenericArguments.enumValue(Text.of("Group"), Group::class.java)
             )

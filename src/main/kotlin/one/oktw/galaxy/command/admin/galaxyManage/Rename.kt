@@ -21,7 +21,7 @@ class Rename : CommandBase {
             .executor(this)
             .permission("oktw.command.admin.galaxyManage.rename")
             .arguments(
-                GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                GenericArguments.optionalWeak(GenericArguments.uuid(Text.of("galaxy"))),
                 GenericArguments.string(Text.of("name"))
             )
             .build()

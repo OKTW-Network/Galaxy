@@ -23,11 +23,8 @@ class SetSize : CommandBase {
             .executor(this)
             .permission("oktw.command.admin.galaxyManage.setSize")
             .arguments(
-                GenericArguments.firstParsing(
-                    GenericArguments.uuid(Text.of("planet")),
-                    GenericArguments.integer(Text.of("size"))
-                ),
-                GenericArguments.optional(GenericArguments.integer(Text.of("size")))
+                GenericArguments.optionalWeak(GenericArguments.uuid(Text.of("planet"))),
+                GenericArguments.integer(Text.of("size"))
             )
             .build()
 

@@ -21,7 +21,7 @@ class Dividends : CommandBase {
             .executor(this)
             .permission("oktw.command.admin.galaxyManage.dividends")
             .arguments(
-                GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))),
+                GenericArguments.optionalWeak(GenericArguments.uuid(Text.of("galaxy"))),
                 GenericArguments.longNum(Text.of("number"))
             )
             .build()

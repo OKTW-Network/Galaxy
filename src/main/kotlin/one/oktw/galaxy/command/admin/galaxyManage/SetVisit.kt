@@ -22,7 +22,7 @@ class SetVisit : CommandBase {
             .executor(this)
             .permission("oktw.command.admin.galaxyManage.setVisit")
             .arguments(
-                GenericArguments.optional(GenericArguments.uuid(Text.of("planet"))),
+                GenericArguments.optionalWeak(GenericArguments.uuid(Text.of("planet"))),
                 GenericArguments.bool(Text.of("visitable"))
             )
             .build()

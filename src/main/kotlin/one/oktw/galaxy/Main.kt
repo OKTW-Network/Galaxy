@@ -1,7 +1,7 @@
 package one.oktw.galaxy
 
 import com.google.inject.Inject
-import kotlinx.coroutines.experimental.CloseableCoroutineDispatcher
+import kotlinx.coroutines.experimental.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.experimental.asCoroutineDispatcher
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
@@ -43,7 +43,7 @@ class Main {
 
         lateinit var main: Main
             private set
-        lateinit var serverThread: CloseableCoroutineDispatcher
+        lateinit var serverThread: ExecutorCoroutineDispatcher
             private set
         lateinit var galaxyManager: GalaxyManager
             private set

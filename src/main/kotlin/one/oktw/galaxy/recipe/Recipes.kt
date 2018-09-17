@@ -76,7 +76,7 @@ class Recipes {
         )
 
         val icons: Map<Type, ItemStackSnapshot> = mapOf(
-            Type.ALL to Button(ButtonType.PLUS).createItemStack().createSnapshot(),
+            Type.ALL to Button(ButtonType.ALL).createItemStack().createSnapshot(),
             Type.TOOL to Tool(ToolType.WRENCH).createItemStack().createSnapshot(),
             Type.MATERIAL to Material(MaterialType.PART_RAW_BASE).createItemStack().createSnapshot(),
             Type.MACHINE to FakeBlockItem(CustomBlocks.ELEVATOR).createItemStack().createSnapshot(),

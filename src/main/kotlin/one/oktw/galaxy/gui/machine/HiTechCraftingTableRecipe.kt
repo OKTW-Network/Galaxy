@@ -16,6 +16,7 @@ import one.oktw.galaxy.recipe.HiTechCraftingRecipe
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
@@ -23,12 +24,14 @@ import org.spongepowered.api.item.inventory.InventoryArchetypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.format.TextColors
 import java.util.*
 import java.util.Arrays.asList
 
 class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, private val recipe: HiTechCraftingRecipe) : GUI() {
     companion object {
         private val lang = Main.languageService.getDefaultLanguage()
+        private val vanillaLang = Main.vanillaLanguageService.getDefaultLanguage()
 
         private enum class Action {
             NONE,
@@ -175,15 +178,22 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
     }
 
     private fun offerConfirm(player: Player, traveler: Traveler) {
-        recipe.haveEnoughDust(traveler)
-            .and(recipe.haveEnoughIngredient(player))
-            .let {
-                if (it) {
-                    view.setSlot(Slot.CRAFT, getGUIItem(ButtonType.OK), Action.CRAFT)
-                } else {
-                    view.setSlot(Slot.CRAFT, getGUIItem(ButtonType.X), Action.CANCEL)
+        if (player.gameMode().get() == GameModes.CREATIVE) {
+            // display the player is in creative mode
+            view.setSlot(Slot.CRAFT, getGUIItem(ButtonType.OK).apply {
+                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, vanillaLang["gameMode.creative"]))
+            }, Action.CRAFT)
+        } else {
+            recipe.haveEnoughDust(traveler)
+                .and(recipe.haveEnoughIngredient(player))
+                .let {
+                    if (it) {
+                        view.setSlot(Slot.CRAFT, getGUIItem(ButtonType.OK), Action.CRAFT)
+                    } else {
+                        view.setSlot(Slot.CRAFT, getGUIItem(ButtonType.X), Action.CANCEL)
+                    }
                 }
-            }
+        }
     }
 
     private fun offerBorder() {
@@ -220,20 +230,31 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
                 launch (Main.serverThread, start = CoroutineStart.UNDISPATCHED) {
                     val traveler = TravelerHelper.getTraveler(player).await() ?: return@launch
 
-                    if (recipe.haveEnoughIngredient(player) && recipe.haveEnoughDust(traveler)) {
-                        if (recipe.consume(player, traveler)) {
-                            val stack = recipe.result()
-                            val item = player.world.createEntity(EntityTypes.ITEM, player.position)
+                    if (player.gameMode().get() == GameModes.CREATIVE) {
+                        // creative mode action
+                        val stack = recipe.result()
+                        val item = player.world.createEntity(EntityTypes.ITEM, player.position)
 
-                            item.offer(Keys.REPRESENTED_ITEM, stack.createSnapshot())
+                        item.offer(Keys.REPRESENTED_ITEM, stack.createSnapshot())
 
-                            player.world.spawnEntity(item)
+                        player.world.spawnEntity(item)
+                    } else{
+                        // survival mode action
+                        if (recipe.haveEnoughIngredient(player) && recipe.haveEnoughDust(traveler)) {
+                            if (recipe.consume(player, traveler)) {
+                                val stack = recipe.result()
+                                val item = player.world.createEntity(EntityTypes.ITEM, player.position)
 
-                            val galaxy = Main.galaxyManager.get(player.world) ?: return@launch
-                            galaxy.saveMember(traveler)
+                                item.offer(Keys.REPRESENTED_ITEM, stack.createSnapshot())
 
-                            val newTraveler = TravelerHelper.getTraveler(player).await() ?: return@launch
-                            offerPage(player, newTraveler)
+                                player.world.spawnEntity(item)
+
+                                val galaxy = Main.galaxyManager.get(player.world) ?: return@launch
+                                galaxy.saveMember(traveler)
+
+                                val newTraveler = TravelerHelper.getTraveler(player).await() ?: return@launch
+                                offerPage(player, newTraveler)
+                            }
                         }
                     }
                 }

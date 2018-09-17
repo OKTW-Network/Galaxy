@@ -43,8 +43,8 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
 
         private enum class Slot {
             NULL,
-            CATALOG_UP,
-            CATALOG_BOTTOM,
+            CATALOG,
+            CATALOG_SELECT,
             RECIPE,
             PREV_PAGE,
             NEXT_PAGE
@@ -57,8 +57,8 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
         )
 
         private val N = Slot.NULL
-        private val U = Slot.CATALOG_UP
-        private val D = Slot.CATALOG_BOTTOM
+        private val C = Slot.CATALOG
+        private val S = Slot.CATALOG_SELECT
         private val R = Slot.RECIPE
         private val P = Slot.PREV_PAGE
         private val Q = Slot.NEXT_PAGE
@@ -68,9 +68,9 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
         private const val HEIGHT = 6
 
         private val layout = asList(
-            N, U, U, U, U, U, U, U, N,
-            N, D, D, D, D, D, D, D, N,
+            N, N, C, C, C, C, C, S, N,
             R, R, R, R, R, R, R, R, P,
+            R, R, R, R, R, R, R, R, N,
             R, R, R, R, R, R, R, R, N,
             R, R, R, R, R, R, R, R, N,
             R, R, R, R, R, R, R, R, Q
@@ -91,12 +91,12 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     )
 
     private var currentPage: Recipes.Companion.Type = Recipes.types[0]
-    private var curretOffset: Int = 0
+    private var currentOffset: Int = 0
 
     private val lock = OrderedLaunch()
 
     init {
-        offerPage(currentPage, curretOffset)
+        offerPage(currentPage, currentOffset)
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
     }
 
@@ -121,56 +121,48 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     }
 
     private fun offerCatalog(page: Recipes.Companion.Type) {
-        val upRow = ArrayList<Pair<ItemStack?, Data?>>()
-        val bottomRow = ArrayList<ItemStack>()
-        val maxLength = view.countSlots(Slot.CATALOG_UP)
+        val row = ArrayList<Pair<ItemStack?, Data?>>()
+        val maxLength = view.countSlots(Slot.CATALOG)
 
         val iterator = Recipes.types.iterator()
 
-        for (i in (1..maxLength - 2)) {
+        var selected = 0
+
+        for (i in (1..maxLength)) {
             if (iterator.hasNext()) {
                 iterator.next().let {
-                    if (it == page) {
-                        upRow.add(Pair(getGUIItem(ButtonType.GUI_LEFT), null))
-                        bottomRow.add(getGUIItem(ButtonType.GUI_CORNER_BOTTOM_LEFT))
-                    }
-
                     Recipes.icons[it]!!.createStack()
                         .apply {
-                            offer(DataUUID(UUID.randomUUID()))
                             offer(Keys.DISPLAY_NAME, Text.of(TextColors.AQUA, Recipes.names[it]!!))
                         }
                         .let { stack ->
-                            upRow.add(
+                            row.add(
                                 if (it == page) {
+                                    selected = i
                                     Pair(stack, null)
                                 } else {
                                     Pair(stack, Data(action = Action.SELECT_CATALOG, catalog = it))
                                 }
                             )
                         }
-
-                    bottomRow.add(
-                        if (it == page) {
-                            getGUIItem(ButtonType.GUI_BOTTOM)
-                        } else {
-                            getGUIItem(ButtonType.GUI_CENTER)
-                        }
-                    )
-
-                    if (it == page) {
-                        upRow.add(Pair(getGUIItem(ButtonType.GUI_RIGHT), null))
-                        bottomRow.add(getGUIItem(ButtonType.GUI_CORNER_BOTTOM_RIGHT))
-                    }
                 }
             } else {
-                upRow.add(Pair(null, null))
-                bottomRow.add(getGUIItem(ButtonType.GUI_CENTER))
+                row.add(Pair(getGUIItem(ButtonType.GUI_CENTER), null))
             }
         }
 
-        view.setSlotPairs(Slot.CATALOG_UP, upRow)
-        view.setSlots(Slot.CATALOG_BOTTOM, bottomRow, null)
+        view.setSlotPairs(Slot.CATALOG, row)
+        view.setSlot(
+            Slot.CATALOG_SELECT,
+            when (selected) {
+                1 -> getGUIItem(ButtonType.GUI_HTCT_TAB_1)
+                2 -> getGUIItem(ButtonType.GUI_HTCT_TAB_2)
+                3 -> getGUIItem(ButtonType.GUI_HTCT_TAB_3)
+                4 -> getGUIItem(ButtonType.GUI_HTCT_TAB_4)
+                5 -> getGUIItem(ButtonType.GUI_HTCT_TAB_5)
+                else -> getGUIItem(ButtonType.GUI_CENTER)
+            }
+        )
     }
 
     private suspend fun offerRecipes(page: Recipes.Companion.Type, offset: Int = 0) {
@@ -214,14 +206,14 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
         if (hasPrev) {
             view.setSlot(Slot.PREV_PAGE, getGUIItem(ButtonType.ARROW_UP), Data(action = Action.PREV_PAGE))
         } else {
-            view.setSlot(Slot.PREV_PAGE, getGUIItem(ButtonType.BLANK), null)
+            view.setSlot(Slot.PREV_PAGE, getGUIItem(ButtonType.UNCLICKABLE_ARROW_UP), null)
         }
 
 
         if (hasNext) {
             view.setSlot(Slot.NEXT_PAGE, getGUIItem(ButtonType.ARROW_DOWN), Data(action = Action.NEXT_PAGE))
         } else {
-            view.setSlot(Slot.NEXT_PAGE, getGUIItem(ButtonType.BLANK), null)
+            view.setSlot(Slot.NEXT_PAGE, getGUIItem(ButtonType.UNCLICKABLE_ARROW_DOWN), null)
         }
     }
 
@@ -257,8 +249,8 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
                 }
 
                 currentPage = catalog
-                curretOffset = 0
-                offerPage(currentPage, curretOffset)
+                currentOffset = 0
+                offerPage(currentPage, currentOffset)
             }
 
             Action.CRAFT -> {
@@ -278,8 +270,8 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
                     setCustom(ItemStackSnapshot.NONE)
                 }
 
-                curretOffset -= view.countSlots(Slot.RECIPE)
-                offerPage(currentPage, curretOffset)
+                currentOffset -= view.countSlots(Slot.RECIPE)
+                offerPage(currentPage, currentOffset)
             }
 
             Action.NEXT_PAGE -> {
@@ -287,8 +279,8 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
                     setCustom(ItemStackSnapshot.NONE)
                 }
 
-                curretOffset += view.countSlots(Slot.RECIPE)
-                offerPage(currentPage, curretOffset)
+                currentOffset += view.countSlots(Slot.RECIPE)
+                offerPage(currentPage, currentOffset)
             }
 
             else -> {

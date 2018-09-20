@@ -91,6 +91,13 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
         Pair(WIDTH, HEIGHT)
     )
 
+    private val isCreative = player.gameMode().get() == GameModes.CREATIVE
+    private val catalog = if (isCreative) {
+        Recipes.creativeCatalog
+    } else {
+        Recipes.catalog
+    }
+
     private var currentPage: Recipes.Companion.Type = Recipes.types[0]
     private var currentOffset: Int = 0
 
@@ -167,15 +174,9 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     }
 
     private suspend fun offerRecipes(page: Recipes.Companion.Type, offset: Int = 0) {
-        val isCreative = player.gameMode().get() == GameModes.CREATIVE
-
         val traveler = TravelerHelper.getTraveler(player).await() ?: return
 
-        val recipes = if (isCreative) {
-            Recipes.catalog[page]
-        } else {
-            Recipes.creativeCatalog[page]
-        } ?: return
+        val recipes = catalog[page] ?: return
 
         val slots = view.countSlots(Slot.RECIPE)
 
@@ -206,13 +207,7 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     }
 
     private fun offerPageButton(page: Recipes.Companion.Type, offset: Int = 0) {
-        val isCreative = player.gameMode().get() == GameModes.CREATIVE
-
-        val recipes = if (isCreative) {
-            Recipes.catalog[page]?.size
-        } else {
-            Recipes.creativeCatalog[page]?.size
-        } ?: return
+        val recipes = catalog[page]?.size ?: return
 
         val slots = view.countSlots(Slot.RECIPE)
 
@@ -242,7 +237,6 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
-        val isCreative = player.gameMode().get() == GameModes.CREATIVE
         val detail = view.getDetail(event)
 
         // don't let user move items in gui
@@ -281,11 +275,7 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
                     GUIHelper.open(player) {
                         HiTechCraftingTableRecipe(
                             player, traveler,
-                            if (isCreative) {
-                                Recipes.catalog[catalog]!![index]
-                            } else {
-                                Recipes.creativeCatalog[catalog]!![index]
-                            }
+                            this@HiTechCraftingTableList.catalog[catalog]!![index]
                         )
                     }
                 }

@@ -6,16 +6,15 @@ import one.oktw.galaxy.block.enums.CustomBlocks
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.enums.MaterialType
 import one.oktw.galaxy.item.enums.ToolType
-import one.oktw.galaxy.item.enums.UpgradeType
-import one.oktw.galaxy.item.type.*
+import one.oktw.galaxy.item.type.Button
+import one.oktw.galaxy.item.type.Gun
+import one.oktw.galaxy.item.type.Material
+import one.oktw.galaxy.item.type.Tool
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.DyeColors
-import org.spongepowered.api.effect.potion.PotionEffect
-import org.spongepowered.api.effect.potion.PotionEffectTypes
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
-import org.spongepowered.api.item.recipe.crafting.Ingredient
 import org.spongepowered.api.item.recipe.crafting.Ingredient.of
 import java.util.Arrays.asList
 
@@ -60,7 +59,7 @@ class Recipes {
 
         private val machines: List<HiTechCraftingRecipe> = asList(
             HiTechCraftingRecipe.builder()
-                .add(of(ItemTypes.IRON_BLOCK), 1)
+                .add(of(ItemTypes.IRON_INGOT), 9)
                 .add(of(ItemTypes.ENDER_PEARL), 1)
                 .cost(0)
                 .result(FakeBlockItem(CustomBlocks.ELEVATOR).createItemStack())

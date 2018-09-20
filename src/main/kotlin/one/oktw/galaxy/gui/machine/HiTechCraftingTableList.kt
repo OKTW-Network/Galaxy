@@ -14,6 +14,7 @@ import one.oktw.galaxy.recipe.Recipes
 import one.oktw.galaxy.util.OrderedLaunch
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
@@ -166,8 +167,16 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     }
 
     private suspend fun offerRecipes(page: Recipes.Companion.Type, offset: Int = 0) {
+        val isCreative = player.gameMode().get() == GameModes.CREATIVE
+
         val traveler = TravelerHelper.getTraveler(player).await() ?: return
-        val recipes = Recipes.catalog[page] ?: return
+
+        val recipes = if (isCreative) {
+            Recipes.catalog[page]
+        } else {
+            Recipes.creativeCatalog[page]
+        } ?: return
+
         val slots = view.countSlots(Slot.RECIPE)
 
         fun fixBound(num: Int, max: Int): Int {
@@ -197,7 +206,14 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     }
 
     private fun offerPageButton(page: Recipes.Companion.Type, offset: Int = 0) {
-        val recipes = Recipes.catalog[page]?.size ?: return
+        val isCreative = player.gameMode().get() == GameModes.CREATIVE
+
+        val recipes = if (isCreative) {
+            Recipes.catalog[page]?.size
+        } else {
+            Recipes.creativeCatalog[page]?.size
+        } ?: return
+
         val slots = view.countSlots(Slot.RECIPE)
 
         val hasPrev = offset > 0
@@ -226,6 +242,7 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
+        val isCreative = player.gameMode().get() == GameModes.CREATIVE
         val detail = view.getDetail(event)
 
         // don't let user move items in gui
@@ -261,7 +278,16 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
                 launch {
                     val traveler = TravelerHelper.getTraveler(player).await() ?: return@launch
 
-                    GUIHelper.open(player) { HiTechCraftingTableRecipe(player, traveler, Recipes.catalog[catalog]!![index]) }
+                    GUIHelper.open(player) {
+                        HiTechCraftingTableRecipe(
+                            player, traveler,
+                            if (isCreative) {
+                                Recipes.catalog[catalog]!![index]
+                            } else {
+                                Recipes.creativeCatalog[catalog]!![index]
+                            }
+                        )
+                    }
                 }
             }
 

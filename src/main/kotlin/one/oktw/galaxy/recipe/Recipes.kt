@@ -34,6 +34,19 @@ class Recipes {
 
         private val materials: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>()
 
+        private val creativeMaterials: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>().apply {
+            add(HiTechCraftingRecipe.builder()
+                .cost(0)
+                .result(Material(MaterialType.PART_RAW_BASE).createItemStack())
+                .build()
+            )
+            add(HiTechCraftingRecipe.builder()
+                .cost(0)
+                .result(Material(MaterialType.PART_BASE).createItemStack())
+                .build()
+            )
+        }.plus(materials)
+
         private val tools: List<HiTechCraftingRecipe> = asList(
             HiTechCraftingRecipe.builder()
                 .add(of(ItemTypes.IRON_INGOT), 3)
@@ -42,6 +55,8 @@ class Recipes {
                 .result(Tool(ToolType.WRENCH).createItemStack())
                 .build()
         )
+
+        private val creativeTools = tools
 
         private val machines: List<HiTechCraftingRecipe> = asList(
             HiTechCraftingRecipe.builder()
@@ -63,9 +78,16 @@ class Recipes {
                 .build()
         )
 
+        private val creativeMachines = machines
+
         private val weapons: List<HiTechCraftingRecipe> = ArrayList()
 
+        private val creativeWeapons = weapons
+
         private val all: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>().plus(tools).plus(materials).plus(machines).plus(weapons)
+
+        private val creativeAll: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>().plus(creativeTools).plus(creativeMaterials).plus(
+            creativeMachines).plus(creativeWeapons)
 
         val catalog: Map<Type, List<HiTechCraftingRecipe>> = mapOf(
             Type.ALL to all,
@@ -73,6 +95,14 @@ class Recipes {
             Type.MATERIAL to materials,
             Type.MACHINE to machines,
             Type.WEAPON to weapons
+        )
+
+        val creativeCatalog: Map<Type, List<HiTechCraftingRecipe>> = mapOf(
+            Type.ALL to creativeAll,
+            Type.TOOL to creativeTools,
+            Type.MATERIAL to creativeMaterials,
+            Type.MACHINE to creativeMachines,
+            Type.WEAPON to creativeWeapons
         )
 
         val icons: Map<Type, ItemStackSnapshot> = mapOf(

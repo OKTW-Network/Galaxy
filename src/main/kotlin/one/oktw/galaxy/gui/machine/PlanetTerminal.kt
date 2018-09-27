@@ -186,7 +186,11 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
                 }
             }
             buttonID[3] -> GUIHelper.openAsync(player) { BrowserMember(galaxy.refresh()) }
-            buttonID[4] -> Unit // TODO ECS
+            buttonID[4] -> GUIHelper.openAsync(player) {
+                galaxy.refresh().let {
+                    EnvironmentControlSystem(it, it.getPlanet(player.world)!!)
+                }
+            }
             buttonID[5] -> GUIHelper.openAsync(player) { GalaxyManagement(galaxy.refresh()) }
             buttonID[6] -> {
                 launch { galaxy.requestJoin(player.uniqueId) }

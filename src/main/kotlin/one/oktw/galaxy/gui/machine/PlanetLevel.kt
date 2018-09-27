@@ -83,7 +83,7 @@ class PlanetLevel(private var galaxy: Galaxy, private var planet: Planet) : GUI(
 
             (0 until length).forEach { _ ->
                 res.add(numbers[current % 10])
-                current %= 10
+                current /= 10
             }
 
             return res.reversed()
@@ -91,10 +91,10 @@ class PlanetLevel(private var galaxy: Galaxy, private var planet: Planet) : GUI(
     }
 
     private val lang = languageService.getDefaultLanguage()
-    override val token = "PlanetUpgrade-${planet.uuid}"
+    override val token = "PlanetLevel-${planet.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.PlanetUpgrade"])))
+        .property(InventoryTitle.of(Text.of(lang["UI.Title.PlanetLevel"])))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 
@@ -135,19 +135,22 @@ class PlanetLevel(private var galaxy: Galaxy, private var planet: Planet) : GUI(
         view.setSlot(Slot.STAR_DUST, Button(ButtonType.STARS).createItemStack().apply {
             offer(
                 Keys.ITEM_LORE, asList<Text>(
-                    Text.of(galaxy.starDust.toString())
+                    Text.of("has dust: ", galaxy.starDust.toString()),
+                    Text.of("level: ", planet.level.toString(), "->", (planet.level + 1).toString())
                 )
             )
         })
     }
 
     private fun fillNumber() {
-        getRequirement(planet.level.toInt()).let{
+        val requirement =  getRequirement(planet.level.toInt())
+
+        requirement.let{
             if (it >= 0) {
                 view.setSlots(
                     Slot.NUMBER,
                     createNumbers(
-                        getRequirement(planet.level.toInt()),
+                        requirement,
                         view.countSlots(Slot.NUMBER)
                     )
                 )
@@ -161,7 +164,9 @@ class PlanetLevel(private var galaxy: Galaxy, private var planet: Planet) : GUI(
     }
 
     private fun fillConfirm() {
-        if (galaxy.starDust > getRequirement(planet.level.toInt())) {
+        val requirement =  getRequirement(planet.level.toInt())
+
+        if (requirement >= 0 && galaxy.starDust > requirement) {
             view.setSlot(
                 Slot.CONFIRM,
                 Button(ButtonType.OK).createItemStack(),

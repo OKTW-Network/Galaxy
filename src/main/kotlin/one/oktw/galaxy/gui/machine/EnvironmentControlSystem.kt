@@ -51,7 +51,7 @@ class EnvironmentControlSystem(private var galaxy: Galaxy, private var planet: P
     override val token = "EnvironmentControlSystem-${planet.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.StarShipController"])))
+        .property(InventoryTitle.of(Text.of(lang["UI.Title.EnvironmentControlSystem"])))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 

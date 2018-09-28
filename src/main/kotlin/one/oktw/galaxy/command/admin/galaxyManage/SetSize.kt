@@ -4,6 +4,7 @@ import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
+import one.oktw.galaxy.galaxy.data.extensions.update
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
@@ -39,15 +40,17 @@ class SetSize : CommandBase {
         var planetUUID: UUID? = args.getOne<UUID>("planet").orElse(null)
         launch {
             val galaxy = planetUUID?.let { galaxyManager.get(planet = it) } ?: (src as? Player)?.world?.let { galaxyManager.get(it) }
-            val planet = planetUUID?.let { galaxy?.getPlanet(it) } ?: (src as? Player)?.world?.let { galaxy?.getPlanet(it) }
 
             if (planetUUID == null) {
-                planetUUID = planet?.uuid
+                planetUUID = galaxy?.getPlanet((src as Player).world)?.uuid
             }
 
             if (planetUUID != null) {
-                planet!!.size = size
-                PlanetHelper.updatePlanet(planet)
+                //update database
+                galaxy!!.update { getPlanet(planetUUID!!)!!.size = size }
+                //update boarder
+                val planet = galaxy.getPlanet(planetUUID!!)
+                PlanetHelper.updatePlanet(planet!!)
                 src.sendMessage(Text.of(GREEN, "Size of ${planet.name} was set to ${planet.size}!"))
             } else {
                 src.sendMessage(Text.of(RED, "Not enough argument: Planet not found or missing."))

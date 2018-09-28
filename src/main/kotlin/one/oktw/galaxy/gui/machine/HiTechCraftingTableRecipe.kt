@@ -31,7 +31,6 @@ import java.util.Arrays.asList
 class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, private val recipe: HiTechCraftingRecipe) : GUI() {
     companion object {
         private val lang = Main.translationService
-        private val vanillaLang = Main.vanillaLanguageService.getDefaultLanguage()
 
         private enum class Action {
             NONE,
@@ -182,7 +181,7 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
         if (player.gameMode().get() == GameModes.CREATIVE) {
             // display the player is in creative mode
             view.setSlot(Slot.CRAFT, getGUIItem(ButtonType.OK).apply {
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, vanillaLang["gameMode.creative"]))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.GREEN, lang.translationUnscoped("gameMode.creative")))
             }, Action.CRAFT)
         } else {
             recipe.haveEnoughDust(traveler)

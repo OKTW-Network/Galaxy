@@ -12,11 +12,7 @@ import org.spongepowered.api.item.inventory.Slot
 import org.spongepowered.api.item.inventory.property.InventoryTitle
 import java.util.*
 
-class UpgradeSlot(
-    parent: GUI,
-    private var upgrade: List<Upgrade>,
-    private vararg val acceptType: UpgradeType
-) : GUI() {
+class UpgradeSlot(parent: GUI, private var upgrade: List<Upgrade>, private vararg val acceptType: UpgradeType) : GUI() {
     private lateinit var closeListener: (List<Upgrade>) -> Unit
     private val lang = Main.translationService
     override val token = parent.token + "-Upgrade"

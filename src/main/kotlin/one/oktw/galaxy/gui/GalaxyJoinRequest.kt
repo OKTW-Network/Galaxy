@@ -30,7 +30,7 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI<UUID>() {
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
     private val lang = Main.translationService
     override val token = "InviteManagement-${galaxy.uuid}"
-    override val inventory: Inventory= Inventory.builder()
+    override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
         .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.JoinRequestList")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)

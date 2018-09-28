@@ -7,10 +7,10 @@ import one.oktw.galaxy.block.enums.CustomBlocks.HT_CRAFTING_TABLE
 import one.oktw.galaxy.item.enums.MaterialType
 import one.oktw.galaxy.item.enums.ToolType.WRENCH
 import one.oktw.galaxy.item.enums.UpgradeType.*
-import one.oktw.galaxy.item.type.Item.Companion.createSmeltingRecipe
 import one.oktw.galaxy.item.type.Material
 import one.oktw.galaxy.item.type.Tool
 import one.oktw.galaxy.item.type.Upgrade
+import one.oktw.galaxy.item.type.extensions.createSmeltingRecipe
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.key.Keys.POTION_EFFECTS

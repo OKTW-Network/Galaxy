@@ -11,6 +11,7 @@ import one.oktw.galaxy.galaxy.data.extensions.refresh
 import one.oktw.galaxy.galaxy.data.extensions.update
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import one.oktw.galaxy.util.Chat.Companion.input
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
@@ -25,6 +26,7 @@ import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextColors.*
 import java.util.*
 
@@ -106,39 +108,43 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
             buttonID[0] -> GUIHelper.openAsync(player) { CreatePlanet(galaxy.refresh()) }
             buttonID[1] -> GUIHelper.openAsync(player) { BrowserMember(galaxy.refresh(), true) }
             buttonID[2] -> launch {
-                val input = input(player, Text.of(AQUA, "請輸入遊戲ID："))?.toPlain() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
+                val input = input(player, Text.of(AQUA, lang.of("Respond.inputPlayerId")).toLegacyText(player))?.toPlain()
+                    ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
 
                 try {
                     val user: User? = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(input).orElse(null)
 
                     if (user != null) {
                         galaxy.addMember(user.uniqueId)
-                        player.sendMessage(Text.of(GREEN, "已成功將 ", RESET, user.name, GREEN, " 加入星系！"))
+                        player.sendMessage(Text.of(GREEN, lang.of("Respond.addedPlayerToGalaxy", Text.of(TextColors.WHITE, user.name))).toLegacyText(player))
                     } else {
-                        player.sendMessage(Text.of(RED, "找不到玩家"))
+                        player.sendMessage(Text.of(RED, lang.of("Respond.cannotFindPlayer")).toLegacyText(player))
                     }
                 } catch (e: RuntimeException) {
-                    player.sendMessage(Text.of(RED, "參數錯誤"))
+                    player.sendMessage(Text.of(RED, lang.of("Respond.badParameters")).toLegacyText(player))
                 }
             }
             buttonID[3] -> GUIHelper.openAsync(player) { GalaxyJoinRequest(galaxy.refresh()) }
             buttonID[4] -> launch {
-                val input = input(player, Text.of(AQUA, "請輸入新名稱："))?.toPlain() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
+                val input = input(player, Text.of(AQUA, lang.of("Respond.inputNewName")).toLegacyText(player))?.toPlain()
+                    ?: return@launch player.sendMessage(Text.of(RED, lang.of("Respond.cancelled")).toLegacyText(player))
 
                 galaxy.update { name = input }
-                player.sendMessage(Text.of(GREEN, "重新命名成功！"))
+                player.sendMessage(Text.of(GREEN, lang.of("Respond.renameSuccess")).toLegacyText(player))
             }
             buttonID[5] -> launch {
-                val input = input(player, Text.of(AQUA, "請輸入星系資訊："))?.serialize() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
+                val input = input(player, Text.of(AQUA, lang.of("Respond.inputGalaxyInfo")).toLegacyText(player))?.serialize()
+                    ?: return@launch player.sendMessage(Text.of(RED, lang.of("Respond.cancelled")).toLegacyText(player))
 
                 galaxy.update { info = input }
-                player.sendMessage(Text.of(GREEN, "設定成功！"))
+                player.sendMessage(Text.of(GREEN, lang.of("Respond.settingSaved")).toLegacyText(player))
             }
             buttonID[6] -> launch {
-                val input = input(player, Text.of(AQUA, "請輸入星系通知："))?.serialize() ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
+                val input = input(player, Text.of(AQUA, lang.of("Respond.inputGalaxyNotification")).toLegacyText(player))?.serialize()
+                    ?: return@launch player.sendMessage(Text.of(RED, lang.of("Respond.cancelled")).toLegacyText(player))
 
                 galaxy.update { notice = input }
-                player.sendMessage(Text.of(GREEN, "設定成功！"))
+                player.sendMessage(Text.of(GREEN, lang.of("Respond.settingSaved")).toLegacyText(player))
             }
         }
     }

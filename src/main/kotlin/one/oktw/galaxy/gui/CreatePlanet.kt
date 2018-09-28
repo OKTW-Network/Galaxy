@@ -15,9 +15,9 @@ import one.oktw.galaxy.galaxy.planet.enums.PlanetType.NETHER
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType.NORMAL
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import one.oktw.galaxy.util.Chat.Companion.confirm
 import one.oktw.galaxy.util.Chat.Companion.input
-import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.data.key.Keys.DISPLAY_NAME
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
@@ -28,9 +28,7 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextColors.*
-import org.spongepowered.api.text.format.TextStyles
 import org.spongepowered.api.text.format.TextStyles.BOLD
 import java.util.*
 
@@ -84,7 +82,7 @@ class CreatePlanet(private val galaxy: Galaxy) : GUI() {
         when (event.cursorTransaction.default[DataUUID.key].orElse(null) ?: return) {
             buttonID[0] -> {
                 if (galaxy.planets.any { it.type == NORMAL }) {
-                    player.sendMessage(Text.of(RED, "目前每種類別的星系僅能創建一個！請等待日後開放"))
+                    player.sendMessage(Text.of(RED, lang.of("Respond.createPlanetOnlyAllowOneCurrently")).toLegacyText(player))
                     return
                 }
 
@@ -92,41 +90,41 @@ class CreatePlanet(private val galaxy: Galaxy) : GUI() {
             }
             buttonID[1] -> {
                 if (galaxy.planets.any { it.type == NETHER }) {
-                    player.sendMessage(Text.of(RED, "目前每種類別的星系僅能創建一個！請等待日後開放"))
+                    player.sendMessage(Text.of(RED, lang.of("Respond.createPlanetOnlyAllowOneCurrently")).toLegacyText(player))
                     return
                 }
 
                 if (galaxy.starDust < 1000) { // TODO price
-                    player.sendMessage(Text.of(RED, "星系擁有的星塵不足！去貢獻點星塵給星系吧"))
+                    player.sendMessage(Text.of(RED, lang.of("Respond.GalaxyStarDustNotEnough")).toLegacyText(player))
                     return
                 }
 
                 launch { if (createPlanet(player, galaxy, NETHER)) galaxy.update { takeStarDust(1000) } }
             }
-            buttonID[2] -> player.sendMessage(Text.of(RED, "尚未開放！")) // TODO planet type end
+            buttonID[2] -> player.sendMessage(Text.of(RED, lang.of("Respond.createPlanetUnavailable")).toLegacyText(player)) // TODO planet type end
         }
     }
 
     private suspend fun createPlanet(player: Player, galaxy: Galaxy, type: PlanetType): Boolean {
-        val name = input(player, Text.of(AQUA, "請輸入一個名稱來創建星球："))?.toPlain()
+        val name = input(player, Text.of(AQUA, lang.of("Respond.createPlanetInputName")).toLegacyText(player))?.toPlain()
 
         if (name == null) {
-            player.sendMessage(Text.of(RED, "已取消創建星球"))
+            player.sendMessage(Text.of(RED, lang.of("Respond.createPlanetCancel")).toLegacyText(player))
             return false
         }
 
-        if (confirm(player, Text.of(AQUA, "確定要創建名為「", TextColors.RESET, BOLD, name, TextStyles.RESET, AQUA, "」的星球嗎？")) == true) {
+        if (confirm(player, Text.of(AQUA,  lang.of("Respond.createPlanetConfirmName", BOLD, name)).toLegacyText(player)) == true) {
             val galaxy1 = galaxy.refresh()
 
             if (galaxy1.planets.any { it.type == type }) {
-                player.sendMessage(Text.of(RED, "目前每種類別的星系僅能創建一個！請等待日後開放"))
+                player.sendMessage(Text.of(RED, lang.of("Respond.createPlanetOnlyAllowOneCurrently")).toLegacyText(player))
                 return false
             }
 
             try {
                 val planet = galaxy1.createPlanet(name, type).apply { loadWorld() }
 
-                player.sendMessage(Text.of(YELLOW, "星球創建成功！"))
+                player.sendMessage(Text.of(YELLOW, lang.of("Respond.createPlanetSuccess")).toLegacyText(player))
                 TeleportHelper.teleport(player, planet)
                 return true
             } catch (e: RuntimeException) {
@@ -139,12 +137,12 @@ class CreatePlanet(private val galaxy: Galaxy) : GUI() {
                     }
                 }
 
-                player.sendMessage(Text.of(RED, "星球創建失敗：", message))
+                player.sendMessage(Text.of(RED,lang.of("Respond.createPlanetFailed", message)))
             }
 
             return false
         } else {
-            player.sendMessage(Text.of(RED, "已取消創建星球"))
+            player.sendMessage(Text.of(RED, lang.of("Respond.createPlanetCancel")).toLegacyText(player))
             return false
         }
     }

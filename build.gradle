@@ -109,6 +109,7 @@ shadowJar {
     relocate "org.reactivestreams", "one.oktw.relocate.org.reactivestreams"
     relocate "kotlin", "one.oktw.relocate.kotlin"
     relocate "kotlinx", "one.oktw.relocate.kotlinx"
+    relocate "com.typesafe", "configurate.typesafe"
 }
 
 signing {

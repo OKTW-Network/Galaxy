@@ -1,7 +1,7 @@
 package one.oktw.galaxy
 
 import com.google.inject.Inject
-import kotlinx.coroutines.experimental.CloseableCoroutineDispatcher
+import kotlinx.coroutines.experimental.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.experimental.asCoroutineDispatcher
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
@@ -47,7 +47,7 @@ class Main {
 
         lateinit var main: Main
             private set
-        lateinit var serverThread: CloseableCoroutineDispatcher
+        lateinit var serverThread: ExecutorCoroutineDispatcher
             private set
         lateinit var galaxyManager: GalaxyManager
             private set
@@ -56,11 +56,12 @@ class Main {
 
         @Deprecated("use translation service instead")
         private lateinit var languageService: LanguageService
+        @Deprecated("use translation service instead")
+        private lateinit var vanillaLanguageService: LanguageService
 
         lateinit var delay: DelayedExecute
             private set
         lateinit var translationService: TranslationService
-            private set
     }
 
     @Inject
@@ -94,8 +95,11 @@ class Main {
         serverThread = Sponge.getScheduler().createSyncExecutor(this).asCoroutineDispatcher()
         delay = DelayedExecute(plugin)
         languageService = LanguageService()
+        vanillaLanguageService = LanguageService("vanilla")
+
         Sponge.getServiceManager().provide(one.oktw.i18n.api.I18n::class.java).get().let {
             translationService = it.register("galaxy", GalaxyTranslationProvider(languageService), false)
+            it.register("minecraft", GalaxyTranslationProvider(vanillaLanguageService), true)
         }
 
         DataRegister()

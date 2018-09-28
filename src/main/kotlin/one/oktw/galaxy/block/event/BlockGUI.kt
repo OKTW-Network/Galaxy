@@ -6,6 +6,7 @@ import one.oktw.galaxy.block.enums.CustomBlocks.*
 import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.MainMenu
+import one.oktw.galaxy.gui.machine.HiTechCraftingTableList
 import one.oktw.galaxy.gui.machine.PlanetTerminal
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
@@ -24,7 +25,7 @@ class BlockGUI {
             DUMMY -> Unit
             CONTROL_PANEL -> GUIHelper.open(player) { MainMenu(player) }
             PLANET_TERMINAL -> launch { galaxyManager.get(player.world)?.let { GUIHelper.open(player) { PlanetTerminal(it, player) } } }
-            HT_CRAFTING_TABLE -> Unit // TODO GUIHelper.open(player) { }
+            HT_CRAFTING_TABLE -> GUIHelper.open(player) { HiTechCraftingTableList(player) }
             else -> Unit
         }
 

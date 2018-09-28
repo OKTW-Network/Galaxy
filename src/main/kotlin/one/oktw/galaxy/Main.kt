@@ -1,7 +1,7 @@
 package one.oktw.galaxy
 
 import com.google.inject.Inject
-import kotlinx.coroutines.experimental.CloseableCoroutineDispatcher
+import kotlinx.coroutines.experimental.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.experimental.asCoroutineDispatcher
 import ninja.leaping.configurate.commented.CommentedConfigurationNode
 import ninja.leaping.configurate.loader.ConfigurationLoader
@@ -10,11 +10,9 @@ import one.oktw.galaxy.galaxy.planet.gen.NetherGenModifier
 import one.oktw.galaxy.galaxy.planet.gen.NormalGenModifier
 import one.oktw.galaxy.internal.DatabaseManager
 import one.oktw.galaxy.internal.LanguageService
-import one.oktw.galaxy.internal.register.CommandRegister
-import one.oktw.galaxy.internal.register.DataRegister
-import one.oktw.galaxy.internal.register.EventRegister
-import one.oktw.galaxy.internal.register.RecipeRegister
+import one.oktw.galaxy.internal.register.*
 import one.oktw.galaxy.machine.chunkloader.ChunkLoaderManager
+import one.oktw.galaxy.util.DelayedExecute
 import org.slf4j.Logger
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.config.ConfigDir
@@ -45,13 +43,17 @@ class Main {
 
         lateinit var main: Main
             private set
-        lateinit var serverThread: CloseableCoroutineDispatcher
+        lateinit var serverThread: ExecutorCoroutineDispatcher
             private set
         lateinit var galaxyManager: GalaxyManager
             private set
         lateinit var chunkLoaderManager: ChunkLoaderManager
             private set
         lateinit var languageService: LanguageService
+            private set
+        lateinit var delay: DelayedExecute
+            private set
+        lateinit var vanillaLanguageService: LanguageService
             private set
     }
 
@@ -83,9 +85,12 @@ class Main {
     @Listener
     fun onPreInit(event: GamePreInitializationEvent) {
         serverThread = Sponge.getScheduler().createSyncExecutor(this).asCoroutineDispatcher()
+        delay = DelayedExecute(plugin)
         languageService = LanguageService()
+        vanillaLanguageService = LanguageService("vanilla")
         DataRegister()
         RecipeRegister()
+        EasyRecipeRegister()
     }
 
     @Listener

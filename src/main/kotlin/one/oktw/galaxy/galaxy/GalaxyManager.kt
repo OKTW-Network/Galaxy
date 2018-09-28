@@ -3,6 +3,9 @@ package one.oktw.galaxy.galaxy
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.reactivestreams.client.FindPublisher
 import kotlinx.coroutines.experimental.reactive.awaitFirstOrNull
+import kotlinx.coroutines.experimental.sync.Mutex
+import kotlinx.coroutines.experimental.sync.withLock
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
@@ -17,6 +20,7 @@ import kotlin.collections.ArrayList
 
 class GalaxyManager {
     private val collection = database.getCollection("Galaxy", Galaxy::class.java)
+    private val saveLock = Mutex()
 
     suspend fun createGalaxy(name: String, creator: Player, vararg members: UUID): Galaxy {
         val memberList = ArrayList<Traveler>(members.size + 1)
@@ -30,20 +34,23 @@ class GalaxyManager {
     }
 
     suspend fun saveGalaxy(galaxy: Galaxy) {
-        collection.findOneAndReplace(eq("uuid", galaxy.uuid), galaxy).awaitFirstOrNull()
+        try {
+            saveLock.withLock { collection.findOneAndReplace(eq("uuid", galaxy.uuid), galaxy).awaitFirstOrNull() }
+        } catch (exception: Exception) {
+            main.logger.error("Failed save galaxy: {}({})", galaxy.uuid, galaxy.name)
+            throw exception
+        }
     }
 
     suspend fun deleteGalaxy(uuid: UUID) {
-        get(uuid)?.planets?.forEach {
-            it.world.let { PlanetHelper.removePlanet(it) }
-        }
+        get(uuid)?.planets?.forEach { PlanetHelper.removePlanet(it.world) }
 
         collection.deleteOne(eq("uuid", uuid)).awaitFirstOrNull()
     }
 
     suspend fun get(uuid: UUID? = null, planet: UUID? = null): Galaxy? {
         return uuid?.let { collection.find(eq("uuid", uuid)).first().awaitFirstOrNull() }
-                ?: planet?.let { collection.find(eq("planets.uuid", planet)).first().awaitFirstOrNull() }
+            ?: planet?.let { collection.find(eq("planets.uuid", planet)).first().awaitFirstOrNull() }
     }
 
 

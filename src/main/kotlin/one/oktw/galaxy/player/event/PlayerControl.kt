@@ -6,6 +6,9 @@ import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.serverThread
+import one.oktw.galaxy.book.BookUtil
+import one.oktw.galaxy.book.enums.BooksInLobby.MAGICAL
+import one.oktw.galaxy.book.enums.BooksInLobby.MANUAL
 import one.oktw.galaxy.galaxy.data.extensions.getMember
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.data.extensions.saveMember
@@ -21,9 +24,12 @@ import one.oktw.galaxy.player.event.Viewer.Companion.isViewer
 import one.oktw.galaxy.player.event.Viewer.Companion.removeViewer
 import one.oktw.galaxy.player.event.Viewer.Companion.setViewer
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.block.BlockTypes.END_PORTAL
+import org.spongepowered.api.block.BlockTypes.PORTAL
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
+import org.spongepowered.api.event.block.CollideBlockEvent
 import org.spongepowered.api.event.entity.MoveEntityEvent
 import org.spongepowered.api.event.filter.Getter
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent
@@ -32,12 +38,12 @@ import org.spongepowered.api.resourcepack.ResourcePack
 import org.spongepowered.api.resourcepack.ResourcePacks
 import org.spongepowered.api.service.user.UserStorageService
 import java.net.URI
+import java.util.Arrays.asList
 import java.util.concurrent.TimeUnit
 
 class PlayerControl {
     private val lobbyResourcePack: ResourcePack?
     private val planetResourcePack: ResourcePack?
-
     init {
         val config = config.getNode("resource-pack")
 
@@ -62,14 +68,13 @@ class PlayerControl {
 
                 try {
                     val player = players.next()
+                    val galaxy = galaxyManager.get(player.world) ?: continue
 
-                    if (!player.isOnline || isViewer(player.uniqueId)) continue
+                    if (!player.isOnline) continue
 
-                    galaxyManager.get(player.world)?.run {
-                        getMember(player.uniqueId)?.also {
-                            saveMember(saveTraveler(it, player)).join()
-                            delay(10, TimeUnit.SECONDS)
-                        }
+                    galaxy.getMember(player.uniqueId)?.also {
+                        galaxy.saveMember(saveTraveler(it, player))
+                        delay(10, TimeUnit.SECONDS)
                     }
                 } catch (e: RuntimeException) {
                     main.logger.error("Saving player data error", e)
@@ -86,8 +91,8 @@ class PlayerControl {
         val user = userService.get(event.profile).orElse(null) ?: return
 
         // check world load else send to default world
-        user.worldUniqueId.orElse(null)?.let(server::getWorld)?.run {
-            if (!isPresent) {
+        user.worldUniqueId.orElse(null)?.let(server::getWorld).run {
+            if (this?.isPresent != true) {
                 server.defaultWorld.get().run { user.setLocation(spawnPosition.toDouble(), uniqueId) }
             }
         }
@@ -114,8 +119,20 @@ class PlayerControl {
                 DENY -> player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() })
             }
 
-            // send resource pack
-            if (galaxy == null) lobbyResourcePack?.let(player::sendResourcePack) else planetResourcePack?.let(player::sendResourcePack)
+            // send resource pack and offer book(s)
+            if (galaxy == null) {
+                // offer book(s)
+                val manual = BookUtil.getBook(MANUAL.key)
+                if (manual != null) player.inventory.offer(manual)
+                if (player.hasPermission("oktw.book.magical")) {
+                    val magical = BookUtil.getBook(MAGICAL.key)
+                    if (magical != null) player.inventory.offer(magical)
+                }
+                // send resource pack
+                lobbyResourcePack?.let(player::sendResourcePack)
+            } else {
+                planetResourcePack?.let(player::sendResourcePack)
+            }
         }
     }
 
@@ -147,12 +164,12 @@ class PlayerControl {
             if (from?.uuid != to?.uuid) {
                 // save and clean player data
                 from?.getMember(player.uniqueId)?.also {
-                    from.saveMember(saveTraveler(it, player)).join()
+                    from.saveMember(saveTraveler(it, player))
                     cleanPlayer(player)
                 } ?: cleanPlayer(player)
 
                 // restore player data
-                to?.let { it.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }
+                to?.let { galaxy -> galaxy.members.firstOrNull { it.uuid == player.uniqueId }?.also { loadTraveler(it, player) } }
             }
 
             // check permission
@@ -165,8 +182,16 @@ class PlayerControl {
                 DENY -> player.transferToWorld(Sponge.getServer().run { getWorld(defaultWorldName).get() })
             }
 
-            // send resource pack
+            // send resource pack and offer book(s)
             if (to == null) {
+                // offer book(s)
+                val manual = BookUtil.getBook(MANUAL.key)
+                if (manual != null) player.inventory.offer(manual)
+                if (player.hasPermission("oktw.book.magical")) {
+                    val magical = BookUtil.getBook(MAGICAL.key)
+                    if (magical != null) player.inventory.offer(magical)
+                }
+                // send resource pack
                 lobbyResourcePack?.let(player::sendResourcePack)
             } else if (from == null) {
                 planetResourcePack?.let(player::sendResourcePack)
@@ -175,16 +200,15 @@ class PlayerControl {
     }
 
     @Listener
-    fun disablePortal(event: MoveEntityEvent.Teleport.Portal) {
-        event.toTransform = event.fromTransform
+    fun disablePortal(event: CollideBlockEvent) {
+        if (event.targetBlock.type in asList(PORTAL, END_PORTAL)) event.isCancelled = true
     }
 
     @Listener
     fun onServerStop(event: GameStoppingServerEvent) {
         Sponge.getServer().onlinePlayers.forEach { player ->
             runBlocking {
-                galaxyManager.get(player.world)
-                    ?.run { getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)).join() } }
+                galaxyManager.get(player.world)?.run { getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)) } }
             }
         }
     }

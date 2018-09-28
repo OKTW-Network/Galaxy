@@ -27,7 +27,6 @@ import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors.*
 import org.spongepowered.api.text.format.TextStyles.BOLD
-import org.spongepowered.api.text.serializer.TextSerializers
 import java.util.*
 import java.util.Arrays.asList
 
@@ -112,6 +111,7 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
                 offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.Button.Info"]))
                 offer(
                     Keys.ITEM_LORE, asList(
+                        Text.of(BOLD, YELLOW, lang["UI.Tip.StarDust"], RESET, ":", galaxy.starDust),
                         Text.of(BOLD, YELLOW, lang["UI.Tip.PlanetLevel"], RESET, ":", planet.level),
                         Text.of(BOLD, YELLOW, lang["UI.Tip.PlanetRange"], RESET, ":", planet.size),
                         Text.of(BOLD, YELLOW, lang["UI.Tip.PlanetEffect"], RESET, ":")
@@ -174,8 +174,8 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
                         val member = galaxy.getMember(player.uniqueId) ?: return@launch
 
                         if (member.takeStarDust(it)) {
-                            galaxy.saveMember(member).join()
-                            galaxy.update { giveStarDust(it) }.join()
+                            galaxy.saveMember(member)
+                            galaxy.update { giveStarDust(it) }
 
                             player.sendMessage(Text.of(AQUA, lang["Respond.DonateStarDustTip"].format(it)))
                         } else {
@@ -188,17 +188,17 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
             buttonID[4] -> Unit // TODO ECS
             buttonID[5] -> GUIHelper.openAsync(player) { GalaxyManagement(galaxy.refresh()) }
             buttonID[6] -> {
-                galaxy.requestJoin(player.uniqueId)
+                launch { galaxy.requestJoin(player.uniqueId) }
 
                 event.isCancelled = false
                 event.cursorTransaction.setCustom(ItemStackSnapshot.NONE)
 
                 inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java)).apply {
-                    Button(PLUS).createItemStack()
-                        .apply {
-                            offer(Keys.DISPLAY_NAME, Text.of(GRAY, lang["UI.Button.JoinRequestSent"]))
-                        }
-                        .let { set(2, 2, it) }
+                    set(
+                        2,
+                        2,
+                        Button(PLUS).createItemStack().apply { offer(Keys.DISPLAY_NAME, Text.of(GRAY, lang["UI.Button.JoinRequestSent"])) }
+                    )
                 }
             }
         }

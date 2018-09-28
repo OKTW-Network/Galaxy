@@ -13,9 +13,6 @@ data class Galaxy(
     var notice: String = "",
     val members: ArrayList<Traveler> = ArrayList(),
     val planets: ArrayList<Planet> = ArrayList(),
-    val joinRequest: ArrayList<UUID> = ArrayList()
-) : StarDustKeeper() {
-    init {
-        interestRate = 0.03
-    }
-}
+    val joinRequest: ArrayList<UUID> = ArrayList(),
+    override var interestRate: Double = 0.0004
+) : StarDustKeeper()

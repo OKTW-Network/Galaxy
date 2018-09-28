@@ -38,7 +38,7 @@ class PlanetHelper {
             .randomSeed()
             .build("planet_nether", "planet_nether")
 
-        suspend fun createPlanet(name: String, type: PlanetType = NORMAL): Planet {
+        suspend fun createPlanet(name: String, type: PlanetType = NORMAL) = withContext(serverThread) {
             if (server.getWorldProperties(name).isPresent)
                 throw IllegalArgumentException("World already exists")
             if (!name.matches(Regex("[a-z0-9\\-_]+", RegexOption.IGNORE_CASE)))
@@ -54,14 +54,12 @@ class PlanetHelper {
             logger.info("Create World [{}]", name)
 
             try {
-                properties = withContext(serverThread) {
-                    server.createWorldProperties(name, archetype).also {
-                        server.loadWorld(it).get().apply {
-                            spawnLocation.chunkPosition.apply {
-                                for (x in x - 1..x + 1) {
-                                    for (z in z - 1..z + 1) {
-                                        loadChunk(x, 0, z, true)
-                                    }
+                properties = server.createWorldProperties(name, archetype).also {
+                    server.loadWorld(it).get().apply {
+                        spawnLocation.chunkPosition.apply {
+                            for (x in x - 1..x + 1) {
+                                for (z in z - 1..z + 1) {
+                                    loadChunk(x, 0, z, true)
                                 }
                             }
                         }
@@ -72,7 +70,7 @@ class PlanetHelper {
                 throw UncheckedIOException(e)
             }
 
-            return Planet(world = properties.uniqueId, name = name, type = type)
+            return@withContext Planet(world = properties.uniqueId, name = name, type = type)
         }
 
         fun removePlanet(worldUUID: UUID): CompletableFuture<Boolean> {
@@ -86,8 +84,7 @@ class PlanetHelper {
             logger.info("Deleting World [{}]", properties.worldName)
             if (server.getWorld(worldUUID).isPresent) {
                 val world = server.getWorld(worldUUID).get()
-                world.players.parallelStream()
-                    .forEach { it.setLocationSafely(server.getWorld(server.defaultWorldName).get().spawnLocation) }
+                world.players.forEach { it.setLocationSafely(server.getWorld(server.defaultWorldName).get().spawnLocation) }
                 server.unloadWorld(world)
             }
 

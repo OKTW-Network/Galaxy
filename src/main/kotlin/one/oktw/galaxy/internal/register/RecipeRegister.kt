@@ -10,7 +10,7 @@ import one.oktw.galaxy.item.enums.UpgradeType.*
 import one.oktw.galaxy.item.type.Material
 import one.oktw.galaxy.item.type.Tool
 import one.oktw.galaxy.item.type.Upgrade
-import one.oktw.galaxy.item.type.extensions.createSmeltingRecipe
+import one.oktw.galaxy.util.extensions.createSmeltingRecipe
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.key.Keys.POTION_EFFECTS

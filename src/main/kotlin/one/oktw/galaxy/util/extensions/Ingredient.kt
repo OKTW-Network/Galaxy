@@ -1,4 +1,4 @@
-package one.oktw.galaxy.item.type.extensions
+package one.oktw.galaxy.util.extensions
 
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.recipe.crafting.Ingredient

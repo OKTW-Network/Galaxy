@@ -92,11 +92,11 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
         .property(InventoryTitle.of(
-            recipe.result().let { result->
-                val name = lang.fromItem(result)
+            recipe.result().let { result ->
+                val name = lang.removeStyle(lang.fromItem(result))
                 lang.ofPlaceHolder("UI.Title.HiTechCraftingTableRecipe", name)
             }
-            ))
+        ))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 
@@ -227,7 +227,7 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
 
             Action.CRAFT -> {
                 // we don't need to switch thread now
-                launch (Main.serverThread, start = CoroutineStart.UNDISPATCHED) {
+                launch(Main.serverThread, start = CoroutineStart.UNDISPATCHED) {
                     val traveler = TravelerHelper.getTraveler(player).await() ?: return@launch
 
                     if (player.gameMode().get() == GameModes.CREATIVE) {
@@ -238,7 +238,7 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
                         item.offer(Keys.REPRESENTED_ITEM, stack.createSnapshot())
 
                         player.world.spawnEntity(item)
-                    } else{
+                    } else {
                         // survival mode action
                         if (recipe.haveEnoughIngredient(player) && recipe.haveEnoughDust(traveler)) {
                             if (recipe.consume(player, traveler)) {

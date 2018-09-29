@@ -136,12 +136,21 @@ class PlanetLevel(private var galaxy: Galaxy, private var planet: Planet) : GUI(
 
     private fun fillDust() {
         view.setSlot(Slot.STAR_DUST, Button(ButtonType.STARS).createItemStack().apply {
-            offer(
-                Keys.ITEM_LORE, asList<Text>(
-                    Text.of("has dust: ", galaxy.starDust.toString()),
-                    Text.of("level: ", planet.level.toString(), "->", (planet.level + 1).toString())
+            if (getRequirement(planet.level.toInt()) >= 0) {
+                offer(
+                    Keys.ITEM_LORE, asList<Text>(
+                        Text.of(lang["UI.Tip.StarDustCount"].format(galaxy.starDust.toString())),
+                        Text.of(lang["UI.Tip.PlanetLevel"], ": ", planet.level.toString(), "->", (planet.level + 1).toString())
+                    )
                 )
-            )
+            } else {
+                offer(
+                    Keys.ITEM_LORE, asList<Text>(
+                        Text.of(lang["UI.Tip.StarDustCount"].format(galaxy.starDust.toString())),
+                        Text.of(lang["UI.Tip.PlanetLevel"], ": ", planet.level.toString())
+                    )
+                )
+            }
         })
     }
 
@@ -197,11 +206,11 @@ class PlanetLevel(private var galaxy: Galaxy, private var planet: Planet) : GUI(
         }
 
         when (detail.primary?.data) {
-            PlanetLevel.Companion.Action.CONFIRM -> launch(start = CoroutineStart.UNDISPATCHED) {
+            Action.CONFIRM -> launch(start = CoroutineStart.UNDISPATCHED) {
                 view.disabled = true
 
                 if (TravelerHelper.getTraveler(player).await()?.group !in asList(Group.ADMIN, Group.OWNER)) {
-                    player.sendMessage(Text.of(TextColors.RED, "Access denied"))
+                    player.sendMessage(Text.of(TextColors.RED, lang["UI.Tip.NotEnoughPermission"]))
                     view.disabled = false
                     return@launch
                 }
@@ -226,7 +235,7 @@ class PlanetLevel(private var galaxy: Galaxy, private var planet: Planet) : GUI(
             }
 
 
-            PlanetLevel.Companion.Action.CANCEL -> {
+            Action.CANCEL -> {
                 GUIHelper.close(token)
             }
             else -> Unit

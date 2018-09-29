@@ -142,3 +142,6 @@ Respond.inputGalaxyName=請輸入一個名稱來創建星系：
 Respond.createGalaxyCancel=已取消創建星系
 Respond.createGalaxySuccess=星系創建成功！
 Respond.openGalaxyConsole=開啟管理介面
+UI.Title.EnvironmentControlSystem=環境控制系統
+UI.Title.PlanetLevel=星球升級
+UI.Tip.NotEnoughPermission=你並沒有足夠的權限進行此操作

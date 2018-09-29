@@ -142,3 +142,6 @@ Respond.inputGalaxyName=Type your desired galaxy name:
 Respond.createGalaxyCancel=Galaxy creation cancelled
 Respond.createGalaxySuccess=Galaxy created
 Respond.openGalaxyConsole=Open galaxy console
+UI.Title.EnvironmentControlSystem=ECS
+UI.Title.PlanetLevel=Upgrade planet level
+UI.Tip.NotEnoughPermission=Access Denied, You don't have required permission for this operation!

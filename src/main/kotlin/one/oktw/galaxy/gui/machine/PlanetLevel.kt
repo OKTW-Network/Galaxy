@@ -109,16 +109,19 @@ class PlanetLevel(private var galaxy: Galaxy, private var planet: Planet) : GUI(
     init {
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
         launch {
+            refreshGalaxyAndPlanet()
             updateView()
         }
     }
 
-    private suspend fun updateView() {
-        view.disabled = true
-        view.clear()
-
+    private suspend fun refreshGalaxyAndPlanet() {
         galaxy = Main.galaxyManager.get(galaxy.uuid) ?: return
         planet = galaxy.getPlanet(planet.uuid) ?: return
+    }
+
+    private fun updateView() {
+        view.disabled = true
+        view.clear()
 
         fillEmpty()
         fillDust()
@@ -203,6 +206,9 @@ class PlanetLevel(private var galaxy: Galaxy, private var planet: Planet) : GUI(
                     return@launch
                 }
 
+                // to prevent desync due to multiple user change the starDust count of galaxy at same time
+                refreshGalaxyAndPlanet()
+
                 val requirement = getRequirement(planet.level.toInt())
 
                 if (requirement > 0 && galaxy.starDust >= requirement) {
@@ -213,6 +219,9 @@ class PlanetLevel(private var galaxy: Galaxy, private var planet: Planet) : GUI(
                 }
 
                 view.disabled = false
+
+                // refresh again after status modified
+                refreshGalaxyAndPlanet()
                 updateView()
             }
 

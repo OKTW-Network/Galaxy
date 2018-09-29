@@ -109,7 +109,7 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
             buttonID[1] -> GUIHelper.openAsync(player) { BrowserMember(galaxy.refresh(), true) }
             buttonID[2] -> launch {
                 val input = input(player, Text.of(AQUA, lang.of("Respond.inputPlayerId")).toLegacyText(player))?.toPlain()
-                    ?: return@launch player.sendMessage(Text.of(RED, "已取消"))
+                    ?: return@launch player.sendMessage(Text.of(RED, lang.of("Respond.cancelled")).toLegacyText(player))
 
                 try {
                     val user: User? = Sponge.getServiceManager().provide(UserStorageService::class.java).get().get(input).orElse(null)

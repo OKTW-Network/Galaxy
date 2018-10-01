@@ -28,6 +28,7 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextColors.*
 import org.spongepowered.api.text.format.TextStyles.BOLD
 import java.util.*
@@ -113,7 +114,7 @@ class CreatePlanet(private val galaxy: Galaxy) : GUI() {
             return false
         }
 
-        if (confirm(player, Text.of(AQUA,  lang.of("Respond.createPlanetConfirmName", BOLD, name)).toLegacyText(player)) == true) {
+        if (confirm(player, Text.of(AQUA, lang.of("Respond.createPlanetConfirmName", Text.of(TextColors.WHITE, BOLD, name))).toLegacyText(player)) == true) {
             val galaxy1 = galaxy.refresh()
 
             if (galaxy1.planets.any { it.type == type }) {
@@ -128,7 +129,7 @@ class CreatePlanet(private val galaxy: Galaxy) : GUI() {
                 TeleportHelper.teleport(player, planet)
                 return true
             } catch (e: RuntimeException) {
-                var message: Text = Text.of(e.message?: "unknown error")
+                var message: Text = Text.of(e.message ?: "unknown error")
 
                 if (e is IllegalArgumentException) {
                     when (e.message) {
@@ -137,7 +138,7 @@ class CreatePlanet(private val galaxy: Galaxy) : GUI() {
                     }
                 }
 
-                player.sendMessage(Text.of(RED,lang.of("Respond.createPlanetFailed", message)))
+                player.sendMessage(Text.of(RED, lang.of("Respond.createPlanetFailed", message)).toLegacyText(player))
             }
 
             return false

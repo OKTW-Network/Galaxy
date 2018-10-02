@@ -48,7 +48,7 @@ class TransferOwner : CommandBase {
                 val traveler = galaxy!!.getMember(member.uniqueId)
                 when {
                     traveler == null -> {
-                        src.sendMessage(Text.of(RED, "Error: Player is not a member in this galaxy."))
+                        src.sendMessage(Text.of(RED, "Error: ${member.name} is not a member in this galaxy."))
                     }
                     traveler.group == Group.OWNER -> {
                         src.sendMessage(Text.of(RED, "Error: ${member.name} is already the owner of this galaxy"))

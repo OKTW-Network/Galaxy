@@ -50,7 +50,7 @@ class SetGroup : CommandBase {
                 val traveler = galaxy!!.getMember(member.uniqueId)
                 when {
                     traveler == null -> {
-                        src.sendMessage(Text.of(RED, "Error: Player is not a member in this galaxy."))
+                        src.sendMessage(Text.of(RED, "Error: ${member.name} is not a member in this galaxy."))
                     }
                     traveler.group == group -> {
                         src.sendMessage(Text.of(RED, "Error: Nothing changed."))

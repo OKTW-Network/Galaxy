@@ -11,7 +11,7 @@ import org.spongepowered.api.command.spec.CommandSpec
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.service.pagination.PaginationList
 import org.spongepowered.api.text.Text
-import java.awt.Color.RED
+import org.spongepowered.api.text.format.TextColors.RED
 import java.util.*
 
 class GalaxyInfo : CommandBase {

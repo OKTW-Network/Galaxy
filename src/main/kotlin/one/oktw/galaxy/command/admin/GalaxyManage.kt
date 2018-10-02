@@ -16,6 +16,7 @@ class GalaxyManage : CommandBase {
             .child(AddMember().spec, "addMember")
             .child(SetGroup().spec, "setGroup")
             .child(RemoveMember().spec, "removeMember")
+            .child(TransferOwner().spec, "transferOwner")
             .child(Rename().spec, "rename")
             .child(Info().spec, "info")
             .child(Notice().spec, "notice")

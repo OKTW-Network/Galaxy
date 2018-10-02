@@ -46,18 +46,20 @@ class TransferOwner : CommandBase {
 
             if (galaxyUUID != null) {
                 val traveler = galaxy!!.getMember(member.uniqueId)
-                if (traveler == null) {
-                    src.sendMessage(Text.of(RED, "Error: Player is not a member in this galaxy."))
-                    return@launch
+                when {
+                    traveler == null -> {
+                        src.sendMessage(Text.of(RED, "Error: Player is not a member in this galaxy."))
+                    }
+                    traveler.group == Group.OWNER -> {
+                        src.sendMessage(Text.of(RED, "Error: ${member.name} is already the owner of this galaxy"))
+                    }
+                    else -> {
+                        val oldOwner = userStorage.get(galaxy.members.first { it.group == OWNER }.uuid).get()
+                        galaxy.setGroup(oldOwner.uniqueId, ADMIN)
+                        galaxy.setGroup(member.uniqueId, OWNER)
+                        src.sendMessage(Text.of(GREEN, "Galaxy owner transferred: ${oldOwner.name} -> ${member.name}"))
+                    }
                 }
-                if (traveler.group == Group.OWNER) {
-                    src.sendMessage(Text.of(RED, "Error: ${member.name} is already the owner of this galaxy"))
-                    return@launch
-                }
-                val oldOwner = userStorage.get(galaxy.members.first { it.group == OWNER }.uuid).get()
-                galaxy.setGroup(oldOwner.uniqueId, ADMIN)
-                galaxy.setGroup(member.uniqueId, OWNER)
-                src.sendMessage(Text.of(GREEN, "Galaxy owner transferred: ${oldOwner.name} -> ${member.name}"))
             } else {
                 src.sendMessage(Text.of(RED, "Not enough argument: galaxy not found or missing."))
             }

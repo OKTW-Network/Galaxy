@@ -54,9 +54,9 @@ class TransferOwner : CommandBase {
                     src.sendMessage(Text.of(RED, "Error: ${member.name} is already the owner of this galaxy"))
                     return@launch
                 }
-                galaxy.setGroup(member.uniqueId, OWNER)
                 val oldOwner = userStorage.get(galaxy.members.first { it.group == OWNER }.uuid).get()
                 galaxy.setGroup(oldOwner.uniqueId, ADMIN)
+                galaxy.setGroup(member.uniqueId, OWNER)
                 src.sendMessage(Text.of(GREEN, "Galaxy owner transferred: ${oldOwner.name} -> ${member.name}"))
             } else {
                 src.sendMessage(Text.of(RED, "Not enough argument: galaxy not found or missing."))

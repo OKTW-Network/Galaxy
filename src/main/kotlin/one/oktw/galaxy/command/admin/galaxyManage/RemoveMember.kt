@@ -40,7 +40,12 @@ class RemoveMember : CommandBase {
             }
 
             if (galaxyUUID != null) {
-                if (galaxy!!.getMember(member.uniqueId)?.group == Group.OWNER) {
+                val traveler = galaxy!!.getMember(member.uniqueId)
+                if (traveler == null) {
+                    src.sendMessage(Text.of(RED, "Error: Player is not a member in this galaxy."))
+                    return@launch
+                }
+                if (traveler.group == Group.OWNER) {
                     src.sendMessage(Text.of(RED, "Error: You are removing an owner"))
                     return@launch
                 }

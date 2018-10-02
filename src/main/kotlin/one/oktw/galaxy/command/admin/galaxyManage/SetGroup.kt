@@ -3,6 +3,7 @@ package one.oktw.galaxy.command.admin.galaxyManage
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.command.CommandBase
+import one.oktw.galaxy.galaxy.data.extensions.getMember
 import one.oktw.galaxy.galaxy.data.extensions.setGroup
 import one.oktw.galaxy.galaxy.enums.Group
 import org.spongepowered.api.command.CommandResult
@@ -41,7 +42,16 @@ class SetGroup : CommandBase {
             }
 
             if (galaxyUUID != null) {
-                galaxy!!.setGroup(member.uniqueId, group)
+                val traveler = galaxy!!.getMember(member.uniqueId)
+                if (traveler == null) {
+                    src.sendMessage(Text.of(RED, "Error: Player is not a member in this galaxy."))
+                    return@launch
+                }
+                if (traveler.group == Group.OWNER) {
+                    src.sendMessage(Text.of(RED, "Error: You are removing an owner"))
+                    return@launch
+                }
+                galaxy.setGroup(member.uniqueId, group)
                 src.sendMessage(Text.of(GREEN, "Group of ${member.name} in ${galaxy.name} was set to ${group.name}!"))
             } else {
                 src.sendMessage(Text.of(RED, "Not enough argument: galaxy not found or missing."))

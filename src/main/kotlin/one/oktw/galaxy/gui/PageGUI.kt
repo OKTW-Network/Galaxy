@@ -21,8 +21,8 @@ import kotlin.collections.ArrayList
 
 abstract class PageGUI<Data> : GUI() {
     companion object {
-        private const val CHANGE_PAGE_INTERVAL = 100
-        private const val SET_ITEM_DELAY = 20
+        private const val CHANGE_PAGE_INTERVAL = 100L
+        private const val SET_ITEM_DELAY = 20L
 
         data class Operation<Data>(
             val action: Action = Action.Null,

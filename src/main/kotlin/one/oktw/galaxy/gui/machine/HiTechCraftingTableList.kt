@@ -29,8 +29,8 @@ import kotlin.collections.ArrayList
 
 class HiTechCraftingTableList(private val player: Player) : GUI() {
     companion object {
-        private const val CHANGE_PAGE_DELAY = 100
-        private const val OFFER_ITEM_DELAY = 100
+        private const val CHANGE_PAGE_DELAY = 100L
+        private const val OFFER_ITEM_DELAY = 100L
         private val lang = Main.translationService
 
         private enum class Action {

@@ -43,7 +43,7 @@ class Main {
 
         lateinit var main: Main
             private set
-        lateinit var serverThread: CloseableCoroutineDispatcher
+        lateinit var serverThread: ExecutorCoroutineDispatcher
             private set
         lateinit var galaxyManager: GalaxyManager
             private set
@@ -52,6 +52,8 @@ class Main {
         lateinit var languageService: LanguageService
             private set
         lateinit var delay: DelayedExecute
+            private set
+        lateinit var vanillaLanguageService: LanguageService
             private set
     }
 
@@ -84,7 +86,8 @@ class Main {
     fun onPreInit(event: GamePreInitializationEvent) {
         serverThread = Sponge.getScheduler().createSyncExecutor(this).asCoroutineDispatcher()
         delay = DelayedExecute(plugin)
-        languageService = LanguageService.getInstance()
+        languageService = LanguageService()
+        vanillaLanguageService = LanguageService("vanilla")
         DataRegister()
         RecipeRegister()
         EasyRecipeRegister()

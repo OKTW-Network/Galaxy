@@ -56,7 +56,7 @@ class SetGroup : CommandBase {
                         src.sendMessage(Text.of(RED, "Error: Nothing changed."))
                     }
                     traveler.group == OWNER -> {
-                        src.sendMessage(Text.of(RED, "Error: You are removing an owner"))
+                        src.sendMessage(Text.of(RED, "Error: You are changing the group of the owner"))
                     }
                     group == OWNER -> {
                         val oldOwner = userStorage.get(galaxy.members.first { it.group == OWNER }.uuid).get()

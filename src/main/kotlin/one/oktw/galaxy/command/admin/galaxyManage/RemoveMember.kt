@@ -46,7 +46,7 @@ class RemoveMember : CommandBase {
                         src.sendMessage(Text.of(RED, "Error: ${member.name} is not a member in this galaxy."))
                     }
                     traveler.group == Group.OWNER -> {
-                        src.sendMessage(Text.of(RED, "Error: You are removing an owner"))
+                        src.sendMessage(Text.of(RED, "Error: You are removing the owner"))
                     }
                     else -> {
                         galaxy.delMember(member.uniqueId)

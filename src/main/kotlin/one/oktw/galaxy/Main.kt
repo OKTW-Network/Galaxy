@@ -84,7 +84,6 @@ class Main {
         event.register(NetherGenModifier())
     }
 
-    @Suppress("DEPRECATION")
     @Listener
     fun onPreInit(event: GamePreInitializationEvent) {
         serverThread = Sponge.getScheduler().createSyncExecutor(this).asCoroutineDispatcher()

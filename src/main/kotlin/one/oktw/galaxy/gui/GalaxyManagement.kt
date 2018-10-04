@@ -42,14 +42,14 @@ class GalaxyManagement(private val galaxy: Galaxy) : GUI() {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
         // button
-        Button(PLUS).createItemStack()
+        Button(PLANET_ADD).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
                 offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.CreateNewPlanet"]))
             }
             .let { inventory.set(1, 1, it) }
 
-        Button(LIST).createItemStack()
+        Button(MEMBER_SETTING).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
                 offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.ManageMember"]))

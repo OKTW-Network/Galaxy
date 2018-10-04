@@ -10,8 +10,7 @@ import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.data.extensions.getGroup
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.gui.view.GridGUIView
-import one.oktw.galaxy.item.enums.ButtonType.GALAXY
-import one.oktw.galaxy.item.enums.ButtonType.PLUS
+import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.util.Chat.Companion.confirm
 import one.oktw.galaxy.util.Chat.Companion.input
@@ -80,7 +79,7 @@ class MainMenu(player: Player) : GUI() {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
 
         // button
-        Button(GALAXY).createItemStack()
+        Button(GALAXY_JOINED).createItemStack()
             .apply {
                 offer(
                     Keys.DISPLAY_NAME,

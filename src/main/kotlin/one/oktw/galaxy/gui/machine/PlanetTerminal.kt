@@ -48,7 +48,7 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
                 offer(DataUUID(buttonID[0]))
                 offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.Button.BackToSpaceShip"]))
             }
-        val buttonListPlanet = Button(PLANET_O).createItemStack()
+        val buttonListPlanet = Button(PLANET_LIST).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
                 offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.PlanetList"]))
@@ -75,7 +75,7 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
                 }
         }
         val buttonManageGalaxy by lazy {
-            Button(LIST).createItemStack()
+            Button(GALAXY_SETTING).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[5]))
                     offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.ManageGalaxy"]))

@@ -49,7 +49,7 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
             }
             .let { inventory.set(0, 0, it) }
 
-        Button(PLANET_O).createItemStack()
+        Button(PLANET_LIST).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
                 offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.PlanetList"]))
@@ -58,7 +58,7 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
 
         when {
             member?.group in asList(OWNER, ADMIN) -> {
-                Button(LIST).createItemStack()
+                Button(GALAXY_SETTING).createItemStack()
                     .apply {
                         offer(DataUUID(buttonID[2]))
                         offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.ManageGalaxy"]))

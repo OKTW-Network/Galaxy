@@ -53,15 +53,10 @@ class Main {
             private set
         lateinit var chunkLoaderManager: ChunkLoaderManager
             private set
-
-        @Deprecated("use translation service instead")
-        private lateinit var languageService: LanguageService
-        @Deprecated("use translation service instead")
-        private lateinit var vanillaLanguageService: LanguageService
-
         lateinit var delay: DelayedExecute
             private set
         lateinit var translationService: TranslationService
+            private set
     }
 
     @Inject
@@ -94,8 +89,9 @@ class Main {
     fun onPreInit(event: GamePreInitializationEvent) {
         serverThread = Sponge.getScheduler().createSyncExecutor(this).asCoroutineDispatcher()
         delay = DelayedExecute(plugin)
-        languageService = LanguageService()
-        vanillaLanguageService = LanguageService("vanilla")
+
+        val languageService = LanguageService()
+        val vanillaLanguageService = LanguageService("vanilla")
 
         Sponge.getServiceManager().provide(one.oktw.i18n.api.I18n::class.java).get().let {
             translationService = it.register("galaxy", GalaxyTranslationProvider(languageService), false)

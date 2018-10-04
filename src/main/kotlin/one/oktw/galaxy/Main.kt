@@ -92,7 +92,7 @@ class Main {
         val languageService = LanguageService()
         val vanillaLanguageService = LanguageService("vanilla")
 
-        Sponge.getServiceManager().provide(one.oktw.i18n.api.I18n::class.java).get().let {
+        Sponge.getServiceManager().provide(one.oktw.i18n.api.I18n::class.java).get().also {
             translationService = it.register("galaxy", GalaxyTranslationProvider(languageService), false)
             it.register("minecraft", GalaxyTranslationProvider(vanillaLanguageService), true)
         }

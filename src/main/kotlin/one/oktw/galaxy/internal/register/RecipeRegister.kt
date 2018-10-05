@@ -4,10 +4,13 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.block.data.FakeBlockItem
 import one.oktw.galaxy.block.enums.CustomBlocks.ELEVATOR
 import one.oktw.galaxy.block.enums.CustomBlocks.HT_CRAFTING_TABLE
+import one.oktw.galaxy.item.enums.MaterialType
 import one.oktw.galaxy.item.enums.ToolType.WRENCH
 import one.oktw.galaxy.item.enums.UpgradeType.*
+import one.oktw.galaxy.item.type.Material
 import one.oktw.galaxy.item.type.Tool
 import one.oktw.galaxy.item.type.Upgrade
+import one.oktw.galaxy.util.extensions.createSmeltingRecipe
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.key.Keys.POTION_EFFECTS
@@ -287,6 +290,15 @@ class RecipeRegister {
                     .addIngredient(of(IRON_BLOCK))
                     .result(FakeBlockItem(ELEVATOR).createItemStack())
                     .build("elevator", main)
+            )
+        }
+
+        Sponge.getRegistry().smeltingRecipeRegistry.apply {
+            register(
+                Material(MaterialType.PART_RAW_BASE).createSmeltingRecipe(
+                    Material(MaterialType.PART_BASE).createItemStack().createSnapshot(),
+                    5.0
+                )
             )
         }
     }

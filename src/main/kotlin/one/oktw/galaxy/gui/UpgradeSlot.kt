@@ -1,6 +1,6 @@
 package one.oktw.galaxy.gui
 
-import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUpgrade
 import one.oktw.galaxy.item.enums.UpgradeType
@@ -10,15 +10,15 @@ import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.InventoryArchetypes
 import org.spongepowered.api.item.inventory.Slot
 import org.spongepowered.api.item.inventory.property.InventoryTitle
-import org.spongepowered.api.text.Text
 import java.util.*
 
 class UpgradeSlot(parent: GUI, private var upgrade: List<Upgrade>, private vararg val acceptType: UpgradeType) : GUI() {
     private lateinit var closeListener: (List<Upgrade>) -> Unit
+    private val lang = Main.translationService
     override val token = parent.token + "-Upgrade"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(languageService.getDefaultLanguage()["UI.Button.Upgrade"]))) // TODO get player language
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Button.Upgrade")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 

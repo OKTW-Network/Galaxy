@@ -16,11 +16,12 @@ import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.recipe.crafting.Ingredient.of
+import org.spongepowered.api.text.translation.Translation
 import java.util.Arrays.asList
 
 class Recipes {
     companion object {
-        private val lang = Main.languageService.getDefaultLanguage()
+        private val lang = Main.translationService
         private val lapis = of(ItemStack.of(ItemTypes.DYE, 1).apply { offer(Keys.DYE_COLOR, DyeColors.BLUE) })
 
         enum class Type {
@@ -112,12 +113,12 @@ class Recipes {
             Type.WEAPON to Gun().createItemStack().createSnapshot()
         )
 
-        val names: Map<Type, String> = mapOf(
-            Type.ALL to lang["recipe.catalog.ALL"],
-            Type.TOOL to lang["recipe.catalog.TOOL"],
-            Type.MATERIAL to lang["recipe.catalog.MATERIAL"],
-            Type.MACHINE to lang["recipe.catalog.MACHINE"],
-            Type.WEAPON to lang["recipe.catalog.WEAPON"]
+        val names: Map<Type, Translation> = mapOf(
+            Type.ALL to lang.translation("recipe.catalog.ALL"),
+            Type.TOOL to lang.translation("recipe.catalog.TOOL"),
+            Type.MATERIAL to lang.translation("recipe.catalog.MATERIAL"),
+            Type.MACHINE to lang.translation("recipe.catalog.MACHINE"),
+            Type.WEAPON to lang.translation("recipe.catalog.WEAPON")
         )
 
         val types: List<Type> = asList(Type.ALL, Type.MACHINE, Type.TOOL, Type.WEAPON, Type.MATERIAL)

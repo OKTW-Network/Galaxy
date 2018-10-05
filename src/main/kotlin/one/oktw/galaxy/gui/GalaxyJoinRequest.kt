@@ -2,7 +2,6 @@ package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
-import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.addMember
@@ -29,11 +28,11 @@ import kotlin.streams.toList
 
 class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI<UUID>() {
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
-    private val lang = languageService.getDefaultLanguage()
+    private val lang = Main.translationService
     override val token = "InviteManagement-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.JoinRequestList"])))
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.JoinRequestList")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 
@@ -81,7 +80,7 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI<UUID>() {
         if (detail.primary?.type == Companion.Slot.ITEMS) {
             val uuid = detail.primary.data?.data?: return
             GUIHelper.open(event.source as Player) {
-                Confirm(Text.of(lang["UI.Title.ConfirmJoinRequest"])) {
+                Confirm(lang.ofPlaceHolder("UI.Title.ConfirmJoinRequest")) {
                     launch {
                         if (it) galaxy.addMember(uuid)
 

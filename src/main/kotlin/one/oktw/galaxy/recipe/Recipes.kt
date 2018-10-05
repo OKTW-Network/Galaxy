@@ -118,7 +118,22 @@ class Recipes {
 
         private val weapons: List<HiTechCraftingRecipe> = ArrayList()
 
-        private val creativeWeapons = weapons
+        private val creativeWeapons = ArrayList<HiTechCraftingRecipe>().apply{
+            // gun
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(Material(MaterialType.BARREL), 1)
+                    .add(Material(MaterialType.HANDLE), 1)
+                    .add(Material(MaterialType.TRIGGER), 1)
+                    .add(Material(MaterialType.COOLANT), 1)
+                    .add(Material(MaterialType.LASER), 1)
+                    .add(Material(MaterialType.BATTERY), 1)
+                    .add(Material(MaterialType.CPU), 1)
+                    .cost(250)
+                    .result(Gun().createItemStack())
+                    .build()
+            )
+        }.plus(weapons)
 
         private val all: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>().plus(tools).plus(materials).plus(machines).plus(weapons)
 

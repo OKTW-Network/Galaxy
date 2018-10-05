@@ -2,8 +2,8 @@ package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
-import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.serverThread
+import one.oktw.galaxy.Main.Companion.translationService
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
@@ -62,7 +62,7 @@ class NumberSelect(content: Text, tip: List<Text> = emptyList(), private val cal
         // Info
         Button(GUI_INFO).createItemStack()
             .apply {
-                offer(DISPLAY_NAME, Text.of(YELLOW, languageService.getDefaultLanguage()["UI.Button.Info"]))
+                offer(DISPLAY_NAME, translationService.ofPlaceHolder(YELLOW, translationService.of("UI.Button.Info")))
                 offer(ITEM_LORE, tip)
             }
             .let { inventory.set(8, 0, it) }

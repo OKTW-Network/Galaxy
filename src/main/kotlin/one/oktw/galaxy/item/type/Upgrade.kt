@@ -1,6 +1,6 @@
 package one.oktw.galaxy.item.type
 
-import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUpgrade
 import one.oktw.galaxy.item.enums.ItemType
@@ -12,7 +12,6 @@ import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import org.spongepowered.api.data.key.Keys.DISPLAY_NAME
 import org.spongepowered.api.item.ItemTypes.ENCHANTED_BOOK
 import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles.BOLD
 
@@ -21,8 +20,8 @@ data class Upgrade(val type: UpgradeType = BASE, var level: Int = 0) : Item {
     override val itemType: ItemType = UPGRADE
 
     override fun createItemStack(): ItemStack {
-        val lang = languageService.getDefaultLanguage() // TODO set language
-        val name = lang["item.Upgrade.${type.name}"]
+        val lang = Main.translationService
+        val name = lang.of("item.Upgrade.${type.name}")
         val color = when (type) {
         // TODO more color
             RANGE -> TextColors.GREEN
@@ -33,7 +32,7 @@ data class Upgrade(val type: UpgradeType = BASE, var level: Int = 0) : Item {
             .itemType(ENCHANTED_BOOK)
             .itemData(DataItemType(UPGRADE))
             .itemData(DataUpgrade(type, level))
-            .add(DISPLAY_NAME, Text.of(BOLD, color, "${lang["item.Upgrade.Item"]} Lv.$level".format(name)))
+            .add(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, color, name, " Lv.$level".format(name)))
             .build()
     }
 

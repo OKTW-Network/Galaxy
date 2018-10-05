@@ -24,15 +24,14 @@ import one.oktw.galaxy.block.enums.CustomBlocks
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.enums.MaterialType
 import one.oktw.galaxy.item.enums.ToolType
-import one.oktw.galaxy.item.type.Button
-import one.oktw.galaxy.item.type.Gun
-import one.oktw.galaxy.item.type.Material
-import one.oktw.galaxy.item.type.Tool
+import one.oktw.galaxy.item.enums.UpgradeType
+import one.oktw.galaxy.item.type.*
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.DyeColors
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
+import org.spongepowered.api.item.recipe.crafting.Ingredient
 import org.spongepowered.api.item.recipe.crafting.Ingredient.of
 import org.spongepowered.api.text.translation.Translation
 import java.util.Arrays.asList
@@ -50,14 +49,115 @@ class Recipes {
             WEAPON
         }
 
-        private val materials: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>()
+        private val materials: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>().apply {
+            // part raw base
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.CLAY), 8)
+                    .add(of(ItemTypes.OBSIDIAN), 8)
+                    .cost(20)
+                    .result(Material(MaterialType.PART_RAW_BASE).createItemStack())
+                    .build()
+            )
+
+            // cpu
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.REDSTONE), 20)
+                    .add(of(ItemTypes.GOLD_INGOT), 8)
+                    .add(of(ItemTypes.QUARTZ), 4)
+                    .add(Material(MaterialType.PART_BASE), 1)
+                    .cost(45)
+                    .result(Material(MaterialType.CPU).createItemStack())
+                    .build()
+            )
+
+            // cooling
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(Upgrade(UpgradeType.COOLING, 1).createItemStack()), 1)
+                    .add(of(ItemTypes.LAPIS_BLOCK), 1)
+                    .add(of(ItemTypes.IRON_INGOT), 6)
+                    .add(Material(MaterialType.PART_BASE), 1)
+                    .cost(20)
+                    .result(Material(MaterialType.COOLANT).createItemStack())
+                    .build()
+            )
+
+            // laser
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.REDSTONE_LAMP), 1)
+                    .add(of(ItemTypes.EMERALD), 1)
+                    .add(of(ItemTypes.GOLD_INGOT), 1)
+                    .add(of(ItemTypes.IRON_INGOT), 1)
+                    .add(of(ItemTypes.OBSIDIAN), 1)
+                    .cost(30)
+                    .result(Material(MaterialType.LASER).createItemStack())
+                    .build()
+            )
+
+            // Battery
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.REDSTONE), 36)
+                    .add(of(ItemTypes.IRON_INGOT), 4)
+                    .add(of(ItemTypes.OBSIDIAN), 8)
+                    .cost(25)
+                    .result(Material(MaterialType.BATTERY).createItemStack())
+                    .build()
+            )
+
+
+            // Scope
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.IRON_INGOT), 4)
+                    .add(of(ItemTypes.OBSIDIAN), 1)
+                    .add(of(ItemTypes.GLASS_PANE), 1)
+                    .add(of(ItemTypes.STRING), 4)
+                    .add(of(ItemStack.of(ItemTypes.DYE, 1).apply { offer(Keys.DYE_COLOR, DyeColors.RED) }), 4)
+                    .cost(30)
+                    .result(Material(MaterialType.SCOPE).createItemStack())
+                    .build()
+            )
+
+            // barrel
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.IRON_INGOT), 18)
+                    .add(of(ItemTypes.GOLD_INGOT), 4)
+                    .add(of(ItemTypes.OBSIDIAN), 1)
+                    .cost(70)
+                    .result(Material(MaterialType.BARREL).createItemStack())
+                    .build()
+            )
+
+            // handle
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.IRON_INGOT), 18)
+                    .add(of(ItemTypes.GOLD_INGOT), 4)
+                    .add(Ingredient.builder().with { it.type == ItemTypes.WOOL }
+                        .withDisplay(ItemStack.of(ItemTypes.WOOL, 1)).build(), 1)
+                    .cost(60)
+                    .result(Material(MaterialType.HANDLE).createItemStack())
+                    .build()
+            )
+
+            // trigger
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.IRON_INGOT), 4)
+                    .add(of(ItemTypes.GOLD_INGOT), 4)
+                    .add(of(ItemTypes.REDSTONE), 2)
+                    .cost(75)
+                    .result(Material(MaterialType.TRIGGER).createItemStack())
+                    .build()
+            )
+        }
 
         private val creativeMaterials: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>().apply {
-            add(HiTechCraftingRecipe.builder()
-                .cost(0)
-                .result(Material(MaterialType.PART_RAW_BASE).createItemStack())
-                .build()
-            )
             add(HiTechCraftingRecipe.builder()
                 .cost(0)
                 .result(Material(MaterialType.PART_BASE).createItemStack())

@@ -19,6 +19,7 @@ import one.oktw.galaxy.machine.teleporter.TeleporterHelper
 import one.oktw.galaxy.machine.teleporter.data.Teleporter
 import one.oktw.galaxy.player.data.ActionBarData
 import one.oktw.galaxy.player.service.ActionBar
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import one.oktw.galaxy.util.CountDown
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
@@ -40,7 +41,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class Teleporter(private val teleporter: Teleporter) : PageGUI() {
+class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
     companion object {
         class MoveEventListener(private val teleporter: one.oktw.galaxy.gui.machine.Teleporter) : EventListener<MoveEntityEvent> {
             override fun handle(event: MoveEntityEvent) {
@@ -51,7 +52,7 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
 
     private val MAX_FRAME = 64
 
-    private val lang = Main.languageService.getDefaultLanguage()
+    private val lang = Main.translationService
     private val list = TeleporterHelper.getAvailableTargets(teleporter)
 
     private var job: Job? = null
@@ -59,22 +60,23 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
 
     private val moveEventListener = MoveEventListener(this)
 
-    override val token = "BrowserGalaxy-${UUID.randomUUID()}"
+    override val token = "Teleporter-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
         .property(InventoryTitle.of(
             teleporter.crossPlanet
                 .let {
                     if (it) {
-                        lang["UI.Title.AdvancedTeleporter"]
+                        lang.of("UI.Title.AdvancedTeleporter", teleporter.name)
                     } else {
-                        lang["UI.Title.Teleporter"]
+                        lang.of("UI.Title.Teleporter", teleporter.name)
                     }
                 }
-                .format(teleporter.name)
-                .let { Text.of(it) }
+                .let {
+                    lang.ofPlaceHolder(it)
+                }
         ))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 
     init {
@@ -87,8 +89,8 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
         // main.logger.info("event registered")
     }
 
-    override suspend fun get(number: Int, skip: Int): List<ItemStack> {
-        val res = ArrayList<ItemStack>()
+    override suspend fun get(number: Int, skip: Int): List<Pair<ItemStack, UUID>> {
+        val res = ArrayList<Pair<ItemStack, UUID>>()
 
         val teleporters = list
             .skip(skip)
@@ -108,25 +110,26 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
                 PlanetType.END -> Button(ButtonType.PLANET_E)
             }.createItemStack()
                 .apply {
-                    offer(DataUUID(targetTransporter.uuid))
                     offer(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, targetTransporter.name))
                     offer(
                         Keys.ITEM_LORE,
                         Arrays.asList(
-                            Text.of(
+                            lang.ofPlaceHolder(
                                 TextColors.GREEN,
-                                lang["UI.Tip.Target"].format(
+                                lang.of(
+                                    "UI.Tip.Target",
                                     "${planet.name} ${targetTransporter.position.x}, ${targetTransporter.position.y}, ${targetTransporter.position.z}"
                                 ),
                                 TextColors.RESET
                             ),
-                            Text.of(
+                            lang.ofPlaceHolder(
                                 TextColors.GREEN,
-                                lang["UI.Tip.CanCrossPlanet"].format(
+                                lang.of(
+                                    "UI.Tip.CanCrossPlanet",
                                     if (targetTransporter.crossPlanet) {
-                                        lang["UI.Tip.true"]
+                                        lang.of("UI.Tip.true")
                                     } else {
-                                        lang["UI.Tip.false"]
+                                        lang.of("UI.Tip.false")
                                     }
                                 ),
                                 TextColors.RESET
@@ -134,124 +137,125 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI() {
                         )
                     )
                 }
-                .let { res.add(it) }
+                .let {
+                    res.add(Pair(it, targetTransporter.uuid))
+                }
         }
 
         return res
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
-        event.isCancelled = true
+        val detail = view.getDetail(event)
+
+        if (detail.affectGUI) {
+            event.isCancelled = true
+        }
 
         val player = event.source as Player
-        val item = event.cursorTransaction.default
-        val uuid = item[DataUUID.key].orElse(null) ?: return
+        val uuid = detail.primary?.data?.data ?: return
 
-        val (slot) = view.getNameOf(event) ?: return
+        launch {
+            waitTingPlayer = player
 
-        if (slot == PageGUI.Companion.Slot.ITEMS) {
-            launch {
-                waitTingPlayer = player
+            GUIHelper.closeAll(player)
 
-                GUIHelper.closeAll(player)
+            // delay listener register to here to prevent listener leak
+            Sponge.getEventManager().registerListener(main, MoveEntityEvent::class.java, moveEventListener)
 
-                // delay listener register to here to prevent listener leak
-                Sponge.getEventManager().registerListener(main, MoveEntityEvent::class.java, moveEventListener)
-
-                job = async {
-                    (5 downTo 1).forEach {
-                        ActionBar.setActionBar(player, ActionBarData(Text.of(TextColors.GREEN, lang["Respond.TeleportCountDown"].format(it)), 3))
-                        delay(1000)
-                    }
-
-                    ActionBar.setActionBar(player, ActionBarData(Text.of(TextColors.GREEN, lang["Respond.TeleportStart"]), 3))
+            job = async {
+                (5 downTo 1).forEach {
+                    ActionBar.setActionBar(player, ActionBarData(Text.of(TextColors.GREEN, lang.of("Respond.TeleportCountDown", it)).toLegacyText(player), 3))
+                    delay(1000)
                 }
 
-                CountDown.instance.countDown(player, 5000) {
-                    job?.cancel()
-                    ActionBar.setActionBar(player, ActionBarData(Text.of(TextColors.RED, lang["Respond.TeleportCancelled"])))
-                }
-
-                job?.join()
-
-                Sponge.getEventManager().unregisterListeners(moveEventListener)
-                // main.logger.info("event unregistered")
-
-                if (job?.isCancelled == true) {
-                    return@launch
-                }
-
-                val targetTeleporter = TeleporterHelper.get(uuid) ?: return@launch
-                val planetId = targetTeleporter.position.planet ?: return@launch
-                val targetPlanet = Main.galaxyManager.get(null, planetId)?.getPlanet(planetId) ?: return@launch
-                val targetWorld = PlanetHelper.loadPlanet(targetPlanet) ?: return@launch
-
-                val sourceFrames = teleporter.position
-                    .let { Location(player.world, it.x, it.y, it.z) }
-                    .let { TeleporterHelper.searchTeleporterFrame(it, MAX_FRAME); }
-
-                if (sourceFrames == null) {
-                    player.sendMessage(Text.of(lang["Respond.TooMuchFramesThisSide"]))
-                    return@launch
-                }
-
-                val sourceEntities = player.world.entities.filter {
-                    sourceFrames[Triple(it.location.blockX, it.location.blockY - 1, it.location.blockZ)] != null
-                }
-
-                val targetFrames = targetTeleporter.position
-                    .let { Location(targetWorld, it.x, it.y, it.z) }
-                    .let { TeleporterHelper.searchTeleporterFrame(it, MAX_FRAME); }
-                    ?.values
-                    ?.let { ArrayList(it) }
-
-                if (targetFrames == null) {
-                    player.sendMessage(Text.of(lang["Respond.TooMuchFramesThatSide"]))
-                    return@launch
-                }
-
-                var index = 0
-
-                sourceEntities.forEach {
-                    val target = if (targetFrames.size != 0) targetFrames[index % targetFrames.size] else Location(
-                        targetWorld,
-                        targetTeleporter.position.x,
-                        targetTeleporter.position.y,
-                        targetTeleporter.position.z
-                    )
-
-                    index++
-
-                    if (it.type == EntityTypes.PLAYER) {
-                        val currentPlayer = it as Player
-
-                        // we teleport the main player to exact position
-                        if (currentPlayer == player) return@forEach
-
-                        TeleportHelper.teleport(
-                            it,
-                            // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
-                            Location(targetWorld, target.x + 0.5, target.y + 1, target.z + 0.5)
-                        )
-                    } else {
-                        withContext(Main.serverThread) {
-                            // ignore special entities
-                            if (it[DataUUID.key].orElse(null) != null) return@withContext
-
-                            it.transferToWorld(
-                                targetWorld,
-                                Vector3d(target.x + 0.5, target.y + 1, target.z + 0.5)
-                            )
-                        }
-                    }
-                }
-
-                TeleportHelper.teleport(
-                    player,
-                    // offset y by 1, so you are on the top of block, offset x and z by 0.5, so you are on the center of block
-                    Location(targetWorld, targetTeleporter.position.x + 0.5, targetTeleporter.position.y + 1, targetTeleporter.position.z + 0.5)
-                )
+                ActionBar.setActionBar(player, ActionBarData(Text.of(TextColors.GREEN, lang.of("Respond.TeleportStart")).toLegacyText(player), 3))
             }
+
+            CountDown.instance.countDown(player, 5000) {
+                job?.cancel()
+                ActionBar.setActionBar(player, ActionBarData(Text.of(TextColors.RED, lang.of("Respond.TeleportCancelled")).toLegacyText(player)))
+            }
+
+            job?.join()
+
+            Sponge.getEventManager().unregisterListeners(moveEventListener)
+            // main.logger.info("event unregistered")
+
+            if (job?.isCancelled == true) {
+                return@launch
+            }
+
+            val targetTeleporter = TeleporterHelper.get(uuid) ?: return@launch
+            val planetId = targetTeleporter.position.planet ?: return@launch
+            val targetPlanet = Main.galaxyManager.get(null, planetId)?.getPlanet(planetId) ?: return@launch
+            val targetWorld = PlanetHelper.loadPlanet(targetPlanet) ?: return@launch
+
+            val sourceFrames = teleporter.position
+                .let { Location(player.world, it.x, it.y, it.z) }
+                .let { TeleporterHelper.searchTeleporterFrame(it, MAX_FRAME); }
+
+            if (sourceFrames == null) {
+                player.sendMessage(lang.of("Respond.TooMuchFramesThisSide").toLegacyText(player))
+                return@launch
+            }
+
+            val sourceEntities = player.world.entities.filter {
+                sourceFrames[Triple(it.location.blockX, it.location.blockY - 1, it.location.blockZ)] != null
+            }
+
+            val targetFrames = targetTeleporter.position
+                .let { Location(targetWorld, it.x, it.y, it.z) }
+                .let { TeleporterHelper.searchTeleporterFrame(it, MAX_FRAME); }
+                ?.values
+                ?.let { ArrayList(it) }
+
+            if (targetFrames == null) {
+                player.sendMessage(lang.of("Respond.TooMuchFramesThatSide").toLegacyText(player))
+                return@launch
+            }
+
+            var index = 0
+
+            sourceEntities.forEach {
+                val target = if (targetFrames.size != 0) targetFrames[index % targetFrames.size] else Location(
+                    targetWorld,
+                    targetTeleporter.position.x,
+                    targetTeleporter.position.y,
+                    targetTeleporter.position.z
+                )
+
+                index++
+
+                if (it.type == EntityTypes.PLAYER) {
+                    val currentPlayer = it as Player
+
+                    // we teleport the main player to exact position
+                    if (currentPlayer == player) return@forEach
+
+                    TeleportHelper.teleport(
+                        it,
+                        // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
+                        Location(targetWorld, target.x + 0.5, target.y + 1, target.z + 0.5)
+                    )
+                } else {
+                    withContext(Main.serverThread) {
+                        // ignore special entities
+                        if (it[DataUUID.key].orElse(null) != null) return@withContext
+
+                        it.transferToWorld(
+                            targetWorld,
+                            Vector3d(target.x + 0.5, target.y + 1, target.z + 0.5)
+                        )
+                    }
+                }
+            }
+
+            TeleportHelper.teleport(
+                player,
+                // offset y by 1, so you are on the top of block, offset x and z by 0.5, so you are on the center of block
+                Location(targetWorld, targetTeleporter.position.x + 0.5, targetTeleporter.position.y + 1, targetTeleporter.position.z + 0.5)
+            )
         }
     }
 

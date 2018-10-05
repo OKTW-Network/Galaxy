@@ -4,7 +4,6 @@ import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.withContext
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.block.enums.CustomBlocks.TELEPORTER
 import one.oktw.galaxy.block.enums.CustomBlocks.TELEPORTER_ADVANCED
 import one.oktw.galaxy.data.DataBlockType
@@ -14,6 +13,7 @@ import one.oktw.galaxy.event.RemoveCustomBlockEvent
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.machine.teleporter.TeleporterHelper
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import one.oktw.galaxy.util.CountDown
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.block.BlockTypes
@@ -41,15 +41,13 @@ import java.util.Arrays.asList
 
 
 class Teleporter {
-    private val logger = main.logger
-
-    private val lang = Main.languageService.getDefaultLanguage()
+    private val lang = Main.translationService
 
     init {
-        Keys.IS_SNEAKING.registerEvent(Player::class.java) {
-            if (it.endResult.successfulData.firstOrNull { it.key == Keys.IS_SNEAKING }?.get() != true) return@registerEvent
+        Keys.IS_SNEAKING.registerEvent(Player::class.java) { event ->
+            if (event.endResult.successfulData.firstOrNull { it.key == Keys.IS_SNEAKING }?.get() != true) return@registerEvent
 
-            val player = it.targetHolder as? Player ?: return@registerEvent
+            val player = event.targetHolder as? Player ?: return@registerEvent
             val location = player.location.sub(0.0, 1.0, 0.0)
 
             if (location.blockType != BlockTypes.MOB_SPAWNER) return@registerEvent
@@ -81,16 +79,16 @@ class Teleporter {
     fun onPlace(event: PlaceCustomBlockEvent) {
         val player = event.cause.first(Player::class.java).orElse(null) ?: return
 
-        event.item.let {
-            val item = it[DataBlockType.key].get()
+        event.item.let { itemStack ->
+            val item = itemStack[DataBlockType.key].get()
 
             if (item == TELEPORTER || item == TELEPORTER_ADVANCED) {
                 launch {
                     val name = if (item == TELEPORTER_ADVANCED) {
-                        lang["block.TELEPORTER_ADVANCED"]
+                        lang.of("block.TELEPORTER_ADVANCED")
                     } else {
-                        lang["block.TELEPORTER"]
-                    }
+                        lang.of("block.TELEPORTER")
+                    }.toLegacyText(player).toPlain()
 
                     galaxyManager.get(player.world)?.getPlanet(player.world)?.let { planet ->
                         TeleporterHelper.create(
@@ -100,8 +98,8 @@ class Teleporter {
                             event.location.blockZ,
                             name,
                             item == TELEPORTER_ADVANCED
-                        ).let {
-                            if (!it) {
+                        ).let { success ->
+                            if (!success) {
                                 player.sendMessage(Text.of("Teleporter creation failed at ${event.location}"))
                                 return@launch
                             }
@@ -135,22 +133,22 @@ class Teleporter {
         val player = event.cause.first(Player::class.java).orElse(null) ?: return
 
         launch {
-            event.location.let {
-                galaxyManager.get(player.world)?.getPlanet(player.world)?.let {
+            event.location.let { location ->
+                galaxyManager.get(player.world)?.getPlanet(player.world)?.let { planet ->
                     TeleporterHelper.get(
-                        it,
-                        event.location.blockX,
-                        event.location.blockY,
-                        event.location.blockZ
+                        planet,
+                        location.blockX,
+                        location.blockY,
+                        location.blockZ
                     )?.let {
                         removeArmorStand(event.location, it.uuid)
                     }
 
                     TeleporterHelper.remove(
-                        it,
-                        event.location.blockX,
-                        event.location.blockY,
-                        event.location.blockZ
+                        planet,
+                        location.blockX,
+                        location.blockY,
+                        location.blockZ
                     )
                 } ?: let {
                     player.sendMessage(Text.of("error: fail to get planet"))

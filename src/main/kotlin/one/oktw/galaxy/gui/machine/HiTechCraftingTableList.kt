@@ -238,7 +238,9 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
 
     @Suppress("UNUSED_PARAMETER")
     private fun openInventoryEvent(event: InteractInventoryEvent.Open) {
-        offerPage(currentPage, currentOffset)
+        launch {
+            offerRecipes(currentPage, currentOffset)
+        }
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {

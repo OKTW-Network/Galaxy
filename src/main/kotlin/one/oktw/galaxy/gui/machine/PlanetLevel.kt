@@ -3,7 +3,6 @@ package one.oktw.galaxy.gui.machine
 import kotlinx.coroutines.experimental.CoroutineStart
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
-import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
@@ -16,6 +15,7 @@ import one.oktw.galaxy.gui.view.GridGUIView
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
@@ -90,11 +90,11 @@ class PlanetLevel(private var galaxy: Galaxy, private var planet: Planet) : GUI(
         }
     }
 
-    private val lang = languageService.getDefaultLanguage()
+    private val lang = Main.translationService
     override val token = "PlanetLevel-${planet.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.PlanetLevel"])))
+        .property(InventoryTitle.of(lang.ofPlaceHolder(lang.of("UI.Title.PlanetLevel"))))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 
@@ -139,15 +139,15 @@ class PlanetLevel(private var galaxy: Galaxy, private var planet: Planet) : GUI(
             if (getRequirement(planet.level.toInt()) >= 0) {
                 offer(
                     Keys.ITEM_LORE, asList<Text>(
-                        Text.of(lang["UI.Tip.StarDustCount"].format(galaxy.starDust.toString())),
-                        Text.of(lang["UI.Tip.PlanetLevel"], ": ", planet.level.toString(), "->", (planet.level + 1).toString())
+                        lang.ofPlaceHolder(lang.of("UI.Tip.StarDustCount", galaxy.starDust.toString())),
+                        lang.ofLiteralPlaceHolder(lang.of("UI.Tip.PlanetLevel"), ": ", planet.level.toString(), "->", (planet.level + 1).toString())
                     )
                 )
             } else {
                 offer(
                     Keys.ITEM_LORE, asList<Text>(
-                        Text.of(lang["UI.Tip.StarDustCount"].format(galaxy.starDust.toString())),
-                        Text.of(lang["UI.Tip.PlanetLevel"], ": ", planet.level.toString())
+                        lang.ofPlaceHolder(lang.of("UI.Tip.StarDustCount", galaxy.starDust.toString())),
+                        lang.ofLiteralPlaceHolder(lang.of("UI.Tip.PlanetLevel"), ": ", planet.level.toString())
                     )
                 )
             }
@@ -210,7 +210,7 @@ class PlanetLevel(private var galaxy: Galaxy, private var planet: Planet) : GUI(
                 view.disabled = true
 
                 if (TravelerHelper.getTraveler(player).await()?.group !in asList(Group.ADMIN, Group.OWNER)) {
-                    player.sendMessage(Text.of(TextColors.RED, lang["UI.Tip.NotEnoughPermission"]))
+                    player.sendMessage(Text.of(TextColors.RED, lang.of("UI.Tip.NotEnoughPermission")).toLegacyText(player))
                     view.disabled = false
                     return@launch
                 }

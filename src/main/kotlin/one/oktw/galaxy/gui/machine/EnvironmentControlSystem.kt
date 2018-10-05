@@ -47,11 +47,11 @@ class EnvironmentControlSystem(private var galaxy: Galaxy, private var planet: P
 
     }
 
-    private val lang = Main.languageService.getDefaultLanguage()
+    private val lang = Main.translationService
     override val token = "EnvironmentControlSystem-${planet.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.EnvironmentControlSystem"])))
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.EnvironmentControlSystem")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 
@@ -74,16 +74,16 @@ class EnvironmentControlSystem(private var galaxy: Galaxy, private var planet: P
 
         view.setSlot(Slot.UPGRADE, Upgrade().createItemStack().apply {
             offer(
-                Keys.DISPLAY_NAME, Text.of(
-                    lang["UI.Tip.PlanetEffect"]
+                Keys.DISPLAY_NAME, lang.ofPlaceHolder(
+                    lang.of("UI.Tip.PlanetEffect")
                 )
             )
         }, Action.OPEN_UPGRADE)
 
         view.setSlot(Slot.LEVEL, Button(ButtonType.PLUS).createItemStack().apply {
             offer(
-                Keys.DISPLAY_NAME, Text.of(
-                    lang["UI.Tip.PlanetLevel"]
+                Keys.DISPLAY_NAME, lang.ofPlaceHolder(
+                    lang.of("UI.Tip.PlanetLevel")
                 )
             )
         }, Action.OPEN_LEVEL)

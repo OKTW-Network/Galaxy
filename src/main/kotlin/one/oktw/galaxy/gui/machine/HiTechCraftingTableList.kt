@@ -22,7 +22,6 @@ import org.spongepowered.api.item.inventory.InventoryArchetypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.inventory.property.InventoryTitle
-import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import java.util.*
 import java.util.Arrays.asList
@@ -106,6 +105,7 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     init {
         offerPage(currentPage, currentOffset)
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
+        registerEvent(InteractInventoryEvent.Open::class.java, this::openInventoryEvent)
     }
 
     private fun offerPage(page: Recipes.Companion.Type, offset: Int) = lock.launch {
@@ -234,6 +234,11 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
         }.let {
             view.setSlots(Slot.NULL, it, null)
         }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun openInventoryEvent(event: InteractInventoryEvent.Open) {
+        offerPage(currentPage, currentOffset)
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {

@@ -3,8 +3,8 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.channels.toList
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.openSubscription
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
@@ -59,13 +59,13 @@ class BrowserGalaxy(player: Player? = null) : PageGUI<BrowserGalaxy.Companion.Wr
             }
     }
 
-    private val lang = languageService.getDefaultLanguage()
+    private val lang = Main.translationService
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
     private val list = galaxyManager.run { player?.let { get(it) } ?: listGalaxy() }
     override val token = "BrowserGalaxy-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.GalaxyList"])))
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.GalaxyList")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
     override val hasFunctionButtons: Boolean = true
@@ -97,27 +97,31 @@ class BrowserGalaxy(player: Player? = null) : PageGUI<BrowserGalaxy.Companion.Wr
                         .add(
                             ITEM_LORE,
                             asList(
-                                Text.of(
+                                lang.ofPlaceHolder(
                                     TextColors.GREEN,
-                                    "${lang["UI.Tip.Info"]}: ",
+                                    lang.of("UI.Tip.Info"),
+                                    ": ",
                                     TextColors.RESET,
                                     galaxy.info
                                 ),
-                                Text.of(
+                                lang.ofPlaceHolder(
                                     TextColors.GREEN,
-                                    "${lang["UI.Tip.Owner"]}: ",
+                                    lang.of("UI.Tip.Owner"),
+                                    ": ",
                                     TextColors.RESET,
                                     owner.name
                                 ),
-                                Text.of(
+                                lang.ofPlaceHolder(
                                     TextColors.GREEN,
-                                    "${lang["UI.Tip.MemberCount"]}: ",
+                                    lang.of("UI.Tip.MemberCount"),
+                                    ": ",
                                     TextColors.RESET,
                                     galaxy.members.size
                                 ),
-                                Text.of(
+                                lang.ofPlaceHolder(
                                     TextColors.GREEN,
-                                    "${lang["UI.Tip.PlanetCount"]}: ",
+                                    lang.of("UI.Tip.PlanetCount"),
+                                    ": ",
                                     TextColors.RESET,
                                     galaxy.planets.size
                                 )

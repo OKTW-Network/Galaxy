@@ -3,8 +3,8 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.experimental.channels.any
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.openSubscription
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.data.extensions.getGroup
@@ -12,6 +12,7 @@ import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.gui.view.GridGUIView
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import one.oktw.galaxy.util.Chat.Companion.confirm
 import one.oktw.galaxy.util.Chat.Companion.input
 import org.spongepowered.api.data.key.Keys
@@ -27,7 +28,6 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.action.TextActions.executeCallback
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextColors.*
-import org.spongepowered.api.text.format.TextStyles
 import org.spongepowered.api.text.format.TextStyles.BOLD
 import org.spongepowered.api.text.format.TextStyles.UNDERLINE
 import java.util.Arrays.asList
@@ -59,11 +59,11 @@ class MainMenu(player: Player) : GUI() {
         )
     }
 
-    private val lang = languageService.getDefaultLanguage()
+    private val lang = Main.translationService
     override val token = "MainMenu-${player.uniqueId}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.StarShipController"])))
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.StarShipController")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 
@@ -83,7 +83,7 @@ class MainMenu(player: Player) : GUI() {
             .apply {
                 offer(
                     Keys.DISPLAY_NAME,
-                    Text.of(GREEN, BOLD, lang["UI.Button.ListJoinedGalaxy"])
+                    lang.ofPlaceHolder(GREEN, BOLD, lang.of("UI.Button.ListJoinedGalaxy"))
                 )
             }
             .let { view.setSlot(Slot.LEFT, it, Action.OWN_GALAXY) }
@@ -93,7 +93,7 @@ class MainMenu(player: Player) : GUI() {
 
             Button(PLUS).createItemStack()
                 .apply {
-                    offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.Button.CreateGalaxy"]))
+                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, BOLD, lang.of("UI.Button.CreateGalaxy")))
                 }
                 .let { view.setSlot(Slot.MIDDLE, it, Action.CREATE_GALAXY) }
         }
@@ -102,10 +102,10 @@ class MainMenu(player: Player) : GUI() {
             .apply {
                 offer(
                     Keys.DISPLAY_NAME,
-                    Text.of(GREEN, BOLD, lang["UI.Button.ListAllGalaxy"])
+                    lang.ofPlaceHolder(GREEN, BOLD, lang.of("UI.Button.ListAllGalaxy"))
                 )
             }
-            .let { view.setSlot(Slot.RIGHT, it, Action.ALL_GALAXY)  }
+            .let { view.setSlot(Slot.RIGHT, it, Action.ALL_GALAXY) }
 
         GUIHelper.fillEmptySlot(inventory)
 
@@ -125,28 +125,35 @@ class MainMenu(player: Player) : GUI() {
             Action.OWN_GALAXY -> GUIHelper.open(player) { BrowserGalaxy(player) }
             Action.CREATE_GALAXY -> launch {
                 if (galaxyManager.get(player).openSubscription().any { it.getGroup(player) == OWNER }) {
-                    player.sendMessage(Text.of(RED, "你只能擁有一個星系"))
+                    player.sendMessage(Text.of(RED, lang.of("Respond.maximumOneGalaxyAllowed")).toLegacyText(player))
                     return@launch
                 }
 
-                val name = input(player, Text.of(AQUA, "請輸入一個名稱來創建星系："))?.toPlain()
+                val name = input(player, Text.of(AQUA, lang.of("Respond.inputGalaxyName")).toLegacyText(player))?.toPlain()
 
                 if (name == null) {
-                    player.sendMessage(Text.of(RED, "已取消創建星系"))
+                    player.sendMessage(Text.of(RED, lang.of("Respond.createGalaxyCancel")).toLegacyText(player))
                     return@launch
                 }
 
-                if (confirm(player, Text.of(AQUA, "確定要創建名為「", TextColors.RESET, BOLD, name, TextStyles.RESET, AQUA, "」的星系嗎？")) == true) {
+                if (
+                    confirm(
+                        player,
+                        Text.of(AQUA, lang.of("Respond.createGalaxyConfirmName", Text.of(TextColors.WHITE, BOLD, name))).toLegacyText(player)
+                    ) == true
+                ) {
                     if (galaxyManager.get(player).openSubscription().any { it.getGroup(player) == OWNER }) {
-                        player.sendMessage(Text.of(RED, "你只能擁有一個星系"))
+                        player.sendMessage(Text.of(RED, lang.of("Respond.maximumOneGalaxyAllowed")).toLegacyText(player))
                         return@launch
                     }
 
                     val galaxy = galaxyManager.createGalaxy(name, player)
-                    player.sendMessage(Text.of(YELLOW, "星系創建成功！"))
-                    player.sendMessage(Text.of(UNDERLINE, AQUA, executeCallback { GUIHelper.open(player) { GalaxyManagement(galaxy) } }, "開啟管理介面"))
+                    player.sendMessage(Text.of(YELLOW, lang.of("Respond.createGalaxySuccess")).toLegacyText(player))
+                    player.sendMessage(Text.of(UNDERLINE, AQUA, executeCallback {
+                        GUIHelper.open(player) { GalaxyManagement(galaxy) }
+                    }, lang.of("Respond.openGalaxyConsole").toLegacyText(player)))
                 } else {
-                    player.sendMessage(Text.of(RED, "已取消創建星系"))
+                    player.sendMessage(Text.of(RED, lang.of("Respond.createGalaxyCancel")).toLegacyText(player))
                 }
             }
             Action.ALL_GALAXY -> GUIHelper.open(player) { BrowserGalaxy() }

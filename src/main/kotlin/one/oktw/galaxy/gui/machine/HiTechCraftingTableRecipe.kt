@@ -30,8 +30,7 @@ import java.util.Arrays.asList
 
 class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, private val recipe: HiTechCraftingRecipe) : GUI() {
     companion object {
-        private val lang = Main.languageService.getDefaultLanguage()
-        private val vanillaLang = Main.vanillaLanguageService.getDefaultLanguage()
+        private val lang = Main.translationService
 
         private enum class Action {
             NONE,
@@ -92,11 +91,12 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
     override val token: String = "HiTechCraftingTableRecipe-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.HiTechCraftingTableRecipe"].let {
-            val result = recipe.result()
-            val name = result[Keys.DISPLAY_NAME].orElse(null)?.toPlain() ?: result.translation.toString()
-            it.format(name)
-        })))
+        .property(InventoryTitle.of(
+            recipe.result().let { result ->
+                val name = lang.removeStyle(lang.fromItem(result))
+                lang.ofPlaceHolder("UI.Title.HiTechCraftingTableRecipe", name)
+            }
+        ))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 
@@ -143,12 +143,12 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
     private fun offerDust(traveler: Traveler) {
         view.setSlot(Slot.DUST, getGUIItem(ButtonType.STARS).apply {
             offer(
-                Keys.DISPLAY_NAME, Text.of(lang["UI.Tip.StarDust"])
+                Keys.DISPLAY_NAME, lang.ofPlaceHolder("UI.Tip.StarDust")
             )
 
             offer(
                 Keys.ITEM_LORE, asList<Text>(
-                    Text.of(lang["UI.Tip.haveItemCount"].format(traveler.starDust))
+                    lang.ofPlaceHolder("UI.Tip.haveItemCount", traveler.starDust)
                 )
             )
         })
@@ -181,7 +181,7 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
         if (player.gameMode().get() == GameModes.CREATIVE) {
             // display the player is in creative mode
             view.setSlot(Slot.CRAFT, getGUIItem(ButtonType.OK).apply {
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, vanillaLang["gameMode.creative"]))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.GREEN, lang.translationUnscoped("gameMode.creative")))
             }, Action.CRAFT)
         } else {
             recipe.haveEnoughDust(traveler)
@@ -227,7 +227,7 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
 
             Action.CRAFT -> {
                 // we don't need to switch thread now
-                launch (Main.serverThread, start = CoroutineStart.UNDISPATCHED) {
+                launch(Main.serverThread, start = CoroutineStart.UNDISPATCHED) {
                     val traveler = TravelerHelper.getTraveler(player).await() ?: return@launch
 
                     if (player.gameMode().get() == GameModes.CREATIVE) {
@@ -238,7 +238,7 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
                         item.offer(Keys.REPRESENTED_ITEM, stack.createSnapshot())
 
                         player.world.spawnEntity(item)
-                    } else{
+                    } else {
                         // survival mode action
                         if (recipe.haveEnoughIngredient(player) && recipe.haveEnoughDust(traveler)) {
                             if (recipe.consume(player, traveler)) {

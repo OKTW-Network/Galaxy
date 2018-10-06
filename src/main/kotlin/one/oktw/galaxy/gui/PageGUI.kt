@@ -1,7 +1,7 @@
 package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.delay
-import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.gui.view.EventDetail
 import one.oktw.galaxy.gui.view.GridGUIView
@@ -13,7 +13,6 @@ import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
-import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
 import java.util.*
@@ -82,7 +81,7 @@ abstract class PageGUI<Data> : GUI() {
     }
 
     protected open val hasFunctionButtons: Boolean = false
-    private val lang = languageService.getDefaultLanguage()
+    private val lang = Main.translationService
     private var pageNumber = 0
     private val lock = OrderedLaunch()
 
@@ -176,7 +175,7 @@ abstract class PageGUI<Data> : GUI() {
         if (previous) {
             Button(ARROW_LEFT).createItemStack()
                 .apply {
-                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.PreviousPage"]))
+                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.GREEN, TextStyles.BOLD, lang.of("UI.Button.PreviousPage")))
                 }
                 .let { view.setSlot(Slot.PREV, it, Operation(Action.PrevPage)) }
         } else {
@@ -187,7 +186,7 @@ abstract class PageGUI<Data> : GUI() {
         if (next) {
             Button(ARROW_RIGHT).createItemStack()
                 .apply {
-                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.NextPage"]))
+                    offer(Keys.DISPLAY_NAME,lang.ofPlaceHolder(TextColors.GREEN, TextStyles.BOLD, lang.of("UI.Button.NextPage")))
                 }
                 .let { view.setSlot(Slot.NEXT, it, Operation(Action.NextPage)) }
         } else {

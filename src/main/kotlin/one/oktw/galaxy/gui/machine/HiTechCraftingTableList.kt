@@ -22,7 +22,6 @@ import org.spongepowered.api.item.inventory.InventoryArchetypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.inventory.property.InventoryTitle
-import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import java.util.*
 import java.util.Arrays.asList
@@ -32,7 +31,7 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     companion object {
         private const val CHANGE_PAGE_DELAY = 100
         private const val OFFER_ITEM_DELAY = 100
-        private val lang = Main.languageService.getDefaultLanguage()
+        private val lang = Main.translationService
 
         private enum class Action {
             NONE,
@@ -81,7 +80,7 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     override val token: String = "HiTechCraftingTableList-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.HiTechCraftingTableList"])))
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.HiTechCraftingTableList")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
 
@@ -106,6 +105,7 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     init {
         offerPage(currentPage, currentOffset)
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
+        registerEvent(InteractInventoryEvent.Open::class.java, this::openInventoryEvent)
     }
 
     private fun offerPage(page: Recipes.Companion.Type, offset: Int) = lock.launch {
@@ -141,7 +141,7 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
                 iterator.next().let {
                     Recipes.icons[it]!!.createStack()
                         .apply {
-                            offer(Keys.DISPLAY_NAME, Text.of(TextColors.AQUA, Recipes.names[it]!!))
+                            offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.AQUA, Recipes.names[it]!!))
                         }
                         .let { stack ->
                             row.add(
@@ -233,6 +233,13 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
             getGUIItem(ButtonType.GUI_CENTER)
         }.let {
             view.setSlots(Slot.NULL, it, null)
+        }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun openInventoryEvent(event: InteractInventoryEvent.Open) {
+        launch {
+            offerRecipes(currentPage, currentOffset)
         }
     }
 

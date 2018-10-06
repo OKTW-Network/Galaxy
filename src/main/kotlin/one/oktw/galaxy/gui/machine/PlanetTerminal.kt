@@ -1,7 +1,7 @@
 package one.oktw.galaxy.gui.machine
 
 import kotlinx.coroutines.experimental.launch
-import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.extensions.deserialize
@@ -12,6 +12,7 @@ import one.oktw.galaxy.galaxy.enums.Group.MEMBER
 import one.oktw.galaxy.gui.*
 import one.oktw.galaxy.item.enums.ButtonType.*
 import one.oktw.galaxy.item.type.Button
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
@@ -31,12 +32,12 @@ import java.util.*
 import java.util.Arrays.asList
 
 class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : GUI() {
-    private val lang = languageService.getDefaultLanguage()
+    private val lang = Main.translationService
     private val buttonID = Array(7) { UUID.randomUUID() }
     override val token = "PlanetTerminal-${galaxy.uuid}-${player.uniqueId}"
     override val inventory: Inventory = Inventory.builder()
         .of(if (galaxy.getGroup(player) == VISITOR) CHEST else DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.Title.PlanetTerminal"])))
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.PlanetTerminal")))
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 
@@ -46,56 +47,56 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
         val buttonExit = Button(EXIT).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.Button.BackToSpaceShip"]))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, BOLD, lang.of("UI.Button.BackToSpaceShip")))
             }
         val buttonListPlanet = Button(PLANET_LIST).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.PlanetList"]))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, lang.of("UI.Button.PlanetList")))
             }
         val buttonStarDust by lazy {
             Button(STARS).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[2]))
-                    offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.Button.StarDust"]))
+                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, BOLD, lang.of("UI.Button.StarDust")))
                 }
         }
         val buttonListMember by lazy {
             Button(MEMBERS).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[3]))
-                    offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.MemberList"]))
+                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, lang.of("UI.Button.MemberList")))
                 }
         }
         val buttonECS by lazy {
             Button(ECS).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[4]))
-                    offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.Button.ECS"]))
+                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, BOLD, lang.of("UI.Button.ECS")))
                 }
         }
         val buttonManageGalaxy by lazy {
             Button(GALAXY_SETTING).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[5]))
-                    offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.ManageGalaxy"]))
+                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, lang.of("UI.Button.ManageGalaxy")))
                 }
         }
         val buttonRequestJoin by lazy {
             Button(PLUS).createItemStack()
                 .apply {
                     if (player.uniqueId in galaxy.joinRequest) {
-                        offer(Keys.DISPLAY_NAME, Text.of(GRAY, lang["UI.Button.JoinRequestSent"]))
+                        offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GRAY, lang.of("UI.Button.JoinRequestSent")))
                     } else {
                         offer(DataUUID(buttonID[6]))
-                        offer(Keys.DISPLAY_NAME, Text.of(GREEN, lang["UI.Button.JoinRequest"]))
+                        offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, lang.of("UI.Button.JoinRequest")))
                     }
                 }
         }
         val buttonNotify by lazy {
             Button(WARNING).createItemStack()
                 .apply {
-                    offer(Keys.DISPLAY_NAME, Text.of(YELLOW, lang["UI.Button.GalaxyNotice"]))
+                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(YELLOW, lang.of("UI.Button.GalaxyNotice")))
                     offer(
                         Keys.ITEM_LORE,
                         galaxy.notice.split("\\n").map { Text.of(WHITE, it.deserialize()) }
@@ -108,13 +109,13 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
             .apply {
                 val planet = galaxy.getPlanet(player.world)!!
 
-                offer(Keys.DISPLAY_NAME, Text.of(GREEN, BOLD, lang["UI.Button.Info"]))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, BOLD, lang.of("UI.Button.Info")))
                 offer(
                     Keys.ITEM_LORE, asList(
-                        Text.of(BOLD, YELLOW, lang["UI.Tip.StarDust"], RESET, ":", galaxy.starDust),
-                        Text.of(BOLD, YELLOW, lang["UI.Tip.PlanetLevel"], RESET, ":", planet.level),
-                        Text.of(BOLD, YELLOW, lang["UI.Tip.PlanetRange"], RESET, ":", planet.size),
-                        Text.of(BOLD, YELLOW, lang["UI.Tip.PlanetEffect"], RESET, ":")
+                    lang.ofPlaceHolder(BOLD, YELLOW, lang.of("UI.Tip.StarDust"), RESET, ":", galaxy.starDust),
+                    lang.ofPlaceHolder(BOLD, YELLOW, lang.of("UI.Tip.PlanetLevel"), RESET, ":", planet.level),
+                    lang.ofPlaceHolder(BOLD, YELLOW, lang.of("UI.Tip.PlanetRange"), RESET, ":", planet.size),
+                    lang.ofPlaceHolder(BOLD, YELLOW, lang.of("UI.Tip.PlanetEffect"), RESET, ":")
                     ).apply { addAll(planet.effect.map { Text.of(BOLD, it.type.potionTranslation) }) }
                 )
             }
@@ -159,11 +160,11 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
             buttonID[1] -> GUIHelper.openAsync(player) { BrowserPlanet(galaxy.refresh()) }
             buttonID[2] -> GUIHelper.openAsync(player) {
                 NumberSelect(
-                    Text.of(lang["UI.Title.SelectStarDustCount"]),
+                    lang.ofPlaceHolder("UI.Title.SelectStarDustCount"),
                     asList(
-                        Text.of(
+                        lang.ofPlaceHolder(
                             GREEN,
-                            lang["UI.Tip.StarDustCount"].format(galaxy.refresh().getMember(player.uniqueId)?.starDust)
+                            lang.of("UI.Tip.StarDustCount", galaxy.refresh().getMember(player.uniqueId)?.starDust)
                         )
                     )
                 ) {
@@ -177,9 +178,9 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
                             galaxy.saveMember(member)
                             galaxy.update { giveStarDust(it) }
 
-                            player.sendMessage(Text.of(AQUA, lang["Respond.DonateStarDustTip"].format(it)))
+                            player.sendMessage(Text.of(AQUA, lang.of("Respond.DonateStarDustTip", it)).toLegacyText(player))
                         } else {
-                            player.sendMessage(Text.of(RED, lang["Respond.StarDustNotEnough"]))
+                            player.sendMessage(Text.of(RED, lang.of("Respond.StarDustNotEnough")).toLegacyText(player))
                         }
                     }
                 }
@@ -197,7 +198,7 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
                     set(
                         2,
                         2,
-                        Button(PLUS).createItemStack().apply { offer(Keys.DISPLAY_NAME, Text.of(GRAY, lang["UI.Button.JoinRequestSent"])) }
+                        Button(PLUS).createItemStack().apply { offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GRAY, lang.of("UI.Button.JoinRequestSent"))) }
                     )
                 }
             }

@@ -152,7 +152,7 @@ abstract class PageGUI<Data> : GUI() {
 
         offerButton(pageNumber != 0, showNextPage)
         offerNumber(pageNumber + 1) // make it start from one...
-        offerEmptySlot(pageNumber == 0, !showNextPage)
+        offerEmptySlot()
 
         if (hasFunctionButtons) {
             offerFunction()
@@ -178,6 +178,9 @@ abstract class PageGUI<Data> : GUI() {
                     offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.GREEN, TextStyles.BOLD, lang.of("UI.Button.PreviousPage")))
                 }
                 .let { view.setSlot(Slot.PREV, it, Operation(Action.PrevPage)) }
+        } else {
+            Button(UNCLICKABLE_ARROW_LEFT).createItemStack()
+                .let { view.setSlot(Slot.PREV, it, null) }
         }
 
         if (next) {
@@ -186,6 +189,9 @@ abstract class PageGUI<Data> : GUI() {
                     offer(Keys.DISPLAY_NAME,lang.ofPlaceHolder(TextColors.GREEN, TextStyles.BOLD, lang.of("UI.Button.NextPage")))
                 }
                 .let { view.setSlot(Slot.NEXT, it, Operation(Action.NextPage)) }
+        } else {
+            Button(UNCLICKABLE_ARROW_RIGHT).createItemStack()
+                .let { view.setSlot(Slot.NEXT, it, null) }
         }
     }
 
@@ -195,23 +201,13 @@ abstract class PageGUI<Data> : GUI() {
         view.setSlots(Slot.NUMBER, getNumbers(pageNumber, length))
     }
 
-    private fun offerEmptySlot(fillPrev: Boolean, fillNext: Boolean) {
+    private fun offerEmptySlot() {
         view.countSlots(Slot.NULL)
             .let { (0 until it) }
             .map {
                 Button(GUI_CENTER).createItemStack()
             }
             .let { view.setSlots(Slot.NULL, it) }
-
-        if (fillPrev) {
-            Button(GUI_CENTER).createItemStack()
-                .let { view.setSlot(Slot.PREV, it, null) }
-        }
-
-        if (fillNext) {
-            Button(GUI_CENTER).createItemStack()
-                .let { view.setSlot(Slot.NEXT, it, null) }
-        }
     }
 
     private suspend fun offerFunction() {

@@ -19,6 +19,8 @@ class Admin : CommandBase {
         .child(DeleteWorld().spec, "deleteWorld")
         .child(UnloadWorld().spec, "unloadWorld")
         .child(Book().spec, "book")
+        .child(GivePlayerStarDust().spec, "givePlayerStarDust")
+        .child(TakePlayerStarDust().spec, "takePlayerStarDust")
         .executor(this)
         .build()
 

@@ -25,6 +25,8 @@ class GalaxyManage : CommandBase {
             .child(RemoveGalaxy().spec, "removeGalaxy")
             .child(RemovePlanet().spec, "removePlanet")
             .child(Dividends().spec, "dividends")
+            .child(GiveStarDust().spec, "giveStarDust")
+            .child(TakeStarDust().spec, "takeStarDust")
             .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {

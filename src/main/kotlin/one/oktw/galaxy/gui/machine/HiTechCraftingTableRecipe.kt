@@ -22,6 +22,7 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.event.PostHiTectCraftEvent
 import one.oktw.galaxy.galaxy.data.extensions.saveMember
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper
 import one.oktw.galaxy.galaxy.traveler.data.Traveler
@@ -31,6 +32,7 @@ import one.oktw.galaxy.gui.view.GridGUIView
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.type.Button
 import one.oktw.galaxy.recipe.HiTechCraftingRecipe
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
@@ -250,24 +252,51 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
 
                     if (player.gameMode().get() == GameModes.CREATIVE) {
                         // creative mode action
-                        val stack = recipe.result()
+                        val stack = recipe.result(player, traveler)
                         val item = player.world.createEntity(EntityTypes.ITEM, player.position)
+                        val galaxy = Main.galaxyManager.get(player.world) ?: return@launch
 
                         item.offer(Keys.REPRESENTED_ITEM, stack.createSnapshot())
 
-                        player.world.spawnEntity(item)
+                        PostHiTectCraftEvent(
+                            stack.createSnapshot(),
+                            player,
+                            galaxy,
+                            traveler,
+                            event.cause
+                        ).also {
+                            Sponge.getEventManager().post(it)
+                        }.also {
+                            if (!it.isCancelled) {
+                                player.world.spawnEntity(item)
+                            }
+                        }
+
+                        galaxy.saveMember(traveler)
                     } else {
                         // survival mode action
                         if (recipe.haveEnoughIngredient(player) && recipe.haveEnoughDust(traveler)) {
                             if (recipe.consume(player, traveler)) {
-                                val stack = recipe.result()
+                                val stack = recipe.result(player, traveler)
                                 val item = player.world.createEntity(EntityTypes.ITEM, player.position)
+                                val galaxy = Main.galaxyManager.get(player.world) ?: return@launch
 
                                 item.offer(Keys.REPRESENTED_ITEM, stack.createSnapshot())
 
-                                player.world.spawnEntity(item)
+                                PostHiTectCraftEvent(
+                                    stack.createSnapshot(),
+                                    player,
+                                    galaxy,
+                                    traveler,
+                                    event.cause
+                                ).also {
+                                    Sponge.getEventManager().post(it)
+                                }.also {
+                                    if (!it.isCancelled) {
+                                        player.world.spawnEntity(item)
+                                    }
+                                }
 
-                                val galaxy = Main.galaxyManager.get(player.world) ?: return@launch
                                 galaxy.saveMember(traveler)
 
                                 val newTraveler = TravelerHelper.getTraveler(player) ?: return@launch

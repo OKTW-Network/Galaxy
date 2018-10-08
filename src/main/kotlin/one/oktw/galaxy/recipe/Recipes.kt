@@ -231,6 +231,7 @@ class Recipes {
                     .add(Material(MaterialType.CPU), 1)
                     .cost(250)
                     .result(Gun().createItemStack())
+                    .customItemResult { Gun() }
                     .build()
             )
         }.plus(weapons)

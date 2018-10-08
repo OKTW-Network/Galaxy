@@ -3,7 +3,6 @@ package one.oktw.galaxy.command.admin.galaxyManage
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.command.CommandBase
-import one.oktw.galaxy.extensions.serialize
 import one.oktw.galaxy.galaxy.data.extensions.update
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
@@ -38,8 +37,8 @@ class Notice : CommandBase {
             }
 
             if (galaxyUUID != null) {
-                galaxy!!.update { notice = Text.of(text).serialize() }
-                src.sendMessage(Text.of(GREEN, "Notice of ${galaxy.name} was set to: \n${Text.of(text).serialize()}"))
+                galaxy!!.update { notice = text }
+                src.sendMessage(Text.of(GREEN, "Notice of ${galaxy.name} was set to $text!"))
 
             } else {
                 src.sendMessage(Text.of(RED, "Not enough argument: galaxy not found or missing."))

@@ -146,6 +146,26 @@ class Gun {
     @Listener
     fun onHeld(event: ChangeInventoryEvent.Held, @Root player: Player) = onChangeInventory(event, player)
 
+    @Listener
+    fun onGunItemCraft(event: PostHiTectCraftEvent) {
+        if (event.item[DataItemType.key].orElse(null) in asList(ItemType.PISTOL, ItemType.SNIPER)) {
+            event.isCancelled = true
+        }
+    }
+
+    @Listener
+    fun onGunCraft(event: CustomItemCraftEvent) {
+        (event.item as? Gun)?.let {
+            val player = event.player
+            val traveler = event.traveler
+            traveler.item.add(it)
+            val res = player.inventory.offer(it.createItemStack())
+            if (res.type != InventoryTransactionResult.Type.SUCCESS) {
+                event.player.sendMessage(lang.of("Respond.weaponDelivered").toLegacyText(player))
+            }
+        }
+    }
+
     @Suppress("unused", "UNUSED_PARAMETER")
     private fun onChangeInventory(event: ChangeInventoryEvent, @Getter("getSource") player: Player) {
         val mainHand = player.getItemInHand(MAIN_HAND).filter { it[DataEnable.key].isPresent }.orElse(null)
@@ -332,25 +352,5 @@ class Gun {
         }?.copy()?.let { doUpgrade(it) }
 
         gun1?.let { CoolDown.showActionBar(player, gun1, gun2) }
-    }
-
-    @Listener
-    private fun onGunItemCraft(event: PostHiTectCraftEvent) {
-        if (event.item[DataItemType.key].orElse(null) in asList(ItemType.PISTOL, ItemType.SNIPER)) {
-            event.isCancelled = true
-        }
-    }
-
-    @Listener
-    private fun onGunCraft(event: CustomItemCraftEvent) {
-        (event.item as? Gun)?.let {
-            val player = event.player
-            val traveler = event.traveler
-            traveler.item.add(it)
-            val res = player.inventory.offer(it.createItemStack())
-            if (res.type != InventoryTransactionResult.Type.SUCCESS) {
-                event.player.sendMessage(lang.of("Respond.weaponDelivered").toLegacyText(player))
-            }
-        }
     }
 }

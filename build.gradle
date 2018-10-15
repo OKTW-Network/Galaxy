@@ -42,7 +42,7 @@ repositories {
 }
 
 minecraft {
-    version = "1.12.2-14.23.4.2768"
+    version = "1.12.2-14.23.5.2768"
     mappings = "stable_39"
     makeObfSourceJar = false
 }

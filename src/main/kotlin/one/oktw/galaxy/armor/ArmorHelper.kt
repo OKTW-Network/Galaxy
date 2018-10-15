@@ -1,5 +1,7 @@
 package one.oktw.galaxy.armor
 
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.withContext
 import net.minecraft.entity.SharedMonsterAttributes
@@ -30,7 +32,7 @@ import java.util.Arrays.asList
 
 class ArmorHelper {
     companion object {
-        fun offerArmor(player: Player) = launch {
+        fun offerArmor(player: Player) = GlobalScope.launch(Dispatchers.Default) {
             val lang = Main.translationService
             val upgrade = getTraveler(player).await()?.armor ?: return@launch
             val helmet: ItemStack = getArmor(DIAMOND_HELMET)
@@ -115,7 +117,7 @@ class ArmorHelper {
             // TODO
         }
 
-        fun toggleLeggings(player: Player) = launch(serverThread) {
+        fun toggleLeggings(player: Player) = GlobalScope.launch(serverThread) {
             val item = player.leggings.get()
             val armor = getTraveler(player).await()?.armor ?: return@launch
 
@@ -128,7 +130,7 @@ class ArmorHelper {
             player.setLeggings(toggleArmorStatus(item))
         }
 
-        fun toggleBoots(player: Player) = launch(serverThread) {
+        fun toggleBoots(player: Player) = GlobalScope.launch(serverThread) {
             val item = player.boots.get()
             val armor = getTraveler(player).await()?.armor ?: return@launch
 

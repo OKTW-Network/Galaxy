@@ -1,7 +1,6 @@
 package one.oktw.galaxy.util
 
-import kotlinx.coroutines.experimental.CoroutineScope
-import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.experimental.*
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class OrderedLaunch {
@@ -11,9 +10,9 @@ class OrderedLaunch {
     private fun runTask() {
         if (todos.size > 0) {
             val todo = todos.poll()
-            activatedJob = kotlinx.coroutines.experimental.launch(block = todo)
+            activatedJob = GlobalScope.launch(Dispatchers.Default, block = todo)
 
-            kotlinx.coroutines.experimental.launch {
+            GlobalScope.launch(Dispatchers.Default) {
                 (activatedJob as Job).join()
                 activatedJob = null
 

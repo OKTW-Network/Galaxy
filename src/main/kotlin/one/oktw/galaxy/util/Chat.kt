@@ -1,5 +1,7 @@
 package one.oktw.galaxy.util
 
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
@@ -57,8 +59,8 @@ class Chat {
             inputStatus[player] = Pair(listener, continuation)
 
             // Timeout 5 min
-            launch {
-                delay(5, MINUTES)
+            GlobalScope.launch(Dispatchers.Default) {
+                delay(MINUTES.toMillis(5))
 
                 if (inputStatus[player]?.first === listener) {
                     eventManager.unregisterListeners(listener)
@@ -93,8 +95,8 @@ class Chat {
             )
 
             // Timeout 5 min
-            launch {
-                delay(5, MINUTES)
+            GlobalScope.launch(Dispatchers.Default) {
+                delay(MINUTES.toMillis(5))
 
                 if (!lock) {
                     lock = true

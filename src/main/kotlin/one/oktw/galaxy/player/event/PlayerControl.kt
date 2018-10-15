@@ -1,5 +1,6 @@
 package one.oktw.galaxy.player.event
 
+import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
@@ -55,14 +56,14 @@ class PlayerControl {
         planetResourcePack = config.getNode("planet").string?.let { ResourcePacks.fromUri(URI(it)) }
 
         // Auto save player data every 1 min
-        launch(serverThread) {
+        GlobalScope.launch(serverThread) {
             val server = Sponge.getServer()
             var players = server.onlinePlayers.iterator()
 
             while (true) {
                 if (!players.hasNext()) {
                     players = server.onlinePlayers.iterator()
-                    delay(1, TimeUnit.MINUTES)
+                    delay(TimeUnit.MINUTES.toMillis(1))
                     continue
                 }
 
@@ -74,7 +75,7 @@ class PlayerControl {
 
                     galaxy.getMember(player.uniqueId)?.also {
                         galaxy.saveMember(saveTraveler(it, player))
-                        delay(10, TimeUnit.SECONDS)
+                        delay(TimeUnit.SECONDS.toMillis(10))
                     }
                 } catch (e: RuntimeException) {
                     main.logger.error("Saving player data error", e)
@@ -103,7 +104,7 @@ class PlayerControl {
         // make player as viewer for safe
         setViewer(player.uniqueId)
 
-        launch(serverThread) {
+        GlobalScope.launch(serverThread) {
             val galaxy = galaxyManager.get(player.world)
 
             // restore player data
@@ -141,7 +142,7 @@ class PlayerControl {
         if (isViewer(player.uniqueId)) return // skip viewer
 
         // save and clean player
-        launch(serverThread) {
+        GlobalScope.launch(serverThread) {
             galaxyManager.get(player.world)?.run {
                 getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)) }
             }
@@ -157,7 +158,7 @@ class PlayerControl {
         // make player as viewer for safe
         setViewer(player.uniqueId)
 
-        launch(serverThread) {
+        GlobalScope.launch(serverThread) {
             val from = galaxyManager.get(event.fromTransform.extent)
             val to = galaxyManager.get(event.toTransform.extent)
 

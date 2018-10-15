@@ -1,5 +1,7 @@
 package one.oktw.galaxy.gui.machine
 
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.chunkLoaderManager
@@ -46,7 +48,7 @@ class ChunkLoader(private val entity: Entity) : GUI() {
         .build(main)
 
     init {
-        launch { chunkLoader = chunkLoaderManager.get(uuid).await() ?: return@launch }
+        GlobalScope.launch(Dispatchers.Default) { chunkLoader = chunkLoaderManager.get(uuid) ?: return@launch }
 
         // fill inventory
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
@@ -132,6 +134,6 @@ class ChunkLoader(private val entity: Entity) : GUI() {
             GUIHelper.close(upgradeGUI.token)
         }
 
-        launch { chunkLoaderManager.delete(uuid) }
+        GlobalScope.launch(Dispatchers.Default) { chunkLoaderManager.delete(uuid) }
     }
 }

@@ -4,7 +4,7 @@ import kotlinx.coroutines.experimental.*
 import org.spongepowered.api.scheduler.Task
 
 class DelayedExecute(private val plugin: Any) {
-    fun <T> launch(tick: Long = 1, block: () -> T): Job = launch(start = CoroutineStart.UNDISPATCHED) {
+    fun <T> launch(tick: Long = 1, block: () -> T): Job = GlobalScope.launch(start = CoroutineStart.UNDISPATCHED) {
         run(tick, block)
     }
 

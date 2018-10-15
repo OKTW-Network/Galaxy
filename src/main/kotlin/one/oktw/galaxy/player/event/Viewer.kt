@@ -1,5 +1,6 @@
 package one.oktw.galaxy.player.event
 
+import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.launch
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.WorldServer
@@ -50,7 +51,7 @@ class Viewer {
 
         fun setViewer(uuid: UUID) {
             viewer += uuid
-            launch(serverThread) {
+            GlobalScope.launch(serverThread) {
                 Sponge.getServer().getPlayer(uuid).ifPresent {
                     it.offer(GAME_MODE, ADVENTURE)
                     it.isSleepingIgnored = true
@@ -66,7 +67,7 @@ class Viewer {
 
         fun removeViewer(uuid: UUID) {
             viewer -= uuid
-            launch(serverThread) { Sponge.getServer().getPlayer(uuid).ifPresent { it.isSleepingIgnored = false } }
+            GlobalScope.launch(serverThread) { Sponge.getServer().getPlayer(uuid).ifPresent { it.isSleepingIgnored = false } }
         }
     }
 

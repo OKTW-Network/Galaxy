@@ -1,5 +1,6 @@
 package one.oktw.galaxy.economy.service
 
+import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.consumeEach
 import one.oktw.galaxy.Main.Companion.galaxyManager
@@ -20,7 +21,7 @@ class EconomyService {
         }
 
         private fun dailyTask() {
-            launch {
+            GlobalScope.launch {
                 galaxyManager.listGalaxy().consumeEach {
                     it.giveInterest()
                     galaxyManager.saveGalaxy(it)

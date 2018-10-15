@@ -1,5 +1,7 @@
 package one.oktw.galaxy.block.event
 
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.block.enums.CustomBlocks.*
@@ -24,7 +26,9 @@ class BlockGUI {
         when (blockType) {
             DUMMY -> Unit
             CONTROL_PANEL -> GUIHelper.open(player) { MainMenu(player) }
-            PLANET_TERMINAL -> launch { galaxyManager.get(player.world)?.let { GUIHelper.open(player) { PlanetTerminal(it, player) } } }
+            PLANET_TERMINAL -> GlobalScope.launch(Dispatchers.Default) {
+                galaxyManager.get(player.world)?.let { GUIHelper.open(player) { PlanetTerminal(it, player) } }
+            }
             HT_CRAFTING_TABLE -> GUIHelper.open(player) { HiTechCraftingTableList(player) }
             else -> Unit
         }

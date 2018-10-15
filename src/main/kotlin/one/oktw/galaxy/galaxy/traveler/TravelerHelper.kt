@@ -1,5 +1,7 @@
 package one.oktw.galaxy.galaxy.traveler
 
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.async
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
@@ -14,7 +16,7 @@ import org.spongepowered.api.item.inventory.Slot
 
 class TravelerHelper {
     companion object {
-        fun getTraveler(player: Player) = async { galaxyManager.get(player.world)?.getMember(player.uniqueId) }
+        fun getTraveler(player: Player) = GlobalScope.async(Dispatchers.Default) { galaxyManager.get(player.world)?.getMember(player.uniqueId) }
 
         fun saveTraveler(traveler: Traveler, player: Player): Traveler {
             traveler.experience = player[TOTAL_EXPERIENCE].get()

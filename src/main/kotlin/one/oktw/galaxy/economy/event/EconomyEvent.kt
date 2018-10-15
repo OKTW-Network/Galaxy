@@ -1,5 +1,6 @@
 package one.oktw.galaxy.economy.event
 
+import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.launch
 import net.minecraftforge.event.entity.player.PlayerPickupXpEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -27,7 +28,7 @@ class EconomyEvent {
 
         if (event.orb.xpValue == 0) return
 
-        launch {
+        GlobalScope.launch {
             galaxyManager.get(player.world)?.run {
                 getMember(player.uniqueId)
                     ?.apply {
@@ -39,6 +40,5 @@ class EconomyEvent {
                     ?.let { saveMember(it) }
             }
         }
-
     }
 }

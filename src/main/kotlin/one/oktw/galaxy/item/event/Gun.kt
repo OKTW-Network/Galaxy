@@ -2,6 +2,8 @@ package one.oktw.galaxy.item.event
 
 import com.flowpowered.math.imaginary.Quaterniond
 import com.flowpowered.math.vector.Vector3d
+import kotlinx.coroutines.experimental.CoroutineScope
+import kotlinx.coroutines.experimental.Dispatchers
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import net.minecraft.entity.EntityLivingBase
@@ -48,7 +50,9 @@ import org.spongepowered.api.world.extent.EntityUniverse.EntityHit
 import java.lang.Math.random
 import kotlin.math.roundToInt
 
-class Gun {
+class Gun : CoroutineScope {
+    override val coroutineContext = Dispatchers.Default
+
     @Listener
     @Suppress("unused")
     fun onInteractItem(event: InteractItemEvent.Secondary.MainHand, @Getter("getSource") player: Player) {
@@ -56,13 +60,13 @@ class Gun {
         if (itemStack.type != DIAMOND_SWORD || !itemStack[DataUUID.key].isPresent) return
 
         val world = player.world
-        var direction =
-            Quaterniond.fromAxesAnglesDeg(player.rotation.x, -player.rotation.y, player.rotation.z).direction
+        var direction = Quaterniond.fromAxesAnglesDeg(player.rotation.x, -player.rotation.y, player.rotation.z).direction
         val source = player.getProperty(EyeLocationProperty::class.java)
             .map(EyeLocationProperty::getValue).orElse(null)?.add(direction) ?: return
 
         launch {
             val gun = (getTraveler(player).await()!!.item
+                .asSequence()
                 .filter { it is Gun }
                 .find { (it as Gun).uuid == itemStack[DataUUID.key].get() } as? Gun ?: return@launch)
                 .copy()
@@ -72,9 +76,7 @@ class Gun {
 
             showActionBar(player)
 
-            if (!player[IS_SNEAKING].get()) {
-                direction = drift(direction)
-            }
+            if (!player[IS_SNEAKING].get()) direction = drift(direction)
 
             val target = getTarget(world, source, direction, gun.range).await()
             val wall = getWall(
@@ -103,7 +105,7 @@ class Gun {
     fun onChangeDataHolder(event: ChangeDataHolderEvent.ValueChange, @Getter("getTargetHolder") @Has(SneakingData::class) player: Player) {
         player.getItemInHand(MAIN_HAND).filter { it[DataEnable.key].isPresent }.ifPresent {
             val sneak: Boolean = event.endResult.successfulData.firstOrNull { it.key == IS_SNEAKING }?.get() as Boolean?
-                    ?: player[IS_SNEAKING].get()
+                ?: player[IS_SNEAKING].get()
             if (it[DataEnable.key].get() != sneak) {
                 player.setItemInHand(MAIN_HAND, toggleScope(it))
             }
@@ -297,10 +299,10 @@ class Gun {
     private suspend fun showActionBar(player: Player) {
         val traveler = getTraveler(player).await() ?: return
         val gun1 = player.getItemInHand(MAIN_HAND).orElse(null)?.run {
-            traveler.item.filterIsInstance(Gun::class.java).firstOrNull { it.uuid == get(DataUUID.key).orElse(null) }
+            traveler.item.asSequence().filterIsInstance(Gun::class.java).firstOrNull { it.uuid == get(DataUUID.key).orElse(null) }
         }?.copy()?.let { doUpgrade(it) }
         val gun2 = player.getItemInHand(OFF_HAND).orElse(null)?.run {
-            traveler.item.filterIsInstance(Gun::class.java).firstOrNull { it.uuid == get(DataUUID.key).orElse(null) }
+            traveler.item.asSequence().filterIsInstance(Gun::class.java).firstOrNull { it.uuid == get(DataUUID.key).orElse(null) }
         }?.copy()?.let { doUpgrade(it) }
 
         gun1?.let { CoolDown.showActionBar(player, gun1, gun2) }

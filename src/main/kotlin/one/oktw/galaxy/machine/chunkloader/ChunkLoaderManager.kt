@@ -2,7 +2,8 @@ package one.oktw.galaxy.machine.chunkloader
 
 import com.flowpowered.math.vector.Vector3i
 import com.mongodb.client.model.Filters.eq
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.awaitFirstOrNull
 import kotlinx.coroutines.experimental.reactive.consumeEach
@@ -36,7 +37,7 @@ class ChunkLoaderManager {
 
         logger.info("Loading world has ChunkLoader...")
 
-        launch {
+        GlobalScope.launch(Dispatchers.Default) {
             collection.find().consumeEach {
                 val planet = it.position.planet?.let { galaxyManager.get(planet = it)?.getPlanet(it) }
 
@@ -75,7 +76,7 @@ class ChunkLoaderManager {
         return ticket
     }
 
-    private fun reload(world: World) = launch {
+    private fun reload(world: World) = GlobalScope.launch(Dispatchers.Default) {
         logger.info("Reloading ChunkLoader in \"{}\" ...", world.name)
 
         val planet = galaxyManager.get(world)?.getPlanet(world) ?: return@launch
@@ -99,16 +100,14 @@ class ChunkLoaderManager {
         return chunkLoader
     }
 
-    fun get(uuid: UUID) = async {
-        return@async collection.find(eq("uuid", uuid)).awaitFirstOrNull()
-    }
+    suspend fun get(uuid: UUID) = collection.find(eq("uuid", uuid)).awaitFirstOrNull()
 
     suspend fun delete(uuid: UUID) {
         worldTickets[uuid]?.release()
         collection.deleteOne(eq("uuid", uuid)).awaitFirstOrNull()
     }
 
-    fun update(chunkLoader: ChunkLoader, reload: Boolean = false) = launch {
+    fun update(chunkLoader: ChunkLoader, reload: Boolean = false) = GlobalScope.launch(Dispatchers.Default) {
         collection.replaceOne(eq("uuid", chunkLoader.uuid), chunkLoader).awaitFirstOrNull()
 
         if (reload) {

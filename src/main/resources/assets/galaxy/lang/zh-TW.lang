@@ -151,6 +151,6 @@ Respond.TooMuchFramesThatSide="目的地傳送站設置了過多的框架"
 block.TELEPORTER=傳送站
 block.TELEPORTER_ADVANCED=高級傳送站
 block.TELEPORTER_FRAME=傳送框架
-Respond.TeleportCountDown="即將於 %d 秒後進行傳送, 請勿離開傳送中樞"
+Respond.TeleportCountDown="即將於 %s 秒後進行傳送, 請勿離開傳送中樞"
 Respond.TeleportCancelled="由於主持人離開了傳送中樞, 傳送已取消"
 Respond.TeleportStart="傳送即將開始, 祝旅途愉快"

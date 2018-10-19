@@ -86,8 +86,6 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
         registerEvent(InteractInventoryEvent.Close::class.java, this::closeInventoryEvent)
-
-        // main.logger.info("event registered")
     }
 
     override suspend fun get(number: Int, skip: Int): List<Pair<ItemStack, UUID>> {
@@ -102,6 +100,13 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
         for (targetTransporter in teleporters) {
             // don't tp to itself
             if (teleporter.uuid == targetTransporter.uuid) continue
+            // don't tp from advanced to normal one in another planet
+            if (
+                teleporter.crossPlanet &&
+                !targetTransporter.crossPlanet &&
+                teleporter.position.planet != targetTransporter.position.planet
+            ) continue
+
             val uuid = targetTransporter.position.planet ?: continue
             val planet = Main.galaxyManager.get(null, uuid)?.getPlanet(uuid) ?: continue
 
@@ -283,7 +288,6 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
             position.floorY != (teleporter.position.y.toInt() + 1) ||
             position.floorZ != teleporter.position.z.toInt()
         ) {
-            // main.logger.info("cancelled")
             CountDown.instance.cancel(player)
         }
     }

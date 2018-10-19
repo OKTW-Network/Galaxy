@@ -206,7 +206,7 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
 
             val targetFrames = targetTeleporter.position
                 .let { Location(targetWorld, it.x, it.y, it.z) }
-                .let { TeleporterHelper.searchTeleporterFrame(it, MAX_FRAME); }
+                .let { TeleporterHelper.searchTeleporterFrame(it, MAX_FRAME) }
                 ?.values
                 ?.let { ArrayList(it) }
 

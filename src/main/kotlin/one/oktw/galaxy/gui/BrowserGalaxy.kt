@@ -43,11 +43,12 @@ import kotlin.streams.toList
 
 class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companion.Wrapper>() {
     companion object {
-        enum class Function(val icon: ButtonType) {
-            SORT_NUMBER(ButtonType.SORT_NUMBER),
-            SORT_NAME(ButtonType.SORT_NAME),
-            LIST(ButtonType.WRITE),
-            NEW_GALAXY(ButtonType.PLUS)
+        enum class Function(val icon: ButtonType, val tips: String) {
+            SORT_NUMBER(ButtonType.SORT_NUMBER, "WIP"),
+            SORT_NAME(ButtonType.SORT_NAME, "WIP"),
+            LIST_ALL(ButtonType.GALAXY, "UI.Button.ListAllGalaxy"),
+            LIST_JOIN(ButtonType.GALAXY_JOINED, "UI.Button.ListJoinedGalaxy"),
+            NEW_GALAXY(ButtonType.PLUS, "UI.Button.CreateGalaxy")
         }
 
         data class Wrapper(
@@ -156,7 +157,7 @@ class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companio
             .subList(0, count)
             .map {
                 if (it != null) {
-                    Pair(Button(it.icon).createItemStack(), Wrapper(function = it))
+                    Pair(Button(it.icon).createItemStack().apply { offer(DISPLAY_NAME, lang.ofPlaceHolder(it.tips)) }, Wrapper(function = it))
                 } else {
                     Pair(Button(ButtonType.GUI_CENTER).createItemStack(), null)
                 }

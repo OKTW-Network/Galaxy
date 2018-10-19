@@ -10,6 +10,7 @@ import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
 import one.oktw.galaxy.galaxy.planet.TeleportHelper
+import one.oktw.galaxy.galaxy.planet.data.extensions.toVector3d
 import one.oktw.galaxy.galaxy.planet.enums.PlanetType
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.PageGUI

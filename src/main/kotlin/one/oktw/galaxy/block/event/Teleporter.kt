@@ -45,9 +45,10 @@ class Teleporter {
 
     init {
         Keys.IS_SNEAKING.registerEvent(Player::class.java) { event ->
+            val player = event.targetHolder as? Player ?: return@registerEvent
+
             if (event.endResult.successfulData.firstOrNull { it.key == Keys.IS_SNEAKING }?.get() != true) return@registerEvent
 
-            val player = event.targetHolder as? Player ?: return@registerEvent
             val location = player.location.sub(0.0, 1.0, 0.0)
 
             if (location.blockType != BlockTypes.MOB_SPAWNER) return@registerEvent

@@ -292,34 +292,6 @@ class RecipeRegister {
                     .result(FakeBlockItem(ELEVATOR).createItemStack())
                     .build("elevator", main)
             )
-
-
-            register(
-                ShapelessCraftingRecipe.builder()
-                    .addIngredient(of(DIAMOND_BLOCK))
-                    .addIngredient(of(ENDER_PEARL))
-                    .addIngredient(of(IRON_BLOCK))
-                    .result(FakeBlockItem(TELEPORTER).createItemStack())
-                    .build("teleporter", main)
-            )
-
-            register(
-                ShapelessCraftingRecipe.builder()
-                    .addIngredient(of(EMERALD_BLOCK))
-                    .addIngredient(of(ENDER_PEARL))
-                    .addIngredient(of(IRON_BLOCK))
-                    .result(FakeBlockItem(TELEPORTER_ADVANCED).createItemStack())
-                    .build("advanced_portal", main)
-            )
-
-            register(
-                ShapelessCraftingRecipe.builder()
-                    .addIngredient(of(GOLD_BLOCK))
-                    .addIngredient(of(ENDER_PEARL))
-                    .addIngredient(of(IRON_BLOCK))
-                    .result(FakeBlockItem(TELEPORTER_FRAME).createItemStack())
-                    .build("portal_frame", main)
-            )
         }
 
         Sponge.getRegistry().smeltingRecipeRegistry.apply {

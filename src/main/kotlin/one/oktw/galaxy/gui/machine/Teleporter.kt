@@ -254,7 +254,7 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
             TeleportHelper.teleport(
                 player,
                 // offset y by 1, so you are on the top of block, offset x and z by 0.5, so you are on the center of block
-                Location(targetWorld, targetTeleporter.position.x + 0.5, targetTeleporter.position.y + 1, targetTeleporter.position.z + 0.5)
+                Location(targetWorld, targetTeleporter.position.toVector3d().add(0.5, 1.0, 0.5))
             )
         }
     }

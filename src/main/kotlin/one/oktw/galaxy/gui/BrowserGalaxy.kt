@@ -51,6 +51,8 @@ class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companio
             NEW_GALAXY(ButtonType.PLUS, "UI.Button.CreateGalaxy")
         }
 
+        private enum class Sort { NAME, NUMBER }
+
         data class Wrapper(
             val uuid: UUID? = null,
             val function: Function? = null
@@ -75,6 +77,7 @@ class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companio
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
     private var list = galaxyManager.get(player)
     private var listAll = false
+    private var sort = Sort.NAME
     override val token = "BrowserGalaxy-${player.uniqueId}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
@@ -147,7 +150,14 @@ class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companio
     }
 
     override suspend fun getFunctionButtons(count: Int): List<Pair<ItemStack, Wrapper?>> {
-        val list = values().asList()
+        val list = values().toMutableList().apply {
+            if (listAll) remove(LIST_ALL) else remove(LIST_JOIN)
+
+            when (sort) {
+                BrowserGalaxy.Companion.Sort.NAME -> removeAll(asList(SORT_NAME))
+                BrowserGalaxy.Companion.Sort.NUMBER -> removeAll(asList(SORT_NUMBER))
+            }
+        }
 
         return ArrayList<Function?>()
             .apply {
@@ -194,13 +204,14 @@ class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companio
                 val function = detail.primary.data?.function ?: return
 
                 when (function) {
-                    SORT_NUMBER -> {
-                        // TODO sort
+                    SORT_NUMBER, SORT_NAME -> {
+                        when (function) {
+                            SORT_NUMBER -> sort = Sort.NUMBER
+                            SORT_NAME -> sort = Sort.NAME
+                            else -> Unit
+                        }
                     }
-                    SORT_NAME -> {
-                        // TODO sort
-                    }
-                    LIST -> {
+                    LIST_ALL, LIST_JOIN -> {
                         list = if (listAll) galaxyManager.get(player) else galaxyManager.listGalaxy()
 
                         listAll = !listAll

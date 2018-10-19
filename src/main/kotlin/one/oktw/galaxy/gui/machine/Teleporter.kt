@@ -193,7 +193,7 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
             val targetWorld = PlanetHelper.loadPlanet(targetPlanet) ?: return@launch
 
             val sourceFrames = teleporter.position
-                .let { Location(player.world, it.x, it.y, it.z) }
+                .run { Location(player.world, x, y, z) }
                 .let { TeleporterHelper.searchTeleporterFrame(it, MAX_FRAME); }
 
             if (sourceFrames == null) {

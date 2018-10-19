@@ -208,8 +208,7 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
             val targetFrames = targetTeleporter.position
                 .let { Location(targetWorld, it.x, it.y, it.z) }
                 .let { TeleporterHelper.searchTeleporterFrame(it, MAX_FRAME) }
-                ?.values
-                ?.let { ArrayList(it) }
+                ?.run { ArrayList(values) }
 
             if (targetFrames == null) {
                 player.sendMessage(lang.of("Respond.TooMuchFramesThatSide").toLegacyText(player))

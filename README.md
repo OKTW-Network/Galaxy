@@ -2,3 +2,10 @@
 OKTW插件服-星系計畫
 
 [Dropbox Paper](https://paper.dropbox.com/doc/i2echYaLHbj8YMP3f1loB)
+
+
+## How to build
+
+1. Clone project
+1. `./gradlew setupDecompWorkspace`
+1. `./gradlew build --refresh-dependencies`

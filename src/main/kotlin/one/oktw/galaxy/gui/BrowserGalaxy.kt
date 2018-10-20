@@ -38,7 +38,6 @@ import org.spongepowered.api.text.format.TextStyles.BOLD
 import org.spongepowered.api.text.format.TextStyles.UNDERLINE
 import java.util.*
 import java.util.Arrays.asList
-import kotlin.collections.ArrayList
 import kotlin.streams.toList
 
 class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companion.Wrapper>() {
@@ -150,28 +149,24 @@ class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companio
     }
 
     override suspend fun getFunctionButtons(count: Int): List<Pair<ItemStack, Wrapper?>> {
-        val list = values().toMutableList().apply {
-            if (listAll) remove(LIST_ALL) else remove(LIST_JOIN)
-
+        val list = arrayListOf<Function?>(
+            if (listAll) LIST_ALL else LIST_JOIN,
             when (sort) {
-                BrowserGalaxy.Companion.Sort.NAME -> removeAll(asList(SORT_NAME))
-                BrowserGalaxy.Companion.Sort.NUMBER -> removeAll(asList(SORT_NUMBER))
+                Sort.NAME -> SORT_NAME
+                Sort.NUMBER -> SORT_NUMBER
+            },
+            NEW_GALAXY
+        )
+
+        list.addAll((0 until count - list.size).map { null })
+
+        return list.map {
+            if (it != null) {
+                Pair(Button(it.icon).createItemStack().apply { offer(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, it.tips)) }, Wrapper(function = it))
+            } else {
+                Pair(Button(ButtonType.GUI_CENTER).createItemStack(), null)
             }
         }
-
-        return ArrayList<Function?>()
-            .apply {
-                addAll(list)
-                addAll((0 until count).map { null })
-            }
-            .subList(0, count)
-            .map {
-                if (it != null) {
-                    Pair(Button(it.icon).createItemStack().apply { offer(DISPLAY_NAME, lang.ofPlaceHolder(it.tips)) }, Wrapper(function = it))
-                } else {
-                    Pair(Button(ButtonType.GUI_CENTER).createItemStack(), null)
-                }
-            }
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {

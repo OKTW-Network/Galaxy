@@ -162,7 +162,7 @@ class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companio
 
         return list.map {
             if (it != null) {
-                Pair(Button(it.icon).createItemStack().apply { offer(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, lang.of(it.tips))) }, Wrapper(function = it))
+                Pair(Button(it.icon).createItemStack().apply { offer(DISPLAY_NAME, lang.ofPlaceHolder(RESET, lang.of(it.tips))) }, Wrapper(function = it))
             } else {
                 Pair(Button(ButtonType.GUI_CENTER).createItemStack(), null)
             }

@@ -14,7 +14,6 @@ import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.text.format.TextColors
-import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 import java.util.Arrays.asList
 import kotlin.collections.ArrayList
@@ -177,7 +176,7 @@ abstract class PageGUI<Data> : GUI() {
         if (previous) {
             Button(ARROW_LEFT).createItemStack()
                 .apply {
-                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.GREEN, TextStyles.BOLD, lang.of("UI.Button.PreviousPage")))
+                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.GREEN, lang.of("UI.Button.PreviousPage")))
                 }
                 .let { view.setSlot(Slot.PREV, it, Operation(Action.PrevPage)) }
         } else {
@@ -188,7 +187,7 @@ abstract class PageGUI<Data> : GUI() {
         if (next) {
             Button(ARROW_RIGHT).createItemStack()
                 .apply {
-                    offer(Keys.DISPLAY_NAME,lang.ofPlaceHolder(TextColors.GREEN, TextStyles.BOLD, lang.of("UI.Button.NextPage")))
+                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.GREEN, lang.of("UI.Button.NextPage")))
                 }
                 .let { view.setSlot(Slot.NEXT, it, Operation(Action.NextPage)) }
         } else {

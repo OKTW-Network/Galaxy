@@ -18,7 +18,6 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.format.TextColors
-import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
 class GroupSelect(private val callback: (Group) -> Unit) : GUI() {
@@ -38,14 +37,14 @@ class GroupSelect(private val callback: (Group) -> Unit) : GUI() {
         Button(MANAGER).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.RED, TextStyles.BOLD, lang.of("UI.Tip.Admin")))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.RED, lang.of("UI.Tip.Admin")))
             }
             .let { inventory.set(1, 0, it) }
 
         Button(ButtonType.MEMBER).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.RED, TextStyles.BOLD, lang.of("UI.Tip.Member")))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.RED, lang.of("UI.Tip.Member")))
             }
             .let { inventory.set(3, 0, it) }
 

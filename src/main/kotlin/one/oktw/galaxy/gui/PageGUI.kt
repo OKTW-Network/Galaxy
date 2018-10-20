@@ -122,6 +122,8 @@ abstract class PageGUI<Data> : GUI() {
         }
     }
 
+    protected fun offerPage() = offerPage(pageNumber)
+
     // There should be only one offerPage processed at same time, or the pages will be merged all together
     protected fun offerPage(pageNumber: Int) = lock.launch {
         view.disabled = true

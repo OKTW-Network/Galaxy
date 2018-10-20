@@ -200,11 +200,14 @@ class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companio
 
                 when (function) {
                     SORT_NUMBER, SORT_NAME -> {
+                        // TODO
                         when (function) {
                             SORT_NUMBER -> sort = Sort.NUMBER
                             SORT_NAME -> sort = Sort.NAME
                             else -> Unit
                         }
+
+                        offerPage()
                     }
                     LIST_ALL, LIST_JOIN -> {
                         list = if (listAll) galaxyManager.get(player) else galaxyManager.listGalaxy()

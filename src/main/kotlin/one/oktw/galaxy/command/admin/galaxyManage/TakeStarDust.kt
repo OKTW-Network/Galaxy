@@ -37,8 +37,13 @@ class TakeStarDust : CommandBase {
             }
 
             if (galaxyUUID != null) {
-                galaxy!!.update { takeStarDust(starDust) }
-                src.sendMessage(Text.of(GREEN, "Taken $starDust from ${galaxy.name}(${galaxy.starDust})"))
+                var success = false
+                galaxy!!.update { success = takeStarDust(starDust) }
+                if (success) {
+                    src.sendMessage(Text.of(GREEN, "Taken $starDust StarDust(s) from ${galaxy.name}(${galaxy.starDust})"))
+                } else {
+                    src.sendMessage(Text.of(RED, "Failed to take $starDust StarDust(s) from ${galaxy.name}(${galaxy.starDust})"))
+                }
 
             } else {
                 src.sendMessage(Text.of(RED, "Not enough argument: galaxy not found or missing."))

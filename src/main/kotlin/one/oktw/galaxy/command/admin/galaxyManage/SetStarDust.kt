@@ -15,11 +15,11 @@ import org.spongepowered.api.text.format.TextColors.GREEN
 import org.spongepowered.api.text.format.TextColors.RED
 import java.util.*
 
-class GiveStarDust : CommandBase {
+class SetStarDust : CommandBase {
     override val spec: CommandSpec
         get() = CommandSpec.builder()
             .executor(this)
-            .permission("oktw.command.admin.galaxyManage.giveStarDust")
+            .permission("oktw.command.admin.galaxyManage.setStarDust")
             .arguments(
                 GenericArguments.optionalWeak(GenericArguments.uuid(Text.of("galaxy"))),
                 GenericArguments.longNum(Text.of("starDust"))
@@ -38,11 +38,11 @@ class GiveStarDust : CommandBase {
 
             if (galaxyUUID != null) {
                 var success = false
-                galaxy!!.update { success = giveStarDust(starDust) }
+                galaxy!!.update { success = setStarDust(starDust) }
                 if (success) {
-                    src.sendMessage(Text.of(GREEN, "Given $starDust StarDust(s) to ${galaxy.name} (${galaxy.starDust})"))
+                    src.sendMessage(Text.of(GREEN, "Set ${galaxy.name}'s StarDust(s) to ${galaxy.starDust}"))
                 } else {
-                    src.sendMessage(Text.of(RED, "Failed to give $starDust StarDust(s) to ${galaxy.name} (${galaxy.starDust})"))
+                    src.sendMessage(Text.of(RED, "Failed to set ${galaxy.name}'s StarDust(s) (Current: ${galaxy.starDust})"))
                 }
 
             } else {

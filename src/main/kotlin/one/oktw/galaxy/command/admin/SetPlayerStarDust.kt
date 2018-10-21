@@ -15,9 +15,9 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors.GREEN
 import org.spongepowered.api.text.format.TextColors.RED
 
-class GivePlayerStarDust : CommandBase {
+class SetPlayerStarDust : CommandBase {
     override val spec: CommandSpec = CommandSpec.builder()
-        .permission("oktw.command.admin.givePlayerStarDust")
+        .permission("oktw.command.admin.setPlayerStarDust")
         .arguments(
             GenericArguments.playerOrSource(Text.of("player")),
             GenericArguments.longNum(Text.of("starDust"))
@@ -40,16 +40,16 @@ class GivePlayerStarDust : CommandBase {
                 src.sendMessage(Text.of(RED, "Error: ${player.name} is not a member of the galaxy."))
                 return@launch
             }
-            val success = traveler.giveStarDust(starDust)
+            val success = traveler.setStarDust(starDust)
             galaxy.run {
                 getMember(player.uniqueId)?.also {
                     saveMember(traveler)
                 }
             }
             if (success) {
-                src.sendMessage(Text.of(GREEN, "Given $starDust StarDust(s) to ${player.name} (${traveler.starDust})"))
+                src.sendMessage(Text.of(GREEN, "Set ${player.name}'s StarDust(s) to ${traveler.starDust}"))
             } else {
-                src.sendMessage(Text.of(RED, "Failed to give $starDust StarDust(s) to ${player.name} (${traveler.starDust})"))
+                src.sendMessage(Text.of(RED, "Failed to set ${player.name}'s StarDust(s) (Current: ${traveler.starDust})"))
             }
         }
 

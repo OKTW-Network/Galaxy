@@ -21,6 +21,7 @@ class Admin : CommandBase {
         .child(Book().spec, "book")
         .child(GivePlayerStarDust().spec, "givePlayerStarDust")
         .child(TakePlayerStarDust().spec, "takePlayerStarDust")
+        .child(SetPlayerStarDust().spec, "setPlayerStarDust")
         .executor(this)
         .build()
 

@@ -15,11 +15,14 @@ import one.oktw.galaxy.galaxy.planet.data.Position
 import one.oktw.galaxy.internal.DatabaseManager
 import one.oktw.galaxy.machine.teleporter.data.Teleporter
 import one.oktw.galaxy.util.CountDown
+import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.property.block.MatterProperty
 import org.spongepowered.api.util.Direction
 import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class TeleporterHelper {
     companion object {
@@ -37,7 +40,9 @@ class TeleporterHelper {
                 center.getBlockRelative(Direction.EAST),
                 center.getBlockRelative(Direction.WEST),
                 center.getBlockRelative(Direction.NORTH),
-                center.getBlockRelative(Direction.SOUTH)
+                center.getBlockRelative(Direction.SOUTH),
+                center.getBlockRelative(Direction.UP),
+                center.getBlockRelative(Direction.DOWN)
             )) {
                 if (isFrame(position)) {
                     list += position
@@ -55,6 +60,7 @@ class TeleporterHelper {
                 list[Triple(it.blockX, it.blockY, it.blockZ)] = it
             }
 
+            list[center.run {Triple(blockX, blockY, blockZ)}] = center
             generation.add(center)
 
             withContext(Main.serverThread) {
@@ -92,6 +98,22 @@ class TeleporterHelper {
             return list
         }
 
+        fun filterSafeLocation(map: HashMap<Triple<Int, Int, Int>, Location<World>>): HashMap<Triple<Int, Int, Int>, Location<World>> {
+            val newMap: HashMap<Triple<Int, Int, Int>, Location<World>> = HashMap()
+
+            map.entries.forEach { (key, loc)->
+                if (
+                    loc.add(0.0, 1.0, 0.0).blockType.getProperty(MatterProperty::class.java).orElse(null) !=
+                        MatterProperty.Matter.SOLID &&
+                    loc.add(0.0, 2.0, 0.0).blockType.getProperty(MatterProperty::class.java).orElse(null) !=
+                        MatterProperty.Matter.SOLID
+                ) {
+                    newMap[key] = loc
+                }
+            }
+
+            return newMap
+        }
 
         suspend fun get(uuid: UUID): Teleporter? {
             return collection.find(

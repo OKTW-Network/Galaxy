@@ -54,11 +54,6 @@ class Teleporter {
             if (location.blockType != BlockTypes.MOB_SPAWNER) return@registerEvent
             if (location[DataBlockType.key].orElse(null) !in asList(TELEPORTER, TELEPORTER_ADVANCED)) return@registerEvent
 
-
-            if (CountDown.instance.isCounting(player)) {
-                return@registerEvent
-            }
-
             launch {
                 galaxyManager.get(player.world)?.getPlanet(player.world)?.let {
                     TeleporterHelper.get(
@@ -68,6 +63,11 @@ class Teleporter {
                         location.blockZ
                     )
                 }?.let {
+                    if (CountDown.instance.isCounting(it.uuid)) {
+                        player.sendMessage(Text.of(TextColors.RED, lang.of("Respond.Teleporting")).toLegacyText(player))
+
+                        return@launch
+                    }
                     one.oktw.galaxy.gui.machine.Teleporter(it)
                 }?.let {
                     GUIHelper.open(player) { it }
@@ -170,7 +170,10 @@ class Teleporter {
                 if (itemOnHand.type == ItemTypes.NAME_TAG) {
                     val newStationName = itemOnHand[DisplayNameData::class.java].orElse(null)?.displayName()?.get()?.toPlain() ?: return
 
-                    consumeItem(player, HandTypes.MAIN_HAND)
+                    // do not consume item of creative players
+                    if (player.gameMode().get() != GameModes.CREATIVE) {
+                        consumeItem(player, HandTypes.MAIN_HAND)
+                    }
 
                     launch {
                         val position = event.targetBlock.location.orElse(null) ?: return@launch

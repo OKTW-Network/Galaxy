@@ -30,11 +30,9 @@ open class StarDustKeeper {
     fun takeStarDust(number: Number): Boolean {
         val i = number.toLong()
 
-        if (i < 0) return false
+        if (i < 0 || starDust < i) return false
 
         starDust -= i
-
-        if (starDust < 0) starDust = 0
 
         return true
     }

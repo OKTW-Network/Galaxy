@@ -41,13 +41,13 @@ class SetPlayerStarDust : CommandBase {
                 return@launch
             }
             val success = traveler.setStarDust(starDust)
-            galaxy.run {
-                getMember(player.uniqueId)?.also {
-                    saveMember(traveler)
-                }
-            }
             if (success) {
                 src.sendMessage(Text.of(GREEN, "Set ${player.name}'s StarDust(s) to ${traveler.starDust}"))
+                galaxy.run {
+                    getMember(player.uniqueId)?.also {
+                        saveMember(traveler)
+                    }
+                }
             } else {
                 src.sendMessage(Text.of(RED, "Failed to set ${player.name}'s StarDust(s) (Current: ${traveler.starDust})"))
             }

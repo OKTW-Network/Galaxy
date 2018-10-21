@@ -41,13 +41,13 @@ class TakePlayerStarDust : CommandBase {
                 return@launch
             }
             val success = traveler.takeStarDust(starDust)
-            galaxy.run {
-                getMember(player.uniqueId)?.also {
-                    saveMember(traveler)
-                }
-            }
             if (success) {
                 src.sendMessage(Text.of(GREEN, "Taken $starDust StarDust(s) from ${player.name} (${traveler.starDust})"))
+                galaxy.run {
+                    getMember(player.uniqueId)?.also {
+                        saveMember(traveler)
+                    }
+                }
             } else {
                 src.sendMessage(Text.of(RED, "Failed to take $starDust StarDust(s) from ${player.name} (${traveler.starDust})"))
             }

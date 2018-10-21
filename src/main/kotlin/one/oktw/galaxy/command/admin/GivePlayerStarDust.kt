@@ -41,13 +41,13 @@ class GivePlayerStarDust : CommandBase {
                 return@launch
             }
             val success = traveler.giveStarDust(starDust)
-            galaxy.run {
-                getMember(player.uniqueId)?.also {
-                    saveMember(traveler)
-                }
-            }
             if (success) {
                 src.sendMessage(Text.of(GREEN, "Given $starDust StarDust(s) to ${player.name} (${traveler.starDust})"))
+                galaxy.run {
+                    getMember(player.uniqueId)?.also {
+                        saveMember(traveler)
+                    }
+                }
             } else {
                 src.sendMessage(Text.of(RED, "Failed to give $starDust StarDust(s) to ${player.name} (${traveler.starDust})"))
             }

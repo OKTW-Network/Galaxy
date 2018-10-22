@@ -188,7 +188,7 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
             GUIHelper.closeAll(player)
 
             if (CountDown.instance.isCounting(teleporter.uuid)) {
-                player.sendMessage(lang.ofPlaceHolder(TextColors.RED, lang.of("Respond.Teleporting")).toLegacyText(player))
+                player.sendMessage(Text.of(TextColors.RED, lang.of("Respond.Teleporting")).toLegacyText(player))
                 return@launch
             }
 
@@ -358,8 +358,6 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
 
         if (
             !sourceFrames.any {
-                Main.main.logger.info(it.blockPosition.add(0, 1, 0).toString())
-                Main.main.logger.info(location.toInt().toString())
                 it.blockPosition.add(0, 1, 0) == location.toInt()
             }
         ) {

@@ -300,17 +300,19 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
 
             var index = 0
 
+            val exactLocation = Location(
+                targetWorld,
+                targetTeleporter.position.x,
+                targetTeleporter.position.y,
+                targetTeleporter.position.z
+            )
+
             waitingEntities.forEach {
-                val target = if (targetFrames.size != 0) targetFrames[index % targetFrames.size] else Location(
-                    targetWorld,
-                    targetTeleporter.position.x,
-                    targetTeleporter.position.y,
-                    targetTeleporter.position.z
-                )
+                val target = if (targetFrames.size != 0) targetFrames[index % targetFrames.size] else exactLocation
 
                 index++
 
-                if (it.type == EntityTypes.PLAYER) {
+                if (it.type == EntityTypes.PLAYER && TeleporterHelper.isSafeLocation(exactLocation)) {
                     val currentPlayer = it as Player
 
                     // we teleport the main player to exact position

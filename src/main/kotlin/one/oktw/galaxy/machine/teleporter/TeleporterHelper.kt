@@ -102,17 +102,19 @@ class TeleporterHelper {
             val newMap: HashMap<Triple<Int, Int, Int>, Location<World>> = HashMap()
 
             map.entries.forEach { (key, loc) ->
-                if (
-                    (loc.add(0.0, 1.0, 0.0).block.getProperty(MatterProperty::class.java).orElse(null)?.value !=
-                        MatterProperty.Matter.SOLID) &&
-                    (loc.add(0.0, 2.0, 0.0).block.getProperty(MatterProperty::class.java).orElse(null)?.value !=
-                        MatterProperty.Matter.SOLID)
-                ) {
+                if (isSafeLocation(loc)) {
                     newMap[key] = loc
                 }
             }
 
             return newMap
+        }
+
+        fun isSafeLocation(loc: Location<World>): Boolean {
+            return loc.add(0.0, 1.0, 0.0).block.getProperty(MatterProperty::class.java).orElse(null)?.value !=
+                MatterProperty.Matter.SOLID &&
+                loc.add(0.0, 2.0, 0.0).block.getProperty(MatterProperty::class.java).orElse(null)?.value !=
+                MatterProperty.Matter.SOLID
         }
 
         suspend fun get(uuid: UUID): Teleporter? {

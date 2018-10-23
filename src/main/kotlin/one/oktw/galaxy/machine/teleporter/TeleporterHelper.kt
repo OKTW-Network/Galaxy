@@ -103,9 +103,9 @@ class TeleporterHelper {
 
             map.entries.forEach { (key, loc)->
                 if (
-                    loc.add(0.0, 1.0, 0.0).blockType.getProperty(MatterProperty::class.java).orElse(null) !=
+                    loc.add(0.0, 1.0, 0.0).block.getProperty(MatterProperty::class.java).orElse(null) !=
                         MatterProperty.Matter.SOLID &&
-                    loc.add(0.0, 2.0, 0.0).blockType.getProperty(MatterProperty::class.java).orElse(null) !=
+                    loc.add(0.0, 2.0, 0.0).block.getProperty(MatterProperty::class.java).orElse(null) !=
                         MatterProperty.Matter.SOLID
                 ) {
                     newMap[key] = loc

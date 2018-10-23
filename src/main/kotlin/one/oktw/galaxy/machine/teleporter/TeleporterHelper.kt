@@ -60,7 +60,7 @@ class TeleporterHelper {
                 list[Triple(it.blockX, it.blockY, it.blockZ)] = it
             }
 
-            list[center.run {Triple(blockX, blockY, blockZ)}] = center
+            list[center.run { Triple(blockX, blockY, blockZ) }] = center
             generation.add(center)
 
             withContext(Main.serverThread) {
@@ -101,12 +101,12 @@ class TeleporterHelper {
         fun filterSafeLocation(map: HashMap<Triple<Int, Int, Int>, Location<World>>): HashMap<Triple<Int, Int, Int>, Location<World>> {
             val newMap: HashMap<Triple<Int, Int, Int>, Location<World>> = HashMap()
 
-            map.entries.forEach { (key, loc)->
+            map.entries.forEach { (key, loc) ->
                 if (
-                    loc.add(0.0, 1.0, 0.0).block.getProperty(MatterProperty::class.java).orElse(null) !=
-                        MatterProperty.Matter.SOLID &&
-                    loc.add(0.0, 2.0, 0.0).block.getProperty(MatterProperty::class.java).orElse(null) !=
-                        MatterProperty.Matter.SOLID
+                    (loc.add(0.0, 1.0, 0.0).block.getProperty(MatterProperty::class.java).orElse(null)?.value !=
+                        MatterProperty.Matter.SOLID) &&
+                    (loc.add(0.0, 2.0, 0.0).block.getProperty(MatterProperty::class.java).orElse(null)?.value !=
+                        MatterProperty.Matter.SOLID)
                 ) {
                     newMap[key] = loc
                 }

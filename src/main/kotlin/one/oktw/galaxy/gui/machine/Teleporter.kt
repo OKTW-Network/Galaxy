@@ -1,6 +1,7 @@
 package one.oktw.galaxy.gui.machine
 
 import com.flowpowered.math.vector.Vector3d
+import com.flowpowered.math.vector.Vector3i
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.channels.toList
 import kotlinx.coroutines.experimental.reactive.openSubscription
@@ -280,6 +281,15 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
                 .let { TeleporterHelper.searchTeleporterFrame(it, MAX_FRAME) }
                 ?.let { TeleporterHelper.filterSafeLocation(it) }
                 ?.run { ArrayList(values) }
+                ?.apply {
+                    sortBy {
+                        it.blockPosition.distance(
+                            targetTeleporter.position.run {
+                                Vector3i(x, y, z)
+                            }
+                        )
+                    }
+                }
 
             if (targetFrames == null) {
                 doWhenPlayer(waitingEntities) {

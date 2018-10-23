@@ -14,13 +14,14 @@ import one.oktw.galaxy.machine.teleporter.TeleporterHelper
 import one.oktw.galaxy.translation.extensions.toLegacyText
 import one.oktw.galaxy.util.CountDown
 import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.type.HandTypes.MAIN_HAND
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.block.InteractBlockEvent
 import org.spongepowered.api.event.filter.cause.First
-import org.spongepowered.api.text.format.TextColors
-import org.spongepowered.api.data.type.HandTypes.MAIN_HAND
 import org.spongepowered.api.item.ItemTypes
+import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.format.TextColors
 
 class BlockGUI {
     private val lang = Main.translationService
@@ -52,7 +53,7 @@ class BlockGUI {
                     )
                 }?.let {
                     if (CountDown.instance.isCounting(it.uuid)) {
-                        player.sendMessage(lang.ofPlaceHolder(TextColors.RED, lang.of("Respond.Teleporting")).toLegacyText(player))
+                        player.sendMessage(Text.of(TextColors.RED, lang.of("Respond.Teleporting")).toLegacyText(player))
 
                         return@launch
                     }

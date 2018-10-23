@@ -171,6 +171,8 @@ class Teleporter {
                 val itemOnHand = player.getItemInHand(HandTypes.MAIN_HAND).orElse(null) ?: return
 
                 if (itemOnHand.type == ItemTypes.NAME_TAG) {
+                    event.isCancelled = true
+
                     val newStationName = itemOnHand[DisplayNameData::class.java].orElse(null)?.displayName()?.get()?.toPlain() ?: return
 
                     // do not consume item of creative players

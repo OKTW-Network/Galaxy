@@ -47,7 +47,7 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
         val buttonExit = Button(EXIT).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, BOLD, lang.of("UI.Button.BackToSpaceShip")))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, lang.of("UI.Button.BackToSpaceShip")))
             }
         val buttonListPlanet = Button(PLANET_LIST).createItemStack()
             .apply {
@@ -58,7 +58,7 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
             Button(STARS).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[2]))
-                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, BOLD, lang.of("UI.Button.StarDust")))
+                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, lang.of("UI.Button.StarDust")))
                 }
         }
         val buttonListMember by lazy {
@@ -72,7 +72,7 @@ class PlanetTerminal(private val galaxy: Galaxy, private val player: Player) : G
             Button(ECS).createItemStack()
                 .apply {
                     offer(DataUUID(buttonID[4]))
-                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, BOLD, lang.of("UI.Button.ECS")))
+                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, lang.of("UI.Button.ECS")))
                 }
         }
         val buttonManageGalaxy by lazy {

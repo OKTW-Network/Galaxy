@@ -23,7 +23,6 @@ import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
-import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 import java.util.Arrays.asList
 
@@ -47,7 +46,7 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
                 offer(DataUUID(buttonID[0]))
                 offer(
                     Keys.DISPLAY_NAME,
-                    lang.ofPlaceHolder(TextColors.GREEN, TextStyles.BOLD, lang.of("UI.Button.RemoveMember"))
+                    lang.ofPlaceHolder(TextColors.GREEN, lang.of("UI.Button.RemoveMember"))
                 )
                 offer(Keys.ITEM_LORE, asList(lang.ofPlaceHolder(TextColors.RED, lang.of("UI.removeMemberNotify"))))
             }
@@ -58,7 +57,7 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
                 offer(DataUUID(buttonID[1]))
                 offer(
                     Keys.DISPLAY_NAME,
-                    lang.ofPlaceHolder(TextColors.GREEN, TextStyles.BOLD, lang.of("UI.Button.ChangePermissionGroup"))
+                    lang.ofPlaceHolder(TextColors.GREEN, lang.of("UI.Button.ChangePermissionGroup"))
                 )
             }
             .let { inventory.set(3, 0, it) }

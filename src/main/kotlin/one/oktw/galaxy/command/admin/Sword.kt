@@ -73,11 +73,9 @@ class Sword : CommandBase {
                 )
 
                 traveler.item.add(sword)
-                launch {
-                    galaxyManager.get(src.world)?.run {
-                        getMember(src.uniqueId)?.also {
-                            saveMember(traveler)
-                        }
+                galaxyManager.get(src.world)?.run {
+                    getMember(src.uniqueId)?.also {
+                        saveMember(traveler)
                     }
                 }
 
@@ -103,13 +101,15 @@ class Sword : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src !is Player) return CommandResult.empty()
             launch {
-                val traveler = TravelerHelper.getTraveler(src).await() ?: return@launch
+                val traveler = TravelerHelper.getTraveler(src).await()
+                if (traveler == null) {
+                    src.sendMessage(Text.of(RED, "Error: Galaxy not found or missing"))
+                    return@launch
+                }
                 traveler.item.removeAt(args.getOne<Int>("Sword").get())
-                launch {
-                    galaxyManager.get(src.world)?.run {
-                        getMember(src.uniqueId)?.also {
-                            saveMember(traveler)
-                        }
+                galaxyManager.get(src.world)?.run {
+                    getMember(src.uniqueId)?.also {
+                        saveMember(traveler)
                     }
                 }
             }
@@ -128,8 +128,17 @@ class Sword : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src !is Player) return CommandResult.empty()
             launch {
-                val traveler = TravelerHelper.getTraveler(src).await() ?: return@launch
-                val sword = traveler.item[args.getOne<Int>("Sword").get()] as? Sword ?: return@launch
+                val traveler = TravelerHelper.getTraveler(src).await()
+                if (traveler == null) {
+                    src.sendMessage(Text.of(RED, "Error: Galaxy not found or missing"))
+                    return@launch
+                }
+
+                val sword = traveler.item[args.getOne<Int>("Sword").get()] as? Sword
+                if (sword == null) {
+                    src.sendMessage(Text.of(RED, "Error: Sword not found"))
+                    return@launch
+                }
 
                 sword.createItemStack().let {
                     src.setItemInHand(

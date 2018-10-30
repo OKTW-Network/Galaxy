@@ -1,8 +1,10 @@
 package one.oktw.galaxy.gui
 
-import one.oktw.galaxy.Main.Companion.languageService
+import kotlinx.coroutines.experimental.launch
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.extensions.deserialize
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.refresh
 import one.oktw.galaxy.galaxy.data.extensions.requestJoin
@@ -21,8 +23,7 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.format.TextColors
-import org.spongepowered.api.text.serializer.TextSerializers
+import org.spongepowered.api.text.format.TextColors.*
 import java.util.*
 import java.util.Arrays.asList
 
@@ -31,10 +32,9 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
         .property(InventoryTitle.of(Text.of(galaxy.name)))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
-    // Todo get player lang
-    private val lang = languageService.getDefaultLanguage()
+    private val lang = Main.translationService
     private val buttonID = Array(4) { UUID.randomUUID() }
 
     init {
@@ -45,33 +45,33 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
         Button(MEMBERS).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.GalaxyInfo.member_list"]))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, lang.of("UI.Button.MemberList")))
             }
             .let { inventory.set(0, 0, it) }
 
-        Button(PLANET_O).createItemStack()
+        Button(PLANET_LIST).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.GalaxyInfo.planet_list"]))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, lang.of("UI.Button.PlanetList")))
             }
             .let { inventory.set(2, 0, it) }
 
         when {
             member?.group in asList(OWNER, ADMIN) -> {
-                Button(LIST).createItemStack()
+                Button(GALAXY_SETTING).createItemStack()
                     .apply {
                         offer(DataUUID(buttonID[2]))
-                        offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.GalaxyInfo.manage_galaxy"]))
+                        offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, lang.of("UI.Button.ManageGalaxy")))
                     }
                     .let { inventory.set(4, 0, it) }
             }
             member != null -> {
                 Button(WARNING).createItemStack()
                     .apply {
-                        offer(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, lang["UI.GalaxyInfo.notice"]))
+                        offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(YELLOW, lang.of("UI.Button.GalaxyNotice")))
                         offer(
                             Keys.ITEM_LORE,
-                            galaxy.notice.split('\n').map(TextSerializers.FORMATTING_CODE::deserialize)
+                            galaxy.notice.split("\\n").map { Text.of(WHITE, it.deserialize()) }
                         )
                     }
                     .let { inventory.set(4, 0, it) }
@@ -80,10 +80,10 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
                 Button(PLUS).createItemStack()
                     .apply {
                         if (player.uniqueId in galaxy.joinRequest) {
-                            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GRAY, lang["UI.GalaxyInfo.join_req_sent"]))
+                            offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GRAY, lang.of("UI.Button.JoinRequestSent")))
                         } else {
                             offer(DataUUID(buttonID[3]))
-                            offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, lang["UI.GalaxyInfo.join_req"]))
+                            offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GREEN, lang.of("UI.Button.JoinRequest")))
                         }
                     }
                     .let { inventory.set(4, 0, it) }
@@ -101,7 +101,7 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
 
         Button(PLUS).createItemStack()
             .apply {
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GRAY, lang["UI.GalaxyInfo.join_req_sent"]))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(GRAY, lang.of("UI.Button.JoinRequestSent")))
             }
             .let { inventory.set(4, 0, it) }
     }
@@ -116,7 +116,7 @@ class GalaxyInfo(private val galaxy: Galaxy, player: Player) : GUI() {
             buttonID[1] -> GUIHelper.openAsync(player) { BrowserPlanet(galaxy.refresh()) }
             buttonID[2] -> GUIHelper.openAsync(player) { GalaxyManagement(galaxy.refresh()) }
             buttonID[3] -> {
-                galaxy.requestJoin(player.uniqueId)
+                launch { galaxy.requestJoin(player.uniqueId) }
 
                 event.isCancelled = false
                 event.cursorTransaction.setCustom(ItemStackSnapshot.NONE)

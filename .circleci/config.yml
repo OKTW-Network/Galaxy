@@ -22,19 +22,19 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - dependencies-v2-{{ .Branch }}-{{ .Revision }}
-            - dependencies-v2-{{ .Branch }}-
-            - dependencies-v2-master-
-            - dependencies-v2-
+          - dependencies-v3-{{ .Branch }}-{{ .Revision }}
+          - dependencies-v3-{{ .Branch }}-
+          - dependencies-v3-master-
+          - dependencies-v3-
 
       - run: gradle setupCiWorkspace
 
       # run build
-      - run: gradle build --build-cache
+      - run: gradle build
 
       - save_cache:
           paths: [~/.gradle]
-          key: dependencies-v2-{{ .Branch }}-{{ .Revision }}
+          key: dependencies-v3-{{ .Branch }}-{{ .Revision }}
 
       - store_artifacts:
           path: build/libs

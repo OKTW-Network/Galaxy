@@ -2,8 +2,8 @@ package one.oktw.galaxy.internal
 
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
-import com.mongodb.client.MongoClients
-import com.mongodb.client.MongoDatabase
+import com.mongodb.reactivestreams.client.MongoClients
+import com.mongodb.reactivestreams.client.MongoDatabase
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.internal.ConfigManager.Companion.config
 import one.oktw.galaxy.internal.ConfigManager.Companion.save

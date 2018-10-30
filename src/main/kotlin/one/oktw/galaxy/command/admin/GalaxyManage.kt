@@ -1,13 +1,16 @@
 package one.oktw.galaxy.command.admin
 
 import kotlinx.coroutines.experimental.launch
-import one.oktw.galaxy.Main
+import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.galaxy.GalaxyManager
 import one.oktw.galaxy.galaxy.data.extensions.*
 import one.oktw.galaxy.galaxy.enums.Group
+import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
+import one.oktw.galaxy.galaxy.planet.enums.PlanetType
+import one.oktw.galaxy.galaxy.planet.enums.PlanetType.NORMAL
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
@@ -53,8 +56,8 @@ class GalaxyManage : CommandBase {
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             val player = args.getOne<Player>("player").get()
-            val galaxy = GalaxyManager().createGalaxy(args.getOne<String>("name").get(),player)
-            src.sendMessage(Text.of(TextColors.GREEN,galaxy.uuid))
+            val galaxy = runBlocking { GalaxyManager().createGalaxy(args.getOne<String>("name").get(), player) }
+            src.sendMessage(Text.of(TextColors.GREEN, galaxy.uuid))
             return CommandResult.success()
         }
     }
@@ -66,20 +69,39 @@ class GalaxyManage : CommandBase {
                 .permission("oktw.command.admin.galaxyManage.createPlanet")
                 .arguments(
                     GenericArguments.string(Text.of("name")),
+                    GenericArguments.optional(
+                        GenericArguments.enumValue(Text.of("Type"), PlanetType::class.java),
+                        NORMAL
+                    ),
                     GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
                 )
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-            var uuid= args.getOne<UUID>("galaxy").orElse(null)
+            val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
-                if (uuid == null) {
-                    src.sendMessage(Text.of(TextColors.RED,"Not enough arguments!\n",Sponge.getCommandManager().getUsage(src)))
+                var galaxy = galaxyManager.get(uuid)
+                //If galaxy(uuid) is null then get player galaxy
+                if (galaxy == null && src is Player) galaxy = galaxyManager.get(src.world)
+                //If it is still null then return
+                if (galaxy == null) {
+                    src.sendMessage(
+                        Text.of(
+                            TextColors.RED,
+                            "Not enough arguments!\n",
+                            Sponge.getCommandManager().getUsage(src)
+                        )
+                    )
                     return@launch
                 }
-                val planet = galaxyManager.get(uuid).await()!!.createPlanet(args.getOne<String>("name").get())
-                src.sendMessage(Text.of(TextColors.GREEN,planet.uuid))
+                try {
+                    val planet = galaxy.createPlanet(args.getOne<String>("name").get(), args.getOne<PlanetType>("Type").get())
+                    src.sendMessage(Text.of(TextColors.GREEN, planet.uuid))
+                } catch (e: IllegalArgumentException) {
+                    src.sendMessage(Text.of(TextColors.RED, "Error：", e.message))
+                } catch (e: NotImplementedError) {
+                    src.sendMessage(Text.of(TextColors.RED, "Error：", e.message))
+                }
             }
             return CommandResult.success()
         }
@@ -92,20 +114,30 @@ class GalaxyManage : CommandBase {
                 .permission("oktw.command.admin.galaxyManage.addMember")
                 .arguments(
                     GenericArguments.playerOrSource(Text.of("player")),
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))))
+                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
+                )
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             val player = args.getOne<Player>("player").get()
-            var uuid= args.getOne<UUID>("galaxy").orElse(null)
+            val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
-                if (uuid == null) {
-                    src.sendMessage(Text.of(TextColors.RED,"Not enough arguments!\n",Sponge.getCommandManager().getUsage(src)))
+                var galaxy = galaxyManager.get(uuid)
+                //If galaxy(uuid) is null then get player galaxy
+                if (galaxy == null && src is Player) galaxy = galaxyManager.get(src.world)
+                //If it is still null then return
+                if (galaxy == null) {
+                    src.sendMessage(
+                        Text.of(
+                            TextColors.RED,
+                            "Not enough arguments!\n",
+                            Sponge.getCommandManager().getUsage(src)
+                        )
+                    )
                     return@launch
                 }
-                galaxyManager.get(uuid).await()!!.addMember(player.uniqueId)
-                src.sendMessage(Text.of(TextColors.GREEN,"Member added！"))
+                galaxy.addMember(player.uniqueId)
+                src.sendMessage(Text.of(TextColors.GREEN, "Member added！"))
             }
             return CommandResult.success()
         }
@@ -125,16 +157,24 @@ class GalaxyManage : CommandBase {
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             val player = args.getOne<Player>("player").get()
-            var uuid= args.getOne<UUID>("galaxy").orElse(null)
+            val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
-                if (uuid == null) {
-                    src.sendMessage(Text.of(TextColors.RED,"Not enough arguments!\n",Sponge.getCommandManager().getUsage(src)))
+                var galaxy = galaxyManager.get(uuid)
+                //If galaxy(uuid) is null then get player galaxy
+                if (galaxy == null && src is Player) galaxy = galaxyManager.get(src.world)
+                //If it is still null then return
+                if (galaxy == null) {
+                    src.sendMessage(
+                        Text.of(
+                            TextColors.RED,
+                            "Not enough arguments!\n",
+                            Sponge.getCommandManager().getUsage(src)
+                        )
+                    )
                     return@launch
                 }
-                galaxyManager.get(uuid).await()!!
-                    .setGroup(player.uniqueId,args.getOne<Group>("Group").get())
-                src.sendMessage(Text.of(TextColors.GREEN,"Group set！"))
+                galaxy.setGroup(player.uniqueId, args.getOne<Group>("Group").get())
+                src.sendMessage(Text.of(TextColors.GREEN, "Group set！"))
             }
             return CommandResult.success()
         }
@@ -147,20 +187,34 @@ class GalaxyManage : CommandBase {
                 .permission("oktw.command.admin.galaxyManage.removeMember")
                 .arguments(
                     GenericArguments.playerOrSource(Text.of("player")),
-                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))))
+                    GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy")))
+                )
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             val player = args.getOne<Player>("player").get()
-            var uuid= args.getOne<UUID>("galaxy").orElse(null)
+            val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
-                if (uuid == null) {
-                    src.sendMessage(Text.of(TextColors.RED,"Not enough arguments!\n",Sponge.getCommandManager().getUsage(src)))
+                var galaxy = galaxyManager.get(uuid)
+                //If galaxy(uuid) is null then get player galaxy
+                if (galaxy == null && src is Player) galaxy = galaxyManager.get(src.world)
+                //If it is still null then return
+                if (galaxy == null) {
+                    src.sendMessage(
+                        Text.of(
+                            TextColors.RED,
+                            "Not enough arguments!\n",
+                            Sponge.getCommandManager().getUsage(src)
+                        )
+                    )
                     return@launch
                 }
-                galaxyManager.get(uuid).await()!!.delMember(player.uniqueId)
-                src.sendMessage(Text.of(TextColors.GREEN,"Member removed！"))
+                if (galaxy.getMember(player.uniqueId)?.group == OWNER) {
+                    src.sendMessage(Text.of(TextColors.RED, "You are deleting an owner"))
+                    return@launch
+                }
+                galaxy.delMember(player.uniqueId)
+                src.sendMessage(Text.of(TextColors.GREEN, "Member removed！"))
             }
             return CommandResult.success()
         }
@@ -178,16 +232,24 @@ class GalaxyManage : CommandBase {
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-            var uuid= args.getOne<UUID>("galaxy").orElse(null)
+            val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
-                if (uuid == null) {
-                    src.sendMessage(Text.of(TextColors.RED,"Not enough arguments!\n",Sponge.getCommandManager().getUsage(src)))
+                var galaxy = galaxyManager.get(uuid)
+                //If galaxy(uuid) is null then get player galaxy
+                if (galaxy == null && src is Player) galaxy = galaxyManager.get(src.world)
+                //If it is still null then return
+                if (galaxy == null) {
+                    src.sendMessage(
+                        Text.of(
+                            TextColors.RED,
+                            "Not enough arguments!\n",
+                            Sponge.getCommandManager().getUsage(src)
+                        )
+                    )
                     return@launch
                 }
-                val galaxy = galaxyManager.get(uuid).await()!!
-                galaxy.update {name = args.getOne<String>("name").get() }
-                src.sendMessage(Text.of(TextColors.GREEN,"Galaxy Renamed to ",galaxy.name,"!"))
+                galaxy.update { name = args.getOne<String>("name").get() }
+                src.sendMessage(Text.of(TextColors.GREEN, "Galaxy Renamed to ", galaxy.name, "!"))
             }
             return CommandResult.success()
         }
@@ -205,16 +267,24 @@ class GalaxyManage : CommandBase {
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-            var uuid= args.getOne<UUID>("galaxy").orElse(null)
+            val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
-                if (uuid == null) {
-                    src.sendMessage(Text.of(TextColors.RED,"Not enough arguments!\n",Sponge.getCommandManager().getUsage(src)))
+                var galaxy = galaxyManager.get(uuid)
+                //If galaxy(uuid) is null then get player galaxy
+                if (galaxy == null && src is Player) galaxy = galaxyManager.get(src.world)
+                //If it is still null then return
+                if (galaxy == null) {
+                    src.sendMessage(
+                        Text.of(
+                            TextColors.RED,
+                            "Not enough arguments!\n",
+                            Sponge.getCommandManager().getUsage(src)
+                        )
+                    )
                     return@launch
                 }
-                val galaxy = galaxyManager.get(uuid).await()!!
                 galaxy.update { info = args.getOne<String>("text").get() }
-                src.sendMessage(Text.of(TextColors.GREEN,"Info set to ",galaxy.info,"!"))
+                src.sendMessage(Text.of(TextColors.GREEN, "Info set to ", galaxy.info, "!"))
             }
             return CommandResult.success()
         }
@@ -232,16 +302,24 @@ class GalaxyManage : CommandBase {
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-            var uuid= args.getOne<UUID>("galaxy").orElse(null)
+            val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.uuid
-                if (uuid == null) {
-                    src.sendMessage(Text.of(TextColors.RED,"Not enough arguments!\n",Sponge.getCommandManager().getUsage(src)))
+                var galaxy = galaxyManager.get(uuid)
+                //If galaxy(uuid) is null then get player galaxy
+                if (galaxy == null && src is Player) galaxy = galaxyManager.get(src.world)
+                //If it is still null then return
+                if (galaxy == null) {
+                    src.sendMessage(
+                        Text.of(
+                            TextColors.RED,
+                            "Not enough arguments!\n",
+                            Sponge.getCommandManager().getUsage(src)
+                        )
+                    )
                     return@launch
                 }
-                val galaxy = galaxyManager.get(uuid).await()!!
                 galaxy.update { notice = args.getOne<String>("text").get() }
-                src.sendMessage(Text.of(TextColors.GREEN,"Notice set to ",galaxy.notice,"!"))
+                src.sendMessage(Text.of(TextColors.GREEN, "Notice set to ", galaxy.notice, "!"))
             }
             return CommandResult.success()
         }
@@ -259,25 +337,33 @@ class GalaxyManage : CommandBase {
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-            if (args.getOne<Int>("size").get() > 375000 || args.getOne<Int>("size").get() < 0) {
-                src.sendMessage(Text.of(TextColors.RED,"Size must be between 0 and 375000"))
+            val maxChunkSize = 375000
+            val minChunkSize = 0
+            if (args.getOne<Int>("size").get() > maxChunkSize || args.getOne<Int>("size").get() < minChunkSize) {
+                src.sendMessage(Text.of(TextColors.RED, "Size must be between $minChunkSize and $maxChunkSize"))
                 return CommandResult.empty()
             }
-            var uuid= args.getOne<UUID>("galaxy").orElse(null)
+            val uuid = args.getOne<UUID>("galaxy").orElse(null)
             launch {
-                if (uuid == null && src is Player) uuid = galaxyManager.get(src.world).await()?.getPlanet(src.world)?.uuid
-                if (uuid == null) {
-                    src.sendMessage(Text.of(TextColors.RED,"Not enough arguments!\n",Sponge.getCommandManager().getUsage(src)))
+                var planet = galaxyManager.get(planet = uuid)?.getPlanet(uuid)
+                //If planet(uuid) is null then get player planet
+                if (planet == null && src is Player) planet = galaxyManager.get(src.world)?.getPlanet(src.world)
+                //If it is still null then return
+                if (planet == null) {
+                    src.sendMessage(
+                        Text.of(
+                            TextColors.RED,
+                            "Not enough arguments!\n",
+                            Sponge.getCommandManager().getUsage(src)
+                        )
+                    )
                     return@launch
                 }
-                val planet = Main.galaxyManager.get(planet = uuid).await()!!.getPlanet(uuid)!!
                 planet.size = args.getOne<Int>("size").get()
                 PlanetHelper.updatePlanet(planet)
-                src.sendMessage(Text.of(TextColors.GREEN,"Size set to",planet.size,"!"))
+                src.sendMessage(Text.of(TextColors.GREEN, "Size set to ", planet.size, "!"))
             }
             return CommandResult.success()
         }
     }
-
-
 }

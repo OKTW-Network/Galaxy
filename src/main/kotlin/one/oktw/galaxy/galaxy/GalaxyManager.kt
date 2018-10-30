@@ -1,9 +1,11 @@
 package one.oktw.galaxy.galaxy
 
 import com.mongodb.client.model.Filters.eq
-import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import com.mongodb.reactivestreams.client.FindPublisher
+import kotlinx.coroutines.experimental.reactive.awaitFirstOrNull
+import kotlinx.coroutines.experimental.sync.Mutex
+import kotlinx.coroutines.experimental.sync.withLock
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
@@ -18,44 +20,49 @@ import kotlin.collections.ArrayList
 
 class GalaxyManager {
     private val collection = database.getCollection("Galaxy", Galaxy::class.java)
+    private val saveLock = Mutex()
 
-    fun createGalaxy(name: String, creator: Player, vararg members: UUID): Galaxy {
+    suspend fun createGalaxy(name: String, creator: Player, vararg members: UUID): Galaxy {
         val memberList = ArrayList<Traveler>(members.size + 1)
         memberList += Traveler(creator.uniqueId, OWNER)
         memberList += members.map { Traveler(it) }
 
         val galaxy = Galaxy(name = name, members = memberList)
 
-        launch { collection.insertOne(galaxy) }
+        collection.insertOne(galaxy).awaitFirstOrNull()
         return galaxy
     }
 
-    fun saveGalaxy(galaxy: Galaxy) {
-        collection.findOneAndReplace(eq("uuid", galaxy.uuid), galaxy)
+    suspend fun saveGalaxy(galaxy: Galaxy) {
+        try {
+            saveLock.withLock { collection.findOneAndReplace(eq("uuid", galaxy.uuid), galaxy).awaitFirstOrNull() }
+        } catch (exception: Exception) {
+            main.logger.error("Failed save galaxy: {}({})", galaxy.uuid, galaxy.name)
+            throw exception
+        }
     }
 
     suspend fun deleteGalaxy(uuid: UUID) {
-        get(uuid).await()?.planets?.forEach {
-            it.world.let { PlanetHelper.removePlanet(it) }
-        }
+        get(uuid)?.planets?.forEach { PlanetHelper.removePlanet(it.world) }
 
-        launch { collection.deleteOne(eq("uuid", uuid)) }
+        collection.deleteOne(eq("uuid", uuid)).awaitFirstOrNull()
     }
 
-    fun get(uuid: UUID? = null, planet: UUID? = null) = async {
-        uuid?.let { collection.find(eq("uuid", uuid)).first() }
-                ?: planet?.let { collection.find(eq("planets.uuid", planet)).first() }
+    suspend fun get(uuid: UUID? = null, planet: UUID? = null): Galaxy? {
+        return uuid?.let { collection.find(eq("uuid", uuid)).first().awaitFirstOrNull() }
+            ?: planet?.let { collection.find(eq("planets.uuid", planet)).first().awaitFirstOrNull() }
     }
 
-    fun get(worldProperties: WorldProperties): Deferred<Galaxy?> = async {
-        collection.find(eq("planets.world", worldProperties.uniqueId)).first()
+
+    suspend fun get(worldProperties: WorldProperties): Galaxy? {
+        return collection.find(eq("planets.world", worldProperties.uniqueId)).first().awaitFirstOrNull()
     }
 
-    fun get(world: World) = get(world.properties)
+    suspend fun get(world: World) = get(world.properties)
 
-    fun get(player: Player) = async { collection.find(eq("members.uuid", player.uniqueId)).asSequence() }
+    fun get(player: Player): FindPublisher<Galaxy> = collection.find(eq("members.uuid", player.uniqueId))
 
-    fun listGalaxy() = async { collection.find().asSequence() }
+    fun listGalaxy(): FindPublisher<Galaxy> = collection.find()
 
-    fun listGalaxy(filter: Bson) = async { collection.find(filter).asSequence() }
+    fun listGalaxy(filter: Bson): FindPublisher<Galaxy> = collection.find(filter)
 }

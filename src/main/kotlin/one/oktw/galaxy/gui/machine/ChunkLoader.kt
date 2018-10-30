@@ -1,8 +1,8 @@
 package one.oktw.galaxy.gui.machine
 
 import kotlinx.coroutines.experimental.launch
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.chunkLoaderManager
-import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.gui.GUI
@@ -28,9 +28,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
-import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
-import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
 class ChunkLoader(private val entity: Entity) : GUI() {
@@ -38,12 +36,12 @@ class ChunkLoader(private val entity: Entity) : GUI() {
     private lateinit var chunkLoader: ChunkLoader
     private lateinit var upgradeGUI: GUI
     private val buttonID = Array(2) { UUID.randomUUID() }
-    private val lang = languageService.getDefaultLanguage() // TODO set language
+    private val lang = Main.translationService
     override val token = "ChunkLoader-$uuid"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.HOPPER)
-        .property(InventoryTitle.of(Text.of(lang["UI.ChunkLoader.Title"])))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.ChunkLoader")))
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
 
     init {
@@ -55,14 +53,14 @@ class ChunkLoader(private val entity: Entity) : GUI() {
         Button(UPGRADE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.ChunkLoader.Upgrade"]))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.GREEN, lang.of("UI.Button.Upgrade")))
             }
             .let { inventory.set(1, 0, it) }
 
         Button(X).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, TextStyles.BOLD, lang["UI.ChunkLoader.Remove"]))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.RED, lang.of("UI.Button.Remove")))
             }
             .let { inventory.set(3, 0, it) }
 
@@ -100,7 +98,7 @@ class ChunkLoader(private val entity: Entity) : GUI() {
 
                     chunkLoader.upgrade = it as ArrayList<Upgrade>
 
-                    chunkLoaderManager.updateChunkLoader(chunkLoader, newLevel != originLevel)
+                    chunkLoaderManager.update(chunkLoader, newLevel != originLevel)
                 }
         }
     }

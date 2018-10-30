@@ -14,7 +14,6 @@ import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent
 import org.spongepowered.api.event.filter.Getter
 import org.spongepowered.api.event.filter.cause.First
-import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.network.ClientConnectionEvent
 import org.spongepowered.api.item.ItemTypes.*
@@ -30,7 +29,11 @@ class Armor {
     fun onClickInventory(event: ClickInventoryEvent, @First player: Player) {
         val item = event.cursorTransaction.default.createStack()
 
-        if (item[DataItemType.key].orElse(null) != ARMOR) return
+        if (item[DataItemType.key].orElse(null) != ARMOR) {
+            if (event.transactions.any { it.default[DataItemType.key].orElse(null) == ARMOR }) event.isCancelled = true
+            return
+        }
+
         if (item[DataEnable.key].isPresent) {
             event.cursorTransaction.apply {
                 setCustom(ItemStackSnapshot.NONE)
@@ -46,11 +49,6 @@ class Armor {
         } else {
             event.isCancelled = true
         }
-    }
-
-    @Listener
-    fun onChangeInventory(event: ChangeInventoryEvent) {
-        if (event.transactions.any { it.default[DataItemType.key].orElse(null) == ARMOR }) event.isCancelled = true
     }
 
     @Listener

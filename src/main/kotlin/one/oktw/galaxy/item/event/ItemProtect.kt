@@ -3,15 +3,17 @@ package one.oktw.galaxy.item.event
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
+import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.Order
+import org.spongepowered.api.event.filter.cause.Root
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.DropItemEvent
 import org.spongepowered.api.item.inventory.InventoryArchetypes
 
 class ItemProtect {
     @Listener(order = Order.FIRST)
-    fun onDropItem(event: DropItemEvent.Pre) {
+    fun onDropItem(event: DropItemEvent.Pre, @Root player: Player) {
         event.droppedItems.any { it[DataUUID.key].isPresent }.let(event::setCancelled)
     }
 

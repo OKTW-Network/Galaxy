@@ -12,6 +12,7 @@ import one.oktw.galaxy.data.DataItemType
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.block.BlockTypes.STANDING_SIGN
 import org.spongepowered.api.block.BlockTypes.WALL_SIGN
+import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.key.Keys.GAME_MODE
 import org.spongepowered.api.data.key.Keys.POTION_EFFECTS
 import org.spongepowered.api.effect.potion.PotionEffect
@@ -39,25 +40,33 @@ import org.spongepowered.api.item.ItemTypes.*
 import org.spongepowered.api.scheduler.Task
 import java.util.*
 import java.util.Arrays.asList
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArraySet
 import java.util.concurrent.TimeUnit
 
 @Suppress("unused")
 class Viewer {
     companion object {
-        private val viewer = ConcurrentHashMap.newKeySet<UUID>()
+        private val viewer = CopyOnWriteArraySet<UUID>()
 
         fun setViewer(uuid: UUID) {
             viewer += uuid
-            launch(serverThread) { Sponge.getServer().getPlayer(uuid).ifPresent { it.offer(GAME_MODE, ADVENTURE) } }
+            launch(serverThread) {
+                Sponge.getServer().getPlayer(uuid).ifPresent {
+                    it.offer(GAME_MODE, ADVENTURE)
+                    it.isSleepingIgnored = true
+                }
+            }
         }
 
         fun isViewer(uuid: UUID): Boolean {
+            if (viewer.isEmpty()) return false
+
             return viewer.contains(uuid)
         }
 
         fun removeViewer(uuid: UUID) {
             viewer -= uuid
+            launch(serverThread) { Sponge.getServer().getPlayer(uuid).ifPresent { it.isSleepingIgnored = false } }
         }
     }
 
@@ -65,10 +74,10 @@ class Viewer {
         Task.builder()
             .interval(1, TimeUnit.MINUTES)
             .execute { _ ->
-                Sponge.getServer().onlinePlayers.forEach {
-                    if (!isViewer(it.uniqueId)) return@forEach
+                Sponge.getServer().onlinePlayers.forEach { player ->
+                    if (!isViewer(player.uniqueId)) return@forEach
 
-                    it.transform(POTION_EFFECTS) {
+                    player.transform(POTION_EFFECTS) {
                         (it ?: ArrayList()).apply { add(PotionEffect.of(PotionEffectTypes.SATURATION, 100, 1)) }
                     }
                 }
@@ -92,6 +101,11 @@ class Viewer {
     }
 
     @Listener(order = Order.FIRST)
+    fun onCollideBlock(event: CollideBlockEvent, @Root player: Player) {
+        if (isViewer(player.uniqueId)) event.isCancelled = true
+    }
+
+    @Listener(order = Order.FIRST)
     fun onSpawnEntity(event: SpawnEntityEvent, @All players: Array<Player>) {
         if (players.any { isViewer(it.uniqueId) }) event.isCancelled = true
     }
@@ -109,11 +123,14 @@ class Viewer {
     @Listener(order = Order.FIRST)
     fun onInteractBlock(event: InteractBlockEvent, @Root player: Player) {
         if (isViewer(player.uniqueId)) {
-            // whitelist some custom blocks
-            if (event.targetBlock.state.type in asList(STANDING_SIGN, WALL_SIGN)) return
+            // only allow event if it is going to open gui
+            if (player[Keys.IS_SNEAKING].orElse(false) == false) {
+                // whitelist some custom blocks
+                if (event.targetBlock.state.type in asList(STANDING_SIGN, WALL_SIGN)) return
 
-            event.targetBlock.location.orElse(null)?.get(DataBlockType.key)?.orElse(null)?.let {
-                if (it in asList(PLANET_TERMINAL, CONTROL_PANEL)) return
+                event.targetBlock.location.orElse(null)?.get(DataBlockType.key)?.orElse(null)?.let {
+                    if (it in asList(PLANET_TERMINAL, CONTROL_PANEL)) return
+                }
             }
 
             event.isCancelled = true
@@ -125,10 +142,12 @@ class Viewer {
 
     @Listener(order = Order.FIRST)
     fun onInteractEntity(event: InteractEntityEvent, @Getter("getTargetEntity") entity: Entity) {
-        val target = entity is Player && isViewer(entity.uniqueId)
-        val source = event.cause.allOf(Player::class.java).any { isViewer(it.uniqueId) }
+        event.isCancelled = entity is Player && isViewer(entity.uniqueId) || event.cause.any { it is Player && isViewer(it.uniqueId) }
+    }
 
-        if (target || source) event.isCancelled = true
+    @Listener(order = Order.FIRST)
+    fun onDamageEntity(event: DamageEntityEvent) {
+        event.isCancelled = event.targetEntity.let { it is Player && isViewer(it.uniqueId) } || event.cause.any { it is Player && isViewer(it.uniqueId) }
     }
 
     @Listener(order = Order.FIRST)
@@ -162,25 +181,12 @@ class Viewer {
     }
 
     @Listener(order = Order.FIRST)
-    fun onDamageEntity(event: DamageEntityEvent) {
-        val target = event.targetEntity is Player && isViewer(event.targetEntity.uniqueId)
-        val source = event.cause.allOf(Player::class.java).any { isViewer(it.uniqueId) }
-
-        if (target || source) event.isCancelled = true
-    }
-
-    @Listener(order = Order.FIRST)
     fun onCollideEntity(event: CollideEntityEvent) {
-        if (event.cause.first(Player::class.java).orElse(null)?.let { isViewer(it.uniqueId) } == true) {
+        if (event.cause.firstOrNull().let { it is Player && isViewer(it.uniqueId) }) {
             event.isCancelled = true
         } else {
-            event.filterEntities { it !is Player || !isViewer(it.uniqueId) }
+            event.entities.removeIf { it is Player && isViewer(it.uniqueId) }
         }
-    }
-
-    @Listener(order = Order.FIRST)
-    fun onCollideBlock(event: CollideBlockEvent, @Root player: Player) {
-        if (isViewer(player.uniqueId)) event.isCancelled = true
     }
 
 // TODO add more Listener

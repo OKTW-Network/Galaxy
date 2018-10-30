@@ -5,9 +5,13 @@ import net.minecraft.world.WorldServer
 import one.oktw.galaxy.block.data.FakeBlockItem
 import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.data.DataItemType
+import one.oktw.galaxy.event.PlaceCustomBlockEvent
+import one.oktw.galaxy.event.RemoveCustomBlockEvent
 import one.oktw.galaxy.item.enums.ItemType
 import one.oktw.galaxy.item.enums.ToolType.WRENCH
 import one.oktw.galaxy.item.type.Tool
+import org.spongepowered.api.Sponge
+import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.block.BlockTypes.COMMAND_BLOCK
 import org.spongepowered.api.block.tileentity.CommandBlock
 import org.spongepowered.api.data.key.Keys.*
@@ -20,6 +24,7 @@ import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.event.Listener
+import org.spongepowered.api.event.block.ChangeBlockEvent
 import org.spongepowered.api.event.block.InteractBlockEvent
 import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.event.world.ExplosionEvent
@@ -34,23 +39,58 @@ class FakeBlock {
         val location = event.targetBlock.location.orElse(null)?.getRelative(event.targetSide) ?: return
         var hand: HandType = MAIN_HAND
         val blockItem = player.getItemInHand(MAIN_HAND).orElse(null)
-                ?: player.getItemInHand(OFF_HAND).orElse(null)?.apply { hand = OFF_HAND }
-                ?: return
+            ?: player.getItemInHand(OFF_HAND).orElse(null)?.apply { hand = OFF_HAND }
+            ?: return
+
+        if (event.targetBlock.location.orElse(null)?.get(DataBlockType.key)?.orElse(null)?.hasGUI == true) {
+            if (player[IS_SNEAKING].orElse(false) == false) {
+                // it is opening custom gui of custom block
+                return
+            }
+        }
 
         if (!isBlock(blockItem) || !checkCanPlace(location)) return
 
         if (placeBlock(blockItem, location)) {
+            PlaceCustomBlockEvent(location, blockItem, event.cause).let {
+                Sponge.getEventManager().post(it)
+            }
+
             playPlaceSound(player)
             consumeItem(player, hand)
         }
     }
 
     @Listener
-    fun onBreakBlock(event: InteractBlockEvent.Primary) {
+    fun onUserBreakBlock(event: InteractBlockEvent.Primary) {
         if (event.targetBlock[DataBlockType.key].isPresent) {
             event.isCancelled = true
 
             event.targetBlock.location.ifPresent {
+                (it.extent as WorldServer).playerChunkMap.markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))
+            }
+        }
+    }
+
+    @Listener
+    fun onChangeBlockBreak(event: ChangeBlockEvent.Break) = onChangeBlock(event)
+
+    @Listener
+    fun onChangeBlockModify(event: ChangeBlockEvent.Modify) = onChangeBlock(event)
+
+    private fun onChangeBlock(event: ChangeBlockEvent) {
+        event.transactions.forEach { transaction ->
+            val original = transaction.original
+
+            // fast check, due to data uuid is slow
+            if (original.state.type != BlockTypes.MOB_SPAWNER) return@forEach
+
+            // skip it if it is not a custom block
+            if (!original[DataBlockType.key].isPresent) return@forEach
+
+            transaction.isValid = false
+
+            transaction.original.location.ifPresent {
                 (it.extent as WorldServer).playerChunkMap.markBlockForUpdate(BlockPos(it.blockX, it.blockY, it.blockZ))
             }
         }
@@ -72,8 +112,13 @@ class FakeBlock {
         val item = FakeBlockItem(block).createItemStack().createSnapshot()
 
         entity.offer(REPRESENTED_ITEM, item)
+        location.remove(DataBlockType::class.java)
         location.removeBlock()
         location.spawnEntity(entity)
+
+        RemoveCustomBlockEvent(location, event.cause).let {
+            Sponge.getEventManager().post(it)
+        }
     }
 
     private fun isBlock(item: ItemStack): Boolean {

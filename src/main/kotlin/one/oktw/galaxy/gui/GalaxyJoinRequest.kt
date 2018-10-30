@@ -2,12 +2,10 @@ package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main
-import one.oktw.galaxy.Main.Companion.languageService
-import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataItemType
-import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.data.extensions.addMember
+import one.oktw.galaxy.galaxy.data.extensions.refresh
 import one.oktw.galaxy.galaxy.data.extensions.removeJoinRequest
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import org.spongepowered.api.Sponge
@@ -25,30 +23,18 @@ import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles
+import java.util.*
+import kotlin.streams.toList
 
-class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
+class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI<UUID>() {
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
-    private val lang = languageService.getDefaultLanguage() // Todo get player lang
+    private val lang = Main.translationService
     override val token = "InviteManagement-${galaxy.uuid}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
-        .property(InventoryTitle.of(Text.of(lang["UI.GalaxyJoinRequest.Title"])))
-        .listener(InteractInventoryEvent::class.java, this::eventProcess)
+        .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.JoinRequestList")))
+        .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(Main.main)
-    override val pages = galaxy.joinRequest.asSequence()
-        .map {
-            val user = userStorage.get(it).get()
-            ItemStack.builder()
-                .itemType(ItemTypes.SKULL)
-                .itemData(DataItemType(BUTTON))
-                .itemData(DataUUID(it))
-                .add(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, user.name))
-                .add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
-                .add(Keys.REPRESENTED_PLAYER, user.profile)
-                .build()
-        }
-        .chunked(9)
-        .chunked(5)
 
     init {
         offerPage(0)
@@ -57,19 +43,48 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI() {
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
     }
 
+    override suspend fun get(number: Int, skip: Int): List<Pair<ItemStack, UUID>> {
+        return galaxy.refresh().joinRequest
+            .parallelStream()
+            .skip(skip.toLong())
+            .limit(number.toLong())
+            .map {
+                val user = userStorage.get(it).get()
+                Pair(
+                ItemStack.builder()
+                    .itemType(ItemTypes.SKULL)
+                    .itemData(DataItemType(BUTTON))
+                    .add(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, user.name))
+                    .add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
+                    .add(Keys.REPRESENTED_PLAYER, user.profile)
+                    .build(), it
+                )
+            }
+            .toList()
+    }
+
     private fun clickEvent(event: ClickInventoryEvent) {
-        val item = event.cursorTransaction.default
-        val uuid = item[DataUUID.key].orElse(null) ?: return
+        if (view.disabled) return
 
-        if (item[DataItemType.key].orElse(null) == BUTTON && !isButton(uuid)) {
+        val detail = view.getDetail(event)
+
+        // ignore gui elements, because they are handled by the PageGUI
+        if (isControl(detail)) {
+            return
+        }
+
+        if (detail.affectGUI) {
             event.isCancelled = true
+        }
 
+        if (detail.primary?.type == Companion.Slot.ITEMS) {
+            val uuid = detail.primary.data?.data?: return
             GUIHelper.open(event.source as Player) {
-                Confirm(Text.of(lang["UI.GalaxyJoinRequest.Conform_join"])) {
-                    launch(serverThread) {
+                Confirm(lang.ofPlaceHolder("UI.Title.ConfirmJoinRequest")) {
+                    launch {
                         if (it) galaxy.addMember(uuid)
 
-                        galaxy.removeJoinRequest(uuid).join()
+                        galaxy.removeJoinRequest(uuid)
 
                         offerPage(0)
                     }

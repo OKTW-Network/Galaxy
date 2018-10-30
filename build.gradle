@@ -1,7 +1,7 @@
 buildscript {
-    ext.kotlin_version = '1.2.51'
+    ext.kotlin_version = '1.2.61'
     ext.sponge_version = "7.1.0-SNAPSHOT"
-    ext.Coroutines_version = "0.23.4"
+    ext.Coroutines_version = "0.25.3"
 
     repositories {
         mavenCentral()
@@ -9,10 +9,15 @@ buildscript {
             name = 'forge'
             url = 'https://files.minecraftforge.net/maven'
         }
+        maven {
+            name = 'sponge'
+            url = 'https://repo.spongepowered.org/maven'
+        }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
     }
 }
 
@@ -20,11 +25,12 @@ plugins {
     id "java"
     id "idea"
     id "signing"
-    id "org.spongepowered.plugin" version "0.8.1"
+    id "org.spongepowered.plugin" version "0.9.0"
     id "com.github.johnrengelman.shadow" version "2.0.4"
 }
 apply plugin: 'kotlin'
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'org.spongepowered.mixin'
 
 group "one.oktw"
 version "1.0-SNAPSHOT"
@@ -37,15 +43,19 @@ repositories {
 
 minecraft {
     version = "1.12.2-14.23.4.2705"
-    mappings = "snapshot_20180708"
+    mappings = "stable_39"
     makeObfSourceJar = false
 }
 
 dependencies {
     compile "org.spongepowered:spongeapi:$sponge_version"
+    compile 'org.spongepowered:mixin:0.7.10-SNAPSHOT'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$Coroutines_version"
-    compile "org.mongodb:mongodb-driver-sync:3.8.0"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$Coroutines_version"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$Coroutines_version"
+    compile "org.mongodb:mongodb-driver-reactivestreams:1.9.1"
+    compile "com.github.OKTW-Network:sponge-i18n:0.1.3:api"
 }
 
 kotlin {
@@ -61,20 +71,46 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+sourceSets {
+    main {
+        ext.refMap = "mixins.galaxy.refmap.json"
+    }
+}
+
+reobf {
+    shadowJar {
+        classpath = sourceSets.main.compileClasspath
+    }
+}
+
+extractAnnotationsJar.enabled = false
+
+jar {
+    manifest.attributes(
+        'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+        'MixinConfigs': 'mixins.galaxy.json',
+        'FMLCorePluginContainsFMLMod': true,
+        'ForceLoadAsMod' : true
+    )
+}
+
 shadowJar {
     classifier = null
-    exclude "META-INF/*"
+//    exclude "META-INF/*"
     exclude "dummyThing"
     dependencies {
         include dependency("org.mongodb:")
+        include dependency("org.reactivestreams:")
         include dependency("org.jetbrains.kotlin:")
         include dependency("org.jetbrains.kotlinx:")
     }
 
     relocate "com.mongodb", "one.oktw.relocate.com.mongodb"
     relocate "org.bson", "one.oktw.relocate.org.bson"
+    relocate "org.reactivestreams", "one.oktw.relocate.org.reactivestreams"
     relocate "kotlin", "one.oktw.relocate.kotlin"
     relocate "kotlinx", "one.oktw.relocate.kotlinx"
+    relocate "com.typesafe", "configurate.typesafe"
 }
 
 signing {

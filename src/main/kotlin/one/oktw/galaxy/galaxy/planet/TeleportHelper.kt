@@ -1,7 +1,6 @@
 package one.oktw.galaxy.galaxy.planet
 
 import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
@@ -20,7 +19,7 @@ import org.spongepowered.api.world.World
 class TeleportHelper {
     companion object {
         suspend fun getAccess(player: Player, world: World): AccessLevel {
-            val planet = galaxyManager.get(world).await()?.getPlanet(world) ?: return DENY
+            val planet = galaxyManager.get(world)?.getPlanet(world) ?: return DENY
 
             return planet.checkPermission(player)
         }
@@ -31,17 +30,8 @@ class TeleportHelper {
 
         fun teleport(player: Player, world: World) = async(serverThread) {
             if (getAccess(player, world) == DENY) return@async false
-            if (!player.transferToWorld(world)) return@async false
 
-            launch {
-                if (galaxyManager.get(world).await()?.getPlanet(world)?.checkPermission(player) == VIEW) {
-                    setViewer(player.uniqueId)
-                } else {
-                    removeViewer(player.uniqueId)
-                }
-            }
-
-            return@async true
+            return@async player.transferToWorld(world)
         }
 
         fun teleport(player: Player, location: Location<World>, safety: Boolean = false) = async(serverThread) {

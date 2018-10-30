@@ -1,6 +1,6 @@
 package one.oktw.galaxy.item.type
 
-import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main.Companion.translationService
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataUUID
@@ -9,7 +9,7 @@ import one.oktw.galaxy.item.ItemUtil.Companion.removeDamage
 import one.oktw.galaxy.item.enums.ItemType
 import one.oktw.galaxy.item.enums.ItemType.SWORD
 import one.oktw.galaxy.item.enums.SwordType
-import one.oktw.galaxy.item.enums.SwordType.*
+import one.oktw.galaxy.item.enums.SwordType.MAGI
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
 import org.spongepowered.api.data.key.Keys.*
 import org.spongepowered.api.item.ItemTypes
@@ -45,7 +45,7 @@ data class Sword(
     var upgrade: ArrayList<Upgrade> = ArrayList()
 ) : Item, Overheat {
     override fun createItemStack(): ItemStack {
-        val lang = languageService.getDefaultLanguage() // TODO player lang
+        val lang = translationService
         val item = ItemStack.builder()
             .itemType(ItemTypes.DIAMOND_SWORD)
             .itemData(DataUUID.Immutable(uuid))
@@ -56,13 +56,8 @@ data class Sword(
             .add(HIDE_ATTRIBUTES, true)
             .add(HIDE_ENCHANTMENTS, true)
             .add(ITEM_DURABILITY, type.id.toInt())
+            .add(DISPLAY_NAME, Text.of(BOLD, GREEN, lang.of("item.sword.$type")))
             .itemData(DataEnable())
-
-        when (type) {
-            MAGI -> item.add(DISPLAY_NAME, Text.of(BOLD, GREEN, lang["item.sword.MAGI"]))
-            FIRE -> item.add(DISPLAY_NAME, Text.of(BOLD, GREEN, lang["item.sword.FIRE"]))
-            SCABBARD -> item.add(DISPLAY_NAME, Text.of(BOLD, GREEN, lang["item.sword.SCABBARD"]))
-        }
 
         return item.build().let(::removeDamage).let(::removeCoolDown)
     }

@@ -56,7 +56,7 @@ data class Sword(
             .add(HIDE_ATTRIBUTES, true)
             .add(HIDE_ENCHANTMENTS, true)
             .add(ITEM_DURABILITY, type.id.toInt())
-            .add(DISPLAY_NAME, Text.of(BOLD, GREEN, lang.of("item.sword.$type")))
+            .add(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, GREEN, lang.of("item.sword.$type")))
             .itemData(DataEnable())
 
         return item.build().let(::removeDamage).let(::removeCoolDown)

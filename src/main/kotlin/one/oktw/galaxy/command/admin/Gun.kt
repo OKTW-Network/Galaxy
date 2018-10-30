@@ -1,7 +1,6 @@
 package one.oktw.galaxy.command.admin
 
 import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.galaxy.data.extensions.getMember
@@ -23,6 +22,7 @@ import org.spongepowered.api.command.spec.CommandSpec
 import org.spongepowered.api.data.type.HandTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.format.TextColors.RED
 
 class Gun : CommandBase {
     override val spec: CommandSpec
@@ -60,8 +60,14 @@ class Gun : CommandBase {
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-            if (src is Player) {
-                val traveler = runBlocking { getTraveler(src).await()!! }
+            if (src !is Player) return CommandResult.empty()
+            launch {
+                val traveler = getTraveler(src).await()
+                if (traveler == null) {
+                    src.sendMessage(Text.of(RED, "Galaxy not found or missing: Join a galaxy which you are member first"))
+                    return@launch
+                }
+
                 val type = if (args.getOne<GunStyle>("Type").get() == SNIPER_SIGHT) SNIPER else PISTOL
                 val gun = Gun(
                     itemType = type,
@@ -76,11 +82,9 @@ class Gun : CommandBase {
                 args.getOne<Int>("Through").ifPresent { gun.upgrade.add(Upgrade(THROUGH, it)) }
 
                 traveler.item.add(gun)
-                launch {
-                    galaxyManager.get(src.world)?.run {
-                        getMember(src.uniqueId)?.also {
-                            saveMember(traveler)
-                        }
+                galaxyManager.get(src.world)?.run {
+                    getMember(src.uniqueId)?.also {
+                        saveMember(traveler)
                     }
                 }
 
@@ -100,9 +104,19 @@ class Gun : CommandBase {
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-            if (src is Player) {
-                val traveler = runBlocking { getTraveler(src).await()!! }
+            if (src !is Player) return CommandResult.empty()
+            launch {
+                val traveler = getTraveler(src).await()
+                if (traveler == null) {
+                    src.sendMessage(Text.of(RED, "Error: Galaxy not found or missing"))
+                    return@launch
+                }
                 traveler.item.removeAt(args.getOne<Int>("Gun").get())
+                galaxyManager.get(src.world)?.run {
+                    getMember(src.uniqueId)?.also {
+                        saveMember(traveler)
+                    }
+                }
             }
             return CommandResult.success()
         }
@@ -117,9 +131,19 @@ class Gun : CommandBase {
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-            if (src is Player) {
-                val traveler = runBlocking { getTraveler(src).await()!! }
-                val gun = traveler.item[args.getOne<Int>("Gun").get()] as? Gun ?: return CommandResult.empty()
+            if (src !is Player) return CommandResult.empty()
+            launch {
+                val traveler = getTraveler(src).await()
+                if (traveler == null) {
+                    src.sendMessage(Text.of(RED, "Error: Galaxy not found or missing"))
+                    return@launch
+                }
+
+                val gun = traveler.item[args.getOne<Int>("Gun").get()] as? Gun
+                if (gun == null) {
+                    src.sendMessage(Text.of(RED, "Error: Gun not found"))
+                    return@launch
+                }
 
                 gun.createItemStack().let { src.setItemInHand(HandTypes.MAIN_HAND, it) }
                 src.sendMessage(Text.of(gun.uuid.toString()))
@@ -136,10 +160,14 @@ class Gun : CommandBase {
                 .build()
 
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
-            if (src is Player) {
-                val traveler = runBlocking { getTraveler(src).await()!! }
-
-                src.sendMessage(Text.of(traveler.item.toString()))
+            if (src !is Player) return CommandResult.empty()
+            launch {
+                val traveler = getTraveler(src).await()
+                if (traveler != null) {
+                    src.sendMessage(Text.of(traveler.item.toString()))
+                } else {
+                    src.sendMessage(Text.of(RED, "Fetch failed: Galaxy not found or missing"))
+                }
             }
             return CommandResult.success()
         }

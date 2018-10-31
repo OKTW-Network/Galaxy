@@ -96,7 +96,7 @@ class Recipes {
                     offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(
                         TextStyles.BOLD,
 
-                        TextColors.YELLOW,
+                        TextColors.GOLD,
                         lang.of("item.event.halloween2018.undeadKiller"))
                     )
 
@@ -110,7 +110,7 @@ class Recipes {
                     offer(Keys.HIDE_ATTRIBUTES, true)
 
                     // id == 127
-                    offer(Keys.ITEM_DURABILITY, 127)
+                    offer(Keys.ITEM_DURABILITY, 8)
                     offer(Keys.ITEM_ENCHANTMENTS, asList(
                         Enchantment.of(EnchantmentTypes.SMITE, 5)
                     ))

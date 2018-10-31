@@ -93,15 +93,12 @@ class Recipes {
             HiTechCraftingRecipe.builder()
                 .add(
                     Ingredient.builder().with { item: ItemStack? ->
-                        if (item == null) {
-                            false
-                        } else {
-                            item.type == ItemTypes.DIAMOND_SWORD &&
-                                item.get(Keys.ITEM_DURABILITY).orElse(null) == 1561 &&
-                                !item.get(Keys.DISPLAY_NAME).isPresent &&
-                                !item.get(DataItemType.key).isPresent &&
-                                (item.get(Keys.ITEM_ENCHANTMENTS).orElse(null)?.size ?: 0) == 0
-                        }
+                        item != null &&
+                        item.type == ItemTypes.DIAMOND_SWORD &&
+                        item.get(Keys.ITEM_DURABILITY).orElse(null) == 1561 &&
+                        !item.get(Keys.DISPLAY_NAME).isPresent &&
+                        !item.get(DataItemType.key).isPresent &&
+                        (item.get(Keys.ITEM_ENCHANTMENTS).orElse(null)?.size ?: 0) == 0
                     }.withDisplay(ItemTypes.DIAMOND_SWORD).build(), 1
                 )
                 .add(of(ItemTypes.PUMPKIN), 6)

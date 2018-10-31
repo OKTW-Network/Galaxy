@@ -108,11 +108,12 @@ class Recipes {
                     offer(Keys.HIDE_UNBREAKABLE, true)
                     offer(Keys.HIDE_MISCELLANEOUS, true)
                     offer(Keys.HIDE_ATTRIBUTES, true)
+                    offer(Keys.HIDE_ENCHANTMENTS, true)
 
                     // id == 127
                     offer(Keys.ITEM_DURABILITY, 8)
                     offer(Keys.ITEM_ENCHANTMENTS, asList(
-                        Enchantment.of(EnchantmentTypes.SMITE, 5)
+                        Enchantment.of(EnchantmentTypes.SMITE, 6)
                     ))
 
                     // TODO, vanilla, change to sponge api if possible

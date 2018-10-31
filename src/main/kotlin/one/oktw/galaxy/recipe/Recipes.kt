@@ -4,6 +4,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.block.data.FakeBlockItem
 import one.oktw.galaxy.block.enums.CustomBlocks
+import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.enums.MaterialType
 import one.oktw.galaxy.item.enums.ToolType
@@ -18,6 +19,7 @@ import org.spongepowered.api.item.enchantment.Enchantment
 import org.spongepowered.api.item.enchantment.EnchantmentTypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
+import org.spongepowered.api.item.recipe.crafting.Ingredient
 import org.spongepowered.api.item.recipe.crafting.Ingredient.of
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
@@ -89,7 +91,19 @@ class Recipes {
         private val weapons: List<HiTechCraftingRecipe> = asList(
             // TODO, remove this after event
             HiTechCraftingRecipe.builder()
-                .add(of(ItemTypes.DIAMOND_SWORD), 1)
+                .add(
+                    Ingredient.builder().with { item: ItemStack? ->
+                        if (item == null) {
+                            false
+                        } else {
+                            item.type == ItemTypes.DIAMOND_SWORD &&
+                                item.get(Keys.ITEM_DURABILITY).orElse(null) == 1561 &&
+                                !item.get(Keys.DISPLAY_NAME).isPresent &&
+                                !item.get(DataItemType.key).isPresent &&
+                                (item.get(Keys.ITEM_ENCHANTMENTS).orElse(null)?.size ?: 0) == 0
+                        }
+                    }.withDisplay(ItemTypes.DIAMOND_SWORD).build(), 1
+                )
                 .add(of(ItemTypes.PUMPKIN), 6)
                 .cost(666)
                 .result(ItemStack.of(ItemTypes.DIAMOND_SWORD).apply {

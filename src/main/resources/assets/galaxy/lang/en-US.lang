@@ -142,3 +142,5 @@ Respond.inputGalaxyName=Type your desired galaxy name:
 Respond.createGalaxyCancel=Galaxy creation cancelled
 Respond.createGalaxySuccess=Galaxy created
 Respond.openGalaxyConsole=Open galaxy console
+item.event.halloween2018.undeadKiller=Undead killer
+item.event.halloween2018.undeadKillerLore=R.I.P

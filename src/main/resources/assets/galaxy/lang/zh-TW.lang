@@ -142,3 +142,5 @@ Respond.inputGalaxyName=請輸入一個名稱來創建星系：
 Respond.createGalaxyCancel=已取消創建星系
 Respond.createGalaxySuccess=星系創建成功！
 Respond.openGalaxyConsole=開啟管理介面
+item.event.halloween2018.undeadKiller=惡鬼切割器
+item.event.halloween2018.undeadKillerLore=R.I.P

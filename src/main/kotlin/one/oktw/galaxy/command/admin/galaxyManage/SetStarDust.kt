@@ -38,7 +38,7 @@ class SetStarDust : CommandBase {
 
             if (galaxyUUID != null) {
                 var success = false
-                galaxy!!.update { success = setStarDust(starDust) }
+                galaxy!!.update { success = changeStarDust(starDust) }
                 if (success) {
                     src.sendMessage(Text.of(GREEN, "Set ${galaxy.name}'s StarDust(s) to ${galaxy.starDust}"))
                 } else {

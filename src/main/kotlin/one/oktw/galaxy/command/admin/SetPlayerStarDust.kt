@@ -40,7 +40,7 @@ class SetPlayerStarDust : CommandBase {
                 src.sendMessage(Text.of(RED, "Error: ${player.name} is not a member of the galaxy."))
                 return@launch
             }
-            val success = traveler.setStarDust(starDust)
+            val success = traveler.changeStarDust(starDust)
             if (success) {
                 src.sendMessage(Text.of(GREEN, "Set ${player.name}'s StarDust(s) to ${traveler.starDust}"))
                 galaxy.run {

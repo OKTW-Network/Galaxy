@@ -17,10 +17,12 @@ open class StarDustKeeper {
         return true
     }
 
-    fun setStarDust(number: Long): Boolean {
-        if (number < 0) return false
+    fun setStarDust(number: Number): Boolean {
+        val i = number.toLong()
 
-        starDust = number
+        if (i < 0) return false
+
+        starDust = i
 
         return true
     }

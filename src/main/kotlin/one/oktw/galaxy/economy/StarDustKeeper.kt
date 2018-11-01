@@ -1,5 +1,6 @@
 package one.oktw.galaxy.economy
 
+import org.bson.codecs.pojo.annotations.BsonIgnore
 import kotlin.math.roundToLong
 
 open class StarDustKeeper {
@@ -17,6 +18,7 @@ open class StarDustKeeper {
         return true
     }
 
+    @BsonIgnore
     fun setStarDust(number: Number): Boolean {
         val i = number.toLong()
 

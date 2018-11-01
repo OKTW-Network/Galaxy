@@ -5,6 +5,7 @@ import one.oktw.galaxy.block.data.FakeBlockItem
 import one.oktw.galaxy.block.enums.CustomBlocks.ELEVATOR
 import one.oktw.galaxy.block.enums.CustomBlocks.HT_CRAFTING_TABLE
 import one.oktw.galaxy.item.enums.MaterialType
+import one.oktw.galaxy.block.enums.CustomBlocks.*
 import one.oktw.galaxy.item.enums.ToolType.WRENCH
 import one.oktw.galaxy.item.enums.UpgradeType.*
 import one.oktw.galaxy.item.type.Material

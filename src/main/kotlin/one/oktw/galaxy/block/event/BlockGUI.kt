@@ -5,9 +5,9 @@ import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.block.enums.CustomBlocks.*
 import one.oktw.galaxy.data.DataBlockType
+import one.oktw.galaxy.gui.BrowserGalaxy
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.gui.GUIHelper
-import one.oktw.galaxy.gui.MainMenu
 import one.oktw.galaxy.gui.machine.HiTechCraftingTableList
 import one.oktw.galaxy.gui.machine.PlanetTerminal
 import one.oktw.galaxy.machine.teleporter.TeleporterHelper
@@ -35,7 +35,7 @@ class BlockGUI {
 
         when (blockType) {
             DUMMY -> Unit
-            CONTROL_PANEL -> GUIHelper.open(player) { MainMenu(player) }
+            CONTROL_PANEL -> GUIHelper.open(player) { BrowserGalaxy(player) }
             PLANET_TERMINAL -> launch { galaxyManager.get(player.world)?.let { GUIHelper.open(player) { PlanetTerminal(it, player) } } }
             HT_CRAFTING_TABLE -> GUIHelper.open(player) { HiTechCraftingTableList(player) }
             TELEPORTER, TELEPORTER_ADVANCED -> launch {

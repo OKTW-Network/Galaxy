@@ -1,16 +1,23 @@
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.experimental.channels.any
 import kotlinx.coroutines.experimental.channels.toList
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.openSubscription
-import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.Main.Companion.translationService
 import one.oktw.galaxy.data.DataItemType
+import one.oktw.galaxy.galaxy.data.extensions.getGroup
 import one.oktw.galaxy.galaxy.enums.Group.OWNER
+import one.oktw.galaxy.gui.BrowserGalaxy.Companion.Function.*
+import one.oktw.galaxy.gui.PageGUI.Companion.Slot.FUNCTION
+import one.oktw.galaxy.gui.PageGUI.Companion.Slot.ITEMS
 import one.oktw.galaxy.item.enums.ButtonType
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
 import one.oktw.galaxy.item.type.Button
+import one.oktw.galaxy.translation.extensions.toLegacyText
+import one.oktw.galaxy.util.Chat
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys.*
 import org.spongepowered.api.data.type.SkullTypes
@@ -24,45 +31,53 @@ import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.service.user.UserStorageService
 import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.action.TextActions
 import org.spongepowered.api.text.format.TextColors
-import org.spongepowered.api.text.format.TextStyles
+import org.spongepowered.api.text.format.TextColors.*
+import org.spongepowered.api.text.format.TextStyles.BOLD
+import org.spongepowered.api.text.format.TextStyles.UNDERLINE
 import java.util.*
 import java.util.Arrays.asList
-import kotlin.collections.ArrayList
 import kotlin.streams.toList
 
-class BrowserGalaxy(player: Player? = null) : PageGUI<BrowserGalaxy.Companion.Wrapper>() {
+class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companion.Wrapper>() {
     companion object {
-        enum class Function(val icon: ButtonType) {
-            SORT_NUMBER(ButtonType.SORT_NUMBER),
-            SORT_NAME(ButtonType.SORT_NAME),
-            LIST(ButtonType.WRITE),
+        enum class Function(val icon: ButtonType, val tips: String) {
+            SORT_NUMBER(ButtonType.SORT_NUMBER, "WIP"),
+            SORT_NAME(ButtonType.SORT_NAME, "WIP"),
+            LIST_ALL(ButtonType.GALAXY, "UI.Button.ListAllGalaxy"),
+            LIST_JOIN(ButtonType.GALAXY_JOINED, "UI.Button.ListJoinedGalaxy"),
+            NEW_GALAXY(ButtonType.PLUS, "UI.Button.CreateGalaxy")
         }
+
+        private enum class Sort { NAME, NUMBER }
 
         data class Wrapper(
             val uuid: UUID? = null,
             val function: Function? = null
         )
 
-        fun UUID.toWrapper(): Wrapper {
+        private fun UUID.toWrapper(): Wrapper {
             return Wrapper(uuid = this)
         }
 
-        val PageGUI.Companion.Operation<BrowserGalaxy.Companion.Wrapper>.uuid: UUID?
+        private val PageGUI.Companion.Operation<BrowserGalaxy.Companion.Wrapper>.uuid: UUID?
             get() {
                 return this.data?.uuid
             }
 
-        val PageGUI.Companion.Operation<BrowserGalaxy.Companion.Wrapper>.function: Function?
+        private val PageGUI.Companion.Operation<BrowserGalaxy.Companion.Wrapper>.function: Function?
             get() {
                 return this.data?.function
             }
     }
 
-    private val lang = Main.translationService
+    private val lang = translationService
     private val userStorage = Sponge.getServiceManager().provide(UserStorageService::class.java).get()
-    private val list = galaxyManager.run { player?.let { get(it) } ?: listGalaxy() }
-    override val token = "BrowserGalaxy-${UUID.randomUUID()}"
+    private var list = galaxyManager.get(player)
+    private var listAll = false
+    private var sort = Sort.NAME
+    override val token = "BrowserGalaxy-${player.uniqueId}"
     override val inventory: Inventory = Inventory.builder()
         .of(InventoryArchetypes.DOUBLE_CHEST)
         .property(InventoryTitle.of(lang.ofPlaceHolder("UI.Title.GalaxyList")))
@@ -91,35 +106,35 @@ class BrowserGalaxy(player: Player? = null) : PageGUI<BrowserGalaxy.Companion.Wr
                     ItemStack.builder()
                         .itemType(ItemTypes.SKULL)
                         .itemData(DataItemType(BUTTON))
-                        .add(DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, galaxy.name))
+                        .add(DISPLAY_NAME, Text.of(YELLOW, BOLD, galaxy.name))
                         .add(SKULL_TYPE, SkullTypes.PLAYER)
                         .add(REPRESENTED_PLAYER, owner.profile)
                         .add(
                             ITEM_LORE,
                             asList(
                                 lang.ofPlaceHolder(
-                                    TextColors.GREEN,
+                                    GREEN,
                                     lang.of("UI.Tip.Info"),
                                     ": ",
                                     TextColors.RESET,
                                     galaxy.info
                                 ),
                                 lang.ofPlaceHolder(
-                                    TextColors.GREEN,
+                                    GREEN,
                                     lang.of("UI.Tip.Owner"),
                                     ": ",
                                     TextColors.RESET,
                                     owner.name
                                 ),
                                 lang.ofPlaceHolder(
-                                    TextColors.GREEN,
+                                    GREEN,
                                     lang.of("UI.Tip.MemberCount"),
                                     ": ",
                                     TextColors.RESET,
                                     galaxy.members.size
                                 ),
                                 lang.ofPlaceHolder(
-                                    TextColors.GREEN,
+                                    GREEN,
                                     lang.of("UI.Tip.PlanetCount"),
                                     ": ",
                                     TextColors.RESET,
@@ -134,21 +149,24 @@ class BrowserGalaxy(player: Player? = null) : PageGUI<BrowserGalaxy.Companion.Wr
     }
 
     override suspend fun getFunctionButtons(count: Int): List<Pair<ItemStack, Wrapper?>> {
-        val list = Function.values().asList()
+        val list = arrayListOf<Function?>(
+            if (listAll) LIST_ALL else LIST_JOIN,
+            when (sort) {
+                Sort.NAME -> SORT_NAME
+                Sort.NUMBER -> SORT_NUMBER
+            },
+            NEW_GALAXY
+        )
 
-        return ArrayList<Function?>()
-            .apply {
-                addAll(list)
-                addAll((0 until count).map { null })
+        list.addAll((0 until count - list.size).map { null })
+
+        return list.map {
+            if (it != null) {
+                Pair(Button(it.icon).createItemStack().apply { offer(DISPLAY_NAME, lang.ofPlaceHolder(RESET, lang.of(it.tips))) }, Wrapper(function = it))
+            } else {
+                Pair(Button(ButtonType.GUI_CENTER).createItemStack(), null)
             }
-            .subList(0, count)
-            .map {
-                if (it != null) {
-                    Pair(Button(it.icon).createItemStack(), Wrapper(function = it))
-                } else {
-                    Pair(Button(ButtonType.GUI_CENTER).createItemStack(), null)
-                }
-            }
+        }
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
@@ -157,7 +175,7 @@ class BrowserGalaxy(player: Player? = null) : PageGUI<BrowserGalaxy.Companion.Wr
         val detail = view.getDetail(event)
 
         // ignore gui elements, because they are handled by the PageGUI
-        if (isControl(detail) && detail.primary?.type != PageGUI.Companion.Slot.FUNCTION) {
+        if (isControl(detail) && detail.primary?.type != FUNCTION) {
             return
         }
 
@@ -166,7 +184,7 @@ class BrowserGalaxy(player: Player? = null) : PageGUI<BrowserGalaxy.Companion.Wr
         }
 
         when (detail.primary?.type) {
-            PageGUI.Companion.Slot.ITEMS -> {
+            ITEMS -> {
                 val player = event.source as Player
                 val uuid = detail.primary.data?.uuid ?: return
 
@@ -177,18 +195,65 @@ class BrowserGalaxy(player: Player? = null) : PageGUI<BrowserGalaxy.Companion.Wr
                 }
             }
 
-            PageGUI.Companion.Slot.FUNCTION -> {
+            FUNCTION -> {
                 val function = detail.primary.data?.function ?: return
 
                 when (function) {
-                    Function.SORT_NUMBER -> {
+                    SORT_NUMBER, SORT_NAME -> {
+                        // TODO
+                        when (function) {
+                            SORT_NUMBER -> sort = Sort.NUMBER
+                            SORT_NAME -> sort = Sort.NAME
+                            else -> Unit
+                        }
 
+                        offerPage()
                     }
-                    Function.SORT_NAME -> {
+                    LIST_ALL, LIST_JOIN -> {
+                        list = if (listAll) galaxyManager.get(player) else galaxyManager.listGalaxy()
 
+                        listAll = !listAll
+
+                        offerPage(0)
                     }
-                    Function.LIST -> {
+                    NEW_GALAXY -> launch {
+                        // TODO clean up
+                        if (galaxyManager.get(player).openSubscription().any { it.getGroup(player) == OWNER }) {
+                            player.sendMessage(Text.of(RED, lang.of("Respond.maximumOneGalaxyAllowed")).toLegacyText(player))
+                            return@launch
+                        }
 
+                        val name = Chat.input(player, Text.of(AQUA, lang.of("Respond.inputGalaxyName")).toLegacyText(player))?.toPlain()
+
+                        if (name == null) {
+                            player.sendMessage(Text.of(RED, lang.of("Respond.createGalaxyCancel")).toLegacyText(player))
+                            return@launch
+                        }
+
+                        if (
+                            Chat.confirm(
+                                player,
+                                Text.of(AQUA, lang.of("Respond.createGalaxyConfirmName", Text.of(WHITE, BOLD, name))).toLegacyText(player)
+                            ) == true
+                        ) {
+                            if (galaxyManager.get(player).openSubscription().any { it.getGroup(player) == OWNER }) {
+                                player.sendMessage(Text.of(RED, lang.of("Respond.maximumOneGalaxyAllowed")).toLegacyText(player))
+                                return@launch
+                            }
+
+                            val galaxy = galaxyManager.createGalaxy(name, player)
+                            player.sendMessage(Text.of(YELLOW, lang.of("Respond.createGalaxySuccess")).toLegacyText(player))
+                            player.sendMessage(
+                                Text.of(
+                                    UNDERLINE,
+                                    AQUA,
+                                    TextActions.executeCallback { GUIHelper.open(player) { GalaxyManagement(galaxy) } },
+                                    lang.of("Respond.openGalaxyConsole").toLegacyText(player)
+                                )
+                            )
+                        } else {
+                            player.sendMessage(Text.of(RED, lang.of("Respond.createGalaxyCancel")).toLegacyText(player))
+                        }
                     }
                 }
             }

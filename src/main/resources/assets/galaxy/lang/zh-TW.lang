@@ -156,3 +156,5 @@ Respond.TeleportCancelled="由於離開了傳送站，傳送已取消"
 Respond.TeleportStart="傳送即將開始, 祝旅途愉快"
 Respond.Teleporting="傳送正在進行中"
 Respond.TeleportNothing="沒有東西可以傳送"
+item.event.halloween2018.undeadKiller=惡鬼切割器
+item.event.halloween2018.undeadKillerLore=R.I.P

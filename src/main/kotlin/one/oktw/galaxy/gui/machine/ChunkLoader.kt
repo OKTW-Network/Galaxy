@@ -29,7 +29,6 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.format.TextColors
-import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 
 class ChunkLoader(private val entity: Entity) : GUI() {
@@ -54,14 +53,14 @@ class ChunkLoader(private val entity: Entity) : GUI() {
         Button(UPGRADE).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.GREEN, TextStyles.BOLD, lang.of("UI.Button.Upgrade")))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.GREEN, lang.of("UI.Button.Upgrade")))
             }
             .let { inventory.set(1, 0, it) }
 
         Button(X).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.RED, TextStyles.BOLD, lang.of("UI.Button.Remove")))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.RED, lang.of("UI.Button.Remove")))
             }
             .let { inventory.set(3, 0, it) }
 

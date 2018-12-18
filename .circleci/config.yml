@@ -27,10 +27,10 @@ jobs:
           - dependencies-v3-master-
           - dependencies-v3-
 
-      - run: gradle setupCiWorkspace
+      - run: ./gradlew setupCiWorkspace
 
       # run build
-      - run: gradle build
+      - run: ./gradlew build
 
       - save_cache:
           paths: [~/.gradle]

@@ -18,7 +18,13 @@ import org.spongepowered.api.world.storage.WorldProperties
 import java.util.*
 import kotlin.collections.ArrayList
 
-class GalaxyManager {
+class GalaxyManager private constructor() {
+    companion object {
+        private val instance = GalaxyManager()
+
+        fun getInstance() = instance
+    }
+
     private val collection = database.getCollection("Galaxy", Galaxy::class.java)
     private val saveLock = Mutex()
 

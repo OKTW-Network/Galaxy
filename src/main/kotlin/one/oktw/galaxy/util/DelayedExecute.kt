@@ -1,9 +1,13 @@
 package one.oktw.galaxy.util
 
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.CoroutineStart
+import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.suspendCancellableCoroutine
+import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.scheduler.Task
 
-class DelayedExecute(private val plugin: Any) {
+class DelayedExecute(private val plugin: PluginContainer) {
     fun <T> launch(tick: Long = 1, block: () -> T): Job = launch(start = CoroutineStart.UNDISPATCHED) {
         run(tick, block)
     }

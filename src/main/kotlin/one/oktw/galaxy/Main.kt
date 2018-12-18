@@ -106,14 +106,14 @@ class Main {
     fun onInit(event: GameInitializationEvent) {
         logger.info("Initializing...")
         DatabaseManager()
-        galaxyManager = GalaxyManager()
+        galaxyManager = GalaxyManager.getInstance()
         EventRegister()
         logger.info("Plugin initialized!")
     }
 
     @Listener
     fun onStarting(event: GameStartingServerEvent) {
-        chunkLoaderManager = ChunkLoaderManager()
+        chunkLoaderManager = ChunkLoaderManager.getInstance()
         CommandRegister()
     }
 

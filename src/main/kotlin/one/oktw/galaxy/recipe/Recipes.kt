@@ -78,7 +78,25 @@ class Recipes {
                 .build()
         )
 
-        private val creativeMachines = machines
+        private val creativeMachines = ArrayList<HiTechCraftingRecipe>().apply {
+            add(HiTechCraftingRecipe.builder()
+                .cost(0)
+                .result(FakeBlockItem(CustomBlocks.TELEPORTER).createItemStack())
+                .build()
+            )
+
+            add(HiTechCraftingRecipe.builder()
+                .cost(0)
+                .result(FakeBlockItem(CustomBlocks.TELEPORTER_ADVANCED).createItemStack())
+                .build()
+            )
+
+            add(HiTechCraftingRecipe.builder()
+                .cost(0)
+                .result(FakeBlockItem(CustomBlocks.TELEPORTER_FRAME).createItemStack())
+                .build()
+            )
+        }.plus(machines)
 
         private val weapons: List<HiTechCraftingRecipe> = ArrayList()
 

@@ -1,27 +1,33 @@
-package one.oktw.galaxy.command.admin
+package one.oktw.galaxy.command.admin.galaxyManage
 
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.command.CommandBase
+import one.oktw.galaxy.galaxy.data.extensions.update
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
 import org.spongepowered.api.command.args.GenericArguments
 import org.spongepowered.api.command.spec.CommandSpec
 import org.spongepowered.api.entity.living.player.Player
-import org.spongepowered.api.service.pagination.PaginationList
 import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.format.TextColors.GREEN
 import org.spongepowered.api.text.format.TextColors.RED
 import java.util.*
 
-class GalaxyInfo : CommandBase {
-    override val spec: CommandSpec = CommandSpec.builder()
-        .permission("oktw.command.admin.galaxyInfo")
-        .arguments(GenericArguments.optional(GenericArguments.uuid(Text.of("galaxy"))))
-        .executor(this)
-        .build()
+class TakeStarDust : CommandBase {
+    override val spec: CommandSpec
+        get() = CommandSpec.builder()
+            .executor(this)
+            .permission("oktw.command.admin.galaxyManage.takeStarDust")
+            .arguments(
+                GenericArguments.optionalWeak(GenericArguments.uuid(Text.of("galaxy"))),
+                GenericArguments.longNum(Text.of("starDust"))
+            )
+            .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+        val starDust = args.getOne<Long>("starDust").get()
         var galaxyUUID: UUID? = args.getOne<UUID>("galaxy").orElse(null)
         launch {
             val galaxy = galaxyUUID?.let { galaxyManager.get(it) } ?: (src as? Player)?.world?.let { galaxyManager.get(it) }
@@ -31,18 +37,14 @@ class GalaxyInfo : CommandBase {
             }
 
             if (galaxyUUID != null) {
-                PaginationList.builder()
-                    .contents(
-                        Text.of("Name: ", galaxy!!.name),
-                        Text.of("UUID: ", galaxy.uuid),
-                        Text.of("Info: ", galaxy.info),
-                        Text.of("Notice: ", galaxy.notice),
-                        Text.of("Star dust: ", galaxy.starDust),
-                        Text.of("Planet: ", galaxy.planets),
-                        Text.of("Member: ", galaxy.members)
-                    )
-                    .title(Text.of("Galaxy Info"))
-                    .sendTo(src)
+                var success = false
+                galaxy!!.update { success = takeStarDust(starDust) }
+                if (success) {
+                    src.sendMessage(Text.of(GREEN, "Taken $starDust StarDust(s) from ${galaxy.name}(${galaxy.starDust})"))
+                } else {
+                    src.sendMessage(Text.of(RED, "Failed to take $starDust StarDust(s) from ${galaxy.name}(${galaxy.starDust})"))
+                }
+
             } else {
                 src.sendMessage(Text.of(RED, "Not enough argument: galaxy not found or missing."))
             }

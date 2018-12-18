@@ -1,8 +1,8 @@
 package one.oktw.galaxy.galaxy.data.extensions
 
 import kotlinx.coroutines.experimental.future.await
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.Main.Companion.languageService
 import one.oktw.galaxy.galaxy.data.Galaxy
 import one.oktw.galaxy.galaxy.enums.Group
 import one.oktw.galaxy.galaxy.enums.Group.MEMBER
@@ -13,6 +13,7 @@ import one.oktw.galaxy.galaxy.planet.enums.PlanetType
 import one.oktw.galaxy.galaxy.traveler.data.Traveler
 import one.oktw.galaxy.galaxy.traveler.extensions.getPlayer
 import one.oktw.galaxy.player.event.Viewer.Companion.setViewer
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.text.Text
@@ -60,13 +61,14 @@ suspend fun Galaxy.addMember(uuid: UUID, group: Group = MEMBER) {
 }
 
 suspend fun Galaxy.delMember(uuid: UUID) {
+    val lang = Main.translationService
     val member = members.firstOrNull { it.uuid == uuid } ?: return
 
     member.getPlayer()?.run {
         val planet = getPlanet(world)
 
         if (planet != null) {
-            sendMessage(Text.of(RED, languageService.getDefaultLanguage()["traveler.memberRemovedNotice"]))
+            sendMessage(Text.of(RED, lang.of("traveler.memberRemovedNotice")).toLegacyText(this))
 
             if (planet.visitable) {
                 setViewer(uuid)

@@ -1,6 +1,6 @@
 package one.oktw.galaxy.block.data
 
-import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.block.enums.CustomBlocks
 import one.oktw.galaxy.data.DataBlockType
 import one.oktw.galaxy.data.DataItemType
@@ -11,18 +11,19 @@ import one.oktw.galaxy.item.type.Item
 import org.spongepowered.api.data.key.Keys.*
 import org.spongepowered.api.item.ItemTypes.WOODEN_SWORD
 import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors.BLUE
 import org.spongepowered.api.text.format.TextStyles.BOLD
 
 data class FakeBlockItem(private val block: CustomBlocks) : Item {
+    private val lang = Main.translationService
+
     override val itemType = BLOCK
 
     override fun createItemStack(): ItemStack = ItemStack.builder()
         .itemType(WOODEN_SWORD)
         .itemData(DataItemType(BLOCK))
         .itemData(DataBlockType(block))
-        .add(DISPLAY_NAME, Text.of(BOLD, BLUE, languageService.getDefaultLanguage()["block.${block.name}"]))
+        .add(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, BLUE, lang.of("block.${block.name}")))
         .add(UNBREAKABLE, true)
         .add(HIDE_UNBREAKABLE, true)
         .add(HIDE_MISCELLANEOUS, true)

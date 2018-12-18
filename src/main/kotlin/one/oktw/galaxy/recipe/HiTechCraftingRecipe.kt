@@ -19,12 +19,7 @@ import java.util.Arrays.asList
 
 class HiTechCraftingRecipe {
     companion object {
-        private val lang = Main.languageService.getDefaultLanguage()
-        private val langVanilla = Main.vanillaLanguageService.getDefaultLanguage()
-
-        private fun translateVanilla(translatable: Translatable): String {
-            return langVanilla[translatable.translation.id]
-        }
+        private val lang = Main.translationService
 
         class Builder {
 
@@ -63,7 +58,7 @@ class HiTechCraftingRecipe {
         fun builder() = Builder()
     }
 
-    private val ingredientList: ArrayList<Ingredient> =  ArrayList()
+    private val ingredientList: ArrayList<Ingredient> = ArrayList()
     private val toMatch: HashMap<Ingredient, Int> = HashMap()
     private var cost: Int = 0
     private var result: ItemStackSnapshot = ItemStackSnapshot.NONE
@@ -102,23 +97,18 @@ class HiTechCraftingRecipe {
         for (item in ingredientList) {
             item.displayedItems()[0]?.createStack()
                 ?.apply {
-                    quantity = toMatch[item]?: return@apply
+                    quantity = toMatch[item] ?: return@apply
 
                     if (!haveEnoughIngredient(player, item, quantity)) {
-                        val originalName = this[Keys.DISPLAY_NAME].orElse(null)?.toPlain()
+                        val originalName = lang.removeStyle(lang.fromItem(this))
 
-                        if (originalName != null) {
-                            offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, originalName))
-                        } else {
-                            offer(Keys.DISPLAY_NAME, Text.of(TextColors.RED, translateVanilla(this)))
-                        }
-
+                        offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.RED, originalName))
                     }
 
                     offer(
                         Keys.ITEM_LORE, asList(
-                            Text.of(lang["UI.Tip.needItemCount"].format(quantity)),
-                            Text.of(lang["UI.Tip.haveItemCount"].format(haveIngredient(player, item)))
+                            lang.ofPlaceHolder("UI.Tip.needItemCount", quantity),
+                            lang.ofPlaceHolder("UI.Tip.haveItemCount", haveIngredient(player, item))
                         ) as List<Text>
                     )
                 }
@@ -214,7 +204,7 @@ class HiTechCraftingRecipe {
             var enough = true
 
             ingredientList.forEach { ingredient ->
-                val count = toMatch[ingredient]?: return@forEach
+                val count = toMatch[ingredient] ?: return@forEach
 
                 val has = haveIngredient(player, ingredient)
                 val item = ingredient.displayedItems()[0]!!
@@ -223,14 +213,14 @@ class HiTechCraftingRecipe {
                     enough = false
                 }
 
-                list += Text.of(
+                list += lang.ofPlaceHolder(
                     if (has < count) {
                         TextColors.RED
                     } else {
                         TextColors.GREEN
                     },
                     "$has / $count ",
-                    item[Keys.DISPLAY_NAME].orElse(null)?.toPlain() ?: translateVanilla(item)
+                    lang.removeStyle(lang.fromItem(item.createStack()))
                 )
             }
 
@@ -238,26 +228,22 @@ class HiTechCraftingRecipe {
                 enough = false
             }
 
-            list += Text.of(
+            list += lang.ofPlaceHolder(
                 if (traveler.starDust < cost) {
                     TextColors.RED
                 } else {
                     TextColors.GREEN
                 },
-                "${traveler.starDust} / $cost ${lang["UI.Tip.StarDust"]}"
+                "${traveler.starDust} / $cost ",
+                lang.of("UI.Tip.StarDust")
             )
 
             offer(Keys.ITEM_LORE, list)
 
             if (!enough) {
-                val originalName = this[Keys.DISPLAY_NAME].orElse(null)?.toPlain()
-
                 offer(
-                    Keys.DISPLAY_NAME, if (originalName != null) {
-                        Text.of(TextColors.RED, originalName)
-                    } else {
-                        Text.of(TextColors.RED, translateVanilla(this))
-                    }
+                    Keys.DISPLAY_NAME,
+                    lang.ofPlaceHolder(TextColors.RED, lang.removeStyle(lang.fromItem(this)))
                 )
             }
         }

@@ -1,7 +1,7 @@
 package one.oktw.galaxy.gui
 
 import kotlinx.coroutines.experimental.delay
-import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.gui.view.EventDetail
 import one.oktw.galaxy.gui.view.GridGUIView
@@ -13,9 +13,7 @@ import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
-import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
-import org.spongepowered.api.text.format.TextStyles
 import java.util.*
 import java.util.Arrays.asList
 import kotlin.collections.ArrayList
@@ -82,7 +80,7 @@ abstract class PageGUI<Data> : GUI() {
     }
 
     protected open val hasFunctionButtons: Boolean = false
-    private val lang = languageService.getDefaultLanguage()
+    private val lang = Main.translationService
     private var pageNumber = 0
     private val lock = OrderedLaunch()
 
@@ -123,6 +121,8 @@ abstract class PageGUI<Data> : GUI() {
         }
     }
 
+    protected fun offerPage() = offerPage(pageNumber)
+
     // There should be only one offerPage processed at same time, or the pages will be merged all together
     protected fun offerPage(pageNumber: Int) = lock.launch {
         view.disabled = true
@@ -153,7 +153,7 @@ abstract class PageGUI<Data> : GUI() {
 
         offerButton(pageNumber != 0, showNextPage)
         offerNumber(pageNumber + 1) // make it start from one...
-        offerEmptySlot(pageNumber == 0, !showNextPage)
+        offerEmptySlot()
 
         if (hasFunctionButtons) {
             offerFunction()
@@ -176,17 +176,23 @@ abstract class PageGUI<Data> : GUI() {
         if (previous) {
             Button(ARROW_LEFT).createItemStack()
                 .apply {
-                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.PreviousPage"]))
+                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.GREEN, lang.of("UI.Button.PreviousPage")))
                 }
                 .let { view.setSlot(Slot.PREV, it, Operation(Action.PrevPage)) }
+        } else {
+            Button(UNCLICKABLE_ARROW_LEFT).createItemStack()
+                .let { view.setSlot(Slot.PREV, it, null) }
         }
 
         if (next) {
             Button(ARROW_RIGHT).createItemStack()
                 .apply {
-                    offer(Keys.DISPLAY_NAME, Text.of(TextColors.GREEN, TextStyles.BOLD, lang["UI.Button.NextPage"]))
+                    offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.GREEN, lang.of("UI.Button.NextPage")))
                 }
                 .let { view.setSlot(Slot.NEXT, it, Operation(Action.NextPage)) }
+        } else {
+            Button(UNCLICKABLE_ARROW_RIGHT).createItemStack()
+                .let { view.setSlot(Slot.NEXT, it, null) }
         }
     }
 
@@ -196,23 +202,13 @@ abstract class PageGUI<Data> : GUI() {
         view.setSlots(Slot.NUMBER, getNumbers(pageNumber, length))
     }
 
-    private fun offerEmptySlot(fillPrev: Boolean, fillNext: Boolean) {
+    private fun offerEmptySlot() {
         view.countSlots(Slot.NULL)
             .let { (0 until it) }
             .map {
                 Button(GUI_CENTER).createItemStack()
             }
             .let { view.setSlots(Slot.NULL, it) }
-
-        if (fillPrev) {
-            Button(GUI_CENTER).createItemStack()
-                .let { view.setSlot(Slot.PREV, it, null) }
-        }
-
-        if (fillNext) {
-            Button(GUI_CENTER).createItemStack()
-                .let { view.setSlot(Slot.NEXT, it, null) }
-        }
     }
 
     private suspend fun offerFunction() {

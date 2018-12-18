@@ -2,9 +2,10 @@ package one.oktw.galaxy.util
 
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
-import one.oktw.galaxy.Main.Companion.languageService
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.gui.GUIHelper
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.EventListener
@@ -69,7 +70,7 @@ class Chat {
 
         suspend fun confirm(player: Player, message: Text) = suspendCoroutine<Boolean?> { continuation ->
             var lock = false
-            val lang = languageService.getDefaultLanguage()
+            val lang = Main.translationService
             val confirm = executeCallback {
                 if (lock) return@executeCallback else lock = true
 
@@ -85,9 +86,9 @@ class Chat {
             player.sendMessage(message)
             player.sendMessage(
                 Text.of(
-                    GREEN, UNDERLINE, showText(Text.of(GREEN, lang["Respond.Confirm"])), confirm, lang["Respond.Confirm"],
+                    GREEN, UNDERLINE, showText(Text.of(GREEN, lang.of("Respond.Confirm")).toLegacyText(player)), confirm, lang.of("Respond.Confirm").toLegacyText(player),
                     TextStyles.RESET, " ",
-                    RED, UNDERLINE, showText(Text.of(RED, lang["Respond.Cancel"])), cancel, lang["Respond.Cancel"]
+                    RED, UNDERLINE, showText(Text.of(RED, lang.of("Respond.Cancel")).toLegacyText(player)), cancel, lang.of("Respond.Cancel").toLegacyText(player)
                 )
             )
 

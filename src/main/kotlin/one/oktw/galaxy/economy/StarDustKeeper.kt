@@ -17,6 +17,16 @@ open class StarDustKeeper {
         return true
     }
 
+    fun changeStarDust(number: Number): Boolean {
+        val i = number.toLong()
+
+        if (i < 0) return false
+
+        starDust = i
+
+        return true
+    }
+
     fun takeStarDust(number: Number): Boolean {
         val i = number.toLong()
 

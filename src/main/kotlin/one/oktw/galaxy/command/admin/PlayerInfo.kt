@@ -3,6 +3,7 @@ package one.oktw.galaxy.command.admin
 import kotlinx.coroutines.experimental.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.command.CommandBase
+import one.oktw.galaxy.galaxy.data.extensions.getMember
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.player.event.Viewer.Companion.isViewer
 import org.spongepowered.api.command.CommandResult
@@ -31,8 +32,10 @@ class PlayerInfo : CommandBase {
                     Text.of("Name: ", player.name),
                     Text.of("UUID: ", player.uniqueId),
                     Text.of("Viewer mode: ", isViewer(player.uniqueId)),
+                    Text.of("StarDust: ", galaxy?.getMember(player.uniqueId)?.starDust),
                     Text.of("Galaxy: ${galaxy?.name} (${galaxy?.uuid})"),
-                    Text.of("Planet: ", galaxy?.getPlanet(player.world))
+                    Text.of("Planet: ", galaxy?.getPlanet(player.world)),
+                    Text.of("World: ${player.world.name} (${player.world.uniqueId})")
                 )
                 .title(Text.of("Player Info"))
                 .sendTo(src)

@@ -31,7 +31,7 @@ data class Button(val type: ButtonType = BLANK) : Item {
         .let(::removeCoolDown)
 
     override fun test(item: ItemStack): Boolean {
-        return item[DataItemType.key].orElse(null) == type && item[ITEM_DURABILITY].orElse(null) == type.id
+        return item[DataItemType.key].orElse(null) == itemType && item[ITEM_DURABILITY].orElse(null) == type.id
     }
 
     override fun displayedItems() = listOfNotNull(createItemStack().createSnapshot())

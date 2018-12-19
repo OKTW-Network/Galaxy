@@ -1,6 +1,6 @@
 package one.oktw.galaxy.gui
 
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.data.DataUUID
@@ -82,7 +82,7 @@ class ManageMember(private val galaxy: Galaxy, private val member: UUID) : GUI()
                     }
                 }
             }
-            buttonID[1] -> GUIHelper.open(player) { GroupSelect() { launch { galaxy.setGroup(member, it) } } }
+            buttonID[1] -> GUIHelper.open(player) { GroupSelect { launch { galaxy.setGroup(member, it) } } }
         }
     }
 }

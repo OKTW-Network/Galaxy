@@ -1,11 +1,15 @@
 package one.oktw.galaxy.gui
 
 import com.google.common.collect.MapMaker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import one.oktw.galaxy.Main.Companion.serverThread
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
 import java.lang.ref.SoftReference
 
-abstract class GUI {
+abstract class GUI : CoroutineScope {
+    override val coroutineContext by lazy { Job() + serverThread }
     private val eventListener = ArrayList<(InteractInventoryEvent) -> Unit>()
     abstract val token: String
     abstract val inventory: Inventory

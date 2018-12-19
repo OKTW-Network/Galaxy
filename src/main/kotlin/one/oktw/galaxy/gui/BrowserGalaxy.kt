@@ -1,9 +1,9 @@
 package one.oktw.galaxy.gui
 
-import kotlinx.coroutines.experimental.channels.any
-import kotlinx.coroutines.experimental.channels.toList
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.reactive.openSubscription
+import kotlinx.coroutines.channels.any
+import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.openSubscription
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.translationService

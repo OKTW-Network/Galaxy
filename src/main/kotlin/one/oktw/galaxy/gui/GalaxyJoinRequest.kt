@@ -1,6 +1,6 @@
 package one.oktw.galaxy.gui
 
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.galaxy.data.Galaxy

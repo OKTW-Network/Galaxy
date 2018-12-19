@@ -1,7 +1,7 @@
 package one.oktw.galaxy.gui.machine
 
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper
@@ -25,12 +25,13 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.text.format.TextColors
 import java.util.*
 import java.util.Arrays.asList
+import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.collections.ArrayList
 
 class HiTechCraftingTableList(private val player: Player) : GUI() {
     companion object {
-        private const val CHANGE_PAGE_DELAY = 100
-        private const val OFFER_ITEM_DELAY = 100
+        private val CHANGE_PAGE_DELAY = SECONDS.toMillis(100)
+        private val OFFER_ITEM_DELAY = SECONDS.toMillis(100)
         private val lang = Main.translationService
 
         private enum class Action {
@@ -174,7 +175,7 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
     }
 
     private suspend fun offerRecipes(page: Recipes.Companion.Type, offset: Int = 0) {
-        val traveler = TravelerHelper.getTraveler(player).await() ?: return
+        val traveler = TravelerHelper.getTraveler(player) ?: return
 
         val recipes = catalog[page] ?: return
 
@@ -277,7 +278,7 @@ class HiTechCraftingTableList(private val player: Player) : GUI() {
                 // player.sendMessage(Text.of("recipe $catalog $index"))
 
                 launch {
-                    val traveler = TravelerHelper.getTraveler(player).await() ?: return@launch
+                    val traveler = TravelerHelper.getTraveler(player) ?: return@launch
 
                     GUIHelper.open(player) {
                         HiTechCraftingTableRecipe(

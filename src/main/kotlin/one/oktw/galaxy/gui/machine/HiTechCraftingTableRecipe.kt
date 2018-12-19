@@ -1,7 +1,7 @@
 package one.oktw.galaxy.gui.machine
 
-import kotlinx.coroutines.experimental.CoroutineStart
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.extensions.saveMember
@@ -228,7 +228,7 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
             Action.CRAFT -> {
                 // we don't need to switch thread now
                 launch(Main.serverThread, start = CoroutineStart.UNDISPATCHED) {
-                    val traveler = TravelerHelper.getTraveler(player).await() ?: return@launch
+                    val traveler = TravelerHelper.getTraveler(player) ?: return@launch
 
                     if (player.gameMode().get() == GameModes.CREATIVE) {
                         // creative mode action
@@ -252,7 +252,7 @@ class HiTechCraftingTableRecipe(private val player: Player, traveler: Traveler, 
                                 val galaxy = Main.galaxyManager.get(player.world) ?: return@launch
                                 galaxy.saveMember(traveler)
 
-                                val newTraveler = TravelerHelper.getTraveler(player).await() ?: return@launch
+                                val newTraveler = TravelerHelper.getTraveler(player) ?: return@launch
                                 offerPage(player, newTraveler)
                             }
                         }

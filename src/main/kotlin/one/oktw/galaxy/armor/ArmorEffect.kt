@@ -1,6 +1,7 @@
 package one.oktw.galaxy.armor
 
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.serverThread
 import org.spongepowered.api.Sponge
@@ -59,12 +60,12 @@ class ArmorEffect {
         fun removeEffect(player: Player, type: PotionEffectType) {
             effect[player.uniqueId]?.remove(type)
 
-            launch(serverThread) { player.transform(Keys.POTION_EFFECTS) { it?.apply { removeIf { it.type == type } } } }
+            GlobalScope.launch(serverThread) { player.transform(Keys.POTION_EFFECTS) { it?.apply { removeIf { it.type == type } } } }
         }
 
         fun removeAllEffect(player: Player) {
             effect[player.uniqueId]?.forEach { map ->
-                launch(serverThread) { player.transform(Keys.POTION_EFFECTS) { it?.apply { removeIf { it.type == map.key } } } }
+                GlobalScope.launch(serverThread) { player.transform(Keys.POTION_EFFECTS) { it?.apply { removeIf { it.type == map.key } } } }
             }
             effect -= player.uniqueId
         }

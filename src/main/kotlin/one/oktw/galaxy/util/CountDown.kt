@@ -5,7 +5,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 
 class CountDown {
     companion object {
@@ -15,7 +14,7 @@ class CountDown {
     private val callbacks = ConcurrentHashMap<Any, () -> Unit>()
     private val pendingTask = ConcurrentHashMap<Any, Job>()
 
-    fun countDown(obj: Any, time: Int, cancelCallback: (() -> Unit)? = null): Boolean {
+    fun countDown(obj: Any, time: Number, cancelCallback: (() -> Unit)? = null): Boolean {
         synchronized(this) {
             if (pendingTask[obj] != null) {
                 return false
@@ -26,7 +25,7 @@ class CountDown {
             }
 
             val task = GlobalScope.launch {
-                delay(TimeUnit.SECONDS.toMillis(time.toLong()))
+                delay(time.toLong())
                 pendingTask.remove(obj)
                 callbacks.remove(obj)
             }

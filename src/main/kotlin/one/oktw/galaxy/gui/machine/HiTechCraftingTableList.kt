@@ -25,13 +25,12 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.text.format.TextColors
 import java.util.*
 import java.util.Arrays.asList
-import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.collections.ArrayList
 
 class HiTechCraftingTableList(private val player: Player) : GUI() {
     companion object {
-        private val CHANGE_PAGE_DELAY = SECONDS.toMillis(100)
-        private val OFFER_ITEM_DELAY = SECONDS.toMillis(100)
+        private const val CHANGE_PAGE_DELAY = 100L
+        private const val OFFER_ITEM_DELAY = 100L
         private val lang = Main.translationService
 
         private enum class Action {

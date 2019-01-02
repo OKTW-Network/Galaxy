@@ -1,11 +1,11 @@
 package one.oktw.galaxy.armor.event
 
 import one.oktw.galaxy.armor.ArmorEffect.Companion.removeAllEffect
-import one.oktw.galaxy.armor.ArmorHelper.Companion.offerArmor
-import one.oktw.galaxy.armor.ArmorHelper.Companion.toggleBoots
-import one.oktw.galaxy.armor.ArmorHelper.Companion.toggleChestplate
-import one.oktw.galaxy.armor.ArmorHelper.Companion.toggleHelmet
-import one.oktw.galaxy.armor.ArmorHelper.Companion.toggleLeggings
+import one.oktw.galaxy.armor.ArmorHelper.offerArmor
+import one.oktw.galaxy.armor.ArmorHelper.toggleBoots
+import one.oktw.galaxy.armor.ArmorHelper.toggleChestplate
+import one.oktw.galaxy.armor.ArmorHelper.toggleHelmet
+import one.oktw.galaxy.armor.ArmorHelper.toggleLeggings
 import one.oktw.galaxy.data.DataEnable
 import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.item.enums.ItemType.ARMOR

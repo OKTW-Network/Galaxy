@@ -1,9 +1,12 @@
 package one.oktw.galaxy.block.event
 
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.block.enums.CustomBlocks.TELEPORTER
 import one.oktw.galaxy.block.enums.CustomBlocks.TELEPORTER_ADVANCED
 import one.oktw.galaxy.data.DataBlockType
@@ -41,8 +44,8 @@ import org.spongepowered.api.world.World
 import java.util.*
 import java.util.Arrays.asList
 
-
-class Teleporter {
+class Teleporter : CoroutineScope {
+    override val coroutineContext by lazy { Job() + serverThread }
     private val lang = Main.translationService
 
     init {
@@ -220,17 +223,17 @@ class Teleporter {
         if (item.quantity <= 0) player.setItemInHand(hand, ItemStack.empty()) else player.setItemInHand(hand, item)
     }
 
-    private suspend fun removeArmorStand(position: Location<World>, uuid: UUID) = withContext (Main.serverThread) {
+    private suspend fun removeArmorStand(position: Location<World>, uuid: UUID) = withContext(Main.serverThread) {
         position.extent.entities.filter {
             it.type == EntityTypes.ARMOR_STAND
         }.filter {
             it[DataUUID.key].orElse(null) == uuid
-        } .forEach {
+        }.forEach {
             it.remove()
         }
     }
 
-    private suspend fun createOrUpdateArmorStand(position: Location<World>, uuid: UUID, name: String) = withContext (Main.serverThread) {
+    private suspend fun createOrUpdateArmorStand(position: Location<World>, uuid: UUID, name: String) = withContext(Main.serverThread) {
         // remove the old one
         removeArmorStand(position, uuid)
 

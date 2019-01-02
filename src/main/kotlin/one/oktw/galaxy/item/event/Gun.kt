@@ -2,8 +2,9 @@ package one.oktw.galaxy.item.event
 
 import com.flowpowered.math.imaginary.Quaterniond
 import com.flowpowered.math.vector.Vector3d
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.EntityDamageSource
@@ -61,8 +62,8 @@ class Gun {
         val source = player.getProperty(EyeLocationProperty::class.java)
             .map(EyeLocationProperty::getValue).orElse(null)?.add(direction) ?: return
 
-        launch {
-            val gun = (getTraveler(player).await()!!.item
+        GlobalScope.launch {
+            val gun = (getTraveler(player)!!.item
                 .filter { it is Gun }
                 .find { (it as Gun).uuid == itemStack[DataUUID.key].get() } as? Gun ?: return@launch)
                 .copy()
@@ -136,7 +137,7 @@ class Gun {
             if (it[DataEnable.key].get()) player.setItemInHand(OFF_HAND, toggleScope(it))
         }
 
-        launch { showActionBar(player) }
+        GlobalScope.launch { showActionBar(player) }
     }
 
     private fun drift(direction: Vector3d): Vector3d {
@@ -157,7 +158,7 @@ class Gun {
         }
     }
 
-    private fun checkOverheat(world: World, source: Vector3d, gun: Gun) = async {
+    private fun checkOverheat(world: World, source: Vector3d, gun: Gun) = GlobalScope.async {
         if (CoolDown.getHeat(gun).overheated) return@async true
 
         if (CoolDown.heating(gun).overheated) {
@@ -167,13 +168,13 @@ class Gun {
         return@async false
     }
 
-    private fun getTarget(world: World, source: Vector3d, direction: Vector3d, range: Double) = async {
+    private fun getTarget(world: World, source: Vector3d, direction: Vector3d, range: Double) = GlobalScope.async {
         world.getIntersectingEntities(source, direction, range) {
             it.entity is Living && it.entity !is Player && it.entity !is ArmorStand && (it.entity as EntityLivingBase).isEntityAlive
         }
     }
 
-    private fun getWall(world: World, source: Vector3d, direction: Vector3d, range: Double) = async(serverThread) {
+    private fun getWall(world: World, source: Vector3d, direction: Vector3d, range: Double) = GlobalScope.async(serverThread) {
         BlockRay.from(world, source)
             .direction(direction)
             .distanceLimit(range)
@@ -201,7 +202,7 @@ class Gun {
             .forEach {
                 val entity = it.entity as Living
 
-                launch(serverThread) {
+                GlobalScope.launch(serverThread) {
                     (entity as EntityLivingBase).hurtResistantTime = 0
 
                     entity.damage(
@@ -231,7 +232,7 @@ class Gun {
             }
     }
 
-    private fun showTrajectory(world: World, source: Vector3d, line: Vector3d) = async {
+    private fun showTrajectory(world: World, source: Vector3d, line: Vector3d) = GlobalScope.async {
         val interval = when (line.abs().maxAxis) {
             0 -> line.abs().x.div(0.3)
             1 -> line.abs().y.div(0.3)
@@ -251,7 +252,7 @@ class Gun {
         }
     }
 
-    private fun playShotSound(world: World, position: Vector3d, type: ItemType) = async {
+    private fun playShotSound(world: World, position: Vector3d, type: ItemType) = GlobalScope.async {
         when (type) {
             PISTOL -> world.playSound(
                 SoundType.of("gun.shot"),
@@ -295,7 +296,7 @@ class Gun {
     }
 
     private suspend fun showActionBar(player: Player) {
-        val traveler = getTraveler(player).await() ?: return
+        val traveler = getTraveler(player) ?: return
         val gun1 = player.getItemInHand(MAIN_HAND).orElse(null)?.run {
             traveler.item.filterIsInstance(Gun::class.java).firstOrNull { it.uuid == get(DataUUID.key).orElse(null) }
         }?.copy()?.let { doUpgrade(it) }

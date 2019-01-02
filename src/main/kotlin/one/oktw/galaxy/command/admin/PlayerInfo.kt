@@ -1,6 +1,6 @@
 package one.oktw.galaxy.command.admin
 
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.galaxy.data.extensions.getMember

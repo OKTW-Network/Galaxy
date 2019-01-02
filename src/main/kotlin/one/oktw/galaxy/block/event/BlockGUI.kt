@@ -1,12 +1,15 @@
 package one.oktw.galaxy.block.event
 
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
+import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.block.enums.CustomBlocks.*
 import one.oktw.galaxy.data.DataBlockType
-import one.oktw.galaxy.gui.BrowserGalaxy
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
+import one.oktw.galaxy.gui.BrowserGalaxy
 import one.oktw.galaxy.gui.GUIHelper
 import one.oktw.galaxy.gui.machine.HiTechCraftingTableList
 import one.oktw.galaxy.gui.machine.PlanetTerminal
@@ -23,14 +26,15 @@ import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 
-class BlockGUI {
+class BlockGUI : CoroutineScope {
+    override val coroutineContext by lazy { Job() + serverThread }
     private val lang = Main.translationService
 
     @Listener
     fun onClickBlock(event: InteractBlockEvent.Secondary.MainHand, @First player: Player) {
         if (player[Keys.IS_SNEAKING].orElse(false) == true) return
 
-        val location = event.targetBlock.location.orElse(null)?: return
+        val location = event.targetBlock.location.orElse(null) ?: return
         val blockType = location.get(DataBlockType.key).orElse(null) ?: return
 
         when (blockType) {

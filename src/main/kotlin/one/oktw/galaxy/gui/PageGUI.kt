@@ -1,6 +1,6 @@
 package one.oktw.galaxy.gui
 
-import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.delay
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.gui.view.EventDetail
@@ -20,8 +20,8 @@ import kotlin.collections.ArrayList
 
 abstract class PageGUI<Data> : GUI() {
     companion object {
-        private const val CHANGE_PAGE_INTERVAL = 100
-        private const val SET_ITEM_DELAY = 20
+        private const val CHANGE_PAGE_INTERVAL = 100L
+        private const val SET_ITEM_DELAY = 20L
 
         data class Operation<Data>(
             val action: Action = Action.Null,

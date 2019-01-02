@@ -1,6 +1,6 @@
 package one.oktw.galaxy.galaxy.planet
 
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.withContext
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.planet.data.Planet

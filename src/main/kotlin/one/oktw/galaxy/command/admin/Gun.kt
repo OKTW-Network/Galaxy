@@ -1,6 +1,6 @@
 package one.oktw.galaxy.command.admin
 
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.launch
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.command.CommandBase
 import one.oktw.galaxy.galaxy.data.extensions.getMember
@@ -62,7 +62,7 @@ class Gun : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src !is Player) return CommandResult.empty()
             launch {
-                val traveler = getTraveler(src).await()
+                val traveler = getTraveler(src)
                 if (traveler == null) {
                     src.sendMessage(Text.of(RED, "Galaxy not found or missing: Join a galaxy which you are member first"))
                     return@launch
@@ -106,7 +106,7 @@ class Gun : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src !is Player) return CommandResult.empty()
             launch {
-                val traveler = getTraveler(src).await()
+                val traveler = getTraveler(src)
                 if (traveler == null) {
                     src.sendMessage(Text.of(RED, "Error: Galaxy not found or missing"))
                     return@launch
@@ -133,7 +133,7 @@ class Gun : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src !is Player) return CommandResult.empty()
             launch {
-                val traveler = getTraveler(src).await()
+                val traveler = getTraveler(src)
                 if (traveler == null) {
                     src.sendMessage(Text.of(RED, "Error: Galaxy not found or missing"))
                     return@launch
@@ -162,7 +162,7 @@ class Gun : CommandBase {
         override fun execute(src: CommandSource, args: CommandContext): CommandResult {
             if (src !is Player) return CommandResult.empty()
             launch {
-                val traveler = getTraveler(src).await()
+                val traveler = getTraveler(src)
                 if (traveler != null) {
                     src.sendMessage(Text.of(traveler.item.toString()))
                 } else {

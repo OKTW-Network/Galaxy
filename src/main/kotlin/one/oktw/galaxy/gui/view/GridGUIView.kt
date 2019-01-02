@@ -1,6 +1,6 @@
 package one.oktw.galaxy.gui.view
 
-import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.Job
 import one.oktw.galaxy.Main
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory

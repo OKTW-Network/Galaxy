@@ -1,6 +1,6 @@
 package one.oktw.galaxy.galaxy.data.extensions
 
-import kotlinx.coroutines.experimental.future.await
+import kotlinx.coroutines.future.await
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.galaxy.data.Galaxy

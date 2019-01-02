@@ -3,9 +3,9 @@ package one.oktw.galaxy.machine.teleporter
 import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.reactivestreams.client.FindPublisher
-import kotlinx.coroutines.experimental.reactive.awaitFirst
-import kotlinx.coroutines.experimental.reactive.awaitFirstOrNull
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.withContext
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.block.enums.CustomBlocks
@@ -14,8 +14,6 @@ import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.planet.data.Position
 import one.oktw.galaxy.internal.DatabaseManager
 import one.oktw.galaxy.machine.teleporter.data.Teleporter
-import one.oktw.galaxy.util.CountDown
-import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.property.block.MatterProperty
 import org.spongepowered.api.util.Direction
 import org.spongepowered.api.world.Location

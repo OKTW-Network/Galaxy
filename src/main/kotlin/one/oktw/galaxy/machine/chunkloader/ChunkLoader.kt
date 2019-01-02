@@ -1,7 +1,8 @@
 package one.oktw.galaxy.machine.chunkloader
 
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import one.oktw.galaxy.Main.Companion.chunkLoaderManager
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataUUID
@@ -27,7 +28,7 @@ class ChunkLoader {
         val enderCrystal = event.entities.firstOrNull { it is EnderCrystal } as? EnderCrystal ?: return
 
         if (enderCrystal.location.add(0.0, -1.0, 0.0).blockType == BlockTypes.OBSIDIAN) {
-            launch {
+            GlobalScope.launch {
                 chunkLoaderManager.add(enderCrystal.location).uuid.let {
                     withContext(serverThread) { enderCrystal.offer(DataUUID(it)) }
                 }

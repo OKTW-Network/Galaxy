@@ -1,7 +1,7 @@
 package one.oktw.galaxy.command.admin.galaxyManage
 
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.command.CommandBase

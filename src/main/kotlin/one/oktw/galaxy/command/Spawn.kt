@@ -1,8 +1,9 @@
 package one.oktw.galaxy.command
 
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.player.data.ActionBarData
 import one.oktw.galaxy.player.service.ActionBar
@@ -30,10 +31,10 @@ class Spawn : CommandBase {
 
         lock += src
 
-        launch {
+        GlobalScope.launch {
             for (i in 0..4) {
                 ActionBar.setActionBar(src, ActionBarData(Text.of(TextColors.GREEN, "請等待 ${5 - i} 秒後傳送"), 3))
-                delay(1, TimeUnit.SECONDS)
+                delay(TimeUnit.SECONDS.toMillis(1))
             }
 
             withContext(serverThread) { src.setLocationSafely(src.world.spawnLocation) }

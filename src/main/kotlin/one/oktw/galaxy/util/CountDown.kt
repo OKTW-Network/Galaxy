@@ -1,8 +1,9 @@
 package one.oktw.galaxy.util
 
-import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 
 class CountDown {
@@ -10,10 +11,10 @@ class CountDown {
         val instance = CountDown()
     }
 
-    private val callbacks = ConcurrentHashMap<Any, ()->Unit>()
+    private val callbacks = ConcurrentHashMap<Any, () -> Unit>()
     private val pendingTask = ConcurrentHashMap<Any, Job>()
 
-    fun countDown(obj: Any, time: Int, cancelCallback: (()->Unit)? = null): Boolean {
+    fun countDown(obj: Any, time: Number, cancelCallback: (() -> Unit)? = null): Boolean {
         synchronized(this) {
             if (pendingTask[obj] != null) {
                 return false
@@ -23,8 +24,8 @@ class CountDown {
                 callbacks[obj] = cancelCallback
             }
 
-            val task = launch {
-                delay(time)
+            val task = GlobalScope.launch {
+                delay(time.toLong())
                 pendingTask.remove(obj)
                 callbacks.remove(obj)
             }

@@ -1,7 +1,8 @@
 package one.oktw.galaxy.gui
 
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.item.enums.ButtonType.GUI_CENTER
 import one.oktw.galaxy.item.type.Button
@@ -21,12 +22,12 @@ class GUIHelper {
             val gui = sync.values.mapNotNull { it.firstOrNull { it.token == new.token } }.firstOrNull() ?: new
 
             sync.getOrPut(player) { ConcurrentLinkedDeque() }.offerLast(gui)
-            launch(serverThread) { player.openInventory(gui.inventory) }
+            GlobalScope.launch(serverThread) { player.openInventory(gui.inventory) }
 
             return gui
         }
 
-        fun openAsync(player: Player, create: suspend () -> GUI) = async {
+        fun openAsync(player: Player, create: suspend () -> GUI) = GlobalScope.async {
             val new = create().apply { registerEvent(InteractInventoryEvent.Close::class.java, ::closeEvent) }
             val gui = sync.values.mapNotNull { it.firstOrNull { it.token == new.token } }.firstOrNull() ?: new
 
@@ -41,7 +42,7 @@ class GUIHelper {
                 if (stack.peekLast()?.token == token) {
                     stack.pollLast()
                     val gui = stack.peekLast()
-                    launch(serverThread) { gui?.run { player.openInventory(inventory) } ?: player.closeInventory() }
+                    GlobalScope.launch(serverThread) { gui?.run { player.openInventory(inventory) } ?: player.closeInventory() }
                 }
 
                 stack.removeIf { it.token == token }
@@ -49,9 +50,9 @@ class GUIHelper {
         }
 
         fun closeAll(player: Player) {
-            launch(serverThread) { player.closeInventory() }
+            GlobalScope.launch(serverThread) { player.closeInventory() }
             sync.filterKeys { it.uniqueId == player.uniqueId }.keys.forEach { sync -= it }
-            launch { cleanOffline() }
+            GlobalScope.launch { cleanOffline() }
         }
 
         fun fillEmptySlot(inventory: Inventory) {

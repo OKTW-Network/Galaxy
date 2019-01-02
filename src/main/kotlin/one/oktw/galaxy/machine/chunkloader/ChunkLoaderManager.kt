@@ -2,10 +2,9 @@ package one.oktw.galaxy.machine.chunkloader
 
 import com.flowpowered.math.vector.Vector3i
 import com.mongodb.client.model.Filters.eq
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.reactive.awaitFirstOrNull
-import kotlinx.coroutines.experimental.reactive.consumeEach
+import kotlinx.coroutines.*
+import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactive.consumeEach
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
@@ -22,13 +21,14 @@ import org.spongepowered.api.world.World
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class ChunkLoaderManager private constructor() {
+class ChunkLoaderManager private constructor() : CoroutineScope {
     companion object {
         private val instance = ChunkLoaderManager()
 
         fun getInstance() = instance
     }
 
+    override val coroutineContext by lazy { Job() + Dispatchers.Default }
     private val logger = main.logger
     private val ticketManager = Sponge.getServer().chunkTicketManager
     private val collection = database.getCollection("ChunkLoader", ChunkLoader::class.java)

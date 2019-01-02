@@ -1,9 +1,8 @@
 package one.oktw.galaxy.galaxy.traveler
 
-import kotlinx.coroutines.experimental.async
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.main
-import one.oktw.galaxy.armor.ArmorHelper.Companion.offerArmor
+import one.oktw.galaxy.armor.ArmorHelper.offerArmor
 import one.oktw.galaxy.galaxy.data.extensions.getMember
 import one.oktw.galaxy.galaxy.traveler.data.Traveler
 import org.spongepowered.api.data.key.Keys.EXPERIENCE_LEVEL
@@ -14,7 +13,7 @@ import org.spongepowered.api.item.inventory.Slot
 
 class TravelerHelper {
     companion object {
-        fun getTraveler(player: Player) = async { galaxyManager.get(player.world)?.getMember(player.uniqueId) }
+        suspend fun getTraveler(player: Player) = galaxyManager.get(player.world)?.getMember(player.uniqueId)
 
         fun saveTraveler(traveler: Traveler, player: Player): Traveler {
             traveler.experience = player[TOTAL_EXPERIENCE].get()

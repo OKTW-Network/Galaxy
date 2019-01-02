@@ -1,7 +1,8 @@
 package one.oktw.galaxy.util
 
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.gui.GUIHelper
@@ -20,8 +21,9 @@ import org.spongepowered.api.text.format.TextStyles.UNDERLINE
 import org.spongepowered.api.text.serializer.TextSerializers.FORMATTING_CODE
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit.MINUTES
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.suspendCoroutine
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class Chat {
     companion object {
@@ -57,8 +59,8 @@ class Chat {
             inputStatus[player] = Pair(listener, continuation)
 
             // Timeout 5 min
-            launch {
-                delay(5, MINUTES)
+            GlobalScope.launch {
+                delay(MINUTES.toMillis(5))
 
                 if (inputStatus[player]?.first === listener) {
                     eventManager.unregisterListeners(listener)
@@ -93,8 +95,8 @@ class Chat {
             )
 
             // Timeout 5 min
-            launch {
-                delay(5, MINUTES)
+            GlobalScope.launch {
+                delay(MINUTES.toMillis(5))
 
                 if (!lock) {
                     lock = true

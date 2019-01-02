@@ -1,6 +1,7 @@
 package one.oktw.galaxy.galaxy.planet
 
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import one.oktw.galaxy.Main.Companion.galaxyManager
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
@@ -24,17 +25,17 @@ class TeleportHelper {
             return planet.checkPermission(player)
         }
 
-        fun teleport(player: Player, planet: Planet) = async(serverThread) {
+        fun teleport(player: Player, planet: Planet) = GlobalScope.async(serverThread) {
             planet.loadWorld()?.let { teleport(player, it).await() } ?: false
         }
 
-        fun teleport(player: Player, world: World) = async(serverThread) {
+        fun teleport(player: Player, world: World) = GlobalScope.async(serverThread) {
             if (getAccess(player, world) == DENY) return@async false
 
             return@async player.transferToWorld(world)
         }
 
-        fun teleport(player: Player, location: Location<World>, safety: Boolean = false) = async(serverThread) {
+        fun teleport(player: Player, location: Location<World>, safety: Boolean = false) = GlobalScope.async(serverThread) {
             val permission = getAccess(player, location.extent)
 
             if (permission == DENY) return@async false

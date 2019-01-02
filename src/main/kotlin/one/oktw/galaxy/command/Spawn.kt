@@ -5,8 +5,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import one.oktw.galaxy.Main.Companion.serverThread
+import one.oktw.galaxy.Main.Companion.translationService
 import one.oktw.galaxy.player.data.ActionBarData
 import one.oktw.galaxy.player.service.ActionBar
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.command.CommandResult
 import org.spongepowered.api.command.CommandSource
 import org.spongepowered.api.command.args.CommandContext
@@ -27,13 +29,14 @@ class Spawn : CommandBase {
             .build()
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
+        val lang = translationService
         if (src !is Player || lock.contains(src)) return CommandResult.empty()
 
         lock += src
 
         GlobalScope.launch {
             for (i in 0..4) {
-                ActionBar.setActionBar(src, ActionBarData(Text.of(TextColors.GREEN, "請等待 ${5 - i} 秒後傳送"), 3))
+                ActionBar.setActionBar(src, ActionBarData(Text.of(TextColors.GREEN, lang.of("command.spawn.countdown", 5 - i)).toLegacyText(src), 3))
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
 

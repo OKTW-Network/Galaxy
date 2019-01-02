@@ -158,3 +158,4 @@ Respond.Teleporting="傳送正在進行中"
 Respond.TeleportNothing="沒有東西可以傳送"
 item.event.halloween2018.undeadKiller=惡鬼切割器
 item.event.halloween2018.undeadKillerLore=R.I.P
+command.spawn.countdown="即將於 %s 秒後進行傳送"

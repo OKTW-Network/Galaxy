@@ -218,6 +218,37 @@ class Recipes {
                 .add(of(ItemTypes.CRAFTING_TABLE), 1)
                 .cost(0)
                 .result(FakeBlockItem(CustomBlocks.HT_CRAFTING_TABLE).createItemStack())
+                .build(),
+
+            HiTechCraftingRecipe.builder()
+                .add(FakeBlockItem(CustomBlocks.ELEVATOR), 1)
+                .add(Material(MaterialType.CPU), 1)
+                .add(Material(MaterialType.COOLANT), 1)
+                .add(of(ItemTypes.GOLD_INGOT), 8)
+                .add(of(ItemTypes.IRON_INGOT), 12)
+                .add(of(ItemTypes.OBSIDIAN), 6)
+                .cost(15)
+                .result(FakeBlockItem(CustomBlocks.TELEPORTER).createItemStack())
+                .build(),
+
+            HiTechCraftingRecipe.builder()
+                .add(FakeBlockItem(CustomBlocks.TELEPORTER), 2)
+                .add(Material(MaterialType.CPU), 1)
+                .add(Material(MaterialType.COOLANT), 1)
+                .add(of(ItemTypes.GOLD_INGOT), 12)
+                .add(of(ItemTypes.IRON_INGOT), 16)
+                .add(of(ItemTypes.OBSIDIAN), 8)
+                .add(of(ItemTypes.DIAMOND), 2)
+                .cost(25)
+                .result(FakeBlockItem(CustomBlocks.TELEPORTER_ADVANCED).createItemStack())
+                .build(),
+
+            HiTechCraftingRecipe.builder()
+                .add(of(ItemTypes.IRON_INGOT), 6)
+                .add(of(ItemTypes.GOLD_INGOT), 4)
+                .add(of(ItemTypes.GLASS), 1)
+                .cost(5)
+                .result(FakeBlockItem(CustomBlocks.TELEPORTER_FRAME).createItemStack())
                 .build()
         )
 

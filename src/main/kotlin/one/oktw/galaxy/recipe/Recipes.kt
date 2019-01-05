@@ -84,6 +84,39 @@ class Recipes {
                     .build()
             )
 
+            // Upgrade base
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(of(ItemTypes.REDSTONE), 4)
+                    .add(of(ItemTypes.QUARTZ), 2)
+                    .add(of(ItemTypes.GOLD_INGOT), 2)
+                    .add(of(ItemTypes.GLASS_PANE), 1)
+                    .cost(5)
+                    .result(Upgrade(UpgradeType.BASE).createItemStack())
+                    .build()
+            )
+
+            // Cooling upgrade
+            add(
+                HiTechCraftingRecipe.builder()
+                    .add(Upgrade(UpgradeType.BASE), 1)
+                    .add(Ingredient.builder().with { it.type == ItemTypes.POTION && !it[Keys.POTION_EFFECTS].isPresent }
+                        .withDisplay(ItemStack.of(ItemTypes.POTION, 1)).build(), 5)
+                    .add(Ingredient.builder().with { it.type in asList(ItemTypes.LEAVES, ItemTypes.LEAVES2) }
+                        .withDisplay(ItemStack.of(ItemTypes.LEAVES, 1)).build(), 8)
+                    .cost(10)
+                    .result(Upgrade(UpgradeType.COOLING, 1).createItemStack())
+                    .build()
+            )
+        }
+
+        private val creativeMaterials: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>().apply {
+            add(HiTechCraftingRecipe.builder()
+                .cost(0)
+                .result(Material(MaterialType.PART_BASE).createItemStack())
+                .build()
+            )
+
             // laser
             add(
                 HiTechCraftingRecipe.builder()
@@ -154,14 +187,6 @@ class Recipes {
                     .cost(75)
                     .result(Material(MaterialType.TRIGGER).createItemStack())
                     .build()
-            )
-        }
-
-        private val creativeMaterials: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>().apply {
-            add(HiTechCraftingRecipe.builder()
-                .cost(0)
-                .result(Material(MaterialType.PART_BASE).createItemStack())
-                .build()
             )
         }.plus(materials)
 

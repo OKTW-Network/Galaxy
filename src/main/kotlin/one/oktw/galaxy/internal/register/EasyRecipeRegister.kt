@@ -151,7 +151,7 @@ class EasyRecipeRegister {
                 ShapedCraftingRecipe.builder().aisle("ifi", "iii")
                     .where('i', of(IRON_INGOT))
                     .where('f', of(FURNACE))
-                    .result(FURNACE.template.createStack())
+                    .result(FURNACE_MINECART.template.createStack())
                     .build("furnace_minecart_ingot", main)
             )
 
@@ -175,7 +175,7 @@ class EasyRecipeRegister {
                     .addIngredient(of(FEATHER))
                     .addIngredient(Ingredient.builder().with { it.type == DYE && it[Keys.DYE_COLOR] == DyeColors.BLACK }.build())
                     .result(WRITABLE_BOOK.template.createStack())
-                    .build("writable_book_made_with_book_ingredient", main)
+                    .build("writable_book_paper", main)
             )
 
             // Dispenser made from dropper
@@ -183,13 +183,13 @@ class EasyRecipeRegister {
                 ShapedCraftingRecipe.builder().aisle(" ts", "tds", " ts")
                     .where('t', of(STICK))
                     .where('s', of(STRING))
-                    .where('D', of(DROPPER))
+                    .where('d', of(DROPPER))
                     .result(DISPENSER.template.createStack())
                     .build("dispenser_made_from_dropper", main)
             )
 
 
-            // Dispenser made from dropper
+            // RedStone lamp
             register(
                 ShapedCraftingRecipe.builder().aisle("rgr", "g g", " rgr")
                     .where('r', of(REDSTONE))
@@ -347,7 +347,7 @@ class EasyRecipeRegister {
                             offer(Keys.COLOR, dye_color.color)
                             offer(Keys.DYE_COLOR, dye_color)
                         })
-                        .build("stained_glass_pane_to_stain_glass", main)
+                        .build("stained_glass_pane_to_glass", main)
                 )
             }
 

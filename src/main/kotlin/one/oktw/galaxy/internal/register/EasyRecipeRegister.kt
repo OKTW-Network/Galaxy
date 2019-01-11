@@ -4,6 +4,7 @@ import one.oktw.galaxy.Main.Companion.main
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.DyeColors
+import org.spongepowered.api.data.type.SlabTypes
 import org.spongepowered.api.data.type.TreeTypes
 import org.spongepowered.api.item.ItemTypes.*
 import org.spongepowered.api.item.recipe.crafting.Ingredient
@@ -16,7 +17,7 @@ class EasyRecipeRegister {
     init {
         Sponge.getRegistry().craftingRecipeRegistry.apply {
 
-            val WoodList = listOf(
+            val woodList = listOf(
                 TreeTypes.OAK,
                 TreeTypes.SPRUCE,
                 TreeTypes.BIRCH,
@@ -25,7 +26,7 @@ class EasyRecipeRegister {
                 TreeTypes.DARK_OAK
             )
 
-            val DyeList = listOf(
+            val dyeList = listOf(
                 DyeColors.BLACK,
                 DyeColors.BLUE,
                 DyeColors.BROWN,
@@ -42,6 +43,20 @@ class EasyRecipeRegister {
                 DyeColors.SILVER,
                 DyeColors.WHITE,
                 DyeColors.YELLOW
+            )
+
+            val straitStoneSlabList = listOf(
+                SlabTypes.COBBLESTONE,
+                SlabTypes.STONE,
+                SlabTypes.BRICK,
+                SlabTypes.NETHERBRICK
+            )
+
+            val lanscapeStoneSlabList = listOf(
+                SlabTypes.QUARTZ,
+                SlabTypes.SAND,
+                SlabTypes.RED_SAND,
+                SlabTypes.SMOOTH_BRICK
             )
 
             // Chest (Log)
@@ -131,6 +146,15 @@ class EasyRecipeRegister {
                     .build("chest_minecart_ingot", main)
             )
 
+            // Furnace Minecart
+            register(
+                ShapedCraftingRecipe.builder().aisle("ifi", "iii")
+                    .where('i', of(IRON_INGOT))
+                    .where('f', of(FURNACE))
+                    .result(FURNACE.template.createStack())
+                    .build("furnace_minecart_ingot", main)
+            )
+
             // Carrot On a Stick
             register(
                 ShapedCraftingRecipe.builder().aisle("  s", " st", "sct")
@@ -139,6 +163,39 @@ class EasyRecipeRegister {
                     .where('c', of(CARROT))
                     .result(CARROT_ON_A_STICK.template.createStack())
                     .build("carrot_rod", main)
+            )
+
+            // 同時用書的材料加羽毛墨囊做可以寫得書
+            register(
+                ShapelessCraftingRecipe.builder()
+                    .addIngredient(of(LEATHER))
+                    .addIngredient(of(PAPER))
+                    .addIngredient(of(PAPER))
+                    .addIngredient(of(PAPER))
+                    .addIngredient(of(FEATHER))
+                    .addIngredient(Ingredient.builder().with { it.type == DYE && it[Keys.DYE_COLOR] == DyeColors.BLACK }.build())
+                    .result(WRITABLE_BOOK.template.createStack())
+                    .build("writable_book_made_with_book_ingredient", main)
+            )
+
+            // Dispenser made from dropper
+            register(
+                ShapedCraftingRecipe.builder().aisle(" ts", "tds", " ts")
+                    .where('t', of(STICK))
+                    .where('s', of(STRING))
+                    .where('D', of(DROPPER))
+                    .result(DISPENSER.template.createStack())
+                    .build("dispenser_made_from_dropper", main)
+            )
+
+
+            // Dispenser made from dropper
+            register(
+                ShapedCraftingRecipe.builder().aisle("rgr", "g g", " rgr")
+                    .where('r', of(REDSTONE))
+                    .where('g', of(GLOWSTONE_DUST))
+                    .result(REDSTONE_LAMP.template.createStack())
+                    .build("redstone_lamp_made_from_dusts", main)
             )
 
             // Redstone Repeater
@@ -152,7 +209,7 @@ class EasyRecipeRegister {
             )
 
             // Slab (Log)
-            WoodList.forEach { tree_type ->
+            woodList.forEach { tree_type ->
                 register(
                     ShapedCraftingRecipe.builder().aisle("lll")
                         .where(
@@ -164,7 +221,8 @@ class EasyRecipeRegister {
             }
 
             // Slab To Block
-            WoodList.forEach { tree_type ->
+            //wood
+            woodList.forEach { tree_type ->
                 register(
                     ShapedCraftingRecipe.builder().aisle("s", "s")
                         .where(
@@ -175,8 +233,126 @@ class EasyRecipeRegister {
                 )
             }
 
+            //擺直的
+            straitStoneSlabList.forEach { slabType ->
+                register(
+                    ShapedCraftingRecipe.builder().aisle("s", "s")
+                        .where('s', Ingredient.builder().with { it.type == STONE_SLAB && it[Keys.SLAB_TYPE].get() == slabType }.build())
+                        .result(
+                            when (slabType) {
+                                SlabTypes.COBBLESTONE -> COBBLESTONE.template.createStack()
+                                SlabTypes.STONE -> STONE.template.createStack()
+                                SlabTypes.BRICK -> BRICK_BLOCK.template.createStack()
+                                SlabTypes.NETHERBRICK -> NETHER_BRICK.template.createStack()
+                                else -> AIR.template.createStack()
+                            }
+                        )
+                        .build("${slabType.name.toLowerCase()}_slab_to_block", main)
+                )
+            }
+
+            //擺橫的
+            //Stones
+            lanscapeStoneSlabList.forEach { slabType ->
+                register(
+                    ShapedCraftingRecipe.builder().aisle("ss")
+                        .where('s', Ingredient.builder().with {
+                            it.type == when (slabType) {
+                                SlabTypes.RED_SAND -> STONE_SLAB2
+                                else -> STONE_SLAB
+                            } && it[Keys.SLAB_TYPE].get() == slabType
+                        }.build())
+                        .result(
+                            when (slabType) {
+                                SlabTypes.QUARTZ -> QUARTZ_BLOCK.template.createStack()
+                                SlabTypes.SAND -> SANDSTONE.template.createStack()
+                                SlabTypes.RED_SAND -> RED_SANDSTONE.template.createStack()
+                                SlabTypes.SMOOTH_BRICK -> STONEBRICK.template.createStack()
+                                else -> AIR.template.createStack()
+                            }
+                        )
+                        .build("${slabType.name.toLowerCase()}_slab_to_block", main)
+                )
+            }
+
+            //Purpur Slab
+            register(
+                ShapedCraftingRecipe.builder().aisle("ss")
+                    .where('s', of(PURPUR_SLAB))
+                    .result(PURPUR_BLOCK.template.createStack())
+                    .build("purpur_slab_block", main)
+            )
+
+            // Glasspane -> Glass
+            register(
+                ShapelessCraftingRecipe.builder()
+                    .addIngredient(of(GLASS_PANE))
+                    .addIngredient(of(GLASS_PANE))
+                    .addIngredient(of(GLASS_PANE))
+                    .addIngredient(of(GLASS_PANE))
+                    .addIngredient(of(GLASS_PANE))
+                    .addIngredient(of(GLASS_PANE))
+                    .addIngredient(of(GLASS_PANE))
+                    .addIngredient(of(GLASS_PANE))
+                    .result(GLASS.template.createStack().apply { quantity = 3 })
+                    .build("glass_pane_to_glass", main)
+            )
+
+            //STAINED GLASS PANE -> StainedGlass
+            dyeList.forEach { dye_color ->
+                register(
+                    ShapelessCraftingRecipe.builder()
+                        .addIngredient(
+                            Ingredient.builder().with {
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                            }.build()
+                        )
+                        .addIngredient(
+                            Ingredient.builder().with {
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                            }.build()
+                        )
+                        .addIngredient(
+                            Ingredient.builder().with {
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                            }.build()
+                        )
+                        .addIngredient(
+                            Ingredient.builder().with {
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                            }.build()
+                        )
+                        .addIngredient(
+                            Ingredient.builder().with {
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                            }.build()
+                        )
+                        .addIngredient(
+                            Ingredient.builder().with {
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                            }.build()
+                        )
+                        .addIngredient(
+                            Ingredient.builder().with {
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                            }.build()
+                        )
+                        .addIngredient(
+                            Ingredient.builder().with {
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                            }.build()
+                        )
+                        .result(STAINED_GLASS.template.createStack().apply {
+                            quantity = 3
+                            offer(Keys.COLOR, dye_color.color)
+                            offer(Keys.DYE_COLOR, dye_color)
+                        })
+                        .build("stained_glass_pane_to_stain_glass", main)
+                )
+            }
+
             // Color WOOL
-            DyeList.forEach { dye_color ->
+            dyeList.forEach { dye_color ->
                 register(
                     ShapelessCraftingRecipe.builder()
                         .addIngredient(Ingredient.builder().with { it.type == DYE && it[Keys.DYE_COLOR].get() == dye_color }.build())
@@ -187,7 +363,7 @@ class EasyRecipeRegister {
             }
 
             //STAINED GLASS
-            DyeList.forEach { dye_color ->
+            dyeList.forEach { dye_color ->
                 register(
                     ShapedCraftingRecipe.builder().aisle("sss", "sds", "sss")
                         .where('s', Ingredient.builder().with { it.type == STAINED_GLASS }.build())
@@ -203,7 +379,7 @@ class EasyRecipeRegister {
             }
 
             //STAINED GLASS PANE
-            DyeList.forEach { dye_color ->
+            dyeList.forEach { dye_color ->
                 register(
                     ShapedCraftingRecipe.builder().aisle("sss", "sds", "sss")
                         .where('s', Ingredient.builder().with { it.type == STAINED_GLASS_PANE }.build())
@@ -217,7 +393,6 @@ class EasyRecipeRegister {
                         .build("stained_glass_pane_" + dye_color.name, main)
                 )
             }
-
         }
     }
 }

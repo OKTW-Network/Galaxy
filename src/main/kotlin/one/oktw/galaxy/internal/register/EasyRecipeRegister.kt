@@ -185,17 +185,24 @@ class EasyRecipeRegister {
                     .where('s', of(STRING))
                     .where('d', of(DROPPER))
                     .result(DISPENSER.template.createStack())
-                    .build("dispenser_made_from_dropper", main)
+                    .build("dropper_bow_to_dispenser", main)
             )
 
+            register(
+                ShapelessCraftingRecipe.builder()
+                    .addIngredient(of(DROPPER))
+                    .addIngredient(of(BOW))
+                    .result(DISPENSER.template.createStack())
+                    .build("dropper_to_dispenser", main)
+            )
 
             // RedStone lamp
             register(
-                ShapedCraftingRecipe.builder().aisle("rgr", "g g", " rgr")
+                ShapedCraftingRecipe.builder().aisle("rgr", "g g", "rgr")
                     .where('r', of(REDSTONE))
                     .where('g', of(GLOWSTONE_DUST))
                     .result(REDSTONE_LAMP.template.createStack())
-                    .build("redstone_lamp_made_from_dusts", main)
+                    .build("dusts_to_lamp", main)
             )
 
             // Redstone Repeater

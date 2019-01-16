@@ -9,6 +9,7 @@ enum class UpgradeType(val id: Int) {
 
     // Weapon or Tool
     DAMAGE(997),
+    COOLING(9999),
     COOLING_LV5(21),
     COOLING_LV4(20),
     COOLING_LV3(19),

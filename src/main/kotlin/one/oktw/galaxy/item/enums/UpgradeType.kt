@@ -4,26 +4,25 @@ enum class UpgradeType(val id: Int) {
     BASE(16),
 
     // Machine
-    //RANGE(),
-    //SPEED(),
+    RANGE(999),
+    SPEED(998),
 
     // Weapon or Tool
-    //DAMAGE(),
+    DAMAGE(997),
     COOLING_LV5(21),
     COOLING_LV4(20),
     COOLING_LV3(19),
     COOLING_LV2(18),
-    COOLING_LV1(17)
-    //HEAT(),
-    //THROUGH(),
+    COOLING_LV1(17),
+    HEAT(996),
+    THROUGH(995),
 
-    /* Armor
-    SHIELD(),
-    FLEXIBLE(),
-    ADAPT(),
-    FLY(),
-    NIGHT_VISION(),
-    GPS(),
-    DETECTOR()
-    */
+    // Armor
+    SHIELD(994),
+    FLEXIBLE(993),
+    ADAPT(992),
+    FLY(991),
+    NIGHT_VISION(990),
+    GPS(989),
+    DETECTOR(988)
 }

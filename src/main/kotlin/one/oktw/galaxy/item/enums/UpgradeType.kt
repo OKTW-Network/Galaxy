@@ -1,6 +1,6 @@
 package one.oktw.galaxy.item.enums
 
-enum class UpgradeType {
+enum class UpgradeType(val id: Int) {
     BASE(16),
 
     // Machine

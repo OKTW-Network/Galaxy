@@ -1,14 +1,19 @@
 package one.oktw.galaxy.item.enums
 
 enum class UpgradeType {
-    // General
-    BASE,
+    BASE(16),
+
+    // Machine
     RANGE,
     SPEED,
 
     // Weapon or Tool
     DAMAGE,
-    COOLING,
+    COOLING_LV5(21),
+    COOLING_LV4(20),
+    COOLING_LV3(19),
+    COOLING_LV2(18),
+    COOLING_LV1(17),
     HEAT,
     THROUGH,
 

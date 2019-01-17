@@ -55,7 +55,6 @@ class EasyRecipeRegister {
             val lanscapeStoneSlabList = listOf(
                 SlabTypes.QUARTZ,
                 SlabTypes.SAND,
-                SlabTypes.RED_SAND,
                 SlabTypes.SMOOTH_BRICK
             )
 
@@ -264,16 +263,12 @@ class EasyRecipeRegister {
                 register(
                     ShapedCraftingRecipe.builder().aisle("ss")
                         .where('s', Ingredient.builder().with {
-                            it.type == when (slabType) {
-                                SlabTypes.RED_SAND -> STONE_SLAB2
-                                else -> STONE_SLAB
-                            } && it[Keys.SLAB_TYPE].get() == slabType
+                            it.type == STONE_SLAB && it[Keys.SLAB_TYPE].get() == slabType
                         }.build())
                         .result(
                             when (slabType) {
                                 SlabTypes.QUARTZ -> QUARTZ_BLOCK.template.createStack()
                                 SlabTypes.SAND -> SANDSTONE.template.createStack()
-                                SlabTypes.RED_SAND -> RED_SANDSTONE.template.createStack()
                                 SlabTypes.SMOOTH_BRICK -> STONEBRICK.template.createStack()
                                 else -> AIR.template.createStack()
                             }
@@ -281,6 +276,14 @@ class EasyRecipeRegister {
                         .build("${slabType.name.toLowerCase()}_slab_to_block", main)
                 )
             }
+
+            //Red Sandstone
+            register(
+                ShapedCraftingRecipe.builder().aisle("ss")
+                    .where('s', of(STONE_SLAB2))
+                    .result(RED_SANDSTONE.template.createStack())
+                    .build("red_sand_slab_block", main)
+            )
 
             //Purpur Slab
             register(

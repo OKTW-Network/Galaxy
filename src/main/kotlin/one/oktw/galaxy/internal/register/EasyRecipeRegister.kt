@@ -310,48 +310,21 @@ class EasyRecipeRegister {
 
             //STAINED GLASS PANE -> StainedGlass
             dyeList.forEach { dye_color ->
+                val glassPane = STAINED_GLASS_PANE.template.createStack()
+                glassPane.apply {
+                    offer(Keys.COLOR, dye_color.color)
+                    offer(Keys.DYE_COLOR, dye_color)
+                }
                 register(
                     ShapelessCraftingRecipe.builder()
-                        .addIngredient(
-                            Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
-                            }.build()
-                        )
-                        .addIngredient(
-                            Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
-                            }.build()
-                        )
-                        .addIngredient(
-                            Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
-                            }.build()
-                        )
-                        .addIngredient(
-                            Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
-                            }.build()
-                        )
-                        .addIngredient(
-                            Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
-                            }.build()
-                        )
-                        .addIngredient(
-                            Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
-                            }.build()
-                        )
-                        .addIngredient(
-                            Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
-                            }.build()
-                        )
-                        .addIngredient(
-                            Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
-                            }.build()
-                        )
+                        .addIngredient(Ingredient.builder().with(glassPane).build())
+                        .addIngredient(Ingredient.builder().with(glassPane).build())
+                        .addIngredient(Ingredient.builder().with(glassPane).build())
+                        .addIngredient(Ingredient.builder().with(glassPane).build())
+                        .addIngredient(Ingredient.builder().with(glassPane).build())
+                        .addIngredient(Ingredient.builder().with(glassPane).build())
+                        .addIngredient(Ingredient.builder().with(glassPane).build())
+                        .addIngredient(Ingredient.builder().with(glassPane).build())
                         .result(STAINED_GLASS.template.createStack().apply {
                             quantity = 3
                             offer(Keys.COLOR, dye_color.color)
@@ -379,10 +352,9 @@ class EasyRecipeRegister {
                         .where('s', Ingredient.builder().with { it.type == STAINED_GLASS }.build())
                         .where('d', Ingredient.builder().with { it.type == DYE && it[Keys.DYE_COLOR].get() == dye_color }.build())
                         .result(STAINED_GLASS.template.createStack().apply {
-                            quantity = 8; offer(Keys.COLOR, dye_color.color); offer(
-                            Keys.DYE_COLOR,
-                            dye_color
-                        )
+                            quantity = 8
+                            offer(Keys.COLOR, dye_color.color)
+                            offer(Keys.DYE_COLOR, dye_color)
                         })
                         .build("stained_glass_" + dye_color.name, main)
                 )
@@ -395,10 +367,9 @@ class EasyRecipeRegister {
                         .where('s', Ingredient.builder().with { it.type == STAINED_GLASS_PANE }.build())
                         .where('d', Ingredient.builder().with { it.type == DYE && it[Keys.DYE_COLOR].get() == dye_color }.build())
                         .result(STAINED_GLASS_PANE.template.createStack().apply {
-                            quantity = 8; offer(Keys.COLOR, dye_color.color); offer(
-                            Keys.DYE_COLOR,
-                            dye_color
-                        )
+                            quantity = 8
+                            offer(Keys.COLOR, dye_color.color)
+                            offer(Keys.DYE_COLOR, dye_color)
                         })
                         .build("stained_glass_pane_" + dye_color.name, main)
                 )

@@ -314,42 +314,42 @@ class EasyRecipeRegister {
                     ShapelessCraftingRecipe.builder()
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
                             }.build()
                         )
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
                             }.build()
                         )
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
                             }.build()
                         )
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
                             }.build()
                         )
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
                             }.build()
                         )
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
                             }.build()
                         )
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
                             }.build()
                         )
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.COLOR].get() == dye_color.color
                             }.build()
                         )
                         .result(STAINED_GLASS.template.createStack().apply {

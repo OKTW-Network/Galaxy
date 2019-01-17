@@ -172,7 +172,7 @@ class EasyRecipeRegister {
                     .addIngredient(of(PAPER))
                     .addIngredient(of(PAPER))
                     .addIngredient(of(FEATHER))
-                    .addIngredient(Ingredient.builder().with { it.type == DYE && it[Keys.DYE_COLOR] == DyeColors.BLACK }.build())
+                    .addIngredient(Ingredient.builder().with { it.type == DYE && it[Keys.DYE_COLOR].get() == DyeColors.BLACK }.build())
                     .result(WRITABLE_BOOK.template.createStack())
                     .build("writable_book_paper", main)
             )
@@ -314,42 +314,42 @@ class EasyRecipeRegister {
                     ShapelessCraftingRecipe.builder()
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
                             }.build()
                         )
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
                             }.build()
                         )
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
                             }.build()
                         )
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
                             }.build()
                         )
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
                             }.build()
                         )
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
                             }.build()
                         )
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
                             }.build()
                         )
                         .addIngredient(
                             Ingredient.builder().with {
-                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR] == dye_color && it[Keys.COLOR] == dye_color
+                                it.type == STAINED_GLASS_PANE && it[Keys.DYE_COLOR].get() == dye_color
                             }.build()
                         )
                         .result(STAINED_GLASS.template.createStack().apply {

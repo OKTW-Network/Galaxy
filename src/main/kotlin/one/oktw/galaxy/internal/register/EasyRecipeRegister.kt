@@ -330,7 +330,7 @@ class EasyRecipeRegister {
                             offer(Keys.COLOR, dye_color.color)
                             offer(Keys.DYE_COLOR, dye_color)
                         })
-                        .build("stained_glass_pane_to_glass", main)
+                        .build("${dye_color.name}_stained_glass_pane_to_glass", main)
                 )
             }
 

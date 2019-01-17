@@ -45,14 +45,11 @@ class EasyRecipeRegister {
                 DyeColors.YELLOW
             )
 
-            val straitStoneSlabList = listOf(
+            val stoneSlabList = listOf(
                 SlabTypes.COBBLESTONE,
                 SlabTypes.STONE,
                 SlabTypes.BRICK,
-                SlabTypes.NETHERBRICK
-            )
-
-            val lanscapeStoneSlabList = listOf(
+                SlabTypes.NETHERBRICK,
                 SlabTypes.QUARTZ,
                 SlabTypes.SAND,
                 SlabTypes.SMOOTH_BRICK
@@ -230,7 +227,7 @@ class EasyRecipeRegister {
             //wood
             woodList.forEach { tree_type ->
                 register(
-                    ShapedCraftingRecipe.builder().aisle("s", "s")
+                    ShapedCraftingRecipe.builder().aisle("ss")
                         .where(
                             's', Ingredient.builder().with { it.type == WOODEN_SLAB && it[Keys.TREE_TYPE].get() == tree_type }.build()
                         )
@@ -239,27 +236,8 @@ class EasyRecipeRegister {
                 )
             }
 
-            //擺直的
-            straitStoneSlabList.forEach { slabType ->
-                register(
-                    ShapedCraftingRecipe.builder().aisle("s", "s")
-                        .where('s', Ingredient.builder().with { it.type == STONE_SLAB && it[Keys.SLAB_TYPE].get() == slabType }.build())
-                        .result(
-                            when (slabType) {
-                                SlabTypes.COBBLESTONE -> COBBLESTONE.template.createStack()
-                                SlabTypes.STONE -> STONE.template.createStack()
-                                SlabTypes.BRICK -> BRICK_BLOCK.template.createStack()
-                                SlabTypes.NETHERBRICK -> NETHER_BRICK.template.createStack()
-                                else -> AIR.template.createStack()
-                            }
-                        )
-                        .build("${slabType.name.toLowerCase()}_slab_to_block", main)
-                )
-            }
-
-            //擺橫的
             //Stones
-            lanscapeStoneSlabList.forEach { slabType ->
+            stoneSlabList.forEach { slabType ->
                 register(
                     ShapedCraftingRecipe.builder().aisle("ss")
                         .where('s', Ingredient.builder().with {
@@ -267,6 +245,10 @@ class EasyRecipeRegister {
                         }.build())
                         .result(
                             when (slabType) {
+                                SlabTypes.COBBLESTONE -> COBBLESTONE.template.createStack()
+                                SlabTypes.STONE -> STONE.template.createStack()
+                                SlabTypes.BRICK -> BRICK_BLOCK.template.createStack()
+                                SlabTypes.NETHERBRICK -> NETHER_BRICK.template.createStack()
                                 SlabTypes.QUARTZ -> QUARTZ_BLOCK.template.createStack()
                                 SlabTypes.SAND -> SANDSTONE.template.createStack()
                                 SlabTypes.SMOOTH_BRICK -> STONEBRICK.template.createStack()

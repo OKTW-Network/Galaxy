@@ -18,6 +18,8 @@
 
 package one.oktw.galaxy.recipe
 
+import net.minecraft.init.PotionTypes
+import net.minecraft.potion.PotionUtils
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.block.data.FakeBlockItem
 import one.oktw.galaxy.block.enums.CustomBlocks
@@ -33,6 +35,7 @@ import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.recipe.crafting.Ingredient
 import org.spongepowered.api.item.recipe.crafting.Ingredient.of
+import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.translation.Translation
 import java.util.Arrays.asList
 
@@ -101,9 +104,15 @@ class Recipes {
                 HiTechCraftingRecipe.builder()
                     .add(Upgrade(UpgradeType.BASE), 1)
                     .add(Ingredient.builder().with { it.type == ItemTypes.POTION && !it[Keys.POTION_EFFECTS].isPresent }
-                        .withDisplay(ItemStack.of(ItemTypes.POTION, 1)).build(), 5)
+                        .withDisplay(ItemStack.of(ItemTypes.POTION, 1).apply {
+                            @Suppress("CAST_NEVER_SUCCEEDS") val native = this as net.minecraft.item.ItemStack
+                            PotionUtils.addPotionToItemStack(native, PotionTypes.WATER)
+                            offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.WHITE, lang.translationUnscoped("potion.effect.water")))
+                        }).build(), 6)
                     .add(Ingredient.builder().with { it.type in asList(ItemTypes.LEAVES, ItemTypes.LEAVES2) }
-                        .withDisplay(ItemStack.of(ItemTypes.LEAVES, 1)).build(), 8)
+                        .withDisplay(ItemStack.of(ItemTypes.LEAVES, 1).apply {
+                            offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.WHITE, lang.of("item.unspecified.anyLeaves")))
+                        }).build(), 8)
                     .cost(10)
                     .result(Upgrade(UpgradeType.COOLING, 1).createItemStack())
                     .build()

@@ -160,3 +160,4 @@ item.event.halloween2018.undeadKiller=Undead killer
 item.event.halloween2018.undeadKillerLore=R.I.P
 command.spawn.countdown=Teleportation will start in %s seconds
 Respond.weaponDelivered=Weapon has been delivered to your weapon inventory
+item.unspecified.anyLeaves="Any leaves"

@@ -261,29 +261,11 @@ class Recipes {
                 .build()
         )
 
-        private val creativeMachines = ArrayList<HiTechCraftingRecipe>().apply {
-            add(HiTechCraftingRecipe.builder()
-                .cost(0)
-                .result(FakeBlockItem(CustomBlocks.TELEPORTER).createItemStack())
-                .build()
-            )
-
-            add(HiTechCraftingRecipe.builder()
-                .cost(0)
-                .result(FakeBlockItem(CustomBlocks.TELEPORTER_ADVANCED).createItemStack())
-                .build()
-            )
-
-            add(HiTechCraftingRecipe.builder()
-                .cost(0)
-                .result(FakeBlockItem(CustomBlocks.TELEPORTER_FRAME).createItemStack())
-                .build()
-            )
-        }.plus(machines)
+        private val creativeMachines = ArrayList<HiTechCraftingRecipe>().apply {}.plus(machines)
 
         private val weapons: List<HiTechCraftingRecipe> = ArrayList()
 
-        private val creativeWeapons = ArrayList<HiTechCraftingRecipe>().apply{
+        private val creativeWeapons = ArrayList<HiTechCraftingRecipe>().apply {
             // gun
             add(
                 HiTechCraftingRecipe.builder()
@@ -301,10 +283,10 @@ class Recipes {
             )
         }.plus(weapons)
 
-        private val all: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>().plus(tools).plus(materials).plus(machines).plus(weapons)
+        private val all: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>().plus(machines).plus(tools).plus(weapons).plus(materials)
 
-        private val creativeAll: List<HiTechCraftingRecipe> = ArrayList<HiTechCraftingRecipe>().plus(creativeTools).plus(creativeMaterials).plus(
-            creativeMachines).plus(creativeWeapons)
+        private val creativeAll: List<HiTechCraftingRecipe> =
+            ArrayList<HiTechCraftingRecipe>().plus(creativeMachines).plus(creativeTools).plus(creativeWeapons).plus(creativeMaterials)
 
         val catalog: Map<Type, List<HiTechCraftingRecipe>> = mapOf(
             Type.ALL to all,

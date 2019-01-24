@@ -18,7 +18,9 @@
 
 package one.oktw.galaxy.item.enums
 
-enum class UpgradeType(val id: Int) {
+import java.util.Arrays.asList
+
+enum class UpgradeType(val id: Int, val extraIds: List<Int>? = null) {
     BASE(16),
 
     // Machine
@@ -27,12 +29,7 @@ enum class UpgradeType(val id: Int) {
 
     // Weapon or Tool
     DAMAGE(997),
-    COOLING(9999),
-    COOLING_LV5(21),
-    COOLING_LV4(20),
-    COOLING_LV3(19),
-    COOLING_LV2(18),
-    COOLING_LV1(17),
+    COOLING(9999, asList(17, 18, 19, 20, 21)),
     HEAT(996),
     THROUGH(995),
 

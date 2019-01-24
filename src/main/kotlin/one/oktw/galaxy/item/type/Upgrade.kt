@@ -33,6 +33,7 @@ import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles.BOLD
+import org.spongepowered.api.text.format.TextStyles.RESET
 
 @BsonDiscriminator
 data class Upgrade(val type: UpgradeType = BASE, var level: Int = 0) : Item {
@@ -44,7 +45,7 @@ data class Upgrade(val type: UpgradeType = BASE, var level: Int = 0) : Item {
         val color = when (type) {
             // TODO more color
             RANGE -> TextColors.GREEN
-            else -> TextColors.NONE
+            else -> TextColors.WHITE
         }
 
         val id = if (level > 0 && type.extraIds?.let { it.size >= level } == true) {

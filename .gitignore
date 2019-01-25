@@ -13,6 +13,7 @@ $RECYCLE.BIN/
 *.lnk
 .idea/*
 !.idea/codeStyles
+!.idea/copyright
 
 cmake-build-debug/
 cmake-build-release/

@@ -108,7 +108,7 @@ class Recipes {
                             @Suppress("CAST_NEVER_SUCCEEDS") val native = this as net.minecraft.item.ItemStack
                             PotionUtils.addPotionToItemStack(native, PotionTypes.WATER)
                             offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.WHITE, lang.translationUnscoped("potion.effect.water")))
-                        }).build(), 6)
+                        }).build(), 1)
                     .add(Ingredient.builder().with { it.type in asList(ItemTypes.LEAVES, ItemTypes.LEAVES2) }
                         .withDisplay(ItemStack.of(ItemTypes.LEAVES, 1).apply {
                             offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.WHITE, lang.of("item.unspecified.anyLeaves")))

@@ -55,7 +55,13 @@ data class Upgrade(val type: UpgradeType = BASE, var level: Int = 0) : Item {
         }
 
         return ItemStack.builder()
-            .add(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, color, lang.of("item.Upgrade.Item", name), " Lv.$level"))
+            .apply {
+                if (level > 0) {
+                    add(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, color, lang.of("item.Upgrade.Item", name), " Lv.$level"))
+                } else {
+                    add(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, color, lang.of("item.Upgrade.Item", name)))
+                }
+            }
             .itemType(ItemTypes.DIAMOND_SWORD)
             .add(Keys.UNBREAKABLE, true)
             .add(Keys.HIDE_UNBREAKABLE, true)

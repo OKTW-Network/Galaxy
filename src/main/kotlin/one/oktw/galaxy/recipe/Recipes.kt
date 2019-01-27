@@ -79,7 +79,7 @@ class Recipes {
             add(
                 HiTechCraftingRecipe.builder()
                     .add(of(Upgrade(UpgradeType.COOLING, 1).createItemStack()), 1)
-                    .add(of(ItemTypes.LAPIS_BLOCK), 3)
+                    .add(lapis, 27)
                     .add(of(ItemTypes.IRON_INGOT), 6)
                     .add(Material(MaterialType.PART_BASE), 1)
                     .cost(20)

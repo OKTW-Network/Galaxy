@@ -46,7 +46,9 @@ import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.EventListener
+import org.spongepowered.api.event.entity.DestructEntityEvent
 import org.spongepowered.api.event.entity.MoveEntityEvent
+import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory
@@ -70,6 +72,18 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
                 teleporter.moveEvent(event)
             }
         }
+
+        class DestructEntityListener(private val teleporter: one.oktw.galaxy.gui.machine.Teleporter) : EventListener<DestructEntityEvent> {
+            override fun handle(event: DestructEntityEvent) {
+                teleporter.destructEntityEvent(event)
+            }
+        }
+
+        class PrePickupListener(private val teleporter: one.oktw.galaxy.gui.machine.Teleporter) : EventListener<ChangeInventoryEvent.Pickup.Pre> {
+            override fun handle(event: ChangeInventoryEvent.Pickup.Pre) {
+                teleporter.prePickupEvent(event)
+            }
+        }
     }
 
     private val MAX_FRAME = 64
@@ -82,6 +96,8 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
     private val sourceFrames: ArrayList<Location<World>> = ArrayList()
 
     private val moveEventListener = MoveEventListener(this)
+    private val destructEntityEventListener = DestructEntityListener(this)
+    private val prePickupListener = PrePickupListener(this)
 
     override val token = "Teleporter-${UUID.randomUUID()}"
     override val inventory: Inventory = Inventory.builder()
@@ -242,6 +258,8 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
 
             // delay listener register to here to prevent listener leak
             Sponge.getEventManager().registerListener(main, MoveEntityEvent::class.java, moveEventListener)
+            Sponge.getEventManager().registerListener(main, DestructEntityEvent::class.java, destructEntityEventListener)
+            Sponge.getEventManager().registerListener(main, ChangeInventoryEvent.Pickup.Pre::class.java, prePickupListener)
 
             waitingEntities.addAll(getEntities(player.world, teleporter))
 
@@ -275,6 +293,8 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
             job?.join()
 
             Sponge.getEventManager().unregisterListeners(moveEventListener)
+            Sponge.getEventManager().unregisterListeners(destructEntityEventListener)
+            Sponge.getEventManager().unregisterListeners(prePickupListener)
             // main.logger.info("event unregistered")
 
             if (job?.isCancelled == true) {
@@ -373,17 +393,18 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
         if (waitingEntities.size == 0) {
             // main.logger.info("event unregistered")
             Sponge.getEventManager().unregisterListeners(moveEventListener)
+            Sponge.getEventManager().unregisterListeners(destructEntityEventListener)
+            Sponge.getEventManager().unregisterListeners(prePickupListener)
         }
     }
 
     private fun moveEvent(event: MoveEntityEvent) {
-
-        val player = event.source as? Player ?: return
+        val entity = event.source as? Entity ?: return
         // main.logger.info("event detect")
 
         val location = event.toTransform.position
 
-        if (player !in waitingEntities) return
+        if (entity !in waitingEntities) return
         // main.logger.info("user match")
 
         if (
@@ -391,9 +412,34 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
                 it.blockPosition.add(0, 1, 0) == location.toInt()
             }
         ) {
-            waitingEntities.remove(player)
-            ActionBar.setActionBar(player, ActionBarData(Text.of(TextColors.RED, lang.of("Respond.TeleportCancelled")).toLegacyText(player), 3))
+            waitingEntities.remove(entity)
+
+            if (entity is Player) {
+                ActionBar.setActionBar(entity, ActionBarData(Text.of(TextColors.RED, lang.of("Respond.TeleportCancelled")).toLegacyText(entity), 3))
+            }
         }
+
+        if (waitingEntities.size == 0) {
+            CountDown.instance.cancel(teleporter.uuid)
+            return
+        }
+    }
+
+    private fun destructEntityEvent(event: DestructEntityEvent) {
+        val entity = event.targetEntity
+        if (entity !in waitingEntities) return
+        waitingEntities.remove(entity)
+
+        if (waitingEntities.size == 0) {
+            CountDown.instance.cancel(teleporter.uuid)
+            return
+        }
+    }
+
+    private fun prePickupEvent(event: ChangeInventoryEvent.Pickup.Pre) {
+        val entity = event.targetEntity
+        if (entity !in waitingEntities) return
+        waitingEntities.remove(entity)
 
         if (waitingEntities.size == 0) {
             CountDown.instance.cancel(teleporter.uuid)

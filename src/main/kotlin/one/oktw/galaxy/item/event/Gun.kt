@@ -26,9 +26,13 @@ import kotlinx.coroutines.launch
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.EntityDamageSource
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataEnable
+import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataUUID
+import one.oktw.galaxy.event.CustomItemCraftEvent
+import one.oktw.galaxy.event.PostHiTectCraftEvent
 import one.oktw.galaxy.galaxy.traveler.TravelerHelper.Companion.getTraveler
 import one.oktw.galaxy.item.enums.ItemType
 import one.oktw.galaxy.item.enums.ItemType.PISTOL
@@ -36,6 +40,7 @@ import one.oktw.galaxy.item.enums.ItemType.SNIPER
 import one.oktw.galaxy.item.enums.UpgradeType.*
 import one.oktw.galaxy.item.service.CoolDown
 import one.oktw.galaxy.item.type.Gun
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.block.BlockTypes.*
 import org.spongepowered.api.data.key.Keys.*
 import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData
@@ -61,13 +66,17 @@ import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
 import org.spongepowered.api.item.ItemTypes.DIAMOND_SWORD
 import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult
 import org.spongepowered.api.util.blockray.BlockRay
 import org.spongepowered.api.world.World
 import org.spongepowered.api.world.extent.EntityUniverse.EntityHit
 import java.lang.Math.random
+import java.util.Arrays.asList
 import kotlin.math.roundToInt
 
 class Gun {
+    val lang = Main.translationService
+
     @Listener
     @Suppress("unused")
     fun onInteractItem(event: InteractItemEvent.Secondary.MainHand, @Getter("getSource") player: Player) {
@@ -136,6 +145,26 @@ class Gun {
 
     @Listener
     fun onHeld(event: ChangeInventoryEvent.Held, @Root player: Player) = onChangeInventory(event, player)
+
+    @Listener
+    fun onGunItemCraft(event: PostHiTectCraftEvent) {
+        if (event.item[DataItemType.key].orElse(null) in asList(ItemType.PISTOL, ItemType.SNIPER)) {
+            event.isCancelled = true
+        }
+    }
+
+    @Listener
+    fun onGunCraft(event: CustomItemCraftEvent) {
+        (event.item as? Gun)?.let {
+            val player = event.player
+            val traveler = event.traveler
+            traveler.item.add(it)
+            val res = player.inventory.offer(it.createItemStack())
+            if (res.type != InventoryTransactionResult.Type.SUCCESS) {
+                event.player.sendMessage(lang.of("Respond.weaponDelivered").toLegacyText(player))
+            }
+        }
+    }
 
     @Suppress("unused", "UNUSED_PARAMETER")
     private fun onChangeInventory(event: ChangeInventoryEvent, @Getter("getSource") player: Player) {

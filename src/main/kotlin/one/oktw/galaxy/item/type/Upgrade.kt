@@ -27,11 +27,13 @@ import one.oktw.galaxy.item.enums.UpgradeType
 import one.oktw.galaxy.item.enums.UpgradeType.BASE
 import one.oktw.galaxy.item.enums.UpgradeType.RANGE
 import org.bson.codecs.pojo.annotations.BsonDiscriminator
+import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.key.Keys.DISPLAY_NAME
-import org.spongepowered.api.item.ItemTypes.ENCHANTED_BOOK
+import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextStyles.BOLD
+import org.spongepowered.api.text.format.TextStyles.RESET
 
 @BsonDiscriminator
 data class Upgrade(val type: UpgradeType = BASE, var level: Int = 0) : Item {
@@ -41,22 +43,40 @@ data class Upgrade(val type: UpgradeType = BASE, var level: Int = 0) : Item {
         val lang = Main.translationService
         val name = lang.of("item.Upgrade.${type.name}")
         val color = when (type) {
-        // TODO more color
+            // TODO more color
             RANGE -> TextColors.GREEN
-            else -> TextColors.NONE
+            else -> TextColors.WHITE
+        }
+
+        val id = if (level > 0 && type.extraIds?.let { it.size >= level } == true) {
+            type.extraIds[level - 1]
+        } else {
+            type.id
         }
 
         return ItemStack.builder()
-            .itemType(ENCHANTED_BOOK)
+            .apply {
+                if (level > 0) {
+                    add(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, color, lang.of("item.Upgrade.Item", name), " Lv.$level"))
+                } else {
+                    add(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, color, lang.of("item.Upgrade.Item", name)))
+                }
+            }
+            .itemType(ItemTypes.DIAMOND_SWORD)
+            .add(Keys.UNBREAKABLE, true)
+            .add(Keys.HIDE_UNBREAKABLE, true)
+            .add(Keys.HIDE_MISCELLANEOUS, true)
+            .add(Keys.HIDE_ATTRIBUTES, true)
+            .add(Keys.HIDE_ENCHANTMENTS, true)
+            .add(Keys.ITEM_DURABILITY, id)
             .itemData(DataItemType(UPGRADE))
             .itemData(DataUpgrade(type, level))
-            .add(DISPLAY_NAME, lang.ofPlaceHolder(BOLD, color, name, " Lv.$level".format(name)))
             .build()
     }
 
     override fun test(item: ItemStack): Boolean {
         return item[DataItemType.key].orElse(null) == UPGRADE &&
-                item[DataUpgrade::class.java].orElse(null).let { it?.type == type && it.level == level }
+            item[DataUpgrade::class.java].orElse(null).let { it?.type == type && it.level == level }
     }
 
     override fun displayedItems() = listOfNotNull(createItemStack().createSnapshot())

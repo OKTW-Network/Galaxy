@@ -20,6 +20,7 @@ package one.oktw.galaxy.item.type
 
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataEnable
+import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.item.ItemUtil.Companion.removeCoolDown
@@ -69,6 +70,7 @@ data class Gun(
         val item = ItemStack.builder()
             .itemType(ItemTypes.DIAMOND_SWORD)
             .itemData(DataUUID.Immutable(uuid))
+            .itemData(DataItemType.Immutable(itemType))
             .itemData(DataOverheat())
             .add(UNBREAKABLE, true)
             .add(HIDE_UNBREAKABLE, true)

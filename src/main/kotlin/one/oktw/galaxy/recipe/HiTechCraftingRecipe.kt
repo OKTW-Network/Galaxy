@@ -19,7 +19,10 @@
 package one.oktw.galaxy.recipe
 
 import one.oktw.galaxy.Main
+import one.oktw.galaxy.event.CustomItemCraftEvent
 import one.oktw.galaxy.galaxy.traveler.data.Traveler
+import one.oktw.galaxy.item.type.Item
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.ItemType
@@ -31,7 +34,6 @@ import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import org.spongepowered.api.item.recipe.crafting.Ingredient
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
-import org.spongepowered.api.text.translation.Translatable
 import java.util.Arrays.asList
 
 
@@ -68,6 +70,16 @@ class HiTechCraftingRecipe {
                 return this
             }
 
+            fun result(newResult: () -> ItemStackSnapshot): Builder {
+                recipe.setResult(newResult)
+                return this
+            }
+
+            fun customItemResult(newResult: () -> Item): Builder {
+                recipe.setCustomResult(newResult)
+                return this
+            }
+
             fun build(): HiTechCraftingRecipe {
                 return recipe
             }
@@ -79,7 +91,8 @@ class HiTechCraftingRecipe {
     private val ingredientList: ArrayList<Ingredient> = ArrayList()
     private val toMatch: HashMap<Ingredient, Int> = HashMap()
     private var cost: Int = 0
-    private var result: ItemStackSnapshot = ItemStackSnapshot.NONE
+    private var result: () -> ItemStackSnapshot = { ItemStackSnapshot.NONE }
+    private var customItemResult: () -> Item? = { null }
 
     private fun add(item: Ingredient, count: Int) {
         if (!ingredientList.contains(item)) {
@@ -102,7 +115,15 @@ class HiTechCraftingRecipe {
     }
 
     private fun setResult(newResult: ItemStackSnapshot) {
+        result = { newResult }
+    }
+
+    private fun setResult(newResult: () -> ItemStackSnapshot) {
         result = newResult
+    }
+
+    private fun setCustomResult(newResult: () -> Item) {
+        customItemResult = newResult
     }
 
     fun getCost(): Int {
@@ -212,12 +233,23 @@ class HiTechCraftingRecipe {
         return true
     }
 
-    fun result(): ItemStack {
-        return result.createStack()
+    fun result(player: Player? = null, traveler: Traveler? = null): ItemStack {
+        return customItemResult.invoke().let {
+            if (it != null) {
+                if (player != null && traveler != null) {
+                    val event = CustomItemCraftEvent(it, player, traveler, Sponge.getCauseStackManager().currentCause)
+                    Sponge.getEventManager().post(event)
+                }
+
+            it.createItemStack()
+            } else {
+                result.invoke().createStack()
+            }
+        }
     }
 
     fun previewResult(player: Player, traveler: Traveler): ItemStack {
-        return result.createStack().apply {
+        return result.invoke().createStack().apply {
             val list = ArrayList<Text>()
             var enough = true
 

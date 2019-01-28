@@ -16,29 +16,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.enums
+package one.oktw.galaxy.event
 
-import java.util.Arrays.asList
+import one.oktw.galaxy.galaxy.traveler.data.Traveler
+import one.oktw.galaxy.item.type.Item
+import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.event.cause.Cause
+import org.spongepowered.api.event.impl.AbstractEvent
 
-enum class UpgradeType(val id: Int, val extraIds: List<Int>? = null) {
-    BASE(16),
+class CustomItemCraftEvent(
+    val item: Item,
+    val player: Player,
+    val traveler: Traveler,
+    cause: Cause
+): AbstractEvent() {
+    private var myCause: Cause = cause
 
-    // Machine
-    RANGE(999),
-    SPEED(998),
-
-    // Weapon or Tool
-    DAMAGE(997),
-    COOLING(9999, asList(17, 18, 19, 20, 21)),
-    HEAT(996),
-    THROUGH(995),
-
-    // Armor
-    SHIELD(994),
-    FLEXIBLE(993),
-    ADAPT(992),
-    FLY(991),
-    NIGHT_VISION(990),
-    GPS(989),
-    DETECTOR(988)
+    override fun getCause(): Cause {
+        return myCause
+    }
 }

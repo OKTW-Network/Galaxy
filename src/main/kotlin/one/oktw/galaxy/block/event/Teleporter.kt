@@ -46,6 +46,7 @@ import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.event.Listener
+import org.spongepowered.api.event.Order
 import org.spongepowered.api.event.block.InteractBlockEvent
 import org.spongepowered.api.event.cause.EventContextKeys
 import org.spongepowered.api.event.cause.entity.spawn.SpawnType
@@ -181,9 +182,7 @@ class Teleporter : CoroutineScope {
         }
     }
 
-
-    @IsCancelled(value = Tristate.UNDEFINED)
-    @Listener
+    @Listener(order = Order.EARLY)
     fun onClickBlock(event: InteractBlockEvent.Secondary.MainHand, @First player: Player) {
         if (player[Keys.IS_SNEAKING].orElse(false) == true) return
 

@@ -455,10 +455,10 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
 
         if (
             !sourceFrames.any {
-                // it.blockPosition.add(0, 1, 0) == location.toInt()
                 it.blockX == location.floorX &&
                     it.blockZ == location.floorZ &&
-                    location.y > it.y + OFFSET_LOWER_BOUND && location.y < it.y + OFFSET_HIGHER_BOUND
+                    location.y > it.y + OFFSET_LOWER_BOUND + 1.0 &&
+                    location.y < it.y + OFFSET_HIGHER_BOUND + 1.0
             }
         ) {
             waitingEntities.remove(entity)

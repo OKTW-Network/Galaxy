@@ -64,7 +64,6 @@ import java.util.*
 import java.util.Arrays.asList
 import kotlin.collections.ArrayList
 
-
 class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
     companion object {
         class MoveEventListener(private val teleporter: one.oktw.galaxy.gui.machine.Teleporter) : EventListener<MoveEntityEvent> {
@@ -84,6 +83,11 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
                 teleporter.prePickupEvent(event)
             }
         }
+
+        // must bigger than -1
+        private const val OFFSET_LOWER_BOUND = -0.5
+        // must smaller than 2
+        private const val OFFSET_HIGHER_BOUND = 1.5
     }
 
     private val MAX_FRAME = 64
@@ -189,6 +193,7 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
         return res
     }
 
+    // get ALl base entities in this range
     private suspend fun getEntities(world: World, teleporter: Teleporter): List<Entity> {
         val sourceFrames = teleporter.position
             .run { Location(world, x, y, z) }
@@ -196,7 +201,27 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
             ?: return asList()
 
         return world.entities.filter {
-            sourceFrames[Triple(it.location.blockX, it.location.blockY - 1, it.location.blockZ)] != null
+            // not base, just ignore
+            if (it.vehicle.isPresent) {
+                return@filter false
+            }
+
+            // is that jumping?
+            if ((it.location.y % 1.0) < (OFFSET_HIGHER_BOUND % 1.0)) {
+                if (sourceFrames[Triple(it.location.blockX, it.location.blockY - 2, it.location.blockZ)] != null) {
+                    return@filter true
+                }
+            }
+
+            // is that under floor?
+            if ((it.location.y % 1.0) > ((OFFSET_LOWER_BOUND + 1.0) % 1.0)) {
+                if (sourceFrames[Triple(it.location.blockX, it.location.blockY, it.location.blockZ)] != null) {
+                    return@filter true
+                }
+            }
+
+            // is there a block on its foot?
+            return@filter sourceFrames[Triple(it.location.blockX, it.location.blockY - 1, it.location.blockZ)] != null
         }
     }
 
@@ -205,7 +230,23 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
             (entity as? Player)?.let { player ->
                 block.invoke(player)
             }
+
+            // recursive though all its passengers
+            doWhenPlayer(entity.passengers, block)
         }
+    }
+
+    private fun dismountRecursive(root: Entity, collected: ArrayList<Entity> = ArrayList()): ArrayList<Entity> {
+        val passengers = root.passengers
+        root.clearPassengers()
+
+        collected += root
+
+        passengers.forEach {
+            dismountRecursive(it, collected)
+        }
+
+        return collected
     }
 
     private fun clickEvent(event: ClickInventoryEvent) {
@@ -301,7 +342,6 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
                 return@launch
             }
 
-
             val sourceFrames = teleporter.position
                 .run { Location(world, x, y, z) }
                 .let { TeleporterHelper.searchTeleporterFrame(it, MAX_FRAME); }
@@ -345,43 +385,49 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
                 targetTeleporter.position.z
             )
 
-            waitingEntities.forEach {
+            waitingEntities.forEach { root ->
                 val target = if (targetFrames.size != 0) targetFrames[index % targetFrames.size] else exactLocation
 
                 index++
 
-                if (it.type == EntityTypes.PLAYER && TeleporterHelper.isSafeLocation(exactLocation)) {
-                    val currentPlayer = it as Player
+                // dismount everything
 
-                    // we teleport the main player to exact position
-                    if (currentPlayer == player) {
-                        TeleportHelper.teleport(
-                            it,
-                            // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
-                            Location(
-                                targetWorld,
-                                targetTeleporter.position.x + 0.5,
-                                targetTeleporter.position.y + 1,
-                                targetTeleporter.position.z + 0.5
+                val entities = dismountRecursive(root)
+
+                entities.forEach {
+                    if (it.type == EntityTypes.PLAYER && TeleporterHelper.isSafeLocation(exactLocation)) {
+                        val currentPlayer = it as Player
+
+                        // we teleport the main player to exact position
+                        if (currentPlayer == player) {
+                            TeleportHelper.teleport(
+                                it,
+                                // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
+                                Location(
+                                    targetWorld,
+                                    targetTeleporter.position.x + 0.5,
+                                    targetTeleporter.position.y + 1,
+                                    targetTeleporter.position.z + 0.5
+                                )
                             )
-                        )
+                        } else {
+                            TeleportHelper.teleport(
+                                it,
+                                // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
+                                Location(targetWorld, target.x + 0.5, target.y + 1, target.z + 0.5)
+                            )
+                        }
+
                     } else {
-                        TeleportHelper.teleport(
-                            it,
-                            // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
-                            Location(targetWorld, target.x + 0.5, target.y + 1, target.z + 0.5)
-                        )
-                    }
+                        withContext(Main.serverThread) {
+                            // ignore special entities
+                            if (it[DataUUID.key].orElse(null) != null) return@withContext
 
-                } else {
-                    withContext(Main.serverThread) {
-                        // ignore special entities
-                        if (it[DataUUID.key].orElse(null) != null) return@withContext
-
-                        it.transferToWorld(
-                            targetWorld,
-                            Vector3d(target.x + 0.5, target.y + 1, target.z + 0.5)
-                        )
+                            it.transferToWorld(
+                                targetWorld,
+                                Vector3d(target.x + 0.5, target.y + 1, target.z + 0.5)
+                            )
+                        }
                     }
                 }
             }
@@ -409,7 +455,10 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
 
         if (
             !sourceFrames.any {
-                it.blockPosition.add(0, 1, 0) == location.toInt()
+                // it.blockPosition.add(0, 1, 0) == location.toInt()
+                it.blockX == location.floorX &&
+                    it.blockZ == location.floorZ &&
+                    location.y > it.y + OFFSET_LOWER_BOUND && location.y < it.y + OFFSET_HIGHER_BOUND
             }
         ) {
             waitingEntities.remove(entity)

@@ -426,34 +426,21 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
                     val entities = tree.flatten()
 
                     val target = when {
-                        entities.contains(player) -> exactLocation
+                        // we teleport the main player to exact position if possible
+                        entities.contains(player) && TeleporterHelper.isSafeLocation(exactLocation) -> exactLocation
+                        // spread entities to safe locations as much as possible
                         targetFrames.size != 0 -> targetFrames[index % targetFrames.size]
+                        // gave up, just bury it into block
                         else -> exactLocation
                     }
 
                     entities.map {
-                        if (it.type == EntityTypes.PLAYER && TeleporterHelper.isSafeLocation(exactLocation)) {
-                            val currentPlayer = it as Player
-
-                            // we teleport the main player to exact position
-                            if (currentPlayer == player) {
-                                TeleportHelper.teleport(
-                                    it,
-                                    // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
-                                    Location(
-                                        targetWorld,
-                                        targetTeleporter.position.x + 0.5,
-                                        targetTeleporter.position.y + 1,
-                                        targetTeleporter.position.z + 0.5
-                                    )
-                                ).await()
-                            } else {
-                                TeleportHelper.teleport(
-                                    it,
-                                    // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
-                                    Location(targetWorld, target.x + 0.5, target.y + 1, target.z + 0.5)
-                                ).await()
-                            }
+                        if (it.type == EntityTypes.PLAYER) {
+                            TeleportHelper.teleport(
+                                it as Player,
+                                // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
+                                Location(targetWorld, target.x + 0.5, target.y + 1, target.z + 0.5)
+                            ).await()
 
                         } else {
                             // ignore special entities

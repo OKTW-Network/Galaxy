@@ -330,7 +330,9 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
             Sponge.getEventManager().registerListener(main, DestructEntityEvent::class.java, destructEntityEventListener)
             Sponge.getEventManager().registerListener(main, ChangeInventoryEvent.Pickup.Pre::class.java, prePickupListener)
 
-            waitingEntities.addAll(getEntities(player.world, teleporter))
+            waitingEntities.addAll(getEntities(player.world, teleporter).filter {
+                !it[DataUUID.key].isPresent
+            })
 
             if (waitingEntities.size == 0) {
                 player.sendMessage(Text.of(TextColors.RED, lang.of("Respond.TeleportNothing")).toLegacyText(player))
@@ -441,11 +443,9 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
                                 // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
                                 Location(targetWorld, target.x + 0.5, target.y + 1, target.z + 0.5)
                             ).await()
-
                         } else {
                             // ignore special entities
                             if (it[DataUUID.key].orElse(null) != null) return@map false
-
                             it.transferToWorld(
                                 targetWorld,
                                 Vector3d(target.x + 0.5, target.y + 1, target.z + 0.5)

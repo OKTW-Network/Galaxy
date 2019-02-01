@@ -437,7 +437,9 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
                     }
 
                     entities.map {
-                        if (it.type == EntityTypes.PLAYER) {
+                        val oldRotation = it.rotation
+
+                        val successOrNot = if (it.type == EntityTypes.PLAYER) {
                             TeleportHelper.teleport(
                                 it as Player,
                                 // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
@@ -446,11 +448,23 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
                         } else {
                             // ignore special entities
                             if (it[DataUUID.key].orElse(null) != null) return@map false
+
+                            // TODO: remove workaround
+                            if (it.world == targetWorld) {
+                                it.transferToWorld(Sponge.getServer().getWorld(Sponge.getServer().defaultWorldName).get())
+                            }
+
                             it.transferToWorld(
                                 targetWorld,
                                 Vector3d(target.x + 0.5, target.y + 1, target.z + 0.5)
                             )
                         }
+
+                        if (successOrNot) {
+                            it.rotation = oldRotation
+                        }
+
+                        successOrNot
                     }.all { it }.let { allSuccess ->
                         if (!allSuccess) {
                             return@let

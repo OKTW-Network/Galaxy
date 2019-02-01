@@ -32,16 +32,21 @@ import one.oktw.galaxy.galaxy.planet.data.Planet
 import one.oktw.galaxy.galaxy.planet.data.Position
 import one.oktw.galaxy.internal.DatabaseManager
 import one.oktw.galaxy.machine.teleporter.data.Teleporter
+import org.spongepowered.api.block.BlockState
+import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.data.property.block.MatterProperty
 import org.spongepowered.api.util.Direction
 import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
 import java.util.*
+import java.util.Arrays.asList
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class TeleporterHelper {
     companion object {
+        private val RAILS = asList(BlockTypes.RAIL, BlockTypes.ACTIVATOR_RAIL, BlockTypes.DETECTOR_RAIL, BlockTypes.GOLDEN_RAIL)
+        private val CARPET = BlockTypes.CARPET
         private val collection = DatabaseManager.database.getCollection("Teleporter", Teleporter::class.java)
 
 
@@ -126,11 +131,16 @@ class TeleporterHelper {
             return newMap
         }
 
+        private fun isSafeBlockBottom(block: BlockState): Boolean = when {
+            block.type in RAILS -> true
+            block.type == CARPET -> true
+            else -> block.getProperty(MatterProperty::class.java).orElse(null)?.value != MatterProperty.Matter.SOLID
+        }
+
+        private fun isSafeBlockTop(block: BlockState): Boolean = block.getProperty(MatterProperty::class.java).orElse(null)?.value != MatterProperty.Matter.SOLID
+
         fun isSafeLocation(loc: Location<World>): Boolean {
-            return loc.add(0.0, 1.0, 0.0).block.getProperty(MatterProperty::class.java).orElse(null)?.value !=
-                MatterProperty.Matter.SOLID &&
-                loc.add(0.0, 2.0, 0.0).block.getProperty(MatterProperty::class.java).orElse(null)?.value !=
-                MatterProperty.Matter.SOLID
+            return isSafeBlockBottom(loc.add(0.0, 1.0, 0.0).block) && isSafeBlockTop(loc.add(0.0, 2.0, 0.0).block)
         }
 
         suspend fun get(uuid: UUID): Teleporter? {

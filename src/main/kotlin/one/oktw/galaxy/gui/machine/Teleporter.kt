@@ -25,6 +25,7 @@ import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.reactive.openSubscription
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.galaxy.data.extensions.getPlanet
 import one.oktw.galaxy.galaxy.planet.PlanetHelper
@@ -64,7 +65,6 @@ import java.util.*
 import java.util.Arrays.asList
 import kotlin.collections.ArrayList
 
-
 class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
     companion object {
         class MoveEventListener(private val teleporter: one.oktw.galaxy.gui.machine.Teleporter) : EventListener<MoveEntityEvent> {
@@ -83,6 +83,51 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
             override fun handle(event: ChangeInventoryEvent.Pickup.Pre) {
                 teleporter.prePickupEvent(event)
             }
+        }
+
+        // must bigger than -1
+        private const val OFFSET_LOWER_BOUND = -0.5
+        // must smaller than 2
+        private const val OFFSET_HIGHER_BOUND = 1.5
+
+        private data class PassengerNode(
+            val node: Entity,
+            val children: ArrayList<PassengerNode> = ArrayList()
+        ) {
+            fun flatten(): List<Entity> {
+                val list = ArrayList<Entity>()
+                list.add(node)
+
+                children.forEach {
+                    list.addAll(it.flatten())
+                }
+
+                return list
+            }
+
+            fun unmountAll() {
+                children.forEach { child ->
+                    node.clearPassengers()
+                    child.unmountAll()
+                }
+            }
+
+            fun mountAll() {
+                children.forEach { child ->
+                    node.addPassenger(child.node)
+                    child.mountAll()
+                }
+            }
+        }
+
+        private fun makePassengerTree(entity: Entity): PassengerNode {
+            val node = PassengerNode(entity)
+
+            entity.passengers.forEach {
+                node.children += makePassengerTree(it)
+            }
+
+            return node
         }
     }
 
@@ -189,6 +234,7 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
         return res
     }
 
+    // get ALl base entities in this range
     private suspend fun getEntities(world: World, teleporter: Teleporter): List<Entity> {
         val sourceFrames = teleporter.position
             .run { Location(world, x, y, z) }
@@ -196,7 +242,27 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
             ?: return asList()
 
         return world.entities.filter {
-            sourceFrames[Triple(it.location.blockX, it.location.blockY - 1, it.location.blockZ)] != null
+            // not base, just ignore
+            if (it.vehicle.isPresent) {
+                return@filter false
+            }
+
+            // is that jumping?
+            if ((it.location.y % 1.0) < (OFFSET_HIGHER_BOUND % 1.0)) {
+                if (sourceFrames[Triple(it.location.blockX, it.location.blockY - 2, it.location.blockZ)] != null) {
+                    return@filter true
+                }
+            }
+
+            // is that under floor?
+            if ((it.location.y % 1.0) > ((OFFSET_LOWER_BOUND + 1.0) % 1.0)) {
+                if (sourceFrames[Triple(it.location.blockX, it.location.blockY, it.location.blockZ)] != null) {
+                    return@filter true
+                }
+            }
+
+            // is there a block on its foot?
+            return@filter sourceFrames[Triple(it.location.blockX, it.location.blockY - 1, it.location.blockZ)] != null
         }
     }
 
@@ -205,6 +271,9 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
             (entity as? Player)?.let { player ->
                 block.invoke(player)
             }
+
+            // recursive though all its passengers
+            doWhenPlayer(entity.passengers, block)
         }
     }
 
@@ -261,7 +330,9 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
             Sponge.getEventManager().registerListener(main, DestructEntityEvent::class.java, destructEntityEventListener)
             Sponge.getEventManager().registerListener(main, ChangeInventoryEvent.Pickup.Pre::class.java, prePickupListener)
 
-            waitingEntities.addAll(getEntities(player.world, teleporter))
+            waitingEntities.addAll(getEntities(player.world, teleporter).filter {
+                !it[DataUUID.key].isPresent
+            })
 
             if (waitingEntities.size == 0) {
                 player.sendMessage(Text.of(TextColors.RED, lang.of("Respond.TeleportNothing")).toLegacyText(player))
@@ -300,7 +371,6 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
             if (job?.isCancelled == true) {
                 return@launch
             }
-
 
             val sourceFrames = teleporter.position
                 .run { Location(world, x, y, z) }
@@ -345,43 +415,62 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
                 targetTeleporter.position.z
             )
 
-            waitingEntities.forEach {
-                val target = if (targetFrames.size != 0) targetFrames[index % targetFrames.size] else exactLocation
+            withContext(serverThread) {
+                waitingEntities.forEach { root ->
 
-                index++
+                    index++
 
-                if (it.type == EntityTypes.PLAYER && TeleporterHelper.isSafeLocation(exactLocation)) {
-                    val currentPlayer = it as Player
+                    // dismount everything
 
-                    // we teleport the main player to exact position
-                    if (currentPlayer == player) {
-                        TeleportHelper.teleport(
-                            it,
-                            // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
-                            Location(
-                                targetWorld,
-                                targetTeleporter.position.x + 0.5,
-                                targetTeleporter.position.y + 1,
-                                targetTeleporter.position.z + 0.5
-                            )
-                        )
-                    } else {
-                        TeleportHelper.teleport(
-                            it,
-                            // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
-                            Location(targetWorld, target.x + 0.5, target.y + 1, target.z + 0.5)
-                        )
+                    val tree = makePassengerTree(root)
+                    tree.unmountAll()
+
+                    val entities = tree.flatten()
+
+                    val target = when {
+                        // we teleport the main player to exact position if possible
+                        entities.contains(player) && TeleporterHelper.isSafeLocation(exactLocation) -> exactLocation
+                        // spread entities to safe locations as much as possible
+                        targetFrames.size != 0 -> targetFrames[index % targetFrames.size]
+                        // gave up, just bury it into block
+                        else -> exactLocation
                     }
 
-                } else {
-                    withContext(Main.serverThread) {
-                        // ignore special entities
-                        if (it[DataUUID.key].orElse(null) != null) return@withContext
+                    entities.map {
+                        val oldRotation = it.rotation
 
-                        it.transferToWorld(
-                            targetWorld,
-                            Vector3d(target.x + 0.5, target.y + 1, target.z + 0.5)
-                        )
+                        val successOrNot = if (it.type == EntityTypes.PLAYER) {
+                            TeleportHelper.teleport(
+                                it as Player,
+                                // offset y by 1, so you are on the block, offset x and z by 0.5, so you are on the center of block
+                                Location(targetWorld, target.x + 0.5, target.y + 1, target.z + 0.5)
+                            ).await()
+                        } else {
+                            // ignore special entities
+                            if (it[DataUUID.key].orElse(null) != null) return@map false
+
+                            // TODO: remove workaround
+                            if (it.world == targetWorld) {
+                                it.transferToWorld(Sponge.getServer().getWorld(Sponge.getServer().defaultWorldName).get())
+                            }
+
+                            it.transferToWorld(
+                                targetWorld,
+                                Vector3d(target.x + 0.5, target.y + 1, target.z + 0.5)
+                            )
+                        }
+
+                        if (successOrNot) {
+                            it.rotation = oldRotation
+                        }
+
+                        successOrNot
+                    }.all { it }.let { allSuccess ->
+                        if (!allSuccess) {
+                            return@let
+                        }
+
+                        tree.mountAll()
                     }
                 }
             }
@@ -409,7 +498,10 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
 
         if (
             !sourceFrames.any {
-                it.blockPosition.add(0, 1, 0) == location.toInt()
+                it.blockX == location.floorX &&
+                    it.blockZ == location.floorZ &&
+                    location.y > it.y + OFFSET_LOWER_BOUND + 1.0 &&
+                    location.y < it.y + OFFSET_HIGHER_BOUND + 1.0
             }
         ) {
             waitingEntities.remove(entity)

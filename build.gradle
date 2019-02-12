@@ -99,12 +99,10 @@ shadowJar {
         include dependency("org.jetbrains.kotlinx:")
     }
 
-    relocate "com.mongodb", "one.oktw.relocate.com.mongodb"
-    relocate "org.bson", "one.oktw.relocate.org.bson"
-    relocate "org.reactivestreams", "one.oktw.relocate.org.reactivestreams"
+    relocate "com", "one.oktw.relocate.com"
+    relocate "org", "one.oktw.relocate.org"
     relocate "kotlin", "one.oktw.relocate.kotlin"
     relocate "kotlinx", "one.oktw.relocate.kotlinx"
-    relocate "com.typesafe", "configurate.typesafe"
 }
 
 signing {

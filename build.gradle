@@ -105,6 +105,8 @@ shadowJar {
     relocate "kotlin", "one.oktw.relocate.kotlin"
     relocate "kotlinx", "one.oktw.relocate.kotlinx"
     relocate "com.typesafe", "configurate.typesafe"
+    
+    minimize()
 }
 
 signing {

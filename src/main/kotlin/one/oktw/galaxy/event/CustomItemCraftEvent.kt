@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2018
+ * Copyright (C) 2018-2019
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,12 +16,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.gui
+package one.oktw.galaxy.event
 
-import one.oktw.galaxy.galaxy.data.Galaxy
-import org.spongepowered.api.item.inventory.Inventory
+import one.oktw.galaxy.galaxy.traveler.data.Traveler
+import one.oktw.galaxy.item.type.Item
+import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.event.cause.Cause
+import org.spongepowered.api.event.impl.AbstractEvent
 
-class GalaxyInventory(private val galaxy: Galaxy) : GUI() {
-    override val token = "GalaxyInventory-${galaxy.uuid}"
-    override val inventory: Inventory = TODO()
+class CustomItemCraftEvent(
+    val item: Item,
+    val player: Player,
+    val traveler: Traveler,
+    cause: Cause
+): AbstractEvent() {
+    private var myCause: Cause = cause
+
+    override fun getCause(): Cause {
+        return myCause
+    }
 }

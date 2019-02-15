@@ -1,3 +1,21 @@
+/*
+ * OKTW Galaxy Project
+ * Copyright (C) 2018-2018
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package one.oktw.galaxy.block.event
 
 import kotlinx.coroutines.CoroutineScope
@@ -28,17 +46,16 @@ import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.event.Listener
+import org.spongepowered.api.event.Order
 import org.spongepowered.api.event.block.InteractBlockEvent
 import org.spongepowered.api.event.cause.EventContextKeys
 import org.spongepowered.api.event.cause.entity.spawn.SpawnType
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes
-import org.spongepowered.api.event.filter.IsCancelled
 import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
-import org.spongepowered.api.util.Tristate
 import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
 import java.util.*
@@ -163,9 +180,7 @@ class Teleporter : CoroutineScope {
         }
     }
 
-
-    @IsCancelled(value = Tristate.UNDEFINED)
-    @Listener
+    @Listener(order = Order.EARLY)
     fun onClickBlock(event: InteractBlockEvent.Secondary.MainHand, @First player: Player) {
         if (player[Keys.IS_SNEAKING].orElse(false) == true) return
 

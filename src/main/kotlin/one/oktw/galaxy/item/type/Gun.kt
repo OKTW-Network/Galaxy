@@ -1,7 +1,26 @@
+/*
+ * OKTW Galaxy Project
+ * Copyright (C) 2018-2018
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package one.oktw.galaxy.item.type
 
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.data.DataEnable
+import one.oktw.galaxy.data.DataItemType
 import one.oktw.galaxy.data.DataOverheat
 import one.oktw.galaxy.data.DataUUID
 import one.oktw.galaxy.item.ItemUtil.Companion.removeCoolDown
@@ -51,6 +70,7 @@ data class Gun(
         val item = ItemStack.builder()
             .itemType(ItemTypes.DIAMOND_SWORD)
             .itemData(DataUUID.Immutable(uuid))
+            .itemData(DataItemType.Immutable(itemType))
             .itemData(DataOverheat())
             .add(UNBREAKABLE, true)
             .add(HIDE_UNBREAKABLE, true)

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2018
+ * Copyright (C) 2018-2019
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,20 +18,32 @@
 
 package one.oktw.galaxy.event
 
-import com.google.inject.Inject
-import one.oktw.galaxy.Main.Companion.main
-import org.slf4j.Logger
+import one.oktw.galaxy.galaxy.data.Galaxy
+import one.oktw.galaxy.galaxy.traveler.data.Traveler
+import org.spongepowered.api.entity.living.player.Player
+import org.spongepowered.api.event.Cancellable
 import org.spongepowered.api.event.cause.Cause
 import org.spongepowered.api.event.impl.AbstractEvent
-import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.world.Location
-import org.spongepowered.api.world.World
+import org.spongepowered.api.item.inventory.ItemStackSnapshot
 
-class RemoveCustomBlockEvent(
-    val location: Location<World>,
+class PostHiTectCraftEvent (
+    val item: ItemStackSnapshot,
+    val player: Player,
+    val galaxy: Galaxy,
+    val traveler: Traveler,
     cause: Cause
-): AbstractEvent() {
-    private var  myCause: Cause = cause
+): AbstractEvent(), Cancellable {
+    private var cancelled = false
+
+    override fun isCancelled(): Boolean {
+        return cancelled
+    }
+
+    override fun setCancelled(cancel: Boolean) {
+        cancelled = cancelled || cancel
+    }
+
+    private var myCause: Cause = cause
 
     override fun getCause(): Cause {
         return myCause

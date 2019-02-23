@@ -90,7 +90,8 @@ jar {
 
 shadowJar {
     classifier = null
-//    exclude "META-INF/*"
+    exclude "META-INF/**"
+    exclude "**/*.kotlin_metadata"
     exclude "dummyThing"
     dependencies {
         include dependency("org.mongodb:")
@@ -105,7 +106,7 @@ shadowJar {
     relocate "kotlin", "one.oktw.relocate.kotlin"
     relocate "kotlinx", "one.oktw.relocate.kotlinx"
     relocate "com.typesafe", "configurate.typesafe"
-    
+
     minimize()
 }
 
@@ -114,5 +115,5 @@ signing {
     sign configurations.archives
 }
 
-jar.dependsOn(shadowJar)
 jar.enabled = false
+reobfJar.dependsOn(shadowJar)

@@ -8,7 +8,6 @@
   "mixins": [
     "MixinBiomeProviderSingle",
     "MixinCommandBase",
-    "MixinWorldProviderHell",
-    "MixinWorldServer"
+    "MixinWorldProviderHell"
   ]
 }

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2018
+ * Copyright (C) 2018-2019
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -39,8 +39,7 @@ class TravelerHelper {
             traveler.enderChest = player.enderChestInventory.slots<Slot>().mapTo(ArrayList()) { it.peek().orElse(empty()) }
 
             if (traveler.experience == 0 && traveler.inventory.all { it == empty() }) {
-                main.logger.error("Try save empty player!", player.toString())
-                throw RuntimeException("Saving empty player")
+                main.logger.error("Try save empty player: ", player.name.toString(), RuntimeException("Saving empty player"))
             }
 
             return traveler

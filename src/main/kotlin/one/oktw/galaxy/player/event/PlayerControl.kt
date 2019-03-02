@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2018
+ * Copyright (C) 2018-2019
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,7 +20,6 @@ package one.oktw.galaxy.player.event
 
 import kotlinx.coroutines.*
 import one.oktw.galaxy.Main.Companion.galaxyManager
-import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.Main.Companion.serverThread
 import one.oktw.galaxy.book.BookUtil
 import one.oktw.galaxy.book.enums.BooksInLobby.MAGICAL
@@ -84,18 +83,14 @@ class PlayerControl : CoroutineScope {
                     continue
                 }
 
-                try {
-                    val player = players.next()
-                    val galaxy = galaxyManager.get(player.world) ?: continue
+                val player = players.next()
+                val galaxy = galaxyManager.get(player.world) ?: continue
 
-                    if (!player.isOnline) continue
+                if (!player.isOnline) continue
 
-                    galaxy.getMember(player.uniqueId)?.also {
-                        galaxy.saveMember(saveTraveler(it, player))
-                        delay(TimeUnit.SECONDS.toMillis(10))
-                    }
-                } catch (e: RuntimeException) {
-                    main.logger.error("Saving player data error", e)
+                galaxy.getMember(player.uniqueId)?.also {
+                    galaxy.saveMember(saveTraveler(it, player))
+                    delay(TimeUnit.SECONDS.toMillis(10))
                 }
             }
         }

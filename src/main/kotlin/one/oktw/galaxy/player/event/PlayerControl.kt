@@ -89,7 +89,7 @@ class PlayerControl : CoroutineScope {
                 if (!player.isOnline) continue
 
                 galaxy.getMember(player.uniqueId)?.also {
-                    galaxy.saveMember(saveTraveler(it, player))
+                    saveTraveler(it, player)?.let { it1 -> galaxy.saveMember(it1) }
                     delay(TimeUnit.SECONDS.toMillis(10))
                 }
             }
@@ -156,7 +156,7 @@ class PlayerControl : CoroutineScope {
         // save and clean player
         launch {
             galaxyManager.get(player.world)?.run {
-                getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)) }
+                getMember(player.uniqueId)?.also { saveTraveler(it, player)?.let { it1 -> saveMember(it1) } }
             }
         }
 
@@ -177,7 +177,7 @@ class PlayerControl : CoroutineScope {
             if (from?.uuid != to?.uuid) {
                 // save and clean player data
                 from?.getMember(player.uniqueId)?.also {
-                    from.saveMember(saveTraveler(it, player))
+                    saveTraveler(it, player)?.let { it1 -> from.saveMember(it1) }
                     cleanPlayer(player)
                 } ?: cleanPlayer(player)
 
@@ -221,7 +221,7 @@ class PlayerControl : CoroutineScope {
     fun onServerStop(event: GameStoppingServerEvent) {
         Sponge.getServer().onlinePlayers.forEach { player ->
             runBlocking {
-                galaxyManager.get(player.world)?.run { getMember(player.uniqueId)?.also { saveMember(saveTraveler(it, player)) } }
+                galaxyManager.get(player.world)?.run { getMember(player.uniqueId)?.also { saveTraveler(it, player)?.let { it1 -> saveMember(it1) } } }
             }
         }
     }

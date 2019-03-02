@@ -33,13 +33,14 @@ class TravelerHelper {
     companion object {
         suspend fun getTraveler(player: Player) = galaxyManager.get(player.world)?.getMember(player.uniqueId)
 
-        fun saveTraveler(traveler: Traveler, player: Player): Traveler {
+        fun saveTraveler(traveler: Traveler, player: Player): Traveler? {
             traveler.experience = player[TOTAL_EXPERIENCE].get()
             traveler.inventory = player.inventory.slots<Slot>().mapTo(ArrayList()) { it.peek().orElse(empty()) }
             traveler.enderChest = player.enderChestInventory.slots<Slot>().mapTo(ArrayList()) { it.peek().orElse(empty()) }
 
             if (traveler.experience == 0 && traveler.inventory.all { it == empty() }) {
                 main.logger.error("Try save empty player: ", player.name.toString(), RuntimeException("Saving empty player"))
+                return null
             }
 
             return traveler

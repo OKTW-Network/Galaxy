@@ -99,7 +99,7 @@ abstract class PageGUI<Data> : GUI() {
 
     protected open val hasFunctionButtons: Boolean = false
     private val lang = Main.translationService
-    private var pageNumber = 0
+    protected var pageNumber = 0
     private val lock = OrderedLaunch()
 
     val view: GridGUIView<Slot, Operation<Data>> by lazy {

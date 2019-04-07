@@ -164,7 +164,7 @@ class Teleporter(private val teleporter: Teleporter) : PageGUI<UUID>() {
         .build(Main.main)
 
     init {
-        offerPage(0)
+        gotoPage(0)
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)

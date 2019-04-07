@@ -104,7 +104,7 @@ class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companio
     override val hasFunctionButtons: Boolean = true
 
     init {
-        offerPage(0)
+        gotoPage(0)
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
@@ -225,15 +225,14 @@ class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companio
                             else -> Unit
                         }
 
-                        offerPage()
+                        refreshPage()
                     }
                     LIST_ALL, LIST_JOIN -> {
                         list = if (listAll) galaxyManager.get(player) else galaxyManager.listGalaxy()
 
                         listAll = !listAll
 
-                        pageNumber = 0
-                        offerPage(0)
+                        gotoPage(0)
                     }
                     NEW_GALAXY -> launch {
                         // TODO clean up

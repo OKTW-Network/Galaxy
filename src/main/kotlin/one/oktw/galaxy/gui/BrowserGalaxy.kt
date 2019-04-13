@@ -232,6 +232,7 @@ class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companio
 
                         listAll = !listAll
 
+                        pageNumber = 0
                         offerPage(0)
                     }
                     NEW_GALAXY -> launch {

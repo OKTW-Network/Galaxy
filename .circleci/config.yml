@@ -27,7 +27,7 @@ jobs:
             - dependencies-v4-master-
             - dependencies-v4-
 
-      - run: ./gradlew setupCiWorkspace
+      #- run: ./gradlew setupCiWorkspace
 
       # run build
       - run: ./gradlew build

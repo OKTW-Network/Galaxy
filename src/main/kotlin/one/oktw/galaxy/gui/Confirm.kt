@@ -36,7 +36,7 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import java.util.*
 
-class Confirm(content: Text, yesButtonText: Text? = null, noButtonText: Text? = null, val callback: (Boolean) -> Unit) : GUI() {
+class Confirm(content: Text, yesButtonText: Text? = null, noButtonText: Text? = null, private val callback: (Boolean) -> Unit) : GUI() {
     override val token = "Confirm-${UUID.randomUUID()}"
     // Todo get player lang
     private val lang = Main.translationService

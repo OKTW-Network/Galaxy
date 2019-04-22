@@ -107,7 +107,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
                                 ": ",
                                 if (location != null) status.concat(location) else status
                             ),
-                            lang.ofPlaceHolder(YELLOW, lang.of("UI.Tip.PermissionGroup"), ": ", RESET, it.group.toString())
+                            lang.ofPlaceHolder(YELLOW, lang.of("UI.Tip.PermissionGroup"), ": ", RESET, lang.of("UI.Tip.${it.group}"))
                         )
                     )
                     .build(), it.uuid

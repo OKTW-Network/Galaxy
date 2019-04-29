@@ -282,8 +282,8 @@ abstract class PageGUI<Data> : GUI() {
             }
 
             when (action) {
-                Action.PrevPage -> if (pageNumber > 0) gotoPage(--pageNumber)
-                Action.NextPage -> gotoPage(++pageNumber)
+                Action.PrevPage -> if (pageNumber > 0) gotoPage(pageNumber + 1)
+                Action.NextPage -> gotoPage(pageNumber + 1)
                 else -> Unit
             }
         }

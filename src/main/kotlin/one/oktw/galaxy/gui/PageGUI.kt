@@ -139,19 +139,13 @@ abstract class PageGUI<Data> : GUI() {
         }
     }
 
-    protected fun refreshPage() {
-        offerPage()
-    }
-
     protected fun gotoPage(pageNumber: Int) {
         this.pageNumber = pageNumber
-        offerPage()
+        refreshPage()
     }
 
-    private fun offerPage() = offerPage(pageNumber)
-
     // There should be only one offerPage processed at same time, or the pages will be merged all together
-    private fun offerPage(pageNumber: Int) = lock.launch {
+    protected fun refreshPage() = lock.launch {
         view.disabled = true
 
         val maxItem = view.countSlots(Slot.ITEMS)
@@ -288,8 +282,8 @@ abstract class PageGUI<Data> : GUI() {
             }
 
             when (action) {
-                Action.PrevPage -> if (pageNumber > 0) offerPage(--pageNumber)
-                Action.NextPage -> offerPage(++pageNumber)
+                Action.PrevPage -> if (pageNumber > 0) gotoPage(--pageNumber)
+                Action.NextPage -> gotoPage(++pageNumber)
                 else -> Unit
             }
         }

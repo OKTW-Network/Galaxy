@@ -139,7 +139,7 @@ class BrowserGalaxy(private val player: Player) : PageGUI<BrowserGalaxy.Companio
                                 ),
                                 lang.ofPlaceHolder(
                                     GREEN,
-                                    lang.of("UI.Tip.Owner"),
+                                    lang.of("UI.Tip.OWNER"),
                                     ": ",
                                     TextColors.RESET,
                                     owner.name

@@ -94,6 +94,7 @@ item.Upgrade.RANGE=Range
 item.Upgrade.SHIELD=Shield
 item.Upgrade.SPEED=Speed
 item.Upgrade.THROUGH=Through
+item.Upgrade.DISTANCE=Distance
 traveler.event.get_dust="You got %s Star Dust (%s)."
 traveler.memberRemovedNotice="You have been remove from this galaxy, your visitor mode has automatically turned on."
 UI.Button.StarDust=Star dust

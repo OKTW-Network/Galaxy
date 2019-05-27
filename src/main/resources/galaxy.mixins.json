@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "one.oktw.galaxy.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "PlayerManagerMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

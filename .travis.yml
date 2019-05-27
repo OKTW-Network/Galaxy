@@ -8,5 +8,4 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-install: ./gradlew setupCiWorkspace
 script: ./gradlew build

@@ -33,11 +33,11 @@ minecraft {
 dependencies {
     //to change the versions see the gradle.properties file
     minecraft(group = "com.mojang", name = "minecraft", version = "1.14.2")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.14.2+build.1")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.14.2+build.2")
 
     modCompile(group = "net.fabricmc", name = "fabric-loader", version = "0.4.8+build.154")
     modCompile(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.31+build.2")
-    modCompile(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.3.0+build.170")
+    modCompile(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.3.0+build.173")
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.

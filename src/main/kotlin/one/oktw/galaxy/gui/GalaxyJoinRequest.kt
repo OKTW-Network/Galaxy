@@ -26,6 +26,7 @@ import one.oktw.galaxy.galaxy.data.extensions.addMember
 import one.oktw.galaxy.galaxy.data.extensions.refresh
 import one.oktw.galaxy.galaxy.data.extensions.removeJoinRequest
 import one.oktw.galaxy.item.enums.ItemType.BUTTON
+import one.oktw.galaxy.translation.extensions.toLegacyText
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.SkullTypes
@@ -69,13 +70,13 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI<UUID>() {
             .map {
                 val user = userStorage.get(it).get()
                 Pair(
-                ItemStack.builder()
-                    .itemType(ItemTypes.SKULL)
-                    .itemData(DataItemType(BUTTON))
-                    .add(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, user.name))
-                    .add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
-                    .add(Keys.REPRESENTED_PLAYER, user.profile)
-                    .build(), it
+                    ItemStack.builder()
+                        .itemType(ItemTypes.SKULL)
+                        .itemData(DataItemType(BUTTON))
+                        .add(Keys.DISPLAY_NAME, Text.of(TextColors.YELLOW, TextStyles.BOLD, user.name))
+                        .add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
+                        .add(Keys.REPRESENTED_PLAYER, user.profile)
+                        .build(), it
                 )
             }
             .toList()
@@ -96,9 +97,13 @@ class GalaxyJoinRequest(private val galaxy: Galaxy) : PageGUI<UUID>() {
         }
 
         if (detail.primary?.type == Companion.Slot.ITEMS) {
-            val uuid = detail.primary.data?.data?: return
-            GUIHelper.open(event.source as Player) {
-                Confirm(lang.ofPlaceHolder("UI.Title.ConfirmJoinRequest")) {
+            val uuid = detail.primary.data?.data ?: return
+            val player = event.source as Player
+            val requestTitle = lang.of("UI.Title.ConfirmJoinRequest", userStorage.get(uuid).get().name).toLegacyText(player)
+            val yes = lang.ofPlaceHolder(TextColors.GREEN, lang.of("UI.Button.Accept"))
+            val no = lang.ofPlaceHolder(TextColors.RED, lang.of("UI.Button.Refuse"))
+            GUIHelper.open(player) {
+                Confirm(requestTitle, yes, no) {
                     launch {
                         if (it) galaxy.addMember(uuid)
 

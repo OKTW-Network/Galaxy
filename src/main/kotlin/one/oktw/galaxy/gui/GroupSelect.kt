@@ -55,14 +55,14 @@ class GroupSelect(private val callback: (Group) -> Unit) : GUI() {
         Button(MANAGER).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.RED, lang.of("UI.Tip.Admin")))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.RED, lang.of("UI.Tip.ADMIN")))
             }
             .let { inventory.set(1, 0, it) }
 
         Button(ButtonType.MEMBER).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.RED, lang.of("UI.Tip.Member")))
+                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.RED, lang.of("UI.Tip.MEMBER")))
             }
             .let { inventory.set(3, 0, it) }
 

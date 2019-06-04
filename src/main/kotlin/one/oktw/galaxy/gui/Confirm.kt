@@ -36,7 +36,7 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColors
 import java.util.*
 
-class Confirm(content: Text, private val callback: (Boolean) -> Unit) : GUI() {
+class Confirm(content: Text, yesButtonText: Text? = null, noButtonText: Text? = null, private val callback: (Boolean) -> Unit) : GUI() {
     override val token = "Confirm-${UUID.randomUUID()}"
     // Todo get player lang
     private val lang = Main.translationService
@@ -46,6 +46,8 @@ class Confirm(content: Text, private val callback: (Boolean) -> Unit) : GUI() {
         .listener(InteractInventoryEvent::class.java, ::eventProcess)
         .build(main)
     private val buttonID = Array(3) { UUID.randomUUID() }
+    private val yes = yesButtonText ?: lang.ofPlaceHolder(TextColors.GREEN, lang.of("UI.Button.Yes"))
+    private val no = noButtonText ?: lang.ofPlaceHolder(TextColors.RED, lang.of("UI.Button.No"))
 
     init {
         val inventory = inventory.query<GridInventory>(QueryOperationTypes.INVENTORY_TYPE.of(GridInventory::class.java))
@@ -54,14 +56,14 @@ class Confirm(content: Text, private val callback: (Boolean) -> Unit) : GUI() {
         Button(OK).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[0]))
-                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.GREEN, lang.of("UI.Button.Yes")))
+                offer(Keys.DISPLAY_NAME, yes)
             }
             .let { inventory.set(1, 0, it) }
 
         Button(X).createItemStack()
             .apply {
                 offer(DataUUID(buttonID[1]))
-                offer(Keys.DISPLAY_NAME, lang.ofPlaceHolder(TextColors.GREEN, lang.of("UI.Button.No")))
+                offer(Keys.DISPLAY_NAME, no)
             }
             .let { inventory.set(3, 0, it) }
 

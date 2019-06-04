@@ -99,7 +99,7 @@ abstract class PageGUI<Data> : GUI() {
 
     protected open val hasFunctionButtons: Boolean = false
     private val lang = Main.translationService
-    protected var pageNumber = 0
+    private var pageNumber = 0
     private val lock = OrderedLaunch()
 
     val view: GridGUIView<Slot, Operation<Data>> by lazy {
@@ -139,10 +139,13 @@ abstract class PageGUI<Data> : GUI() {
         }
     }
 
-    protected fun offerPage() = offerPage(pageNumber)
+    protected fun gotoPage(pageNumber: Int) {
+        this.pageNumber = pageNumber
+        refreshPage()
+    }
 
     // There should be only one offerPage processed at same time, or the pages will be merged all together
-    protected fun offerPage(pageNumber: Int) = lock.launch {
+    protected fun refreshPage() = lock.launch {
         view.disabled = true
 
         val maxItem = view.countSlots(Slot.ITEMS)
@@ -279,8 +282,8 @@ abstract class PageGUI<Data> : GUI() {
             }
 
             when (action) {
-                Action.PrevPage -> if (pageNumber > 0) offerPage(--pageNumber)
-                Action.NextPage -> offerPage(++pageNumber)
+                Action.PrevPage -> if (pageNumber > 0) gotoPage(pageNumber - 1)
+                Action.NextPage -> gotoPage(pageNumber + 1)
                 else -> Unit
             }
         }

@@ -57,7 +57,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
         .build(Main.main)
 
     init {
-        offerPage(0)
+        gotoPage(0)
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)
@@ -135,7 +135,7 @@ class BrowserMember(private val galaxy: Galaxy, private val manage: Boolean = fa
             val uuid = detail.primary.data?.data?: return
             launch {
                 GUIHelper.openAsync(event.source as Player) { ManageMember(galaxy.refresh(), uuid) }.await()
-                    .registerEvent(InteractInventoryEvent.Close::class.java) { offerPage(0) }
+                    .registerEvent(InteractInventoryEvent.Close::class.java) { gotoPage(0) }
             }
         }
     }

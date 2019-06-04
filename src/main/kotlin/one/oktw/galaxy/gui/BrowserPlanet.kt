@@ -52,7 +52,7 @@ class BrowserPlanet(private val galaxy: Galaxy) : PageGUI<UUID>() {
         .build(Main.main)
 
     init {
-        offerPage(0)
+        gotoPage(0)
 
         // register event
         registerEvent(ClickInventoryEvent::class.java, this::clickEvent)

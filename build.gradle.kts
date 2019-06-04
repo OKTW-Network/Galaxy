@@ -33,7 +33,7 @@ minecraft {
 dependencies {
     //to change the versions see the gradle.properties file
     minecraft(group = "com.mojang", name = "minecraft", version = "1.14.2")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.14.2+build.2")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.14.2+build.7")
 
     modCompile(group = "net.fabricmc", name = "fabric-loader", version = "0.4.8+build.154")
     modCompile(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.31+build.2")

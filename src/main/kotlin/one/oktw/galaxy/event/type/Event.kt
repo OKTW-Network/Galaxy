@@ -16,26 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy
+package one.oktw.galaxy.event.type
 
-import net.fabricmc.api.ModInitializer
-import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.server.dedicated.MinecraftDedicatedServer
-import one.oktw.galaxy.event.EventManager
-
-@Suppress("unused")
-class Main : ModInitializer {
-    lateinit var server: MinecraftDedicatedServer
-    lateinit var eventManager: EventManager
-
-    companion object {
-        var main: Main? = null
-            private set
-    }
-
-    override fun onInitialize() {
-        main = this
-        server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
-        eventManager = EventManager(server)
-    }
-}
+interface Event

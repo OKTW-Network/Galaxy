@@ -1,0 +1,6 @@
+[submodule "src/main/resources/resourcepack/Galaxy-resourcepack"]
+	path = src/main/resources/resourcepack/Galaxy-resourcepack
+	url = https://github.com/OKTW-Network/Galaxy-resourcepack.git
+[submodule "src/main/resources/resourcepack/Galaxy-lobby-resourcepack"]
+	path = src/main/resources/resourcepack/Galaxy-lobby-resourcepack
+	url = https://github.com/OKTW-Network/Galaxy-lobby-resourcepack.git

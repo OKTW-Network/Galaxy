@@ -36,8 +36,8 @@ dependencies {
     mappings(group = "net.fabricmc", name = "yarn", version = "1.14.2+build.7")
 
     modCompile(group = "net.fabricmc", name = "fabric-loader", version = "0.4.8+build.154")
-    modCompile(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.31+build.2")
-    modCompile(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.3.0+build.173")
+    modCompile(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.31+build.4")
+    modCompile(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.3.0+build.179")
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.

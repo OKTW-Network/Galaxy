@@ -34,8 +34,8 @@ class Main : ModInitializer {
     }
 
     override fun onInitialize() {
-        main = this
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
+        main = this
     }
 }

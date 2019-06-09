@@ -21,6 +21,7 @@ package one.oktw.galaxy
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
+import one.oktw.galaxy.command.CommandRegister
 import one.oktw.galaxy.event.EventManager
 
 @Suppress("unused")
@@ -28,6 +29,8 @@ class Main : ModInitializer {
     lateinit var server: MinecraftDedicatedServer
         private set
     lateinit var eventManager: EventManager
+        private set
+    lateinit var commandRegister: CommandRegister
         private set
 
     companion object {
@@ -38,6 +41,7 @@ class Main : ModInitializer {
     override fun onInitialize() {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
+        commandRegister = CommandRegister()
         main = this
     }
 }

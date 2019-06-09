@@ -26,7 +26,9 @@ import one.oktw.galaxy.event.EventManager
 @Suppress("unused")
 class Main : ModInitializer {
     lateinit var server: MinecraftDedicatedServer
+        private set
     lateinit var eventManager: EventManager
+        private set
 
     companion object {
         var main: Main? = null

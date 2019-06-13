@@ -1,3 +1,5 @@
+import java.util.Arrays.asList
+
 plugins {
     //    "maven-publish"
     kotlin("jvm") version "1.3.31"
@@ -59,6 +61,39 @@ tasks.getByName<ProcessResources>("processResources") {
 tasks.getByName<Jar>("jar") {
     from("LICENSE")
 }
+
+tasks.register<Exec>("submoduleUpdate") {
+    description = "update All submodule"
+    commandLine = asList<Any>("git", "submodule", "update", "--init", "--recursive")
+    group = "build setup"
+}
+
+tasks.register<Zip>("resourcePack") {
+    archiveName = "Galaxy-resourcepack.zip"
+    this.destinationDir = buildDir.resolve("./libs")
+
+    from("$projectDir/src/main/resources/resourcepack/Galaxy-resourcepack")
+    group = "build"
+}
+
+tasks.register<Zip>("resourcePackLobby") {
+    archiveName = "Galaxy-lobby-resourcepack.zip"
+    this.destinationDir = buildDir.resolve("./libs")
+
+    from("$projectDir/src/main/resources/resourcepack/Galaxy-lobby-resourcepack")
+    group = "build"
+}
+
+tasks.getByName("resourcePack")
+    .dependsOn("submoduleUpdate")
+
+tasks.getByName("resourcePackLobby")
+    .dependsOn("submoduleUpdate")
+
+
+tasks.getByName("build")
+    .dependsOn("resourcePack")
+    .dependsOn("resourcePackLobby")
 
 // configure the maven publication
 //publishing {

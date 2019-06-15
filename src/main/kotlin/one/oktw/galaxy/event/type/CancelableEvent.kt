@@ -18,9 +18,9 @@
 
 package one.oktw.galaxy.event.type
 
-class CancelableEvent : Event {
-    var isCancel = false
+open class CancelableEvent : Event {
+    var cancel = false
         set(cancel) {
-            if (!isCancel) field = cancel
+            if (!this.cancel) field = cancel
         }
 }

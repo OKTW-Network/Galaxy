@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "one.oktw.galaxy.mixin.event",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinPlayerChat_MeCommand",
+    "MixinPlayerChat_NetworkHandler",
+    "MixinPlayerChat_SayCommand"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

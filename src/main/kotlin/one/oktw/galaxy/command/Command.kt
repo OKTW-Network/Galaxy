@@ -18,14 +18,9 @@
 
 package one.oktw.galaxy.command
 
-import net.fabricmc.fabric.api.registry.CommandRegistry
+import com.mojang.brigadier.CommandDispatcher
+import net.minecraft.server.command.ServerCommandSource
 
-class CommandHelper {
-    companion object {
-        fun register(command: Command, dedicated: Boolean = false) {
-            CommandRegistry.INSTANCE.register(dedicated) { dispatcher ->
-                command.register(dispatcher)
-            }
-        }
-    }
+interface Command {
+    fun register(dispatcher: CommandDispatcher<ServerCommandSource>)
 }

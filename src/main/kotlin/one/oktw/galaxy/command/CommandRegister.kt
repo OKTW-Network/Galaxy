@@ -24,6 +24,6 @@ class CommandRegister {
     private val commandHelper = CommandHelper
 
     init {
-        commandHelper.register("test", TEST())
+        commandHelper.register(TEST())
     }
 }

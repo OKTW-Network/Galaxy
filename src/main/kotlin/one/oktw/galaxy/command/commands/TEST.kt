@@ -43,7 +43,7 @@ class TEST : Command {
                     CommandManager.argument("targets", EntityArgumentType.entities())
                         // 指令執行動作在這
                         .executes { context ->
-                            // 使用另一個 fun 完持
+                            // 使用另一個 fun 完成
                             execute(
                                 // 指令執行者
                                 context.source,

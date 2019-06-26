@@ -19,14 +19,13 @@
 package one.oktw.galaxy.command.commands
 
 import com.mojang.brigadier.CommandDispatcher
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.minecraft.ChatFormat
 import net.minecraft.client.network.packet.TitleS2CPacket
 import net.minecraft.network.chat.TextComponent
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import java.util.concurrent.TimeUnit
 
@@ -49,9 +48,12 @@ class Spawn : Command {
                 player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, component))
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
-            // TODO (Broken spawnPos)
-            player.setPositionAndAngles(source.world.spawnPos, 0.0F, 0.0F)
+            withContext(main!!.server.asCoroutineDispatcher()) {
+                // TODO (Broken spawnPos)
+                player.setPositionAndAngles(source.world.spawnPos, 0.0F, 0.0F)
+            }
         }
+
         return com.mojang.brigadier.Command.SINGLE_SUCCESS
     }
 }

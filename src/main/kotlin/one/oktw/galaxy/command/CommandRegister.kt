@@ -18,6 +18,8 @@
 
 package one.oktw.galaxy.command
 
+import one.oktw.galaxy.command.commands.Join
+import one.oktw.galaxy.command.commands.Spawn
 import one.oktw.galaxy.command.commands.TEST
 
 class CommandRegister {
@@ -25,5 +27,7 @@ class CommandRegister {
 
     init {
         commandHelper.register(TEST())
+        commandHelper.register(Spawn())
+        commandHelper.register(Join())
     }
 }

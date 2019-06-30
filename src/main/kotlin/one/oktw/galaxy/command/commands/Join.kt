@@ -20,10 +20,10 @@ package one.oktw.galaxy.command.commands
 
 import com.mojang.brigadier.CommandDispatcher
 import net.minecraft.command.arguments.EntityArgumentType
-import net.minecraft.network.chat.TextComponent
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.text.LiteralText
 import one.oktw.galaxy.command.Command
 
 class Join : Command {
@@ -44,7 +44,7 @@ class Join : Command {
 
     private fun execute(source: ServerCommandSource, player: ServerPlayerEntity): Int {
         // TODO (戳Proxy加入玩家）
-        source.sendFeedback(TextComponent("已傳入玩家 ${player.displayName.formattedText}"), false)
+        source.sendFeedback(LiteralText("已傳入玩家 ${player.displayName}"), false)
         return com.mojang.brigadier.Command.SINGLE_SUCCESS
     }
 }

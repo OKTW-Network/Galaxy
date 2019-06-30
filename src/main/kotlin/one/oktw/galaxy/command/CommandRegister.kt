@@ -22,10 +22,8 @@ import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.command.commands.Spawn
 
 class CommandRegister {
-    private val commandHelper = CommandHelper
-
     init {
-        commandHelper.register(Spawn())
-        commandHelper.register(Join())
+        CommandHelper.register(Spawn())
+        CommandHelper.register(Join())
     }
 }

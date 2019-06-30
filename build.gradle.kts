@@ -55,7 +55,6 @@ dependencies {
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
-    compile(group = "com.google.guava", name = "guava", version = "28.0-jre")
 }
 
 tasks.getByName<ProcessResources>("processResources") {

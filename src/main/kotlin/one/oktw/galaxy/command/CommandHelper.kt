@@ -20,12 +20,10 @@ package one.oktw.galaxy.command
 
 import net.fabricmc.fabric.api.registry.CommandRegistry
 
-class CommandHelper {
-    companion object {
-        fun register(command: Command, dedicated: Boolean = false) {
-            CommandRegistry.INSTANCE.register(dedicated) { dispatcher ->
-                command.register(dispatcher)
-            }
+object CommandHelper {
+    fun register(command: Command, dedicated: Boolean = false) {
+        CommandRegistry.INSTANCE.register(dedicated) { dispatcher ->
+            command.register(dispatcher)
         }
     }
 }

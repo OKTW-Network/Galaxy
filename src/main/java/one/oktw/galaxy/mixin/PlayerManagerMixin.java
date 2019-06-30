@@ -44,7 +44,7 @@ abstract class PlayerManagerMixin {
     @Shadow()
     private final List<ServerPlayerEntity> players = Lists.newArrayList();
 
-    private static final Identifier GALAXY_CHAT = new Identifier("galaxy/chat");
+    private static final Identifier GALAXY_CHAT = new Identifier("galaxy", "proxy/chat");
     @Inject(
         method = "broadcastChatMessage(Lnet/minecraft/network/chat/Component;Z)V",
         at = @At("HEAD")

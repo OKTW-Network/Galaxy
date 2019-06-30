@@ -18,11 +18,12 @@
 
 package one.oktw.galaxy.command.commands
 
+import com.google.common.collect.Lists
+import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.CommandDispatcher
-import net.minecraft.command.arguments.EntityArgumentType
+import net.minecraft.command.arguments.GameProfileArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.LiteralText
 import one.oktw.galaxy.command.Command
 
@@ -31,20 +32,34 @@ class Join : Command {
         dispatcher.register(
             CommandManager.literal("join")
                 .executes { context ->
-                    execute(context.source, context.source.player)
+                    val profile = Lists.newArrayList<GameProfile>()
+                    profile.add(context.source.player.gameProfile)
+                    execute(context.source, profile)
                 }
                 .then(
-                    CommandManager.argument("targets", EntityArgumentType.player())
+                    CommandManager.argument("targets", GameProfileArgumentType.gameProfile())
+                        //用來移除 ＠ 開頭的自動完成
+                        .suggests { context, suggestionsBuilder ->
+                            context.source.minecraftServer.playerManager.playerList
+                                .forEach { suggestionsBuilder.suggest(it.name.asString()) }
+                            return@suggests suggestionsBuilder.buildFuture()
+                        }
                         .executes { context ->
-                            execute(context.source, EntityArgumentType.getPlayer(context, "targets"))
+                            execute(context.source, GameProfileArgumentType.getProfileArgument(context, "targets"))
                         }
                 )
         )
     }
 
-    private fun execute(source: ServerCommandSource, player: ServerPlayerEntity): Int {
+    private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {
         // TODO (戳Proxy加入玩家）
-        source.sendFeedback(LiteralText("已傳入玩家 ").append(player.displayName), false)
+        val players = collection.iterator()
+
+        while (players.hasNext()) {
+            val player = players.next()
+            source.sendFeedback(LiteralText("已傳入玩家 ${player.name} UUID: ${player.id}"), false)
+            break
+        }
         return com.mojang.brigadier.Command.SINGLE_SUCCESS
     }
 }

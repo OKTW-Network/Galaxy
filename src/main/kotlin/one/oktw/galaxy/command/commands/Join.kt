@@ -44,7 +44,7 @@ class Join : Command {
 
     private fun execute(source: ServerCommandSource, player: ServerPlayerEntity): Int {
         // TODO (戳Proxy加入玩家）
-        source.sendFeedback(LiteralText("已傳入玩家 ${player.displayName}"), false)
+        source.sendFeedback(LiteralText("已傳入玩家 ").append(player.displayName), false)
         return com.mojang.brigadier.Command.SINGLE_SUCCESS
     }
 }

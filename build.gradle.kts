@@ -41,12 +41,12 @@ minecraft {
 
 dependencies {
     //to change the versions see the gradle.properties file
-    minecraft(group = "com.mojang", name = "minecraft", version = "1.14.2")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.14.2+build.7")
+    minecraft(group = "com.mojang", name = "minecraft", version = "1.14.3")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.14.3+build.9")
 
-    modCompile(group = "net.fabricmc", name = "fabric-loader", version = "0.4.8+build.154")
-    modCompile(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.31+build.4")
-    modCompile(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.3.0+build.179")
+    modCompile(group = "net.fabricmc", name = "fabric-loader", version = "0.4.8+build.155")
+    modCompile(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.40+build.1")
+    modCompile(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.3.0+build.187")
     modCompile(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
 
     // Jar in Jar

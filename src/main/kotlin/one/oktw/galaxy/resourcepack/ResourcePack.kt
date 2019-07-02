@@ -19,13 +19,19 @@
 package one.oktw.galaxy.resourcepack
 
 import com.google.common.hash.Hashing
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
 import java.net.URI
 
 
-class ResourcePack(url: String) {
+class ResourcePack private constructor(url: String) {
+    companion object {
+        suspend fun new(url: String): ResourcePack = withContext(IO) { ResourcePack(url) }
+    }
+
     private var uri = URI(url)
     private var hash = ""
 
@@ -33,9 +39,9 @@ class ResourcePack(url: String) {
         this.hash = getHashFromUri(uri)
     }
 
-    fun updateHash(url: String) {
+    suspend fun updateHash(url: String) {
         this.uri = URI(url)
-        this.hash = getHashFromUri(uri)
+        this.hash = withContext(IO) { getHashFromUri(uri) }
     }
 
     fun getHash(): String {

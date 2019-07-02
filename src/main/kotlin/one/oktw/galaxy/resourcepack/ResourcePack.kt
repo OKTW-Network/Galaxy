@@ -32,8 +32,10 @@ class ResourcePack private constructor(url: String) {
         suspend fun new(url: String): ResourcePack = withContext(IO) { ResourcePack(url) }
     }
 
-    private var uri = URI(url)
-    private var hash = ""
+    var uri = URI(url)
+        private set
+    var hash = ""
+        private set
 
     init {
         this.hash = getHashFromUri(uri)
@@ -42,10 +44,6 @@ class ResourcePack private constructor(url: String) {
     suspend fun updateHash(url: String) {
         this.uri = URI(url)
         this.hash = withContext(IO) { getHashFromUri(uri) }
-    }
-
-    fun getHash(): String {
-        return this.hash
     }
 
     @Throws(FileNotFoundException::class)

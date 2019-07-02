@@ -29,7 +29,7 @@ class EventManager(private val serverThread: ThreadExecutor<*>) : CoroutineScope
     private val asyncEventListeners = ConcurrentHashMap<KClass<out Event>, ConcurrentHashMap.KeySetView<Consumer<Event>, Boolean>>()
     private val syncEventListeners = ConcurrentHashMap<KClass<out Event>, ConcurrentHashMap.KeySetView<Consumer<Event>, Boolean>>()
 
-    fun <T : Event> emit(event: T) {
+    fun <T : Event> emit(event: T): T {
         launch { asyncEventListeners[event::class]?.forEach { it.accept(event) } }
 
         if (!serverThread.isOnThread) {
@@ -37,6 +37,7 @@ class EventManager(private val serverThread: ThreadExecutor<*>) : CoroutineScope
         } else {
             syncEventListeners[event::class]?.forEach { it.accept(event) }
         }
+        return event
     }
 
     fun <T : Event> register(event: KClass<T>, sync: Boolean = false, listener: Consumer<T>) = launch {

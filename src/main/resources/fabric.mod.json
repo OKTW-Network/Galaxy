@@ -21,7 +21,9 @@
       }
     ]
   },
-  "mixins": [],
+  "mixins": [
+    "galaxy.mixin.json"
+  ],
   "requires": {
     "fabricloader": ">=0.4.0",
     "fabric-language-kotlin": ">=1.3.31",

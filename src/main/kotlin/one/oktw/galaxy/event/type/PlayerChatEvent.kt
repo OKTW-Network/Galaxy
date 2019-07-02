@@ -18,9 +18,7 @@
 
 package one.oktw.galaxy.event.type
 
-open class CancelableEvent : Event {
-    var cancel = false
-        set(cancel) {
-            if (!this.cancel) field = cancel
-        }
-}
+import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.text.Text
+
+class PlayerChatEvent(val player: ServerPlayerEntity, val message: Text) : CancelableEvent()

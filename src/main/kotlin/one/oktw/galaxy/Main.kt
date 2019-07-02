@@ -18,10 +18,13 @@
 
 package one.oktw.galaxy
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import one.oktw.galaxy.event.EventManager
+import one.oktw.galaxy.resourcepack.ResourcePack
 
 @Suppress("unused")
 class Main : ModInitializer {
@@ -33,11 +36,17 @@ class Main : ModInitializer {
     companion object {
         var main: Main? = null
             private set
+        var resourcePack: ResourcePack? = null
+            private set
     }
 
     override fun onInitialize() {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
         main = this
+        val resourcePackUrl: String? = System.getenv("resourcePack")
+        if (resourcePackUrl != null) {
+            GlobalScope.launch { resourcePack = ResourcePack.new(resourcePackUrl) }
+        }
     }
 }

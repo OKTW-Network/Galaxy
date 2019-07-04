@@ -38,8 +38,6 @@ class Main : ModInitializer {
     companion object {
         var main: Main? = null
             private set
-        var resourcePack: ResourcePack? = null
-            private set
     }
 
     override fun onInitialize() {
@@ -49,9 +47,9 @@ class Main : ModInitializer {
         val resourcePackUrl: String? = System.getenv("resourcePack")
         if (resourcePackUrl != null) {
             GlobalScope.launch {
-                resourcePack = ResourcePack.new(resourcePackUrl)
+                val resourcePack = ResourcePack.new(resourcePackUrl)
                 withContext(server.asCoroutineDispatcher()) {
-                    server.setResourcePack(resourcePack!!.uri.toString(), resourcePack!!.hash)
+                    server.setResourcePack(resourcePack.uri.toString(), resourcePack.hash)
                 }
             }
         }

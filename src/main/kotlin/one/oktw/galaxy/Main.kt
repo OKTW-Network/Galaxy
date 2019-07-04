@@ -19,7 +19,9 @@
 package one.oktw.galaxy
 
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
@@ -48,7 +50,9 @@ class Main : ModInitializer {
         if (resourcePackUrl != null) {
             GlobalScope.launch {
                 resourcePack = ResourcePack.new(resourcePackUrl)
-                server.setResourcePack(resourcePack!!.uri.toString(), resourcePack!!.hash)
+                withContext(server.asCoroutineDispatcher()) {
+                    server.setResourcePack(resourcePack!!.uri.toString(), resourcePack!!.hash)
+                }
             }
         }
     }

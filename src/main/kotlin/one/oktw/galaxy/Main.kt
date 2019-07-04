@@ -46,8 +46,10 @@ class Main : ModInitializer {
         main = this
         val resourcePackUrl: String? = System.getenv("resourcePack")
         if (resourcePackUrl != null) {
-            GlobalScope.launch { resourcePack = ResourcePack.new(resourcePackUrl) }
-            server.setResourcePack(resourcePack!!.uri.toString(), resourcePack!!.hash)
+            GlobalScope.launch {
+                resourcePack = ResourcePack.new(resourcePackUrl)
+                server.setResourcePack(resourcePack!!.uri.toString(), resourcePack!!.hash)
+            }
         }
     }
 }

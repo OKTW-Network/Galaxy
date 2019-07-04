@@ -21,7 +21,6 @@ package one.oktw.galaxy.resourcepack
 import com.google.common.hash.Hashing
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
-import one.oktw.galaxy.Main.Companion.main
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
@@ -40,13 +39,11 @@ class ResourcePack private constructor(url: String) {
 
     init {
         this.hash = getHashFromUri(uri)
-        main!!.server.setResourcePack(this.uri.toString(), this.hash)
     }
 
     suspend fun updateHash(url: String) {
         this.uri = URI(url)
         this.hash = withContext(IO) { getHashFromUri(uri) }
-        main!!.server.setResourcePack(this.uri.toString(), this.hash)
     }
 
     @Throws(FileNotFoundException::class)

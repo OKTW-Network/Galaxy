@@ -18,22 +18,26 @@
 
 package one.oktw.galaxy.command.commands
 
-import com.google.common.collect.Lists
 import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.CommandDispatcher
+import io.netty.buffer.Unpooled.wrappedBuffer
 import net.minecraft.command.arguments.GameProfileArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.server.network.packet.CustomPayloadC2SPacket
 import net.minecraft.text.LiteralText
+import net.minecraft.util.PacketByteBuf
+import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.command.Command
+import one.oktw.galaxy.proxy.api.ProxyAPI.encode
+import one.oktw.galaxy.proxy.api.packet.CreateGalaxy
 
 class Join : Command {
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
             CommandManager.literal("join")
                 .executes { context ->
-                    val profile = Lists.newArrayList<GameProfile>()
-                    profile.add(context.source.player.gameProfile)
+                    val profile = listOf(context.source.player.gameProfile)
                     execute(context.source, profile)
                 }
                 .then(
@@ -52,14 +56,13 @@ class Join : Command {
     }
 
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {
-        // TODO (戳Proxy加入玩家）
-        val players = collection.iterator()
+        val player = collection.first()
 
-        while (players.hasNext()) {
-            val player = players.next()
-            source.sendFeedback(LiteralText("已傳入玩家 ${player.name} UUID: ${player.id}"), false)
-            break
-        }
+        source.player.networkHandler.sendPacket(
+            CustomPayloadC2SPacket(PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(player.id)))))
+        )
+        source.sendFeedback(LiteralText(if (source.player.gameProfile == player) "正在加入您的星系" else "正在加入 ${player.name} 的星系"), false)
+
         return com.mojang.brigadier.Command.SINGLE_SUCCESS
     }
 }

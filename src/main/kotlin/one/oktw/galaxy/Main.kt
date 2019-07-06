@@ -21,6 +21,7 @@ package one.oktw.galaxy
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
+import net.minecraft.util.Identifier
 import one.oktw.galaxy.command.CommandRegister
 import one.oktw.galaxy.event.EventManager
 
@@ -34,6 +35,7 @@ class Main : ModInitializer {
         private set
 
     companion object {
+        val PROXY_IDENTIFIER = Identifier("galaxy", "proxy")
         var main: Main? = null
             private set
     }

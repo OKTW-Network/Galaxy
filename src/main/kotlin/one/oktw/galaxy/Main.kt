@@ -25,6 +25,8 @@ import kotlinx.coroutines.withContext
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
+import net.minecraft.util.Identifier
+import one.oktw.galaxy.command.CommandRegister
 import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.resourcepack.ResourcePack
 
@@ -34,8 +36,11 @@ class Main : ModInitializer {
         private set
     lateinit var eventManager: EventManager
         private set
+    lateinit var commandRegister: CommandRegister
+        private set
 
     companion object {
+        val PROXY_IDENTIFIER = Identifier("galaxy", "proxy")
         var main: Main? = null
             private set
     }
@@ -43,6 +48,7 @@ class Main : ModInitializer {
     override fun onInitialize() {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
+        commandRegister = CommandRegister()
         main = this
         val resourcePackUrl: String? = System.getenv("resourcePack")
         if (resourcePackUrl != null) {

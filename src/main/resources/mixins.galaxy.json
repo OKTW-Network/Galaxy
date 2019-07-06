@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.7.10",
+  "package": "one.oktw.galaxy.mixin",
+  "refmap": "mixins.galaxy.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinBiomeProviderSingle",
+    "MixinCommandBase",
+    "MixinWorldProviderHell"
+  ]
+}

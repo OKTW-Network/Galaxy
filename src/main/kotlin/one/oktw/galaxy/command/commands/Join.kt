@@ -37,8 +37,7 @@ class Join : Command {
         dispatcher.register(
             CommandManager.literal("join")
                 .executes { context ->
-                    val profile = listOf(context.source.player.gameProfile)
-                    execute(context.source, profile)
+                    execute(context.source, listOf(context.source.player.gameProfile))
                 }
                 .then(
                     CommandManager.argument("targets", GameProfileArgumentType.gameProfile())

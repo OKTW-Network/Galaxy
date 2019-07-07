@@ -40,7 +40,7 @@ class Join : Command {
                     execute(context.source, listOf(context.source.player.gameProfile))
                 }
                 .then(
-                    CommandManager.argument("targets", GameProfileArgumentType.gameProfile())
+                    CommandManager.argument("target", GameProfileArgumentType.gameProfile())
                         //用來移除 ＠ 開頭的自動完成
                         .suggests { context, suggestionsBuilder ->
                             context.source.minecraftServer.playerManager.playerList
@@ -48,7 +48,7 @@ class Join : Command {
                             return@suggests suggestionsBuilder.buildFuture()
                         }
                         .executes { context ->
-                            execute(context.source, GameProfileArgumentType.getProfileArgument(context, "targets"))
+                            execute(context.source, GameProfileArgumentType.getProfileArgument(context, "target"))
                         }
                 )
         )

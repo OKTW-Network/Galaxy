@@ -35,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(MeCommand.class)
 public class MixinPlayerChat_MeCommand {
     @SuppressWarnings("UnresolvedMixinReference")
-    @Inject(method = "method_13563(Lcom/mojang/brigadier/context/CommandContext;)I", remap = false, at = @At("HEAD"), cancellable = true)
+    @Inject(method = "method_13238(Lcom/mojang/brigadier/context/CommandContext;)I", remap = false, at = @At("HEAD"), cancellable = true)
     private static void onCommand(CommandContext<ServerCommandSource> context, CallbackInfoReturnable<Integer> ci) {
         Main main = Main.Companion.getMain();
         if (main == null) return;

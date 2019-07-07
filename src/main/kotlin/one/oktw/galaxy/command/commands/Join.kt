@@ -21,10 +21,10 @@ package one.oktw.galaxy.command.commands
 import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.CommandDispatcher
 import io.netty.buffer.Unpooled.wrappedBuffer
+import net.minecraft.client.network.packet.CustomPayloadS2CPacket
 import net.minecraft.command.arguments.GameProfileArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.server.network.packet.CustomPayloadC2SPacket
 import net.minecraft.text.LiteralText
 import net.minecraft.util.PacketByteBuf
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
@@ -40,7 +40,7 @@ class Join : Command {
                     execute(context.source, listOf(context.source.player.gameProfile))
                 }
                 .then(
-                    CommandManager.argument("targets", GameProfileArgumentType.gameProfile())
+                    CommandManager.argument("target", GameProfileArgumentType.gameProfile())
                         //用來移除 ＠ 開頭的自動完成
                         .suggests { context, suggestionsBuilder ->
                             context.source.minecraftServer.playerManager.playerList
@@ -48,7 +48,7 @@ class Join : Command {
                             return@suggests suggestionsBuilder.buildFuture()
                         }
                         .executes { context ->
-                            execute(context.source, GameProfileArgumentType.getProfileArgument(context, "targets"))
+                            execute(context.source, GameProfileArgumentType.getProfileArgument(context, "target"))
                         }
                 )
         )
@@ -58,7 +58,7 @@ class Join : Command {
         val player = collection.first()
 
         source.player.networkHandler.sendPacket(
-            CustomPayloadC2SPacket(PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(player.id)))))
+            CustomPayloadS2CPacket(PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(player.id)))))
         )
         source.sendFeedback(LiteralText(if (source.player.gameProfile == player) "正在加入您的星系" else "正在加入 ${player.name} 的星系"), false)
 

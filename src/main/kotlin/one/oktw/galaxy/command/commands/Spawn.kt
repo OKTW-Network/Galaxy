@@ -25,6 +25,7 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Formatting
+import net.minecraft.world.dimension.DimensionType.OVERWORLD
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import java.util.concurrent.TimeUnit
@@ -51,11 +52,23 @@ class Spawn : Command {
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
             withContext(main!!.server.asCoroutineDispatcher()) {
-                player.teleport(
-                    level.spawnX.toDouble(),
-                    level.spawnY.toDouble(),
-                    level.spawnZ.toDouble()
-                )
+                if (world.dimension.type != OVERWORLD) {
+                    val overWorld = player.server.getWorld(OVERWORLD)
+                    player.teleport(
+                        overWorld,
+                        level.spawnX.toDouble(),
+                        level.spawnY.toDouble(),
+                        level.spawnZ.toDouble(),
+                        player.yaw,
+                        player.pitch
+                    )
+                } else {
+                    player.teleport(
+                        level.spawnX.toDouble(),
+                        level.spawnY.toDouble(),
+                        level.spawnZ.toDouble()
+                    )
+                }
             }
         }
 

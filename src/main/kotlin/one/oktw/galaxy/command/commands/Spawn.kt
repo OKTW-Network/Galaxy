@@ -42,6 +42,8 @@ class Spawn : Command {
 
     private fun execute(source: ServerCommandSource): Int {
         val player = source.player
+        val world = player.serverWorld
+        val level = world.levelProperties
         GlobalScope.launch {
             for (i in 0..4) {
                 val component = LiteralText("請等待 ${5 - i} 秒鐘").styled { style -> style.color = Formatting.GREEN }
@@ -49,13 +51,10 @@ class Spawn : Command {
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
             withContext(main!!.server.asCoroutineDispatcher()) {
-                // TODO (Broken spawnPos)
-                player.setPositionAndAngles(
-                    source.world.levelProperties.spawnX.toDouble(),
-                    source.world.levelProperties.spawnY.toDouble(),
-                    source.world.levelProperties.spawnZ.toDouble(),
-                    0.0F,
-                    0.0F
+                player.teleport(
+                    level.spawnX.toDouble(),
+                    level.spawnY.toDouble(),
+                    level.spawnZ.toDouble()
                 )
             }
         }

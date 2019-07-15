@@ -9,7 +9,7 @@ plugins {
 val version = "0.0.1"
 val group = "one.oktw"
 
-val proxyApiVersion = "0.0.6"
+val proxyApiVersion = "3e885981e9"
 
 repositories {
     mavenCentral()

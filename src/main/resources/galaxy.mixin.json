@@ -6,7 +6,8 @@
     "MixinPlayerChat_MeCommand",
     "MixinPlayerChat_NetworkHandler",
     "MixinPlayerChat_SayCommand",
-    "MixinCustomPayloadC2SPacket"
+    "MixinCustomPayload_CustomPayloadC2SPacket",
+    "MixinCustomPayload_NetworkHandler"
   ],
   "client": [],
   "injectors": {

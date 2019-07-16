@@ -18,28 +18,35 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.server.network.packet.CustomPayloadC2SPacket;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.PacketByteBuf;
 import one.oktw.galaxy.Main;
-import one.oktw.galaxy.event.type.PlayerChatEvent;
+import one.oktw.galaxy.event.type.ProxyPacketReceiveEvent;
+import one.oktw.galaxy.network.CustomPayloadC2SPacketAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayNetworkHandler.class)
-public class MixinPlayerChat_NetworkHandler {
+public class MixinCustomPayload_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Redirect(method = "onChatMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Z)V"))
-    private void onChat(PlayerManager playerManager, Text message, boolean isSystem) {
-        Main main = Main.Companion.getMain();
+    @Inject(method = "onCustomPayload", at = @At("HEAD"), cancellable = true)
+    private void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo info) {
+        Identifier channel = ((CustomPayloadC2SPacketAccessor) packet).getChannel();
 
-        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, message)).getCancel()) {
-            playerManager.broadcastChatMessage(message, isSystem);
+        Main.Companion main = Main.Companion;
+        if (main.getMain() == null) return;
+
+        if (channel == main.getPROXY_IDENTIFIER()) {
+            PacketByteBuf buff = ((CustomPayloadC2SPacketAccessor) packet).getData();
+            main.getMain().getEventManager().emit(new ProxyPacketReceiveEvent(buff, player));
         }
     }
 }

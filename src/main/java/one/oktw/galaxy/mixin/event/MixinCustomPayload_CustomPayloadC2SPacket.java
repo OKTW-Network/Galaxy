@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.network;
+package one.oktw.galaxy.mixin.event;
 
 import net.minecraft.server.network.packet.CustomPayloadC2SPacket;
 import net.minecraft.util.Identifier;
@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(CustomPayloadC2SPacket.class)
-public class MixinCustomPayloadC2SPacket implements CustomPayloadC2SPacketAccessor {
+public class MixinCustomPayload_CustomPayloadC2SPacket implements CustomPayloadC2SPacketAccessor {
     @Shadow
     private Identifier channel;
     @Shadow

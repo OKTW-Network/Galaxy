@@ -26,6 +26,7 @@ import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
+import one.oktw.galaxy.chat.Exchange
 import one.oktw.galaxy.command.CommandRegister
 import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.resourcepack.ResourcePack
@@ -38,6 +39,8 @@ class Main : ModInitializer {
         private set
     lateinit var commandRegister: CommandRegister
         private set
+    lateinit var chatExchange: Exchange
+        private set
 
     companion object {
         val PROXY_IDENTIFIER = Identifier("galaxy", "proxy")
@@ -49,6 +52,7 @@ class Main : ModInitializer {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
         commandRegister = CommandRegister()
+        chatExchange = Exchange()
         main = this
         val resourcePackUrl: String? = System.getenv("resourcePack")
         if (resourcePackUrl != null) {

@@ -39,8 +39,6 @@ class Main : ModInitializer {
         private set
     lateinit var commandRegister: CommandRegister
         private set
-    lateinit var chatExchange: Exchange
-        private set
 
     companion object {
         val PROXY_IDENTIFIER = Identifier("galaxy", "proxy")
@@ -52,7 +50,7 @@ class Main : ModInitializer {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
         commandRegister = CommandRegister()
-        chatExchange = Exchange()
+        Exchange(eventManager)
         main = this
         val resourcePackUrl: String? = System.getenv("resourcePack")
         if (resourcePackUrl != null) {

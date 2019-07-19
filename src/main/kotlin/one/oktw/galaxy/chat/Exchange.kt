@@ -23,19 +23,19 @@ import net.minecraft.client.network.packet.CustomPayloadS2CPacket
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.util.PacketByteBuf
-import one.oktw.galaxy.Main
+import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.event.type.PlayerChatEvent
 import one.oktw.galaxy.proxy.api.ProxyAPI
 import one.oktw.galaxy.proxy.api.ProxyAPI.encode
 import one.oktw.galaxy.proxy.api.packet.MessageSend
 
-class Exchange {
+class Exchange (eventManager: EventManager) {
     companion object {
         val PROXY_CHAT_IDENTIFIER = Identifier("galaxy", "proxy/chat")
     }
 
     init {
-        Main.main?.eventManager?.register(PlayerChatEvent::class, true, ::handleChat)
+        eventManager.register(PlayerChatEvent::class, true, ::handleChat)
     }
 
     fun handleChat(event: PlayerChatEvent) {

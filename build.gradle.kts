@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     //    "maven-publish"
-    kotlin("jvm") version "1.3.31"
-    id("fabric-loom") version "0.2.2-SNAPSHOT"
+    kotlin("jvm") version "1.3.40"
+    id("fabric-loom") version "0.2.3-SNAPSHOT"
 }
 
 val version = "0.0.1"
@@ -41,8 +41,8 @@ minecraft {
 
 dependencies {
     // Core
-    minecraft(group = "com.mojang", name = "minecraft", version = "1.14.3")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.14.3+build.9")
+    minecraft(group = "com.mojang", name = "minecraft", version = "1.14.4")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.14.4+build.1")
     modCompile(group = "net.fabricmc", name = "fabric-loader", version = "0.4.8+build.155")
 
     // fabric api/library

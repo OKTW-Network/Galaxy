@@ -44,6 +44,8 @@ import java.util.concurrent.ConcurrentHashMap
 
 class Join : Command {
     private var completeID = ConcurrentHashMap<UUID, Int>()
+    private var completeInput = ConcurrentHashMap<UUID, String>()
+
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
             CommandManager.literal("join")
@@ -52,10 +54,10 @@ class Join : Command {
                 }
                 .then(
                     CommandManager.argument("target", GameProfileArgumentType.gameProfile())
-                        //用來移除 ＠ 開頭的自動完成
                         .suggests { context, suggestionsBuilder ->
-                            context.source.minecraftServer.playerManager.playerList
-                                .forEach { suggestionsBuilder.suggest(it.name.asString()) }
+                            //                            context.source.minecraftServer.playerManager.playerList
+//                                .forEach { suggestionsBuilder.suggest(it.name.asString()) }
+                            //先給個空的 Suggest
                             return@suggests suggestionsBuilder.buildFuture()
                         }
                         .executes { context ->
@@ -68,6 +70,7 @@ class Join : Command {
             val command = event.packet.partialCommand
             if (command.toLowerCase().startsWith("/join ")) {
                 completeID[event.player.uuid] = event.packet.completionId
+                completeInput[event.player.uuid] = command
                 event.player.networkHandler.sendPacket(
                     CustomPayloadS2CPacket(
                         PROXY_IDENTIFIER,
@@ -79,8 +82,9 @@ class Join : Command {
         val searchResultListener = fun(event: ProxyPacketReceiveEvent) {
             val data = decode<Packet>(event.packet.nioBuffer()) as? SearchPlayer.Result ?: return
             val id = completeID[event.player.uuid] ?: return
+            val input = completeInput[event.player.uuid] ?: return
 
-            val suggestion = SuggestionsBuilder("", 0)
+            val suggestion = SuggestionsBuilder(input, "/join ".length)
             data.players.forEach { player ->
                 suggestion.suggest(player)
             }

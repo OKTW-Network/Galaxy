@@ -44,7 +44,7 @@ public class MixinCustomPayload_NetworkHandler {
         Main.Companion main = Main.Companion;
         if (main.getMain() == null) return;
 
-        if (channel == main.getPROXY_IDENTIFIER()) {
+        if (channel.equals(main.getPROXY_IDENTIFIER())) {
             PacketByteBuf buff = ((CustomPayloadC2SPacketAccessor) packet).getData();
             main.getMain().getEventManager().emit(new ProxyPacketReceiveEvent(buff, player));
         }

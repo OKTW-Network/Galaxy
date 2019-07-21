@@ -22,7 +22,7 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.packet.RequestCommandCompletionsC2SPacket;
 import one.oktw.galaxy.Main;
-import one.oktw.galaxy.event.type.RequestCommendCompletionsEvent;
+import one.oktw.galaxy.event.type.RequestCommandCompletionsEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,6 +38,6 @@ public class MixinRequestCompletions_NetworkHandler {
     private void onRequestCommandCompletions(RequestCommandCompletionsC2SPacket packet, CallbackInfo info) {
         Main.Companion main = Main.Companion;
         if (main.getMain() == null) return;
-        main.getMain().getEventManager().emit(new RequestCommendCompletionsEvent(packet, player));
+        main.getMain().getEventManager().emit(new RequestCommandCompletionsEvent(packet, player));
     }
 }

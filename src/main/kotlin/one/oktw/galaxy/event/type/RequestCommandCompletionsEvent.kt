@@ -21,4 +21,4 @@ package one.oktw.galaxy.event.type
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.network.packet.RequestCommandCompletionsC2SPacket
 
-class RequestCommendCompletionsEvent(val packet: RequestCommandCompletionsC2SPacket, val player: ServerPlayerEntity) : Event
+class RequestCommandCompletionsEvent(val packet: RequestCommandCompletionsC2SPacket, val player: ServerPlayerEntity) : Event

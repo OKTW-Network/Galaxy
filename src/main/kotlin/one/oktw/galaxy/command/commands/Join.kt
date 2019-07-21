@@ -33,10 +33,11 @@ import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.event.type.ProxyPacketReceiveEvent
-import one.oktw.galaxy.event.type.RequestCommendCompletionsEvent
+import one.oktw.galaxy.event.type.RequestCommandCompletionsEvent
 import one.oktw.galaxy.proxy.api.ProxyAPI.decode
 import one.oktw.galaxy.proxy.api.ProxyAPI.encode
 import one.oktw.galaxy.proxy.api.packet.CreateGalaxy
+import one.oktw.galaxy.proxy.api.packet.Packet
 import one.oktw.galaxy.proxy.api.packet.SearchPlayer
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -62,11 +63,11 @@ class Join : Command {
                         }
                 )
         )
-        main!!.eventManager.register(RequestCommendCompletionsEvent::class) { event ->
+
+        val requestCompletionListener = fun(event: RequestCommandCompletionsEvent) {
             val command = event.packet.partialCommand
             if (command.toLowerCase().startsWith("/join ")) {
                 completeID[event.player.uuid] = event.packet.completionId
-                // completeID[event.player.uuid] = event.packet.completionId
                 event.player.networkHandler.sendPacket(
                     CustomPayloadS2CPacket(
                         PROXY_IDENTIFIER,
@@ -75,25 +76,25 @@ class Join : Command {
                 )
             }
         }
-        main!!.eventManager.register(ProxyPacketReceiveEvent::class) { event ->
-            val data: Any = decode(event.packet.array())
-            if (data is SearchPlayer.Result) {
-                val id = completeID[event.player.uuid]
-                if (id != null) {
-                    val suggestion = SuggestionsBuilder("", 0)
-                    data.players.forEach { player ->
-                        suggestion.suggest(player)
-                    }
+        val searchResultListener = fun(event: ProxyPacketReceiveEvent) {
+            val data = decode<Packet>(event.packet.nioBuffer()) as? SearchPlayer.Result ?: return
+            val id = completeID[event.player.uuid] ?: return
 
-                    event.player.networkHandler.sendPacket(
-                        CommandSuggestionsS2CPacket(
-                            id,
-                            suggestion.buildFuture().get()
-                        )
-                    )
-                }
+            val suggestion = SuggestionsBuilder("", 0)
+            data.players.forEach { player ->
+                suggestion.suggest(player)
             }
+
+            event.player.networkHandler.sendPacket(
+                CommandSuggestionsS2CPacket(
+                    id,
+                    suggestion.buildFuture().get()
+                )
+            )
         }
+
+        main!!.eventManager.register(RequestCommandCompletionsEvent::class, listener = requestCompletionListener)
+        main!!.eventManager.register(ProxyPacketReceiveEvent::class, listener = searchResultListener)
     }
 
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {

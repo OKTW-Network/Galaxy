@@ -38,6 +38,8 @@ public class MixinRequestCompletions_NetworkHandler {
     private void onRequestCommandCompletions(RequestCommandCompletionsC2SPacket packet, CallbackInfo info) {
         Main.Companion main = Main.Companion;
         if (main.getMain() == null) return;
-        main.getMain().getEventManager().emit(new RequestCommandCompletionsEvent(packet, player));
+        if (main.getMain().getEventManager().emit(new RequestCommandCompletionsEvent(packet, player)).getCancel()) {
+            info.cancel();
+        }
     }
 }

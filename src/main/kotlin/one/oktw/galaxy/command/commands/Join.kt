@@ -69,6 +69,7 @@ class Join : Command {
         val requestCompletionListener = fun(event: RequestCommandCompletionsEvent) {
             val command = event.packet.partialCommand
             if (command.toLowerCase().startsWith("/join ")) {
+                event.cancel = true
                 completeID[event.player.uuid] = event.packet.completionId
                 completeInput[event.player.uuid] = command
                 event.player.networkHandler.sendPacket(

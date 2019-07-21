@@ -53,21 +53,17 @@ class Join : Command {
                     execute(context.source, listOf(context.source.player.gameProfile))
                 }
                 .then(
-                    CommandManager.argument("target", GameProfileArgumentType.gameProfile())
-                        .suggests { context, suggestionsBuilder ->
-                            //                            context.source.minecraftServer.playerManager.playerList
-//                                .forEach { suggestionsBuilder.suggest(it.name.asString()) }
-                            //先給個空的 Suggest
-                            return@suggests suggestionsBuilder.buildFuture()
-                        }
+                    CommandManager.argument("player", GameProfileArgumentType.gameProfile())
                         .executes { context ->
-                            execute(context.source, GameProfileArgumentType.getProfileArgument(context, "target"))
+                            execute(context.source, GameProfileArgumentType.getProfileArgument(context, "player"))
                         }
                 )
         )
 
         val requestCompletionListener = fun(event: RequestCommandCompletionsEvent) {
             val command = event.packet.partialCommand
+
+            //取消原版自動完成並向 proxy 發請求
             if (command.toLowerCase().startsWith("/join ")) {
                 event.cancel = true
                 completeID[event.player.uuid] = event.packet.completionId
@@ -80,6 +76,8 @@ class Join : Command {
                 )
             }
         }
+
+        //從 proxy 接收回覆並送自動完成封包給玩家
         val searchResultListener = fun(event: ProxyPacketReceiveEvent) {
             val data = decode<Packet>(event.packet.nioBuffer()) as? SearchPlayer.Result ?: return
             val id = completeID[event.player.uuid] ?: return

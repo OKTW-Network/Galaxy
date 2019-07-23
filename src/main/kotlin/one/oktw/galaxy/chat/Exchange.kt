@@ -31,7 +31,7 @@ import one.oktw.galaxy.proxy.api.packet.MessageSend
 
 class Exchange (eventManager: EventManager) {
     companion object {
-        val PROXY_CHAT_IDENTIFIER = Identifier("galaxy", "proxy/chat")
+        val PROXY_CHAT_IDENTIFIER = Identifier("galaxy", "proxy-chat")
     }
 
     init {

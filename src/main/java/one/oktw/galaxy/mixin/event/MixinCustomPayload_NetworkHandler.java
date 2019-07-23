@@ -24,7 +24,7 @@ import net.minecraft.server.network.packet.CustomPayloadC2SPacket;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
 import one.oktw.galaxy.Main;
-import one.oktw.galaxy.event.type.ProxyPacketReceiveEvent;
+import one.oktw.galaxy.event.type.PacketReceiveEvent;
 import one.oktw.galaxy.network.CustomPayloadC2SPacketAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -41,12 +41,9 @@ public class MixinCustomPayload_NetworkHandler {
     private void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo info) {
         Identifier channel = ((CustomPayloadC2SPacketAccessor) packet).getChannel();
 
-        Main.Companion main = Main.Companion;
-        if (main.getMain() == null) return;
-
-        if (channel.equals(main.getPROXY_IDENTIFIER())) {
-            PacketByteBuf buff = ((CustomPayloadC2SPacketAccessor) packet).getData();
-            main.getMain().getEventManager().emit(new ProxyPacketReceiveEvent(buff, player));
-        }
+        Main main = Main.Companion.getMain();
+        if (main == null) return;
+        PacketByteBuf buff = ((CustomPayloadC2SPacketAccessor) packet).getData();
+        main.getEventManager().emit(new PacketReceiveEvent(channel, buff, player));
     }
 }

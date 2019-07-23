@@ -32,7 +32,7 @@ import net.minecraft.util.PacketByteBuf
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
-import one.oktw.galaxy.event.type.ProxyPacketReceiveEvent
+import one.oktw.galaxy.event.type.PacketReceiveEvent
 import one.oktw.galaxy.event.type.RequestCommandCompletionsEvent
 import one.oktw.galaxy.proxy.api.ProxyAPI.decode
 import one.oktw.galaxy.proxy.api.ProxyAPI.encode
@@ -81,7 +81,8 @@ class Join : Command {
             }
 
             //從 proxy 接收回覆並送自動完成封包給玩家
-            val searchResultListener = fun(event: ProxyPacketReceiveEvent) {
+            val searchResultListener = fun(event: PacketReceiveEvent) {
+                if (event.channel != PROXY_IDENTIFIER) return
                 val data = decode<Packet>(event.packet.nioBuffer()) as? SearchPlayer.Result ?: return
                 val id = completeID[event.player.uuid] ?: return
                 val input = completeInput[event.player.uuid] ?: return
@@ -100,7 +101,7 @@ class Join : Command {
             }
 
             main!!.eventManager.register(RequestCommandCompletionsEvent::class, listener = requestCompletionListener)
-            main!!.eventManager.register(ProxyPacketReceiveEvent::class, listener = searchResultListener)
+            main!!.eventManager.register(PacketReceiveEvent::class, listener = searchResultListener)
         }
     }
 

@@ -27,6 +27,7 @@ import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.command.CommandRegister
+import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.resourcepack.ResourcePack
 
@@ -59,5 +60,7 @@ class Main : ModInitializer {
                 }
             }
         }
+        //Events
+        Join.registerEvent()
     }
 }

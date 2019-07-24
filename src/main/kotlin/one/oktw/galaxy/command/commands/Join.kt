@@ -74,7 +74,7 @@ class Join : Command {
                     event.player.networkHandler.sendPacket(
                         CustomPayloadS2CPacket(
                             PROXY_IDENTIFIER,
-                            PacketByteBuf(wrappedBuffer(encode(SearchPlayer(command.toLowerCase().removePrefix("/join "), 100))))
+                            PacketByteBuf(wrappedBuffer(encode(SearchPlayer(command.toLowerCase().removePrefix("/join "), 10))))
                         )
                     )
                 }

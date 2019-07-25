@@ -22,7 +22,8 @@
     ]
   },
   "mixins": [
-    "galaxy.mixin.json"
+    "galaxy.mixin.json",
+    "tweak.mixin.json"
   ],
   "requires": {
     "fabricloader": ">=0.4.0",

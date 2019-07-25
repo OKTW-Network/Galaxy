@@ -9,7 +9,7 @@ plugins {
 val version = "0.0.1"
 val group = "one.oktw"
 
-val proxyApiVersion = "chat-preview-2"
+val proxyApiVersion = "0.1.0"
 
 repositories {
     mavenCentral()

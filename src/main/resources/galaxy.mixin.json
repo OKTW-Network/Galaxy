@@ -5,7 +5,10 @@
   "mixins": [
     "MixinPlayerChat_MeCommand",
     "MixinPlayerChat_NetworkHandler",
-    "MixinPlayerChat_SayCommand"
+    "MixinPlayerChat_SayCommand",
+    "MixinCustomPayload_CustomPayloadC2SPacket",
+    "MixinCustomPayload_NetworkHandler",
+    "MixinRequestCompletions_NetworkHandler"
   ],
   "client": [],
   "injectors": {

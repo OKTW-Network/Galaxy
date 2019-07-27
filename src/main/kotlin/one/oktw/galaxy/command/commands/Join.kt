@@ -20,7 +20,9 @@ package one.oktw.galaxy.command.commands
 
 import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.CommandDispatcher
+import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.netty.buffer.Unpooled.wrappedBuffer
+import net.minecraft.client.network.packet.CommandSuggestionsS2CPacket
 import net.minecraft.client.network.packet.CustomPayloadS2CPacket
 import net.minecraft.command.arguments.GameProfileArgumentType
 import net.minecraft.server.command.CommandManager
@@ -28,9 +30,17 @@ import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
 import net.minecraft.util.PacketByteBuf
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
+import one.oktw.galaxy.event.type.PacketReceiveEvent
+import one.oktw.galaxy.event.type.RequestCommandCompletionsEvent
+import one.oktw.galaxy.proxy.api.ProxyAPI.decode
 import one.oktw.galaxy.proxy.api.ProxyAPI.encode
 import one.oktw.galaxy.proxy.api.packet.CreateGalaxy
+import one.oktw.galaxy.proxy.api.packet.Packet
+import one.oktw.galaxy.proxy.api.packet.SearchPlayer
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 class Join : Command {
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
@@ -40,18 +50,63 @@ class Join : Command {
                     execute(context.source, listOf(context.source.player.gameProfile))
                 }
                 .then(
-                    CommandManager.argument("target", GameProfileArgumentType.gameProfile())
-                        //用來移除 ＠ 開頭的自動完成
-                        .suggests { context, suggestionsBuilder ->
-                            context.source.minecraftServer.playerManager.playerList
-                                .forEach { suggestionsBuilder.suggest(it.name.asString()) }
+                    CommandManager.argument("player", GameProfileArgumentType.gameProfile())
+                        .suggests { _, suggestionsBuilder ->
+                            //先給個空的 Suggest
                             return@suggests suggestionsBuilder.buildFuture()
                         }
                         .executes { context ->
-                            execute(context.source, GameProfileArgumentType.getProfileArgument(context, "target"))
+                            execute(context.source, GameProfileArgumentType.getProfileArgument(context, "player"))
                         }
                 )
         )
+    }
+
+    companion object {
+        private var completeID = ConcurrentHashMap<UUID, Int>()
+        private var completeInput = ConcurrentHashMap<UUID, String>()
+
+        fun registerEvent() {
+            val requestCompletionListener = fun(event: RequestCommandCompletionsEvent) {
+                val command = event.packet.partialCommand
+
+                //取消原版自動完成並向 proxy 發請求
+                if (command.toLowerCase().startsWith("/join ")) {
+                    event.cancel = true
+                    completeID[event.player.uuid] = event.packet.completionId
+                    completeInput[event.player.uuid] = command
+                    event.player.networkHandler.sendPacket(
+                        CustomPayloadS2CPacket(
+                            PROXY_IDENTIFIER,
+                            PacketByteBuf(wrappedBuffer(encode(SearchPlayer(command.toLowerCase().removePrefix("/join "), 10))))
+                        )
+                    )
+                }
+            }
+
+            //從 proxy 接收回覆並送自動完成封包給玩家
+            val searchResultListener = fun(event: PacketReceiveEvent) {
+                if (event.channel != PROXY_IDENTIFIER) return
+                val data = decode<Packet>(event.packet.nioBuffer()) as? SearchPlayer.Result ?: return
+                val id = completeID[event.player.uuid] ?: return
+                val input = completeInput[event.player.uuid] ?: return
+
+                val suggestion = SuggestionsBuilder(input, "/join ".length)
+                data.players.forEach { player ->
+                    suggestion.suggest(player)
+                }
+
+                event.player.networkHandler.sendPacket(
+                    CommandSuggestionsS2CPacket(
+                        id,
+                        suggestion.buildFuture().get()
+                    )
+                )
+            }
+
+            main!!.eventManager.register(RequestCommandCompletionsEvent::class, listener = requestCompletionListener)
+            main!!.eventManager.register(PacketReceiveEvent::class, listener = searchResultListener)
+        }
     }
 
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {

@@ -52,8 +52,6 @@ class Join : Command {
                 .then(
                     CommandManager.argument("player", GameProfileArgumentType.gameProfile())
                         .suggests { _, suggestionsBuilder ->
-                            //                            context.source.minecraftServer.playerManager.playerList
-//                                .forEach { suggestionsBuilder.suggest(it.name.asString()) }
                             //先給個空的 Suggest
                             return@suggests suggestionsBuilder.buildFuture()
                         }

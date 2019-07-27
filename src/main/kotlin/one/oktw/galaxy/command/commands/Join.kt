@@ -71,14 +71,14 @@ class Join : Command {
                 val command = event.packet.partialCommand
 
                 //取消原版自動完成並向 proxy 發請求
-                if (command.toLowerCase().startsWith("/join ")) {
+                if (command.startsWith("/join ")) {
                     event.cancel = true
                     completeID[event.player.uuid] = event.packet.completionId
                     completeInput[event.player.uuid] = command
                     event.player.networkHandler.sendPacket(
                         CustomPayloadS2CPacket(
                             PROXY_IDENTIFIER,
-                            PacketByteBuf(wrappedBuffer(encode(SearchPlayer(command.toLowerCase().removePrefix("/join "), 10))))
+                            PacketByteBuf(wrappedBuffer(encode(SearchPlayer(command.removePrefix("/join "), 10))))
                         )
                     )
                 }

@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "one.oktw.galaxy.mixin.tweak",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinRCON_RconClient"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

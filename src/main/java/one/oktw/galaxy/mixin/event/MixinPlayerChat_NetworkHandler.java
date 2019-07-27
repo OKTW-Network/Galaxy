@@ -18,12 +18,14 @@
 
 package one.oktw.galaxy.mixin.event;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,12 +36,18 @@ public class MixinPlayerChat_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
 
+    @Shadow
+    @Final
+    private MinecraftServer server;
+
     @Redirect(method = "onChatMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Z)V"))
     private void onChat(PlayerManager playerManager, Text message, boolean isSystem) {
         Main main = Main.Companion.getMain();
 
         if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, message)).getCancel()) {
             playerManager.broadcastChatMessage(message, isSystem);
+        } else {
+            server.sendMessage(message.append(" (Canceled)"));
         }
     }
 }

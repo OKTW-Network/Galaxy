@@ -18,35 +18,31 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.MeCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(MeCommand.class)
 public class MixinPlayerChat_MeCommand {
     @SuppressWarnings("UnresolvedMixinReference")
-    @Inject(method = "method_13238(Lcom/mojang/brigadier/context/CommandContext;)I", remap = false, at = @At("HEAD"), cancellable = true)
-    private static void onCommand(CommandContext<ServerCommandSource> context, CallbackInfoReturnable<Integer> ci) {
+    @Redirect(method = "method_13238(Lcom/mojang/brigadier/context/CommandContext;)I", at = @At(value = "INVOKE", target = "net/minecraft/server/PlayerManager.sendToAll(Lnet/minecraft/text/Text;)V"))
+    private static void onCommand(PlayerManager playerManager, Text message, CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         Main main = Main.Companion.getMain();
-        if (main == null) return;
+        ServerPlayerEntity player = context.getSource().getPlayer();
 
-        try {
-            ServerPlayerEntity player = context.getSource().getPlayer();
-            if (main.getEventManager().emit(new PlayerChatEvent(player, new TranslatableText("chat.type.emote", player.getDisplayName(), StringArgumentType.getString(context, "action")))).getCancel()) {
-                ci.setReturnValue(0);
-                ci.cancel();
-            }
-        } catch (CommandSyntaxException ignored) {
+        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, message)).getCancel()) {
+            playerManager.sendToAll(message);
+        } else {
+            player.server.sendMessage(message.append(" (Canceled)"));
         }
     }
 }

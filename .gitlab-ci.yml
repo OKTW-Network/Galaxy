@@ -19,7 +19,7 @@ build:
   before_script:
     - export GRADLE_USER_HOME=`pwd`/.gradle
 
-  script: "./gradlew build"
+  script: "./gradlew --no-daemon build"
 
   artifacts:
     expire_in: 1 weeks

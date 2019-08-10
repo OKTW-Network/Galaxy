@@ -22,11 +22,18 @@ import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.netty.buffer.Unpooled.wrappedBuffer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.time.delay
 import net.minecraft.client.network.packet.CommandSuggestionsS2CPacket
 import net.minecraft.client.network.packet.CustomPayloadS2CPacket
 import net.minecraft.command.arguments.GameProfileArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.LiteralText
 import net.minecraft.util.PacketByteBuf
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
@@ -38,11 +45,14 @@ import one.oktw.galaxy.proxy.api.ProxyAPI.decode
 import one.oktw.galaxy.proxy.api.ProxyAPI.encode
 import one.oktw.galaxy.proxy.api.packet.CreateGalaxy
 import one.oktw.galaxy.proxy.api.packet.Packet
+import one.oktw.galaxy.proxy.api.packet.ProgressStage.*
+import one.oktw.galaxy.proxy.api.packet.ProgressStage.Queue
 import one.oktw.galaxy.proxy.api.packet.SearchPlayer
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class Join : Command {
+class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
             CommandManager.literal("join")
@@ -63,6 +73,7 @@ class Join : Command {
     }
 
     companion object {
+        private val lock = ConcurrentHashMap<ServerPlayerEntity, Mutex>()
         private var completeID = ConcurrentHashMap<UUID, Int>()
         private var completeInput = ConcurrentHashMap<UUID, String>()
 
@@ -110,12 +121,49 @@ class Join : Command {
     }
 
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {
-        val player = collection.first()
+        if (!lock.getOrPut(source.player, { Mutex() }).tryLock()) {
+            source.sendFeedback(LiteralText("請稍後..."), false)
+            return com.mojang.brigadier.Command.SINGLE_SUCCESS
+        }
 
-        source.player.networkHandler.sendPacket(
-            CustomPayloadS2CPacket(PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(player.id)))))
-        )
-        source.sendFeedback(LiteralText(if (source.player.gameProfile == player) "正在加入您的星系" else "正在加入 ${player.name} 的星系"), false)
+        val targetPlayer = collection.first()
+
+        source.player.networkHandler.sendPacket(CustomPayloadS2CPacket(PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(targetPlayer.id))))))
+        source.sendFeedback(LiteralText(if (source.player.gameProfile == targetPlayer) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系"), false)
+
+        launch {
+            val sourcePlayer = source.player
+
+            val listener = fun(event: PacketReceiveEvent) {
+                if (event.player.gameProfile != sourcePlayer.gameProfile) return
+
+                val data = decode<Packet>(event.packet.nioBuffer()) as? CreateGalaxy.CreateProgress ?: return
+
+                if (data.uuid != targetPlayer.id) return
+
+                when (data.stage) {
+                    Queue -> sourcePlayer.sendMessage(LiteralText("正在等待星系載入"))
+                    Creating -> sourcePlayer.sendMessage(LiteralText("星系載入中..."))
+                    Starting -> sourcePlayer.sendMessage(LiteralText("星系正在啟動請稍後..."))
+                    Started -> {
+                        sourcePlayer.sendMessage(LiteralText("星系已載入！"))
+                        lock[sourcePlayer]?.unlock()
+                        lock.remove(sourcePlayer)
+                    }
+                    Failed -> {
+                        sourcePlayer.sendMessage(LiteralText("星系載入失敗，請聯絡開發團隊！"))
+                        lock[source.player]?.unlock()
+                        lock.remove(sourcePlayer)
+                    }
+                }
+            }
+
+            main!!.eventManager.register(PacketReceiveEvent::class, listener = listener)
+            delay(Duration.ofMillis(5))
+            main!!.eventManager.unregister(listener)
+            lock[sourcePlayer]?.unlock()
+            lock.remove(sourcePlayer)
+        }
 
         return com.mojang.brigadier.Command.SINGLE_SUCCESS
     }

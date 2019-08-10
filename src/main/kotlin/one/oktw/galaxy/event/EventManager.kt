@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer
 import kotlin.reflect.KClass
 
-class EventManager(private val serverThread: ThreadExecutor<*>) : CoroutineScope by CoroutineScope(Dispatchers.Default) {
+class EventManager(private val serverThread: ThreadExecutor<*>) : CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     private val asyncEventListeners = ConcurrentHashMap<KClass<out Event>, ConcurrentHashMap.KeySetView<Consumer<Event>, Boolean>>()
     private val syncEventListeners = ConcurrentHashMap<KClass<out Event>, ConcurrentHashMap.KeySetView<Consumer<Event>, Boolean>>()
 
@@ -41,6 +41,7 @@ class EventManager(private val serverThread: ThreadExecutor<*>) : CoroutineScope
     }
 
     fun <T : Event> register(event: KClass<T>, sync: Boolean = false, listener: Consumer<T>) = launch {
+        @Suppress("UNCHECKED_CAST")
         (if (sync) syncEventListeners else asyncEventListeners).getOrPut(event, { ConcurrentHashMap.newKeySet() }).add(listener as Consumer<Event>)
     }
 

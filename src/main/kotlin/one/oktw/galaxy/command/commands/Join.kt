@@ -53,6 +53,8 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
+    private val lock = ConcurrentHashMap<ServerPlayerEntity, Mutex>()
+
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
             CommandManager.literal("join")
@@ -73,7 +75,6 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
     }
 
     companion object {
-        private val lock = ConcurrentHashMap<ServerPlayerEntity, Mutex>()
         private var completeID = ConcurrentHashMap<UUID, Int>()
         private var completeInput = ConcurrentHashMap<UUID, String>()
 
@@ -159,7 +160,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             }
 
             main!!.eventManager.register(PacketReceiveEvent::class, listener = listener)
-            delay(Duration.ofMillis(5))
+            delay(Duration.ofMinutes(5))
             main!!.eventManager.unregister(listener)
             lock[sourcePlayer]?.unlock()
             lock.remove(sourcePlayer)

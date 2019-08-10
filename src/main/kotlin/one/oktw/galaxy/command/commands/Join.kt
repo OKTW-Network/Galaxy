@@ -136,7 +136,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             val sourcePlayer = source.player
 
             val listener = fun(event: PacketReceiveEvent) {
-                if (event.player.gameProfile != sourcePlayer.gameProfile) return
+                if (event.player.gameProfile != sourcePlayer.gameProfile || event.channel != PROXY_IDENTIFIER) return
 
                 val data = decode<Packet>(event.packet.nioBuffer()) as? CreateGalaxy.CreateProgress ?: return
 

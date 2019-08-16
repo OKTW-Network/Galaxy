@@ -16,15 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.type
+package one.oktw.galaxy.item
 
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.STONE_SWORD
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
-import one.oktw.galaxy.item.enums.ItemType.MATERIAL
-import one.oktw.galaxy.item.enums.MaterialType
-import one.oktw.galaxy.item.enums.MaterialType.DUMMY
+import one.oktw.galaxy.item.type.ItemType.MATERIAL
+import one.oktw.galaxy.item.type.MaterialType
+import one.oktw.galaxy.item.type.MaterialType.DUMMY
 
 class Material(val type: MaterialType = DUMMY) : Item {
     override val itemType = MATERIAL

@@ -16,9 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.enums
+package one.oktw.galaxy.item.type
 
-enum class ToolType(val customModelData: Int) {
-    DUMMY(0),
-    WRENCH(1010100)
+enum class ButtonType(val customModelData: Int) {
+    BLANK(1001000)
 }

@@ -16,21 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.type
+package one.oktw.galaxy.item
 
 import net.minecraft.item.ItemStack
-import net.minecraft.item.Items.DIAMOND_SWORD
+import net.minecraft.item.Items.DIAMOND_HOE
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
-import one.oktw.galaxy.item.enums.ItemType.WEAPON
-import one.oktw.galaxy.item.enums.WeaponType
-import one.oktw.galaxy.item.enums.WeaponType.DUMMY
+import net.minecraft.text.LiteralText
+import one.oktw.galaxy.item.type.ButtonType
+import one.oktw.galaxy.item.type.ButtonType.BLANK
+import one.oktw.galaxy.item.type.ItemType.BUTTON
 
-class Weapon(val type: WeaponType = DUMMY) : Item {
-    override val itemType = WEAPON
+class Button(val type: ButtonType = BLANK) : Item {
+    override val itemType = BUTTON
 
     override fun createItemStack(): ItemStack {
-        val item = ItemStack(DIAMOND_SWORD, 1)
+        val item = ItemStack(DIAMOND_HOE, 1)
         val tag = CompoundTag()
         tag.putInt("CustomModelData", type.customModelData)
         tag.putBoolean("Unbreakable", true)
@@ -39,10 +40,7 @@ class Weapon(val type: WeaponType = DUMMY) : Item {
         // hide all flag
         tag.putInt("HideFlags", 63)
         item.tag = tag
-        when (type) {
-            //TODO Weapon Name
-            else -> Unit
-        }
+        item.setCustomName(LiteralText("").styled { style -> style.isItalic = false })
         return item
     }
 }

@@ -16,8 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.enums
+package one.oktw.galaxy.item
 
-enum class WeaponType(val customModelData: Int) {
-    DUMMY(0)
+import net.minecraft.item.ItemStack
+import one.oktw.galaxy.item.type.ItemType
+
+interface Item {
+    val itemType: ItemType
+
+    fun createItemStack(): ItemStack
 }

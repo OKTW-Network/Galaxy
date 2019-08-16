@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.enums
+package one.oktw.galaxy.item.type
 
-enum class ButtonType(val customModelData: Int) {
-    BLANK(1001000)
+enum class WeaponType(val customModelData: Int) {
+    DUMMY(0)
 }

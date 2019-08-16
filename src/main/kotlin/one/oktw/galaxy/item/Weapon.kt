@@ -16,22 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.type
+package one.oktw.galaxy.item
 
 import net.minecraft.item.ItemStack
-import net.minecraft.item.Items.DIAMOND_HOE
+import net.minecraft.item.Items.DIAMOND_SWORD
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
-import net.minecraft.text.LiteralText
-import one.oktw.galaxy.item.enums.ButtonType
-import one.oktw.galaxy.item.enums.ButtonType.BLANK
-import one.oktw.galaxy.item.enums.ItemType.BUTTON
+import one.oktw.galaxy.item.type.ItemType.WEAPON
+import one.oktw.galaxy.item.type.WeaponType
+import one.oktw.galaxy.item.type.WeaponType.DUMMY
 
-class Button(val type: ButtonType = BLANK) : Item {
-    override val itemType = BUTTON
+class Weapon(val type: WeaponType = DUMMY) : Item {
+    override val itemType = WEAPON
 
     override fun createItemStack(): ItemStack {
-        val item = ItemStack(DIAMOND_HOE, 1)
+        val item = ItemStack(DIAMOND_SWORD, 1)
         val tag = CompoundTag()
         tag.putInt("CustomModelData", type.customModelData)
         tag.putBoolean("Unbreakable", true)
@@ -40,7 +39,10 @@ class Button(val type: ButtonType = BLANK) : Item {
         // hide all flag
         tag.putInt("HideFlags", 63)
         item.tag = tag
-        item.setCustomName(LiteralText("").styled { style -> style.isItalic = false })
+        when (type) {
+            //TODO Weapon Name
+            else -> Unit
+        }
         return item
     }
 }

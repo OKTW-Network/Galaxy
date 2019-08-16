@@ -16,17 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.type
+package one.oktw.galaxy.item
 
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.IRON_SWORD
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.text.LiteralText
-import one.oktw.galaxy.item.enums.ItemType.TOOL
-import one.oktw.galaxy.item.enums.ToolType
-import one.oktw.galaxy.item.enums.ToolType.DUMMY
-import one.oktw.galaxy.item.enums.ToolType.WRENCH
+import one.oktw.galaxy.item.type.ItemType.TOOL
+import one.oktw.galaxy.item.type.ToolType
+import one.oktw.galaxy.item.type.ToolType.DUMMY
+import one.oktw.galaxy.item.type.ToolType.WRENCH
 
 class Tool(val type: ToolType = DUMMY) : Item {
     override val itemType = TOOL

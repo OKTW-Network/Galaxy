@@ -18,11 +18,7 @@
 
 package one.oktw.galaxy.item.type
 
-import net.minecraft.item.ItemStack
-import one.oktw.galaxy.item.enums.ItemType
-
-interface Item {
-    val itemType: ItemType
-
-    fun createItemStack(): ItemStack
+enum class ToolType(val customModelData: Int) {
+    DUMMY(0),
+    WRENCH(1010100)
 }

@@ -19,5 +19,16 @@
 package one.oktw.galaxy.item.type
 
 enum class MaterialType(val customModelData: Int) {
-    DUMMY(0)
+    DUMMY(0),
+    RAW_BASE_PLATE(1010100),
+    BASE_PLATE(1010101),
+    COOLANT(1010102),
+    CPU(1010103),
+    SCOPE(1010200),
+    BATTERY(1010300),
+    LASER(1010400),
+    BUTT(1010500),
+    TRIGGER(1010501),
+    HANDLE(1010502),
+    BARREL(1010503)
 }

@@ -18,14 +18,6 @@
 
 package one.oktw.galaxy.item.type
 
-enum class ItemType {
-    // System
-    DUMMY,
-    BUTTON,
-    GUI,
-
-    // Weapons & Tools
-    MATERIAL,
-    WEAPON,
-    TOOL
+enum class GuiType(val customModelData: Int) {
+    BLANK(1001000)
 }

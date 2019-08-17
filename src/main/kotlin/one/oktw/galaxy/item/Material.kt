@@ -22,6 +22,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.STONE_SWORD
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
+import net.minecraft.text.TranslatableText
 import one.oktw.galaxy.item.type.ItemType.MATERIAL
 import one.oktw.galaxy.item.type.MaterialType
 import one.oktw.galaxy.item.type.MaterialType.DUMMY
@@ -39,9 +40,9 @@ class Material(val type: MaterialType = DUMMY) : Item {
         // hide all flag
         tag.putInt("HideFlags", 63)
         item.tag = tag
-        when (type) {
-            //TODO Material Name
-            else -> Unit
+        when (type.languageKey) {
+            "" -> Unit
+            else -> item.setCustomName(TranslatableText(type.languageKey).styled { style -> style.isItalic = false })
         }
         return item
     }

@@ -22,11 +22,11 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.IRON_SWORD
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
-import net.minecraft.text.LiteralText
+import net.minecraft.text.TranslatableText
+import net.minecraft.util.Formatting
 import one.oktw.galaxy.item.type.ItemType.TOOL
 import one.oktw.galaxy.item.type.ToolType
 import one.oktw.galaxy.item.type.ToolType.DUMMY
-import one.oktw.galaxy.item.type.ToolType.WRENCH
 
 class Tool(val type: ToolType = DUMMY) : Item {
     override val itemType = TOOL
@@ -41,10 +41,12 @@ class Tool(val type: ToolType = DUMMY) : Item {
         // hide all flag
         tag.putInt("HideFlags", 63)
         item.tag = tag
-        when (type) {
-            // TODO Language
-            WRENCH -> item.setCustomName(LiteralText("扳手").styled { style -> style.isItalic = false })
-            else -> Unit
+        when (type.languageKey) {
+            "" -> Unit
+            else -> item.setCustomName(TranslatableText(type.languageKey).styled { style ->
+                style.color = Formatting.YELLOW
+                style.isItalic = false
+            })
         }
         return item
     }

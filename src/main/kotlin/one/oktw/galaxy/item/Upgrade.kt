@@ -22,6 +22,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.DIAMOND_SWORD
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
+import net.minecraft.text.TranslatableText
 import one.oktw.galaxy.item.type.ItemType.UPGRADE
 import one.oktw.galaxy.item.type.UpgradeType
 import one.oktw.galaxy.item.type.UpgradeType.DUMMY
@@ -39,9 +40,11 @@ class Upgrade(val type: UpgradeType = DUMMY) : Item {
         // hide all flag
         tag.putInt("HideFlags", 63)
         item.tag = tag
-        when (type) {
-            //TODO Upgrade Name
-            else -> Unit
+        when (type.languageKey) {
+            "" -> Unit
+            else -> item.setCustomName(
+                TranslatableText("item.Upgrade.Item", TranslatableText(type.languageKey)).styled { style -> style.isItalic = false }
+            )
         }
         return item
     }

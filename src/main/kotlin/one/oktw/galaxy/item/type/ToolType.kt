@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.item.type
 
-enum class ToolType(val customModelData: Int) {
-    DUMMY(0),
-    WRENCH(1010100)
+enum class ToolType(val customModelData: Int, val languageKey: String) {
+    DUMMY(0, ""),
+    WRENCH(1010100, "item.Tool.WRENCH")
 }

@@ -18,6 +18,6 @@
 
 package one.oktw.galaxy.item.type
 
-enum class UpgradeType(val customModelData: Int) {
-    DUMMY(0)
+enum class UpgradeType(val customModelData: Int, val languageKey: String) {
+    DUMMY(0, "")
 }

@@ -22,6 +22,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.DIAMOND_SWORD
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
+import net.minecraft.text.TranslatableText
+import net.minecraft.util.Formatting
 import one.oktw.galaxy.item.type.ItemType.WEAPON
 import one.oktw.galaxy.item.type.WeaponType
 import one.oktw.galaxy.item.type.WeaponType.DUMMY
@@ -39,9 +41,12 @@ class Weapon(val type: WeaponType = DUMMY) : Item {
         // hide all flag
         tag.putInt("HideFlags", 63)
         item.tag = tag
-        when (type) {
-            //TODO Weapon Name
-            else -> Unit
+        when (type.languageKey) {
+            "" -> Unit
+            else -> item.setCustomName(TranslatableText(type.languageKey).styled { style ->
+                style.color = Formatting.GREEN //TODO Advanced weapon
+                style.isItalic = false
+            })
         }
         return item
     }

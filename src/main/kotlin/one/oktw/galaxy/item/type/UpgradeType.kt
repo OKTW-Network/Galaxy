@@ -18,15 +18,6 @@
 
 package one.oktw.galaxy.item.type
 
-enum class ItemType {
-    // System
-    DUMMY,
-    BUTTON,
-    GUI,
-
-    // Weapons & Tools
-    MATERIAL,
-    WEAPON,
-    TOOL,
-    UPGRADE
+enum class UpgradeType(val customModelData: Int) {
+    DUMMY(0)
 }

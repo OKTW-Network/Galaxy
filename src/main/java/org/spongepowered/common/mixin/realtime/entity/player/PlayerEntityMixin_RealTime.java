@@ -82,8 +82,7 @@ public abstract class PlayerEntityMixin_RealTime extends LivingEntityMixin_RealT
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lnet/minecraft/entity/player/PlayerEntity;wakeUp(ZZZ)V",
-                ordinal = 1
+                target = "Lnet/minecraft/entity/player/PlayerEntity;wakeUp(ZZZ)V"
             ),
             to = @At(
                 value = "CONSTANT",

@@ -114,8 +114,7 @@ public abstract class AbstractFurnaceBlockEntityMixin_RealTime extends BlockEnti
             ),
             to = @At(
                 value = "INVOKE",
-                target = "Lnet/minecraft/block/entity/AbstractFurnaceBlockEntity;isBurning()Z",
-                ordinal = 0
+                target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z"
             )
         )
     )

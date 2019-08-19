@@ -55,8 +55,9 @@ public abstract class ServerPlayerInteractionManagerMixin_RealTime {
             from = @At("HEAD"),
             to = @At(
                 value = "FIELD",
-                target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;field_14000:I",
-                opcode = Opcodes.GETFIELD
+                target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;field_20328:Z",
+                opcode = Opcodes.GETFIELD,
+                ordinal = 0
             )
         )
     )

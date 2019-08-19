@@ -44,11 +44,11 @@ public abstract class WorldMixin_RealTime implements RealTimeTrackingBridge {
     protected LevelProperties properties;
 
     @Shadow
-    public abstract void setTime(long long_1);
-
-    @Shadow
     @Nullable
     public abstract MinecraftServer getServer();
+
+    @Shadow
+    public abstract void setTimeOfDay(long long_1);
 
     @Inject(method = "tickTime", at = @At("HEAD"))
     private void realTimeImpl$fixTimeOfDayForRealTime(CallbackInfo ci) {
@@ -57,7 +57,7 @@ public abstract class WorldMixin_RealTime implements RealTimeTrackingBridge {
             long diff = this.realTimeBridge$getRealTimeTicks() - 1;
             // Don't set if we're not changing it as other mods might be listening for changes
             if (diff > 0) {
-                this.setTime(this.properties.getTimeOfDay() + diff);
+                this.setTimeOfDay(this.properties.getTimeOfDay() + diff);
             }
         }
     }

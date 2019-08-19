@@ -33,17 +33,13 @@ import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin_RealTime implements RealTimeTrackingBridge {
-
     private static long lastTickNanos = System.nanoTime();
     private static long realTimeTicks = 1;
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void realTimeImpl$adjustTickForRealTimeTicks(final CallbackInfo ci) {
         final long currentNanos = System.nanoTime();
-        realTimeTicks = (currentNanos - lastTickNanos) / 50000000;
-        if (realTimeTicks < 1) {
-            realTimeTicks = 1;
-        }
+        realTimeTicks = Math.max(1, (currentNanos - lastTickNanos) / 50000000);
         lastTickNanos = currentNanos;
     }
 

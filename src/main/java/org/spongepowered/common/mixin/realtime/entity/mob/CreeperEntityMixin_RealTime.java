@@ -50,10 +50,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
-import org.spongepowered.common.mixin.realtime.entity.LivingEntityMixin_RealTime;
 
 @Mixin(CreeperEntity.class)
-public abstract class CreeperEntityMixin_RealTime extends LivingEntityMixin_RealTime {
+public abstract class CreeperEntityMixin_RealTime {
     @Shadow
     private int currentFuseTime;
 
@@ -69,9 +68,8 @@ public abstract class CreeperEntityMixin_RealTime extends LivingEntityMixin_Real
             to = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/CreeperEntity;explode()V")
         )
     )
-
     private void realTimeImpl$adjustForRealTimeCreeperFuseTime(final CreeperEntity self, final int modifier) {
         final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
-        this.currentFuseTime += ticks;
+        this.currentFuseTime += modifier * ticks;
     }
 }

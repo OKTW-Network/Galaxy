@@ -5,9 +5,11 @@
   "mixins": [
     "blockentity.AbstractFurnaceBlockEntityMixin_RealTime",
     "blockentity.BrewingStandBlockEntityMixin_RealTime",
+    "entity.mob.CreeperEntityMixin_RealTime",
     "entity.mob.MobEntityMixin_RealTime",
     "entity.mob.ZombieVillagerEntityMixin_RealTime",
     "entity.passive.PassiveEntityMixin_RealTime",
+    "entity.player.ItemCooldownManagerMixin_RealTime",
     "entity.player.PlayerEntityMixin_RealTime",
     "entity.EntityMixin_RealTime",
     "entity.ExperienceOrbEntityMixin_RealTime",

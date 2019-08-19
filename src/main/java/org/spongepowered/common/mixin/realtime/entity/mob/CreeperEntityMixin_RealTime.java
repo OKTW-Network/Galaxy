@@ -40,46 +40,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.mixin.realtime.entity;
+package org.spongepowered.common.mixin.realtime.entity.mob;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.CreeperEntity;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
+import org.spongepowered.common.mixin.realtime.entity.LivingEntityMixin_RealTime;
 
-@Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin_RealTime extends EntityMixin_RealTime {
+@Mixin(CreeperEntity.class)
+public abstract class CreeperEntityMixin_RealTime extends LivingEntityMixin_RealTime {
     @Shadow
-    public int deathTime;
+    private int currentFuseTime;
 
-    @Shadow
-    protected int despawnCounter;
+    @Redirect(
+        method = "tick",
+        at = @At(
+            value = "FIELD",
+            target = "Lnet/minecraft/entity/mob/CreeperEntity;currentFuseTime:I",
+            opcode = Opcodes.PUTFIELD
+        ),
+        slice = @Slice(
+            from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/CreeperEntity;getFuseSpeed()I"),
+            to = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/CreeperEntity;explode()V")
+        )
+    )
 
-    @Shadow
-    protected int itemUseTimeLeft;
-
-    @Redirect(method = "updatePostDeath",
-        at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;deathTime:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
-    private void realTimeImpl$adjustForRealTimeDeathTime(final LivingEntity self, final int vanillaNewDeathTime) {
+    private void realTimeImpl$adjustForRealTimeCreeperFuseTime(final CreeperEntity self, final int modifier) {
         final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
-        int newDeathTime = this.deathTime + ticks;
-        // At tick 20, XP is dropped and the death animation finishes. The
-        // entity is also removed from the world... except in the case of
-        // players, which are not removed until they log out or click Respawn.
-        // For players, then, let the death time pass 20 to avoid XP
-        // multiplication - not just duplication, but *multiplication*.
-        if (vanillaNewDeathTime <= 20 && newDeathTime > 20) {
-            newDeathTime = 20;
-        }
-        this.deathTime = newDeathTime;
-    }
-
-    @Redirect(method = "method_6076", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;itemUseTimeLeft:I", opcode = Opcodes.PUTFIELD))
-    private void realTimeImpl$adjustForRealTimeUseTime(final LivingEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
-        this.itemUseTimeLeft -= ticks;
+        this.currentFuseTime += ticks;
     }
 }

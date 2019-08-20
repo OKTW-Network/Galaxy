@@ -56,6 +56,9 @@ public abstract class CreeperEntityMixin_RealTime {
     @Shadow
     private int currentFuseTime;
 
+    @Shadow
+    public abstract int getFuseSpeed();
+
     @Redirect(
         method = "tick",
         at = @At(
@@ -70,10 +73,9 @@ public abstract class CreeperEntityMixin_RealTime {
         )
     )
     private void realTimeImpl$adjustForRealTimeCreeperFuseTime(final CreeperEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         if (modifier != 0) {
-            System.out.printf("DEBUG: curr=%d, modif=%d", currentFuseTime, modifier);
-            this.currentFuseTime += (modifier * ticks);
+            final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
+            this.currentFuseTime += (getFuseSpeed() * ticks);
         }
     }
 }

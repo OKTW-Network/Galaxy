@@ -61,11 +61,12 @@ public abstract class CreeperEntityMixin_RealTime {
         at = @At(
             value = "FIELD",
             target = "Lnet/minecraft/entity/mob/CreeperEntity;currentFuseTime:I",
-            opcode = Opcodes.PUTFIELD
+            opcode = Opcodes.PUTFIELD,
+            ordinal = 0
         ),
         slice = @Slice(
-            from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/CreeperEntity;getFuseSpeed()I"),
-            to = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/CreeperEntity;explode()V")
+            from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/CreeperEntity;playSound(Lnet/minecraft/sound/SoundEvent;FF)V"),
+            to = @At(value = "CONSTANT", args = "intValue=0", ordinal = 0)
         )
     )
     private void realTimeImpl$adjustForRealTimeCreeperFuseTime(final CreeperEntity self, final int modifier) {

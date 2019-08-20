@@ -53,11 +53,16 @@ import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
 @Mixin(CreeperEntity.class)
 public abstract class CreeperEntityMixin_RealTime {
+    private boolean delay;
+
     @Shadow
     private int currentFuseTime;
 
     @Shadow
     public abstract int getFuseSpeed();
+
+    @Shadow
+    private int fuseTime;
 
     @Redirect(
         method = "tick",
@@ -76,6 +81,14 @@ public abstract class CreeperEntityMixin_RealTime {
         if (modifier != 0) {
             final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
             this.currentFuseTime += (getFuseSpeed() * ticks);
+
+            // delay 1 tick wait AI detect player distance
+            if (currentFuseTime >= fuseTime && !delay) {
+                delay = true;
+                currentFuseTime = fuseTime - 1;
+            } else if (delay) {
+                delay = false;
+            }
         }
     }
 }

@@ -21,9 +21,10 @@ package one.oktw.galaxy.item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.DIAMOND_SWORD
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.ListTag
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
+import one.oktw.galaxy.item.ItemUtil.Companion.removeAllModifiers
+import one.oktw.galaxy.item.ItemUtil.Companion.setAttributes
 import one.oktw.galaxy.item.type.ItemType.WEAPON
 import one.oktw.galaxy.item.type.WeaponType
 import one.oktw.galaxy.item.type.WeaponType.DUMMY
@@ -33,14 +34,13 @@ class Weapon(val type: WeaponType = DUMMY) : Item {
 
     override fun createItemStack(): ItemStack {
         val item = ItemStack(DIAMOND_SWORD, 1)
+
         val tag = CompoundTag()
         tag.putInt("CustomModelData", type.customModelData)
-        tag.putBoolean("Unbreakable", true)
-        // remove all modifiers(attack damage, attack speed)
-        tag.put("AttributeModifiers", ListTag())
-        // hide all flag
-        tag.putInt("HideFlags", 63)
+        tag.let(::setAttributes)
+            .let(::removeAllModifiers)
         item.tag = tag
+
         if (type.languageKey != "") {
             TranslatableText(type.languageKey).styled { style ->
                 style.color = Formatting.GREEN //TODO Advanced weapon

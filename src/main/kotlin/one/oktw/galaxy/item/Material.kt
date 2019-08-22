@@ -21,8 +21,9 @@ package one.oktw.galaxy.item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.STONE_SWORD
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.ListTag
 import net.minecraft.text.TranslatableText
+import one.oktw.galaxy.item.ItemUtil.Companion.removeAllModifiers
+import one.oktw.galaxy.item.ItemUtil.Companion.setAttributes
 import one.oktw.galaxy.item.type.ItemType.MATERIAL
 import one.oktw.galaxy.item.type.MaterialType
 import one.oktw.galaxy.item.type.MaterialType.DUMMY
@@ -32,14 +33,13 @@ class Material(val type: MaterialType = DUMMY) : Item {
 
     override fun createItemStack(): ItemStack {
         val item = ItemStack(STONE_SWORD, 1)
+
         val tag = CompoundTag()
         tag.putInt("CustomModelData", type.customModelData)
-        tag.putBoolean("Unbreakable", true)
-        // remove all modifiers(attack damage, attack speed)
-        tag.put("AttributeModifiers", ListTag())
-        // hide all flag
-        tag.putInt("HideFlags", 63)
+        tag.let(::setAttributes)
+            .let(::removeAllModifiers)
         item.tag = tag
+
         if (type.languageKey != "") {
             TranslatableText(type.languageKey).styled { style ->
                 style.isItalic = false

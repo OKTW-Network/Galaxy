@@ -40,9 +40,10 @@ class Material(val type: MaterialType = DUMMY) : Item {
         // hide all flag
         tag.putInt("HideFlags", 63)
         item.tag = tag
-        when (type.languageKey) {
-            "" -> Unit
-            else -> item.setCustomName(TranslatableText(type.languageKey).styled { style -> style.isItalic = false })
+        if (type.languageKey != "") {
+            TranslatableText(type.languageKey).styled { style ->
+                style.isItalic = false
+            }.let(item::setCustomName)
         }
         return item
     }

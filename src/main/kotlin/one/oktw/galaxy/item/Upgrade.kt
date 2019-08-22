@@ -40,13 +40,14 @@ class Upgrade(val type: UpgradeType = DUMMY) : Item {
         // hide all flag
         tag.putInt("HideFlags", 63)
         item.tag = tag
-        val name = when (type.level) {
-            0 -> TranslatableText("item.Upgrade.Item", TranslatableText(type.languageKey))
-            else -> TranslatableText("item.Upgrade.Item", TranslatableText(type.languageKey)).append(" Lv.${type.level}")
-        }
-        when (type.languageKey) {
-            "" -> Unit
-            else -> item.setCustomName(name.styled { style -> style.isItalic = false })
+        if (type.languageKey != "") {
+            val name = TranslatableText("item.Upgrade.Item", TranslatableText(type.languageKey))
+            if (type.level > 0) {
+                name.append(" Lv.${type.level}")
+            }
+            name.styled { style ->
+                style.isItalic = false
+            }.let(item::setCustomName)
         }
         return item
     }

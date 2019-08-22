@@ -41,12 +41,11 @@ class Tool(val type: ToolType = DUMMY) : Item {
         // hide all flag
         tag.putInt("HideFlags", 63)
         item.tag = tag
-        when (type.languageKey) {
-            "" -> Unit
-            else -> item.setCustomName(TranslatableText(type.languageKey).styled { style ->
+        if (type.languageKey != "") {
+            TranslatableText(type.languageKey).styled { style ->
                 style.color = Formatting.YELLOW
                 style.isItalic = false
-            })
+            }.let(item::setCustomName)
         }
         return item
     }

@@ -41,12 +41,11 @@ class Weapon(val type: WeaponType = DUMMY) : Item {
         // hide all flag
         tag.putInt("HideFlags", 63)
         item.tag = tag
-        when (type.languageKey) {
-            "" -> Unit
-            else -> item.setCustomName(TranslatableText(type.languageKey).styled { style ->
+        if (type.languageKey != "") {
+            TranslatableText(type.languageKey).styled { style ->
                 style.color = Formatting.GREEN //TODO Advanced weapon
                 style.isItalic = false
-            })
+            }.let(item::setCustomName)
         }
         return item
     }

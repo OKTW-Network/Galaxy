@@ -37,8 +37,7 @@ class Weapon(val type: WeaponType = DUMMY) : Item {
 
         val tag = CompoundTag()
         tag.putInt("CustomModelData", type.customModelData)
-        tag.let(::setAttributes)
-            .let(::removeAllModifiers)
+        tag.let(::setAttributes).let(::removeAllModifiers)
         item.tag = tag
 
         if (type.languageKey != "") {

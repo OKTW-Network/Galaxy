@@ -36,8 +36,7 @@ class Button(val type: ButtonType = BLANK) : Item {
 
         val tag = CompoundTag()
         tag.putInt("CustomModelData", type.customModelData)
-        tag.let(::setAttributes)
-            .let(::removeAllModifiers)
+        tag.let(::setAttributes).let(::removeAllModifiers)
         item.tag = tag
 
         item.setCustomName(LiteralText("").styled { style -> style.isItalic = false })

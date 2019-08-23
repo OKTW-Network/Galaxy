@@ -16,25 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item
+package one.oktw.galaxy.item.util
 
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.ListTag
-
-class ItemUtil {
-    companion object {
-        fun setAttributes(tag: CompoundTag): CompoundTag {
-            // give unbreakable
-            tag.putBoolean("Unbreakable", true)
-            // hide all flag
-            tag.putInt("HideFlags", 63)
-            return tag
-        }
-
-        fun removeAllModifiers(tag: CompoundTag): CompoundTag {
-            // remove all modifiers(attack damage, attack speed)
-            tag.put("AttributeModifiers", ListTag())
-            return tag
-        }
-    }
+enum class Flags(val id: Int) {
+    ALL(63),
+    ENCHANTMENTS(1),
+    ATTRIBUTE_MODIFIERS(2),
+    UNBREAKABLE(4),
+    CAN_BREAK(8),
+    CAN_PLACE(16),
+    OTHERS(32)
 }

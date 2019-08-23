@@ -20,32 +20,31 @@ package one.oktw.galaxy.item
 
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.IRON_SWORD
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
-import one.oktw.galaxy.item.ItemUtil.Companion.removeAllModifiers
-import one.oktw.galaxy.item.ItemUtil.Companion.setAttributes
 import one.oktw.galaxy.item.type.ItemType.TOOL
 import one.oktw.galaxy.item.type.ToolType
 import one.oktw.galaxy.item.type.ToolType.DUMMY
+import one.oktw.galaxy.item.util.CustomItemBuilder
 
 class Tool(val type: ToolType = DUMMY) : Item {
     override val itemType = TOOL
 
     override fun createItemStack(): ItemStack {
-        val item = ItemStack(IRON_SWORD, 1)
-
-        val tag = CompoundTag()
-        tag.putInt("CustomModelData", type.customModelData)
-        tag.let(::setAttributes).let(::removeAllModifiers)
-        item.tag = tag
+        val item = CustomItemBuilder()
+            .setBaseItem(IRON_SWORD)
+            .setModel(type.customModelData)
+            .setUnbreakable()
+            .hideAllFlags()
+            .removeAllModifiers()
 
         if (type.languageKey != "") {
             TranslatableText(type.languageKey).styled { style ->
                 style.color = Formatting.YELLOW
                 style.isItalic = false
-            }.let(item::setCustomName)
+            }.let(item::setName)
         }
-        return item
+
+        return item.build()
     }
 }

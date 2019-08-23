@@ -20,30 +20,29 @@ package one.oktw.galaxy.item
 
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.STONE_SWORD
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.text.TranslatableText
-import one.oktw.galaxy.item.ItemUtil.Companion.removeAllModifiers
-import one.oktw.galaxy.item.ItemUtil.Companion.setAttributes
 import one.oktw.galaxy.item.type.ItemType.MATERIAL
 import one.oktw.galaxy.item.type.MaterialType
 import one.oktw.galaxy.item.type.MaterialType.DUMMY
+import one.oktw.galaxy.item.util.CustomItemBuilder
 
 class Material(val type: MaterialType = DUMMY) : Item {
     override val itemType = MATERIAL
 
     override fun createItemStack(): ItemStack {
-        val item = ItemStack(STONE_SWORD, 1)
-
-        val tag = CompoundTag()
-        tag.putInt("CustomModelData", type.customModelData)
-        tag.let(::setAttributes).let(::removeAllModifiers)
-        item.tag = tag
+        val item = CustomItemBuilder()
+            .setBaseItem(STONE_SWORD)
+            .setModel(type.customModelData)
+            .setUnbreakable()
+            .hideAllFlags()
+            .removeAllModifiers()
 
         if (type.languageKey != "") {
             TranslatableText(type.languageKey).styled { style ->
                 style.isItalic = false
-            }.let(item::setCustomName)
+            }.let(item::setName)
         }
-        return item
+
+        return item.build()
     }
 }

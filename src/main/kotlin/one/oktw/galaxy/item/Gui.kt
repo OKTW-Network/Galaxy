@@ -20,26 +20,27 @@ package one.oktw.galaxy.item
 
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.DIAMOND_HOE
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.text.LiteralText
-import one.oktw.galaxy.item.ItemUtil.Companion.removeAllModifiers
-import one.oktw.galaxy.item.ItemUtil.Companion.setAttributes
 import one.oktw.galaxy.item.type.GuiType
 import one.oktw.galaxy.item.type.GuiType.BLANK
 import one.oktw.galaxy.item.type.ItemType.GUI
+import one.oktw.galaxy.item.util.CustomItemBuilder
 
 class Gui(val type: GuiType = BLANK) : Item {
     override val itemType = GUI
 
     override fun createItemStack(): ItemStack {
-        val item = ItemStack(DIAMOND_HOE, 1)
+        val item = CustomItemBuilder()
+            .setBaseItem(DIAMOND_HOE)
+            .setModel(type.customModelData)
+            .setUnbreakable()
+            .hideAllFlags()
+            .removeAllModifiers()
 
-        val tag = CompoundTag()
-        tag.putInt("CustomModelData", type.customModelData)
-        tag.let(::setAttributes).let(::removeAllModifiers)
-        item.tag = tag
+        LiteralText("").styled { style ->
+            style.isItalic = false
+        }.let(item::setName)
 
-        item.setCustomName(LiteralText("").styled { style -> style.isItalic = false })
-        return item
+        return item.build()
     }
 }

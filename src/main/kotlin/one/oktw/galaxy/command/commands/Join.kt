@@ -123,22 +123,21 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
     }
 
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {
-        if (!lock.getOrPut(source.player, { Mutex() }).tryLock()) {
+        val sourcePlayer = source.player
+        if (!lock.getOrPut(sourcePlayer, { Mutex() }).tryLock()) {
             source.sendFeedback(LiteralText("請稍後...").styled { style -> style.color = Formatting.YELLOW }, false)
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
 
         val targetPlayer = collection.first()
 
-        source.player.networkHandler.sendPacket(CustomPayloadS2CPacket(PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(targetPlayer.id))))))
-        val text = LiteralText(if (source.player.gameProfile == targetPlayer) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系").styled { style ->
+        sourcePlayer.networkHandler.sendPacket(CustomPayloadS2CPacket(PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(targetPlayer.id))))))
+        val text = LiteralText(if (sourcePlayer.gameProfile == targetPlayer) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系").styled { style ->
             style.color = Formatting.YELLOW
         }
         source.sendFeedback(text, false)
 
         launch {
-            val sourcePlayer = source.player
-
             val listener = fun(event: PacketReceiveEvent) {
                 if (event.player.gameProfile != sourcePlayer.gameProfile || event.channel != PROXY_IDENTIFIER) return
 
@@ -157,7 +156,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                     }
                     Failed -> {
                         sourcePlayer.sendMessage(LiteralText("星系載入失敗，請聯絡開發團隊！").styled { style -> style.color = Formatting.RED })
-                        lock[source.player]?.unlock()
+                        lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }
                 }

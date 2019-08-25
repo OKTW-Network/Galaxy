@@ -30,12 +30,17 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.time.delay
 import net.minecraft.client.network.packet.CommandSuggestionsS2CPacket
 import net.minecraft.client.network.packet.CustomPayloadS2CPacket
+import net.minecraft.client.network.packet.TitleS2CPacket
 import net.minecraft.command.arguments.GameProfileArgumentType
+import net.minecraft.entity.boss.BossBar
+import net.minecraft.entity.boss.CommandBossBar
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.LiteralText
+import net.minecraft.text.Text
 import net.minecraft.util.Formatting
+import net.minecraft.util.Identifier
 import net.minecraft.util.PacketByteBuf
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.Main.Companion.main
@@ -55,6 +60,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     private val lock = ConcurrentHashMap<ServerPlayerEntity, Mutex>()
+    private val starting = ConcurrentHashMap<ServerPlayerEntity, Boolean>()
 
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
@@ -136,6 +142,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             style.color = Formatting.YELLOW
         }
         source.sendFeedback(text, false)
+        sourcePlayer.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.TITLE, text))
 
         launch {
             val listener = fun(event: PacketReceiveEvent) {
@@ -146,16 +153,55 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                 if (data.uuid != targetPlayer.id) return
 
                 when (data.stage) {
-                    Queue -> sourcePlayer.sendMessage(LiteralText("正在等待星系載入").styled { style -> style.color = Formatting.YELLOW })
-                    Creating -> sourcePlayer.sendMessage(LiteralText("星系載入中...").styled { style -> style.color = Formatting.YELLOW })
-                    Starting -> sourcePlayer.sendMessage(LiteralText("星系正在啟動請稍後...").styled { style -> style.color = Formatting.YELLOW })
+                    Queue -> {
+                        val subText = LiteralText("正在等待星系載入").styled { style -> style.color = Formatting.YELLOW }
+                        updateVisualStatus(source, text, subText, 0)
+                        // 將 Title 設置成 5 分鐘
+                        sourcePlayer.networkHandler.sendPacket(TitleS2CPacket(0, 60000, 20))
+                    }
+                    Creating -> {
+                        val subText = LiteralText("星系載入中...").styled { style -> style.color = Formatting.YELLOW }
+                        updateVisualStatus(source, text, subText, 10)
+                    }
+                    Starting -> {
+                        val subText = LiteralText("星系正在啟動請稍後...").styled { style -> style.color = Formatting.YELLOW }
+                        updateVisualStatus(source, text, subText, 20)
+                        starting[sourcePlayer] = true
+                        launch {
+                            val bossBar = getOrCreateProcessBossBar(source)
+                            var seconds = 0
+                            val targetSeconds = 300
+                            while (true) {
+                                val starting = starting[sourcePlayer] ?: false
+                                if (!starting || seconds >= targetSeconds) {
+                                    break
+                                }
+                                bossBar.value = 20 + (79 * (seconds / targetSeconds))
+                                delay(Duration.ofSeconds(1))
+                                seconds += 1
+                            }
+                        }
+                    }
                     Started -> {
-                        sourcePlayer.sendMessage(LiteralText("星系已載入！").styled { style -> style.color = Formatting.GREEN })
+                        // 重置Title時間
+                        sourcePlayer.networkHandler.sendPacket(TitleS2CPacket(20, 40, 20))
+                        val subText = LiteralText("星系已載入！").styled { style -> style.color = Formatting.GREEN }
+                        sourcePlayer.sendMessage(subText)
+                        updateVisualStatus(source, text, subText, 100)
+                        starting[sourcePlayer] = false
+                        starting.remove(sourcePlayer)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
+                        launch {
+                            delay(Duration.ofSeconds(2))
+                            removeProcessBossBar(source)
+                        }
                     }
                     Failed -> {
                         sourcePlayer.sendMessage(LiteralText("星系載入失敗，請聯絡開發團隊！").styled { style -> style.color = Formatting.RED })
+                        starting[sourcePlayer] = false
+                        starting.remove(sourcePlayer)
+                        removeProcessBossBar(source)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }
@@ -165,10 +211,55 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             main!!.eventManager.register(PacketReceiveEvent::class, listener = listener)
             delay(Duration.ofMinutes(5))
             main!!.eventManager.unregister(listener)
+            starting[sourcePlayer] = false
+            starting.remove(sourcePlayer)
+            removeProcessBossBar(source)
             lock[sourcePlayer]?.unlock()
             lock.remove(sourcePlayer)
         }
 
         return com.mojang.brigadier.Command.SINGLE_SUCCESS
+    }
+
+    private fun updateVisualStatus(source: ServerCommandSource, title: Text, subTitle: Text, progress: Int) {
+        // bossBar
+        val bossBar = getOrCreateProcessBossBar(source)
+        bossBar.name = subTitle
+        bossBar.value = progress
+
+        // title
+        sendTitle(source.player, title, subTitle)
+    }
+
+    private fun removeProcessBossBar(source: ServerCommandSource) {
+        val player = source.player
+        val identifier = Identifier("process_${player.uuid}")
+        val bossBarManager = source.minecraftServer.bossBarManager
+        val bossBar = bossBarManager.get(identifier)
+        if (bossBar != null) {
+            bossBarManager.remove(bossBar)
+        }
+    }
+
+    private fun getOrCreateProcessBossBar(source: ServerCommandSource): CommandBossBar {
+        val player = source.player
+        val identifier = Identifier("process_${player.uuid}")
+        val bossBarManager = source.minecraftServer.bossBarManager
+
+        val bossBar = bossBarManager.get(identifier)
+        return if (bossBar == null) {
+            val newBossBar = bossBarManager.add(identifier, LiteralText("請稍後..."))
+            newBossBar.color = BossBar.Color.YELLOW
+            newBossBar.isVisible = true
+            newBossBar.addPlayer(player)
+            newBossBar
+        } else {
+            bossBar
+        }
+    }
+
+    private fun sendTitle(player: ServerPlayerEntity, title: Text, subTitle: Text) {
+        player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.TITLE, title))
+        player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.SUBTITLE, subTitle))
     }
 }

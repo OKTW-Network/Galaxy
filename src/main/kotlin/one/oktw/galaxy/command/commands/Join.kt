@@ -33,6 +33,7 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.LiteralText
+import net.minecraft.util.Formatting
 import net.minecraft.util.PacketByteBuf
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.Main.Companion.main
@@ -70,14 +71,17 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
 
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {
         if (!lock.getOrPut(source.player, { Mutex() }).tryLock()) {
-            source.sendFeedback(LiteralText("請稍後..."), false)
+            source.sendFeedback(LiteralText("請稍後...").styled { style -> style.color = Formatting.YELLOW }, false)
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
 
         val targetPlayer = collection.first()
 
         source.player.networkHandler.sendPacket(CustomPayloadS2CPacket(PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(targetPlayer.id))))))
-        source.sendFeedback(LiteralText(if (source.player.gameProfile == targetPlayer) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系"), false)
+        val text = LiteralText(if (source.player.gameProfile == targetPlayer) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系").styled { style ->
+            style.color = Formatting.YELLOW
+        }
+        source.sendFeedback(text, false)
 
         launch {
             val sourcePlayer = source.player
@@ -90,16 +94,16 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                 if (data.uuid != targetPlayer.id) return
 
                 when (data.stage) {
-                    Queue -> sourcePlayer.sendMessage(LiteralText("正在等待星系載入"))
-                    Creating -> sourcePlayer.sendMessage(LiteralText("星系載入中..."))
-                    Starting -> sourcePlayer.sendMessage(LiteralText("星系正在啟動請稍後..."))
+                    Queue -> sourcePlayer.sendMessage(LiteralText("正在等待星系載入").styled { style -> style.color = Formatting.YELLOW })
+                    Creating -> sourcePlayer.sendMessage(LiteralText("星系載入中...").styled { style -> style.color = Formatting.YELLOW })
+                    Starting -> sourcePlayer.sendMessage(LiteralText("星系正在啟動請稍後...").styled { style -> style.color = Formatting.YELLOW })
                     Started -> {
-                        sourcePlayer.sendMessage(LiteralText("星系已載入！"))
+                        sourcePlayer.sendMessage(LiteralText("星系已載入！").styled { style -> style.color = Formatting.GREEN })
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }
                     Failed -> {
-                        sourcePlayer.sendMessage(LiteralText("星系載入失敗，請聯絡開發團隊！"))
+                        sourcePlayer.sendMessage(LiteralText("星系載入失敗，請聯絡開發團隊！").styled { style -> style.color = Formatting.RED })
                         lock[source.player]?.unlock()
                         lock.remove(sourcePlayer)
                     }

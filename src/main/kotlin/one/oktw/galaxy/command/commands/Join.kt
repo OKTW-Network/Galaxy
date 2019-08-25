@@ -156,8 +156,6 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                     Queue -> {
                         val subText = LiteralText("正在等待星系載入").styled { style -> style.color = Formatting.YELLOW }
                         updateVisualStatus(source, text, subText, 0)
-                        // 將 Title 設置成 5 分鐘
-                        sourcePlayer.networkHandler.sendPacket(TitleS2CPacket(0, 60000, 20))
                     }
                     Creating -> {
                         val subText = LiteralText("星系載入中...").styled { style -> style.color = Formatting.YELLOW }
@@ -170,21 +168,24 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                         launch {
                             val bossBar = getOrCreateProcessBossBar(source)
                             var seconds = 0
+                            val fastTargetSeconds = 120
                             val targetSeconds = 300
                             while (true) {
                                 val starting = starting[sourcePlayer] ?: false
                                 if (!starting || seconds >= targetSeconds) {
                                     break
                                 }
-                                bossBar.value = 20 + (79 * (seconds / targetSeconds))
+                                bossBar.value = if (seconds <= fastTargetSeconds) {
+                                    20 + (60 * (seconds / fastTargetSeconds))
+                                } else {
+                                    80 + (19 * ((seconds - fastTargetSeconds) / (targetSeconds - fastTargetSeconds)))
+                                }
                                 delay(Duration.ofSeconds(1))
                                 seconds += 1
                             }
                         }
                     }
                     Started -> {
-                        // 重置Title時間
-                        sourcePlayer.networkHandler.sendPacket(TitleS2CPacket(20, 40, 20))
                         val subText = LiteralText("星系已載入！").styled { style -> style.color = Formatting.GREEN }
                         sourcePlayer.sendMessage(subText)
                         updateVisualStatus(source, text, subText, 100)

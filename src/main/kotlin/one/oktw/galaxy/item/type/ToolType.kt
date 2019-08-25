@@ -16,15 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.command
+package one.oktw.galaxy.item.type
 
-import one.oktw.galaxy.command.commands.Admin
-import one.oktw.galaxy.command.commands.Join
-
-class CommandRegister {
-    init {
-//        CommandHelper.register(Spawn())
-        CommandHelper.register(Join())
-        CommandHelper.register(Admin())
-    }
+enum class ToolType(val customModelData: Int, val languageKey: String) {
+    DUMMY(0, ""),
+    WRENCH(1010100, "item.Tool.WRENCH")
 }

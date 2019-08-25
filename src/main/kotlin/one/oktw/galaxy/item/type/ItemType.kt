@@ -16,15 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.command
+package one.oktw.galaxy.item.type
 
-import one.oktw.galaxy.command.commands.Admin
-import one.oktw.galaxy.command.commands.Join
+enum class ItemType {
+    // System
+    DUMMY,
+    BUTTON,
+    GUI,
 
-class CommandRegister {
-    init {
-//        CommandHelper.register(Spawn())
-        CommandHelper.register(Join())
-        CommandHelper.register(Admin())
-    }
+    // Weapons & Tools
+    MATERIAL,
+    WEAPON,
+    TOOL,
+    UPGRADE
 }

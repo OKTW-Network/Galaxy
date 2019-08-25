@@ -16,15 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.command
+package one.oktw.galaxy.item
 
-import one.oktw.galaxy.command.commands.Admin
-import one.oktw.galaxy.command.commands.Join
+import net.minecraft.item.ItemStack
+import one.oktw.galaxy.item.type.ItemType
 
-class CommandRegister {
-    init {
-//        CommandHelper.register(Spawn())
-        CommandHelper.register(Join())
-        CommandHelper.register(Admin())
-    }
+interface Item {
+    val itemType: ItemType
+
+    fun createItemStack(): ItemStack
 }

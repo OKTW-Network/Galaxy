@@ -16,15 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.command
+package one.oktw.galaxy.command.commands
 
-import one.oktw.galaxy.command.commands.Admin
-import one.oktw.galaxy.command.commands.Join
+import com.mojang.brigadier.CommandDispatcher
+import net.minecraft.server.command.CommandManager
+import net.minecraft.server.command.ServerCommandSource
+import one.oktw.galaxy.command.Command
+import one.oktw.galaxy.command.commands.admin.GetItem
 
-class CommandRegister {
-    init {
-//        CommandHelper.register(Spawn())
-        CommandHelper.register(Join())
-        CommandHelper.register(Admin())
+class Admin : Command {
+    override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
+        dispatcher.register(
+            CommandManager.literal("admin")
+                .requires { source -> source.hasPermissionLevel(2) }
+                .then(GetItem.command)
+        )
     }
 }
+

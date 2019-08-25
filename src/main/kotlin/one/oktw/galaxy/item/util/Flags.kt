@@ -16,15 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.command
+package one.oktw.galaxy.item.util
 
-import one.oktw.galaxy.command.commands.Admin
-import one.oktw.galaxy.command.commands.Join
-
-class CommandRegister {
-    init {
-//        CommandHelper.register(Spawn())
-        CommandHelper.register(Join())
-        CommandHelper.register(Admin())
-    }
+enum class Flags(val id: Int) {
+    ALL(63),
+    ENCHANTMENTS(1),
+    ATTRIBUTE_MODIFIERS(2),
+    UNBREAKABLE(4),
+    CAN_BREAK(8),
+    CAN_PLACE(16),
+    OTHERS(32)
 }

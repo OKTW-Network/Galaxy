@@ -168,18 +168,13 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                         launch {
                             val bossBar = getOrCreateProcessBossBar(source)
                             var seconds = 0
-                            val fastTargetSeconds = 120
                             val targetSeconds = 300
                             while (true) {
                                 val starting = starting[sourcePlayer] ?: false
                                 if (!starting || seconds >= targetSeconds) {
                                     break
                                 }
-                                bossBar.value = if (seconds <= fastTargetSeconds) {
-                                    20 + (60 * (seconds / fastTargetSeconds))
-                                } else {
-                                    80 + (19 * ((seconds - fastTargetSeconds) / (targetSeconds - fastTargetSeconds)))
-                                }
+                                bossBar.value = 20 + (79 * (seconds / targetSeconds))
                                 delay(Duration.ofSeconds(1))
                                 seconds += 1
                             }

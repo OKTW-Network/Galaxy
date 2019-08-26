@@ -168,8 +168,8 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                         println("Outside launch ${starting[sourcePlayer]}")
                         launch {
                             val bossBar = getOrCreateProcessBossBar(source)
-                            var seconds = 0
-                            val targetSeconds = 300
+                            var seconds = 0.0
+                            val targetSeconds = 300.0
                             println("Before loop ${starting[sourcePlayer]}")
                             while (true) {
                                 println("loop $seconds seconds, ${starting[sourcePlayer]}")
@@ -178,7 +178,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                                     println("broken")
                                     break
                                 }
-                                bossBar.value = 20 + (79 * (seconds / targetSeconds))
+                                bossBar.value = 20 + (79 * (seconds / targetSeconds)).toInt()
                                 println("value ${79 * (seconds / targetSeconds)}")
                                 delay(Duration.ofSeconds(1))
                                 seconds += 1

@@ -106,31 +106,41 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                     }
                     Creating -> {
                         val subText = LiteralText("星系載入中...").styled { style -> style.color = Formatting.YELLOW }
-                        updateVisualStatus(source, text, subText, 10)
+                        updateVisualStatus(source, text, subText, 20)
                     }
                     Starting -> {
                         val subText = LiteralText("星系正在啟動請稍後...").styled { style -> style.color = Formatting.YELLOW }
-                        updateVisualStatus(source, text, subText, 20)
+                        updateVisualStatus(source, text, subText, 40)
                         starting[sourcePlayer] = true
                         launch {
                             val bossBar = getOrCreateProcessBossBar(source)
                             var seconds = 0.0
+                            val fastTargetSeconds = 120.0
                             val targetSeconds = 300.0
                             while (true) {
                                 val starting = starting[sourcePlayer] ?: false
                                 if (!starting || seconds >= targetSeconds) {
                                     break
                                 }
-                                bossBar.value = 20 + (79 * (seconds / targetSeconds)).toInt()
-                                delay(Duration.ofSeconds(1))
-                                seconds += 1
+                                bossBar.value = if (seconds <= fastTargetSeconds) {
+                                    40 + (130 * (seconds / fastTargetSeconds)).toInt()
+                                } else {
+                                    170 + (29 * ((seconds - fastTargetSeconds) / (targetSeconds - fastTargetSeconds))).toInt()
+                                }
+                                delay(Duration.ofMillis(500))
+                                seconds += 0.5
+                                if (seconds >= 1) {
+                                    LiteralText("星系正在啟動請稍後... 已經過 ${seconds.toInt()} 秒").styled { style ->
+                                        style.color = Formatting.YELLOW
+                                    }.let(bossBar::setName)
+                                }
                             }
                         }
                     }
                     Started -> {
                         val subText = LiteralText("星系已載入！").styled { style -> style.color = Formatting.GREEN }
                         sourcePlayer.sendMessage(subText)
-                        updateVisualStatus(source, text, subText, 100)
+                        updateVisualStatus(source, text, subText, 200)
                         starting[sourcePlayer] = false
                         starting.remove(sourcePlayer)
                         lock[sourcePlayer]?.unlock()
@@ -194,6 +204,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             val newBossBar = bossBarManager.add(identifier, LiteralText("請稍後..."))
             newBossBar.color = BossBar.Color.YELLOW
             newBossBar.isVisible = true
+            newBossBar.maxValue = 200
             newBossBar.addPlayer(player)
             newBossBar
         } else {

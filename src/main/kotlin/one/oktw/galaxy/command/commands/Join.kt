@@ -165,16 +165,21 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                         val subText = LiteralText("星系正在啟動請稍後...").styled { style -> style.color = Formatting.YELLOW }
                         updateVisualStatus(source, text, subText, 20)
                         starting[sourcePlayer] = true
+                        println("Outside launch ${starting[sourcePlayer]}")
                         launch {
                             val bossBar = getOrCreateProcessBossBar(source)
                             var seconds = 0
                             val targetSeconds = 300
+                            println("Before loop ${starting[sourcePlayer]}")
                             while (true) {
+                                println("loop $seconds seconds, ${starting[sourcePlayer]}")
                                 val starting = starting[sourcePlayer] ?: false
                                 if (!starting || seconds >= targetSeconds) {
+                                    println("broken")
                                     break
                                 }
                                 bossBar.value = 20 + (79 * (seconds / targetSeconds))
+                                println("value ${20 + (79 * (seconds / targetSeconds))}")
                                 delay(Duration.ofSeconds(1))
                                 seconds += 1
                             }

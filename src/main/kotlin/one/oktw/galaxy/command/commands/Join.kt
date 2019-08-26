@@ -179,7 +179,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                                     break
                                 }
                                 bossBar.value = 20 + (79 * (seconds / targetSeconds))
-                                println("value ${20 + (79 * (seconds / targetSeconds))}")
+                                println("value ${79 * (seconds / targetSeconds)}")
                                 delay(Duration.ofSeconds(1))
                                 seconds += 1
                             }

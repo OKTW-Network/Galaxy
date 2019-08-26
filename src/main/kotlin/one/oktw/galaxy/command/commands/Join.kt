@@ -169,15 +169,25 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                         launch {
                             val bossBar = getOrCreateProcessBossBar(source)
                             var seconds = 0.0
+                            val fastTargetSeconds = 120.0
                             val targetSeconds = 300.0
                             while (true) {
                                 val starting = starting[sourcePlayer] ?: false
                                 if (!starting || seconds >= targetSeconds) {
                                     break
                                 }
-                                bossBar.value = 20 + (79 * (seconds / targetSeconds)).toInt()
-                                delay(Duration.ofSeconds(1))
-                                seconds += 1
+                                bossBar.value = if (seconds <= fastTargetSeconds) {
+                                    20 + (50 * (seconds / fastTargetSeconds)).toInt()
+                                } else {
+                                    70 + (29 * ((seconds - fastTargetSeconds) / (targetSeconds - fastTargetSeconds))).toInt()
+                                }
+                                delay(Duration.ofMillis(500))
+                                seconds += 0.5
+                                if (seconds >= 1) {
+                                    LiteralText("星系正在啟動請稍後... 已經過 ${seconds.toInt()} 秒").styled { style ->
+                                        style.color = Formatting.YELLOW
+                                    }.let(bossBar::setName)
+                                }
                             }
                         }
                     }

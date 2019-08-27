@@ -159,11 +159,11 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                     }
                     Creating -> {
                         val subText = LiteralText("星系載入中...").styled { style -> style.color = Formatting.YELLOW }
-                        updateVisualStatus(source, text, subText, 10)
+                        updateVisualStatus(source, text, subText, 20)
                     }
                     Starting -> {
                         val subText = LiteralText("星系正在啟動請稍後...").styled { style -> style.color = Formatting.YELLOW }
-                        updateVisualStatus(source, text, subText, 20)
+                        updateVisualStatus(source, text, subText, 40)
                         starting[sourcePlayer] = true
                         println("Outside launch ${starting[sourcePlayer]}")
                         launch {
@@ -177,9 +177,9 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                                     break
                                 }
                                 bossBar.value = if (seconds <= fastTargetSeconds) {
-                                    20 + (50 * (seconds / fastTargetSeconds)).toInt()
+                                    40 + (130 * (seconds / fastTargetSeconds)).toInt()
                                 } else {
-                                    70 + (29 * ((seconds - fastTargetSeconds) / (targetSeconds - fastTargetSeconds))).toInt()
+                                    170 + (29 * ((seconds - fastTargetSeconds) / (targetSeconds - fastTargetSeconds))).toInt()
                                 }
                                 delay(Duration.ofMillis(500))
                                 seconds += 0.5
@@ -194,7 +194,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                     Started -> {
                         val subText = LiteralText("星系已載入！").styled { style -> style.color = Formatting.GREEN }
                         sourcePlayer.sendMessage(subText)
-                        updateVisualStatus(source, text, subText, 100)
+                        updateVisualStatus(source, text, subText, 200)
                         starting[sourcePlayer] = false
                         starting.remove(sourcePlayer)
                         lock[sourcePlayer]?.unlock()

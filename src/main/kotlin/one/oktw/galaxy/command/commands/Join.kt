@@ -239,7 +239,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
 
     private fun removeProcessBossBar(source: ServerCommandSource) {
         val player = source.player
-        val identifier = Identifier("process_${player.uuid}")
+        val identifier = Identifier("galaxy:process_${player.uuid}")
         val bossBarManager = source.minecraftServer.bossBarManager
         val bossBar = bossBarManager.get(identifier)
         if (bossBar != null) {
@@ -249,7 +249,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
 
     private fun getOrCreateProcessBossBar(source: ServerCommandSource): CommandBossBar {
         val player = source.player
-        val identifier = Identifier("process_${player.uuid}")
+        val identifier = Identifier("galaxy:process_${player.uuid}")
         val bossBarManager = source.minecraftServer.bossBarManager
 
         val bossBar = bossBarManager.get(identifier)

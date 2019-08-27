@@ -207,7 +207,9 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                                 delay(Duration.ofMillis(500))
                                 seconds += 0.5
                                 if (seconds >= 1) {
-                                    subText.append(
+                                    LiteralText("飛船正在飛向星系請稍後...").styled { style ->
+                                        style.color = Formatting.AQUA
+                                    }.append(
                                         LiteralText("航行時間： ${seconds.toInt()} 秒").styled { style ->
                                             style.color = Formatting.YELLOW
                                         }

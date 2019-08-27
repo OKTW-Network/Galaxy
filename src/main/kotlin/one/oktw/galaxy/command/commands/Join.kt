@@ -46,6 +46,7 @@ import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.event.type.PacketReceiveEvent
+import one.oktw.galaxy.event.type.PlayerConnectEvent
 import one.oktw.galaxy.event.type.RequestCommandCompletionsEvent
 import one.oktw.galaxy.proxy.api.ProxyAPI.decode
 import one.oktw.galaxy.proxy.api.ProxyAPI.encode
@@ -125,8 +126,21 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             )
         }
 
+        val playerConnectListener = fun(event: PlayerConnectEvent) {
+            val identifier = Identifier("galaxy:process_${event.player.uuid}")
+            val bossBarManager = main!!.server.bossBarManager
+            val bossBar = bossBarManager.get(identifier)
+            if (bossBar != null) {
+                val starting = starting[event.player] ?: false
+                if (!starting) {
+                    bossBarManager.remove(bossBar)
+                }
+            }
+        }
+
         main!!.eventManager.register(RequestCommandCompletionsEvent::class, listener = requestCompletionListener)
         main!!.eventManager.register(PacketReceiveEvent::class, listener = searchResultListener)
+        main!!.eventManager.register(PlayerConnectEvent::class, listener = playerConnectListener)
     }
 
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {

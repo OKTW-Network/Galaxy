@@ -59,6 +59,8 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
+    private var completeID = ConcurrentHashMap<UUID, Int>()
+    private var completeInput = ConcurrentHashMap<UUID, String>()
     private val lock = ConcurrentHashMap<ServerPlayerEntity, Mutex>()
     private val starting = ConcurrentHashMap<ServerPlayerEntity, Boolean>()
 
@@ -82,50 +84,49 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
     }
 
     companion object {
-        private var completeID = ConcurrentHashMap<UUID, Int>()
-        private var completeInput = ConcurrentHashMap<UUID, String>()
+        fun registerEvent() = Join().registerEvents()
+    }
 
-        fun registerEvent() {
-            val requestCompletionListener = fun(event: RequestCommandCompletionsEvent) {
-                val command = event.packet.partialCommand
+    private fun registerEvents() {
+        val requestCompletionListener = fun(event: RequestCommandCompletionsEvent) {
+            val command = event.packet.partialCommand
 
-                //取消原版自動完成並向 proxy 發請求
-                if (command.startsWith("/join ")) {
-                    event.cancel = true
-                    completeID[event.player.uuid] = event.packet.completionId
-                    completeInput[event.player.uuid] = command
-                    event.player.networkHandler.sendPacket(
-                        CustomPayloadS2CPacket(
-                            PROXY_IDENTIFIER,
-                            PacketByteBuf(wrappedBuffer(encode(SearchPlayer(command.removePrefix("/join "), 10))))
-                        )
-                    )
-                }
-            }
-
-            //從 proxy 接收回覆並送自動完成封包給玩家
-            val searchResultListener = fun(event: PacketReceiveEvent) {
-                if (event.channel != PROXY_IDENTIFIER) return
-                val data = decode<Packet>(event.packet.nioBuffer()) as? SearchPlayer.Result ?: return
-                val id = completeID[event.player.uuid] ?: return
-                val input = completeInput[event.player.uuid] ?: return
-
-                val suggestion = SuggestionsBuilder(input, "/join ".length)
-                data.players.forEach { player ->
-                    suggestion.suggest(player)
-                }
-
+            //取消原版自動完成並向 proxy 發請求
+            if (command.startsWith("/join ")) {
+                event.cancel = true
+                completeID[event.player.uuid] = event.packet.completionId
+                completeInput[event.player.uuid] = command
                 event.player.networkHandler.sendPacket(
-                    CommandSuggestionsS2CPacket(
-                        id,
-                        suggestion.buildFuture().get()
+                    CustomPayloadS2CPacket(
+                        PROXY_IDENTIFIER,
+                        PacketByteBuf(wrappedBuffer(encode(SearchPlayer(command.removePrefix("/join "), 10))))
                     )
                 )
             }
-
-            main!!.eventManager.register(RequestCommandCompletionsEvent::class, listener = requestCompletionListener)
-            main!!.eventManager.register(PacketReceiveEvent::class, listener = searchResultListener)
         }
+
+        //從 proxy 接收回覆並送自動完成封包給玩家
+        val searchResultListener = fun(event: PacketReceiveEvent) {
+            if (event.channel != PROXY_IDENTIFIER) return
+            val data = decode<Packet>(event.packet.nioBuffer()) as? SearchPlayer.Result ?: return
+            val id = completeID[event.player.uuid] ?: return
+            val input = completeInput[event.player.uuid] ?: return
+
+            val suggestion = SuggestionsBuilder(input, "/join ".length)
+            data.players.forEach { player ->
+                suggestion.suggest(player)
+            }
+
+            event.player.networkHandler.sendPacket(
+                CommandSuggestionsS2CPacket(
+                    id,
+                    suggestion.buildFuture().get()
+                )
+            )
+        }
+
+        main!!.eventManager.register(RequestCommandCompletionsEvent::class, listener = requestCompletionListener)
+        main!!.eventManager.register(PacketReceiveEvent::class, listener = searchResultListener)
     }
 
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {

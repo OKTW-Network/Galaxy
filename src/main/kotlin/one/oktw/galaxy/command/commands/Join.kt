@@ -210,7 +210,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                                     LiteralText("飛船正在飛向星系請稍後...").styled { style ->
                                         style.color = Formatting.AQUA
                                     }.append(
-                                        LiteralText("航行時間： ${seconds.toInt()} 秒").styled { style ->
+                                        LiteralText(" 航行時間： ${seconds.toInt()} 秒").styled { style ->
                                             style.color = Formatting.YELLOW
                                         }
                                     ).let(bossBar::setName)

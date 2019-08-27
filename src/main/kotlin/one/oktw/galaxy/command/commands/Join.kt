@@ -258,6 +258,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             val newBossBar = bossBarManager.add(identifier, LiteralText("請稍後..."))
             newBossBar.color = BossBar.Color.YELLOW
             newBossBar.isVisible = true
+            newBossBar.maxValue = 200
             newBossBar.addPlayer(player)
             newBossBar
         } else {

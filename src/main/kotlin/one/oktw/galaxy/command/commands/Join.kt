@@ -93,10 +93,8 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
 
         sourcePlayer.networkHandler.sendPacket(CustomPayloadS2CPacket(PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(targetPlayer.id))))))
         if (startingTarget[sourcePlayer.uuid] != null) {
-            if (startingTarget[sourcePlayer.uuid] == targetPlayer) {
-                val bossBar = getOrCreateProcessBossBar(source)
-                bossBar.addPlayer(sourcePlayer)
-            }
+            val bossBar = getOrCreateProcessBossBar(source)
+            bossBar.addPlayer(sourcePlayer)
         }
         val message = if (startingTarget[sourcePlayer.uuid] != null) {
             if (startingTarget[sourcePlayer.uuid] == targetPlayer) {
@@ -141,34 +139,35 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                             style.color = Formatting.YELLOW
                         }
                         source.sendFeedback(tipText, false)
-                        if (startingTarget[sourcePlayer.uuid] != targetPlayer) {
-                            startingTarget[sourcePlayer.uuid] = targetPlayer
-                            launch {
-                                val bossBar = getOrCreateProcessBossBar(source)
-                                var seconds = 0.0
-                                val fastTargetSeconds = 120.0
-                                val targetSeconds = 300.0
-                                while (true) {
-                                    val starting = startingTarget[sourcePlayer.uuid]
-                                    if (starting == null || seconds >= targetSeconds) {
-                                        break
-                                    }
-                                    bossBar.value = if (seconds <= fastTargetSeconds) {
-                                        40 + (130 * (seconds / fastTargetSeconds)).toInt()
-                                    } else {
-                                        170 + (29 * ((seconds - fastTargetSeconds) / (targetSeconds - fastTargetSeconds))).toInt()
-                                    }
-                                    delay(Duration.ofMillis(500))
-                                    seconds += 0.5
-                                    if (seconds >= 1) {
-                                        LiteralText("飛船正在飛向星系請稍後...").styled { style ->
-                                            style.color = Formatting.AQUA
-                                        }.append(
-                                            LiteralText(" 航行時間： ${seconds.toInt()} 秒").styled { style ->
-                                                style.color = Formatting.YELLOW
-                                            }
-                                        ).let(bossBar::setName)
-                                    }
+                        if (startingTarget[sourcePlayer.uuid] != null) {
+                            if (startingTarget[sourcePlayer.uuid] == targetPlayer) return
+                        }
+                        startingTarget[sourcePlayer.uuid] = targetPlayer
+                        launch {
+                            val bossBar = getOrCreateProcessBossBar(source)
+                            var seconds = 0.0
+                            val fastTargetSeconds = 120.0
+                            val targetSeconds = 300.0
+                            while (true) {
+                                val starting = startingTarget[sourcePlayer.uuid]
+                                if (starting == null || seconds >= targetSeconds) {
+                                    break
+                                }
+                                bossBar.value = if (seconds <= fastTargetSeconds) {
+                                    40 + (130 * (seconds / fastTargetSeconds)).toInt()
+                                } else {
+                                    170 + (29 * ((seconds - fastTargetSeconds) / (targetSeconds - fastTargetSeconds))).toInt()
+                                }
+                                delay(Duration.ofMillis(500))
+                                seconds += 0.5
+                                if (seconds >= 1) {
+                                    LiteralText("飛船正在飛向星系請稍後...").styled { style ->
+                                        style.color = Formatting.AQUA
+                                    }.append(
+                                        LiteralText(" 航行時間： ${seconds.toInt()} 秒").styled { style ->
+                                            style.color = Formatting.YELLOW
+                                        }
+                                    ).let(bossBar::setName)
                                 }
                             }
                         }

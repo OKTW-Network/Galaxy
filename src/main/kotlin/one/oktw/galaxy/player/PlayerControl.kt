@@ -22,10 +22,13 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.netty.buffer.Unpooled.wrappedBuffer
 import net.minecraft.client.network.packet.CommandSuggestionsS2CPacket
 import net.minecraft.client.network.packet.CustomPayloadS2CPacket
+import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.util.Identifier
 import net.minecraft.util.PacketByteBuf
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.event.type.PacketReceiveEvent
+import one.oktw.galaxy.event.type.PlayerConnectEvent
 import one.oktw.galaxy.event.type.RequestCommandCompletionsEvent
 import one.oktw.galaxy.proxy.api.ProxyAPI.decode
 import one.oktw.galaxy.proxy.api.ProxyAPI.encode
@@ -41,11 +44,13 @@ class PlayerControl private constructor() {
 
     private val completeID = ConcurrentHashMap<UUID, Int>()
     private val completeInput = ConcurrentHashMap<UUID, String>()
+    val starting = ConcurrentHashMap<ServerPlayerEntity, Boolean>()
 
     fun registerEvents() {
         // Events
         main!!.eventManager.register(RequestCommandCompletionsEvent::class, listener = ::onRequestCommandComplete)
         main!!.eventManager.register(PacketReceiveEvent::class, listener = ::onSearchResult)
+        main!!.eventManager.register(PlayerConnectEvent::class, listener = onPlayerConnect)
     }
 
     private fun onRequestCommandComplete(event: RequestCommandCompletionsEvent) {
@@ -83,5 +88,17 @@ class PlayerControl private constructor() {
                 suggestion.buildFuture().get()
             )
         )
+    }
+
+    private val onPlayerConnect = fun(event: PlayerConnectEvent) {
+        val identifier = Identifier("galaxy:process_${event.player.uuid}")
+        val bossBarManager = main!!.server.bossBarManager
+        val bossBar = bossBarManager.get(identifier)
+        if (bossBar != null) {
+            val starting = starting[event.player] ?: false
+            if (!starting) {
+                bossBarManager.remove(bossBar)
+            }
+        }
     }
 }

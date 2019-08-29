@@ -92,10 +92,6 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
         val targetPlayer = collection.first()
 
         sourcePlayer.networkHandler.sendPacket(CustomPayloadS2CPacket(PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(targetPlayer.id))))))
-        if (startingTarget[sourcePlayer.uuid] != null) {
-            val bossBar = getOrCreateProcessBossBar(source)
-            bossBar.addPlayer(sourcePlayer)
-        }
         val message = if (startingTarget[sourcePlayer.uuid] != null) {
             if (startingTarget[sourcePlayer.uuid] == targetPlayer) {
                 "正在返回航道"
@@ -240,6 +236,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             newBossBar.addPlayer(player)
             newBossBar
         } else {
+            bossBar.addPlayer(player)
             bossBar
         }
     }

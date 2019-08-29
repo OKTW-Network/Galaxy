@@ -54,7 +54,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     private val lock = ConcurrentHashMap<ServerPlayerEntity, Mutex>()
-    private val startingTarget = main!!.playerControl.startingTarget
 
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
@@ -76,6 +75,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
     }
 
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {
+        val startingTarget = main!!.playerControl.startingTarget
         val sourcePlayer = source.player
         if (!lock.getOrPut(sourcePlayer, { Mutex() }).tryLock()) {
             val target = startingTarget[sourcePlayer]

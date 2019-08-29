@@ -65,5 +65,7 @@ class Main : ModInitializer {
                 }
             }
         }
+        //Event
+        playerControl.registerEvent()
     }
 }

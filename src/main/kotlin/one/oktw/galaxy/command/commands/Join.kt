@@ -76,6 +76,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
 
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {
         val startingTarget = main!!.playerControl.startingTarget
+        println(startingTarget)
         val sourcePlayer = source.player
         if (!lock.getOrPut(sourcePlayer, { Mutex() }).tryLock()) {
             val target = startingTarget[sourcePlayer]

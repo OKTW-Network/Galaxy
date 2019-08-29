@@ -52,8 +52,8 @@ class Main : ModInitializer {
     override fun onInitialize() {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
-        commandRegister = CommandRegister()
         playerControl = PlayerControl.new()
+        commandRegister = CommandRegister()
         Exchange(eventManager)
         main = this
         val resourcePackUrl: String? = System.getenv("resourcePack")

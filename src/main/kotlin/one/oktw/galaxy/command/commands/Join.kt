@@ -20,7 +20,6 @@ package one.oktw.galaxy.command.commands
 
 import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.CommandDispatcher
-import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.netty.buffer.Unpooled.wrappedBuffer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +27,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.time.delay
-import net.minecraft.client.network.packet.CommandSuggestionsS2CPacket
 import net.minecraft.client.network.packet.CustomPayloadS2CPacket
 import net.minecraft.client.network.packet.TitleS2CPacket
 import net.minecraft.command.arguments.GameProfileArgumentType
@@ -46,24 +44,17 @@ import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.event.type.PacketReceiveEvent
-import one.oktw.galaxy.event.type.PlayerConnectEvent
-import one.oktw.galaxy.event.type.RequestCommandCompletionsEvent
 import one.oktw.galaxy.proxy.api.ProxyAPI.decode
 import one.oktw.galaxy.proxy.api.ProxyAPI.encode
 import one.oktw.galaxy.proxy.api.packet.CreateGalaxy
 import one.oktw.galaxy.proxy.api.packet.Packet
 import one.oktw.galaxy.proxy.api.packet.ProgressStage.*
-import one.oktw.galaxy.proxy.api.packet.ProgressStage.Queue
-import one.oktw.galaxy.proxy.api.packet.SearchPlayer
 import java.time.Duration
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
-    private var completeID = ConcurrentHashMap<UUID, Int>()
-    private var completeInput = ConcurrentHashMap<UUID, String>()
     private val lock = ConcurrentHashMap<ServerPlayerEntity, Mutex>()
-    private val starting = ConcurrentHashMap<ServerPlayerEntity, Boolean>()
+    private val starting = main!!.playerControl.starting
 
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
@@ -82,65 +73,6 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                         }
                 )
         )
-    }
-
-    companion object {
-        fun registerEvent() = Join().registerEvents()
-    }
-
-    private fun registerEvents() {
-        val requestCompletionListener = fun(event: RequestCommandCompletionsEvent) {
-            val command = event.packet.partialCommand
-
-            //取消原版自動完成並向 proxy 發請求
-            if (command.startsWith("/join ")) {
-                event.cancel = true
-                completeID[event.player.uuid] = event.packet.completionId
-                completeInput[event.player.uuid] = command
-                event.player.networkHandler.sendPacket(
-                    CustomPayloadS2CPacket(
-                        PROXY_IDENTIFIER,
-                        PacketByteBuf(wrappedBuffer(encode(SearchPlayer(command.removePrefix("/join "), 10))))
-                    )
-                )
-            }
-        }
-
-        //從 proxy 接收回覆並送自動完成封包給玩家
-        val searchResultListener = fun(event: PacketReceiveEvent) {
-            if (event.channel != PROXY_IDENTIFIER) return
-            val data = decode<Packet>(event.packet.nioBuffer()) as? SearchPlayer.Result ?: return
-            val id = completeID[event.player.uuid] ?: return
-            val input = completeInput[event.player.uuid] ?: return
-
-            val suggestion = SuggestionsBuilder(input, "/join ".length)
-            data.players.forEach { player ->
-                suggestion.suggest(player)
-            }
-
-            event.player.networkHandler.sendPacket(
-                CommandSuggestionsS2CPacket(
-                    id,
-                    suggestion.buildFuture().get()
-                )
-            )
-        }
-
-        val playerConnectListener = fun(event: PlayerConnectEvent) {
-            val identifier = Identifier("galaxy:process_${event.player.uuid}")
-            val bossBarManager = main!!.server.bossBarManager
-            val bossBar = bossBarManager.get(identifier)
-            if (bossBar != null) {
-                val starting = starting[event.player] ?: false
-                if (!starting) {
-                    bossBarManager.remove(bossBar)
-                }
-            }
-        }
-
-        main!!.eventManager.register(RequestCommandCompletionsEvent::class, listener = requestCompletionListener)
-        main!!.eventManager.register(PacketReceiveEvent::class, listener = searchResultListener)
-        main!!.eventManager.register(PlayerConnectEvent::class, listener = playerConnectListener)
     }
 
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {

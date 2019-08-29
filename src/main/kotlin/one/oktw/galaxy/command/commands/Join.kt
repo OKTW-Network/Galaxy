@@ -135,9 +135,6 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                             style.color = Formatting.YELLOW
                         }
                         source.sendFeedback(tipText, false)
-                        if (startingTarget[sourcePlayer.uuid] != null) {
-                            if (startingTarget[sourcePlayer.uuid] == targetPlayer) return
-                        }
                         startingTarget[sourcePlayer.uuid] = targetPlayer
                         launch {
                             val bossBar = getOrCreateProcessBossBar(source)

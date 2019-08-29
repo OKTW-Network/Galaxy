@@ -79,7 +79,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
         println(startingTarget)
         val sourcePlayer = source.player
         if (!lock.getOrPut(sourcePlayer, { Mutex() }).tryLock()) {
-            val target = startingTarget[sourcePlayer]
+            val target = startingTarget[sourcePlayer.uuid]
             val message = if (target != null) {
                 if (target == sourcePlayer.gameProfile) "飛船目前正在飛向您的星系請稍後" else "飛船正在飛向 ${target.name} 的星系請稍後"
             } else {
@@ -92,14 +92,14 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
         val targetPlayer = collection.first()
 
         sourcePlayer.networkHandler.sendPacket(CustomPayloadS2CPacket(PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(targetPlayer.id))))))
-        if (startingTarget[sourcePlayer] != null) {
-            if (startingTarget[sourcePlayer] == targetPlayer) {
+        if (startingTarget[sourcePlayer.uuid] != null) {
+            if (startingTarget[sourcePlayer.uuid] == targetPlayer) {
                 val bossBar = getOrCreateProcessBossBar(source)
                 bossBar.addPlayer(sourcePlayer)
             }
         }
-        val message = if (startingTarget[sourcePlayer] != null) {
-            if (startingTarget[sourcePlayer] == targetPlayer) {
+        val message = if (startingTarget[sourcePlayer.uuid] != null) {
+            if (startingTarget[sourcePlayer.uuid] == targetPlayer) {
                 "正在返回航道"
             } else {
                 if (sourcePlayer.gameProfile == targetPlayer) "已將目的地更改為您的星系" else "已將目的地更改為 ${targetPlayer.name} 的星系"
@@ -141,15 +141,15 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                             style.color = Formatting.YELLOW
                         }
                         source.sendFeedback(tipText, false)
-                        if (startingTarget[sourcePlayer] != targetPlayer) {
-                            startingTarget[sourcePlayer] = targetPlayer
+                        if (startingTarget[sourcePlayer.uuid] != targetPlayer) {
+                            startingTarget[sourcePlayer.uuid] = targetPlayer
                             launch {
                                 val bossBar = getOrCreateProcessBossBar(source)
                                 var seconds = 0.0
                                 val fastTargetSeconds = 120.0
                                 val targetSeconds = 300.0
                                 while (true) {
-                                    val starting = startingTarget[sourcePlayer]
+                                    val starting = startingTarget[sourcePlayer.uuid]
                                     if (starting == null || seconds >= targetSeconds) {
                                         break
                                     }
@@ -177,7 +177,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                         val subText = LiteralText("成功抵達目的地！").styled { style -> style.color = Formatting.GREEN }
                         sourcePlayer.sendMessage(subText)
                         updateVisualStatus(source, text, subText, 200)
-                        startingTarget.remove(sourcePlayer)
+                        startingTarget.remove(sourcePlayer.uuid)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                         launch {
@@ -187,7 +187,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                     }
                     Failed -> {
                         sourcePlayer.sendMessage(LiteralText("您的飛船在飛行途中炸毀了，請聯絡開發團隊！").styled { style -> style.color = Formatting.RED })
-                        startingTarget.remove(sourcePlayer)
+                        startingTarget.remove(sourcePlayer.uuid)
                         removeProcessBossBar(source)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
@@ -198,7 +198,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             main!!.eventManager.register(PacketReceiveEvent::class, listener = listener)
             delay(Duration.ofMinutes(5))
             main!!.eventManager.unregister(listener)
-            startingTarget.remove(sourcePlayer)
+            startingTarget.remove(sourcePlayer.uuid)
             removeProcessBossBar(source)
             lock[sourcePlayer]?.unlock()
             lock.remove(sourcePlayer)

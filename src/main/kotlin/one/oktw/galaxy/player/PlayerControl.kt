@@ -23,7 +23,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.netty.buffer.Unpooled.wrappedBuffer
 import net.minecraft.client.network.packet.CommandSuggestionsS2CPacket
 import net.minecraft.client.network.packet.CustomPayloadS2CPacket
-import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
@@ -47,7 +46,7 @@ class PlayerControl private constructor() {
 
     private var completeID = ConcurrentHashMap<UUID, Int>()
     private var completeInput = ConcurrentHashMap<UUID, String>()
-    val startingTarget = ConcurrentHashMap<ServerPlayerEntity, GameProfile>()
+    val startingTarget = ConcurrentHashMap<UUID, GameProfile>()
 
     fun registerEvent() {
         // Events
@@ -98,7 +97,7 @@ class PlayerControl private constructor() {
         val bossBarManager = main!!.server.bossBarManager
         val bossBar = bossBarManager.get(identifier)
         if (bossBar != null) {
-            val target = startingTarget[event.player]
+            val target = startingTarget[event.player.uuid]
             if (target == null) {
                 bossBarManager.remove(bossBar)
             } else {

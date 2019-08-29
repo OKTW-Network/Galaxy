@@ -54,7 +54,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     private val lock = ConcurrentHashMap<ServerPlayerEntity, Mutex>()
-    private val starting = main!!.playerControl.starting
+    private val startingTarget = main!!.playerControl.startingTarget
 
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
@@ -78,15 +78,35 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {
         val sourcePlayer = source.player
         if (!lock.getOrPut(sourcePlayer, { Mutex() }).tryLock()) {
-            val starting = starting[sourcePlayer] ?: false
-            source.sendFeedback(LiteralText(if (starting) "飛船正在飛向星系請稍後..." else "請稍後...").styled { style -> style.color = Formatting.AQUA }, false)
+            val target = startingTarget[sourcePlayer]
+            val message = if (target != null) {
+                if (target.id == sourcePlayer.uuid) "飛船目前正在飛向您的星系請稍後" else "飛船正在飛向 ${target.name} 的星系請稍後"
+            } else {
+                "請稍後..."
+            }
+            source.sendFeedback(LiteralText(message).styled { style -> style.color = Formatting.AQUA }, false)
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
 
         val targetPlayer = collection.first()
 
         sourcePlayer.networkHandler.sendPacket(CustomPayloadS2CPacket(PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(targetPlayer.id))))))
-        val text = LiteralText(if (sourcePlayer.gameProfile == targetPlayer) "已將飛船目的地設為您的星系" else "已將飛船目的地設為 ${targetPlayer.name} 的星系").styled { style ->
+        if (startingTarget[sourcePlayer] != null) {
+            if (startingTarget[sourcePlayer] == targetPlayer) {
+                val bossBar = getOrCreateProcessBossBar(source)
+                bossBar.addPlayer(sourcePlayer)
+            }
+        }
+        val message = if (startingTarget[sourcePlayer] != null) {
+            if (startingTarget[sourcePlayer] == targetPlayer) {
+                "正在返回航道"
+            } else {
+                if (sourcePlayer.gameProfile == targetPlayer) "已將目的地更改為您的星系" else "已將目的地更改為 ${targetPlayer.name} 的星系"
+            }
+        } else {
+            if (sourcePlayer.gameProfile == targetPlayer) "已將目的地設為您的星系" else "已將目的地設為 ${targetPlayer.name} 的星系"
+        }
+        val text = LiteralText(message).styled { style ->
             style.color = Formatting.AQUA
         }
         source.sendFeedback(text, false)
@@ -120,32 +140,34 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                             style.color = Formatting.YELLOW
                         }
                         source.sendFeedback(tipText, false)
-                        starting[sourcePlayer] = true
-                        launch {
-                            val bossBar = getOrCreateProcessBossBar(source)
-                            var seconds = 0.0
-                            val fastTargetSeconds = 120.0
-                            val targetSeconds = 300.0
-                            while (true) {
-                                val starting = starting[sourcePlayer] ?: false
-                                if (!starting || seconds >= targetSeconds) {
-                                    break
-                                }
-                                bossBar.value = if (seconds <= fastTargetSeconds) {
-                                    40 + (130 * (seconds / fastTargetSeconds)).toInt()
-                                } else {
-                                    170 + (29 * ((seconds - fastTargetSeconds) / (targetSeconds - fastTargetSeconds))).toInt()
-                                }
-                                delay(Duration.ofMillis(500))
-                                seconds += 0.5
-                                if (seconds >= 1) {
-                                    LiteralText("飛船正在飛向星系請稍後...").styled { style ->
-                                        style.color = Formatting.AQUA
-                                    }.append(
-                                        LiteralText(" 航行時間： ${seconds.toInt()} 秒").styled { style ->
-                                            style.color = Formatting.YELLOW
-                                        }
-                                    ).let(bossBar::setName)
+                        if (startingTarget[sourcePlayer] != targetPlayer) {
+                            startingTarget[sourcePlayer] = targetPlayer
+                            launch {
+                                val bossBar = getOrCreateProcessBossBar(source)
+                                var seconds = 0.0
+                                val fastTargetSeconds = 120.0
+                                val targetSeconds = 300.0
+                                while (true) {
+                                    val starting = startingTarget[sourcePlayer]
+                                    if (starting != null || seconds >= targetSeconds) {
+                                        break
+                                    }
+                                    bossBar.value = if (seconds <= fastTargetSeconds) {
+                                        40 + (130 * (seconds / fastTargetSeconds)).toInt()
+                                    } else {
+                                        170 + (29 * ((seconds - fastTargetSeconds) / (targetSeconds - fastTargetSeconds))).toInt()
+                                    }
+                                    delay(Duration.ofMillis(500))
+                                    seconds += 0.5
+                                    if (seconds >= 1) {
+                                        LiteralText("飛船正在飛向星系請稍後...").styled { style ->
+                                            style.color = Formatting.AQUA
+                                        }.append(
+                                            LiteralText(" 航行時間： ${seconds.toInt()} 秒").styled { style ->
+                                                style.color = Formatting.YELLOW
+                                            }
+                                        ).let(bossBar::setName)
+                                    }
                                 }
                             }
                         }
@@ -154,8 +176,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                         val subText = LiteralText("成功抵達目的地！").styled { style -> style.color = Formatting.GREEN }
                         sourcePlayer.sendMessage(subText)
                         updateVisualStatus(source, text, subText, 200)
-                        starting[sourcePlayer] = false
-                        starting.remove(sourcePlayer)
+                        startingTarget.remove(sourcePlayer)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                         launch {
@@ -165,8 +186,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                     }
                     Failed -> {
                         sourcePlayer.sendMessage(LiteralText("您的飛船在飛行途中炸毀了，請聯絡開發團隊！").styled { style -> style.color = Formatting.RED })
-                        starting[sourcePlayer] = false
-                        starting.remove(sourcePlayer)
+                        startingTarget.remove(sourcePlayer)
                         removeProcessBossBar(source)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
@@ -177,8 +197,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             main!!.eventManager.register(PacketReceiveEvent::class, listener = listener)
             delay(Duration.ofMinutes(5))
             main!!.eventManager.unregister(listener)
-            starting[sourcePlayer] = false
-            starting.remove(sourcePlayer)
+            startingTarget.remove(sourcePlayer)
             removeProcessBossBar(source)
             lock[sourcePlayer]?.unlock()
             lock.remove(sourcePlayer)

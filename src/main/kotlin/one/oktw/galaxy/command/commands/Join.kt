@@ -81,7 +81,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
         if (!lock.getOrPut(sourcePlayer, { Mutex() }).tryLock()) {
             val target = startingTarget[sourcePlayer]
             val message = if (target != null) {
-                if (target.id == sourcePlayer.uuid) "飛船目前正在飛向您的星系請稍後" else "飛船正在飛向 ${target.name} 的星系請稍後"
+                if (target == sourcePlayer.gameProfile) "飛船目前正在飛向您的星系請稍後" else "飛船正在飛向 ${target.name} 的星系請稍後"
             } else {
                 "請稍後..."
             }
@@ -150,7 +150,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                                 val targetSeconds = 300.0
                                 while (true) {
                                     val starting = startingTarget[sourcePlayer]
-                                    if (starting != null || seconds >= targetSeconds) {
+                                    if (starting == null || seconds >= targetSeconds) {
                                         break
                                     }
                                     bossBar.value = if (seconds <= fastTargetSeconds) {

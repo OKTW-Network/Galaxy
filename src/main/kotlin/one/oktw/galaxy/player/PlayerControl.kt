@@ -103,7 +103,7 @@ class PlayerControl private constructor() {
                 bossBarManager.remove(bossBar)
             } else {
                 bossBar.removePlayer(event.player)
-                val firstMessage = if (target == event.player) "飛船目前正在飛向您的星系" else "飛船正在飛向 ${target.name} 的星系"
+                val firstMessage = if (target == event.player.gameProfile) "飛船目前正在飛向您的星系" else "飛船正在飛向 ${target.name} 的星系"
                 LiteralText("$firstMessage，重新加入星系以返回航道或更改目的地").styled { style ->
                     style.color = Formatting.YELLOW
                 }.let(event.player::sendMessage)

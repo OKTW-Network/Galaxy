@@ -131,6 +131,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             val bossBarManager = main!!.server.bossBarManager
             val bossBar = bossBarManager.get(identifier)
             if (bossBar != null) {
+                println(starting)
                 val starting = starting[event.player] ?: false
                 if (!starting) {
                     bossBarManager.remove(bossBar)

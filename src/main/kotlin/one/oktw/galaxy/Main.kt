@@ -30,6 +30,7 @@ import one.oktw.galaxy.chat.Exchange
 import one.oktw.galaxy.command.CommandRegister
 import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.event.EventManager
+import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.resourcepack.ResourcePack
 
 @Suppress("unused")
@@ -64,5 +65,6 @@ class Main : ModInitializer {
         }
         //Events
         Join.registerEvent()
+        Harvest.registerEvent()
     }
 }

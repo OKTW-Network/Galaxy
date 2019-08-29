@@ -49,15 +49,6 @@ class PlayerControl private constructor() {
     private var completeInput = ConcurrentHashMap<UUID, String>()
     val startingTarget = ConcurrentHashMap<ServerPlayerEntity, GameProfile>()
 
-    init {
-        // Events
-        with(main!!) {
-            eventManager.register(RequestCommandCompletionsEvent::class, listener = onRequestCommandComplete)
-            eventManager.register(PacketReceiveEvent::class, listener = onSearchResult)
-            eventManager.register(PlayerConnectEvent::class, listener = onPlayerConnect)
-        }
-    }
-
     private val onRequestCommandComplete = fun(event: RequestCommandCompletionsEvent) {
         val command = event.packet.partialCommand
 
@@ -111,5 +102,12 @@ class PlayerControl private constructor() {
                 }.let(event.player::sendMessage)
             }
         }
+    }
+
+    init {
+        // Events
+        main!!.eventManager.register(RequestCommandCompletionsEvent::class, listener = onRequestCommandComplete)
+        main!!.eventManager.register(PacketReceiveEvent::class, listener = onSearchResult)
+        main!!.eventManager.register(PlayerConnectEvent::class, listener = onPlayerConnect)
     }
 }

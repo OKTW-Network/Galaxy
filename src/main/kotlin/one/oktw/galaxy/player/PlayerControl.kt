@@ -18,11 +18,14 @@
 
 package one.oktw.galaxy.player
 
+import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.netty.buffer.Unpooled.wrappedBuffer
 import net.minecraft.client.network.packet.CommandSuggestionsS2CPacket
 import net.minecraft.client.network.packet.CustomPayloadS2CPacket
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.text.LiteralText
+import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.PacketByteBuf
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
@@ -42,9 +45,9 @@ class PlayerControl private constructor() {
         fun new() = PlayerControl()
     }
 
-    private val completeID = ConcurrentHashMap<UUID, Int>()
-    private val completeInput = ConcurrentHashMap<UUID, String>()
-    val starting = ConcurrentHashMap<ServerPlayerEntity, Boolean>()
+    private var completeID = ConcurrentHashMap<UUID, Int>()
+    private var completeInput = ConcurrentHashMap<UUID, String>()
+    val startingTarget = ConcurrentHashMap<ServerPlayerEntity, GameProfile>()
 
     fun registerEvents() {
         // Events
@@ -95,9 +98,15 @@ class PlayerControl private constructor() {
         val bossBarManager = main!!.server.bossBarManager
         val bossBar = bossBarManager.get(identifier)
         if (bossBar != null) {
-            val starting = starting[event.player] ?: false
-            if (!starting) {
+            val target = startingTarget[event.player]
+            if (target == null) {
                 bossBarManager.remove(bossBar)
+            } else {
+                bossBar.removePlayer(event.player)
+                val firstMessage = if (target == event.player) "飛船目前正在飛向您的星系" else "飛船正在飛向 ${target.name} 的星系"
+                LiteralText("$firstMessage，重新加入星系以返回航道或更改目的地").styled { style ->
+                    style.color = Formatting.YELLOW
+                }.let(event.player::sendMessage)
             }
         }
     }

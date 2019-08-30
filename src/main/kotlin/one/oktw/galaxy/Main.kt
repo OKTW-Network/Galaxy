@@ -28,8 +28,8 @@ import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.chat.Exchange
 import one.oktw.galaxy.command.CommandRegister
-import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.event.EventManager
+import one.oktw.galaxy.player.PlayerControl
 import one.oktw.galaxy.resourcepack.ResourcePack
 
 @Suppress("unused")
@@ -37,6 +37,8 @@ class Main : ModInitializer {
     lateinit var server: MinecraftDedicatedServer
         private set
     lateinit var eventManager: EventManager
+        private set
+    lateinit var playerControl: PlayerControl
         private set
     lateinit var commandRegister: CommandRegister
         private set
@@ -50,6 +52,7 @@ class Main : ModInitializer {
     override fun onInitialize() {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
+        playerControl = PlayerControl.new()
         commandRegister = CommandRegister()
         Exchange(eventManager)
         main = this
@@ -63,6 +66,6 @@ class Main : ModInitializer {
             }
         }
         //Events
-        Join.registerEvent()
+        playerControl.registerEvents()
     }
 }

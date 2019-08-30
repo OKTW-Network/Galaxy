@@ -158,7 +158,8 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                     Started -> {
                         val subText = LiteralText("成功抵達目的地！").styled { style -> style.color = Formatting.GREEN }
                         sourcePlayer.sendMessage(subText)
-                        updateVisualStatus(source, text, subText, 200)
+                        val bossBar = getOrCreateProcessBossBar(source)
+                        updateVisualStatus(source, text, subText, bossBar.maxValue)
                         startingTarget.remove(sourcePlayer.uuid)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)

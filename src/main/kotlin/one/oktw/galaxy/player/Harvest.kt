@@ -33,50 +33,53 @@ import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 
 class Harvest {
     companion object {
-         fun registerEvent() = Harvest().registerEvents()
+         fun new() = Harvest()
     }
-    private fun registerEvents() {
-        val playerInteractBlockListener = fun(event: PlayerInteractBlockEvent) {
-            val world = main!!.server.getWorld(event.player.dimension)
-            val hand = event.packet.hand
-            if (hand != Hand.MAIN_HAND) {
-                return
-            }
-            val blockHitResult = event.packet.hitY
-            val blockState = world.getBlockState(blockHitResult.blockPos)
 
-            val isMature = when (blockState.block) {
-                WHEAT, CARROTS, POTATOES -> blockState.let((blockState.block as CropBlock)::isMature)
-                BEETROOTS -> blockState.let((blockState.block as BeetrootsBlock)::isMature)
-                COCOA -> blockState[CocoaBlock.AGE] >= 2
-                NETHER_WART -> blockState[NetherWartBlock.AGE] >= 3
-                MELON -> isNextTo(world, blockHitResult.blockPos, ATTACHED_MELON_STEM)
-                PUMPKIN -> isNextTo(world, blockHitResult.blockPos, ATTACHED_PUMPKIN_STEM)
-                else -> false
-            }
+    fun registerEvent() {
+        main!!.eventManager.register(PlayerInteractBlockEvent::class, listener = ::onPlayerInteractBlock)
+    }
 
-            if (isMature) {
-                val ageProperties = when (blockState.block) {
-                    WHEAT, CARROTS, POTATOES -> CropBlock.AGE
-                    BEETROOTS -> BeetrootsBlock.AGE
-                    COCOA -> CocoaBlock.AGE
-                    NETHER_WART -> NetherWartBlock.AGE
-                    else -> IntProperty.of("AGE", 0, 1)
-                }
-                GlobalScope.launch {
-                    withContext(main!!.server.asCoroutineDispatcher()) {
-                        world.breakBlock(blockHitResult.blockPos, true)
-                        if (blockState.block != PUMPKIN && blockState.block != MELON){
-                            world.setBlockState(blockHitResult.blockPos, blockState.with(ageProperties, 0))
-                            world.updateNeighbors(blockHitResult.blockPos, blockState.block)
-                        }
+    private fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
+        val world = main!!.server.getWorld(event.player.dimension)
+        val hand = event.packet.hand
+        if (hand != Hand.MAIN_HAND) {
+            return
+        }
+        val blockHitResult = event.packet.hitY
+        val blockState = world.getBlockState(blockHitResult.blockPos)
+
+        val isMature = when (blockState.block) {
+            WHEAT, CARROTS, POTATOES -> blockState.let((blockState.block as CropBlock)::isMature)
+            BEETROOTS -> blockState.let((blockState.block as BeetrootsBlock)::isMature)
+            COCOA -> blockState[CocoaBlock.AGE] >= 2
+            NETHER_WART -> blockState[NetherWartBlock.AGE] >= 3
+            MELON -> isNextTo(world, blockHitResult.blockPos, ATTACHED_MELON_STEM)
+            PUMPKIN -> isNextTo(world, blockHitResult.blockPos, ATTACHED_PUMPKIN_STEM)
+            else -> false
+        }
+
+        if (isMature) {
+            val ageProperties = when (blockState.block) {
+                WHEAT, CARROTS, POTATOES -> CropBlock.AGE
+                BEETROOTS -> BeetrootsBlock.AGE
+                COCOA -> CocoaBlock.AGE
+                NETHER_WART -> NetherWartBlock.AGE
+                else -> IntProperty.of("AGE", 0, 1)
+            }
+            GlobalScope.launch {
+                withContext(main!!.server.asCoroutineDispatcher()) {
+                    world.breakBlock(blockHitResult.blockPos, true)
+                    if (blockState.block != PUMPKIN && blockState.block != MELON){
+                        world.setBlockState(blockHitResult.blockPos, blockState.with(ageProperties, 0))
+                        world.updateNeighbors(blockHitResult.blockPos, blockState.block)
                     }
                 }
-                return
             }
+            return
         }
-        main!!.eventManager.register(PlayerInteractBlockEvent::class, listener = playerInteractBlockListener)
     }
+
     private fun isNextTo(world: ServerWorld, blockPos: BlockPos, block: Block): Boolean {
         return world.getBlockState(blockPos.add(1, 0, 0)).block == block ||
                 world.getBlockState(blockPos.add(0, 0, 1)).block == block ||

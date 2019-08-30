@@ -41,6 +41,8 @@ class Main : ModInitializer {
         private set
     lateinit var commandRegister: CommandRegister
         private set
+    lateinit var harvest: Harvest
+        private set
 
     companion object {
         val PROXY_IDENTIFIER = Identifier("galaxy", "proxy")
@@ -52,6 +54,7 @@ class Main : ModInitializer {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
         commandRegister = CommandRegister()
+        harvest = Harvest.new()
         Exchange(eventManager)
         main = this
         val resourcePackUrl: String? = System.getenv("resourcePack")
@@ -65,6 +68,6 @@ class Main : ModInitializer {
         }
         //Events
         Join.registerEvent()
-        Harvest.registerEvent()
+        harvest.registerEvent()
     }
 }

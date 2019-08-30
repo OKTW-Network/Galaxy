@@ -218,6 +218,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
         val bossBarManager = source.minecraftServer.bossBarManager
         val bossBar = bossBarManager.get(identifier)
         if (bossBar != null) {
+            bossBar.clearPlayers()
             bossBarManager.remove(bossBar)
         }
     }

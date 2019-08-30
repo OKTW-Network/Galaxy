@@ -99,6 +99,7 @@ class PlayerControl private constructor() {
         if (bossBar != null) {
             val target = startingTarget[event.player.uuid]
             if (target == null) {
+                bossBar.clearPlayers()
                 bossBarManager.remove(bossBar)
             } else {
                 bossBar.removePlayer(event.player)

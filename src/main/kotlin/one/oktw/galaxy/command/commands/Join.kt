@@ -49,9 +49,8 @@ import one.oktw.galaxy.proxy.api.ProxyAPI.encode
 import one.oktw.galaxy.proxy.api.packet.CreateGalaxy
 import one.oktw.galaxy.proxy.api.packet.Packet
 import one.oktw.galaxy.proxy.api.packet.ProgressStage.*
-import one.oktw.galaxy.proxy.api.packet.ProgressStage.Queue
+import java.lang.Math.random
 import java.time.Duration
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
@@ -146,9 +145,9 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                             while (seconds <= targetSeconds) {
                                 startingTarget[sourcePlayer.uuid] ?: break
                                 bossBar.value += if (seconds >= fastTargetSeconds || bossBar.value > bossBar.maxValue * 0.9) {
-                                    Random().nextInt(4)
+                                    randomInt(1, 4)
                                 } else {
-                                    Random().nextInt(8)
+                                    randomInt(5, 8)
                                 }
                                 delay(Duration.ofMillis(500))
                                 seconds += 0.5
@@ -195,6 +194,8 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
 
         return com.mojang.brigadier.Command.SINGLE_SUCCESS
     }
+
+    private fun randomInt(min: Int, max: Int): Int = (random() * ((max - min) - 1)).toInt() + min
 
     private fun updateVisualStatus(source: ServerCommandSource, title: Text, subTitle: Text, progress: Int) {
         // bossBar

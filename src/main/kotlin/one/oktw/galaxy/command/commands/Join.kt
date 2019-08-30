@@ -146,9 +146,9 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                             while (seconds <= targetSeconds) {
                                 startingTarget[sourcePlayer.uuid] ?: break
                                 bossBar.value += if (seconds >= fastTargetSeconds || bossBar.value > bossBar.maxValue * 0.9) {
-                                    Random().nextInt(5)
+                                    Random().nextInt(2)
                                 } else {
-                                    Random().nextInt(10)
+                                    Random().nextInt(5)
                                 }
                                 delay(Duration.ofMillis(500))
                                 seconds += 0.5

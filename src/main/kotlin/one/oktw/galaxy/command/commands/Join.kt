@@ -146,9 +146,9 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                             while (seconds <= targetSeconds) {
                                 startingTarget[sourcePlayer.uuid] ?: break
                                 bossBar.value += if (seconds >= fastTargetSeconds || bossBar.value > bossBar.maxValue * 0.9) {
-                                    Random().nextInt(9)
+                                    Random().nextInt(5)
                                 } else {
-                                    Random().nextInt(20)
+                                    Random().nextInt(10)
                                 }
                                 delay(Duration.ofMillis(500))
                                 seconds += 0.5
@@ -226,7 +226,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             val newBossBar = bossBarManager.add(identifier, LiteralText("請稍後..."))
             newBossBar.color = BossBar.Color.YELLOW
             newBossBar.isVisible = true
-            newBossBar.maxValue = 500
+            newBossBar.maxValue = 1000
             newBossBar.addPlayer(player)
             newBossBar
         } else {

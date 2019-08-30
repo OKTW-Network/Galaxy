@@ -140,11 +140,8 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                             var seconds = 0.0
                             val fastTargetSeconds = 120.0
                             val targetSeconds = 300.0
-                            while (true) {
-                                    val starting = startingTarget[sourcePlayer.uuid]
-                                if (starting != null || seconds >= targetSeconds) {
-                                    break
-                                }
+                            while (seconds <= targetSeconds) {
+                                startingTarget[sourcePlayer.uuid] ?: break
                                 bossBar.value = if (seconds <= fastTargetSeconds) {
                                     40 + (130 * (seconds / fastTargetSeconds)).toInt()
                                 } else {
@@ -177,11 +174,16 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                         }
                     }
                     Failed -> {
-                        sourcePlayer.sendMessage(LiteralText("您的飛船在飛行途中炸毀了，請聯絡開發團隊！").styled { style -> style.color = Formatting.RED })
+                        val subText = LiteralText("您的飛船在飛行途中炸毀了，請聯絡開發團隊！").styled { style -> style.color = Formatting.RED }
+                        sourcePlayer.sendMessage(subText)
+                        updateVisualStatus(source, text, subText, 0)
                         startingTarget.remove(sourcePlayer.uuid)
-                        removeProcessBossBar(source)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
+                        launch {
+                            delay(Duration.ofSeconds(2))
+                            removeProcessBossBar(source)
+                        }
                     }
                 }
             }

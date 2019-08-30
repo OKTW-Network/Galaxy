@@ -52,7 +52,7 @@ class PlayerControl private constructor() {
         // Events
         main!!.eventManager.register(RequestCommandCompletionsEvent::class, listener = ::onRequestCommandComplete)
         main!!.eventManager.register(PacketReceiveEvent::class, listener = ::onSearchResult)
-        main!!.eventManager.register(PlayerConnectEvent::class, listener = onPlayerConnect)
+        main!!.eventManager.register(PlayerConnectEvent::class, listener = ::onPlayerConnect)
     }
 
     private fun onRequestCommandComplete(event: RequestCommandCompletionsEvent) {
@@ -92,7 +92,7 @@ class PlayerControl private constructor() {
         )
     }
 
-    private val onPlayerConnect = fun(event: PlayerConnectEvent) {
+    private fun onPlayerConnect(event: PlayerConnectEvent) {
         val identifier = Identifier("galaxy:process_${event.player.uuid}")
         val bossBarManager = main!!.server.bossBarManager
         val bossBar = bossBarManager.get(identifier)

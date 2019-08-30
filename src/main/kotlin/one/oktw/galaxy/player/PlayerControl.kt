@@ -50,12 +50,12 @@ class PlayerControl private constructor() {
 
     fun registerEvent() {
         // Events
-        main!!.eventManager.register(RequestCommandCompletionsEvent::class, listener = onRequestCommandComplete)
-        main!!.eventManager.register(PacketReceiveEvent::class, listener = onSearchResult)
-        main!!.eventManager.register(PlayerConnectEvent::class, listener = onPlayerConnect)
+        main!!.eventManager.register(RequestCommandCompletionsEvent::class, listener = ::onRequestCommandComplete)
+        main!!.eventManager.register(PacketReceiveEvent::class, listener = ::onSearchResult)
+        main!!.eventManager.register(PlayerConnectEvent::class, listener = ::onPlayerConnect)
     }
 
-    private val onRequestCommandComplete = fun(event: RequestCommandCompletionsEvent) {
+    private fun onRequestCommandComplete(event: RequestCommandCompletionsEvent) {
         val command = event.packet.partialCommand
 
         //取消原版自動完成並向 proxy 發請求
@@ -73,7 +73,7 @@ class PlayerControl private constructor() {
     }
 
     //從 proxy 接收回覆並送自動完成封包給玩家
-    private val onSearchResult = fun(event: PacketReceiveEvent) {
+    private fun onSearchResult(event: PacketReceiveEvent) {
         if (event.channel != PROXY_IDENTIFIER) return
         val data = decode<Packet>(event.packet.nioBuffer()) as? SearchPlayer.Result ?: return
         val id = completeID[event.player.uuid] ?: return
@@ -92,7 +92,7 @@ class PlayerControl private constructor() {
         )
     }
 
-    private val onPlayerConnect = fun(event: PlayerConnectEvent) {
+    private fun onPlayerConnect(event: PlayerConnectEvent) {
         val identifier = Identifier("galaxy:process_${event.player.uuid}")
         val bossBarManager = main!!.server.bossBarManager
         val bossBar = bossBarManager.get(identifier)

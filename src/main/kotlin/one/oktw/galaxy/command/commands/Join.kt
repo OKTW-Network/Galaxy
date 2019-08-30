@@ -100,6 +100,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
         } else {
             if (sourcePlayer.gameProfile == targetPlayer) "已將目的地設為您的星系" else "已將目的地設為 ${targetPlayer.name} 的星系"
         }
+        startingTarget.remove(sourcePlayer.uuid)
         val text = LiteralText(message).styled { style ->
             style.color = Formatting.AQUA
         }
@@ -192,9 +193,10 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             delay(Duration.ofMinutes(5))
             main!!.eventManager.unregister(listener)
             startingTarget.remove(sourcePlayer.uuid)
-            removeProcessBossBar(source)
             lock[sourcePlayer]?.unlock()
             lock.remove(sourcePlayer)
+            delay(Duration.ofSeconds(5))
+            removeProcessBossBar(source)
         }
 
         return com.mojang.brigadier.Command.SINGLE_SUCCESS
@@ -216,6 +218,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
         val bossBarManager = source.minecraftServer.bossBarManager
         val bossBar = bossBarManager.get(identifier)
         if (bossBar != null) {
+            bossBar.clearPlayers()
             bossBarManager.remove(bossBar)
         }
     }

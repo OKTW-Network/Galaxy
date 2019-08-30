@@ -46,7 +46,9 @@ class Harvest {
             val blockState = world.getBlockState(blockHitResult.blockPos)
 
             val isMature = when (blockState.block) {
-                in listOf(WHEAT, CARROTS, POTATOES) -> blockState.let((blockState.block as CropBlock)::isMature)
+                WHEAT, CARROTS, POTATOES -> {
+                    blockState.let((blockState.block as CropBlock)::isMature)
+                }
                 BEETROOTS -> blockState.let((blockState.block as BeetrootsBlock)::isMature)
                 COCOA -> blockState[CocoaBlock.AGE] >= 2
                 NETHER_WART -> blockState[NetherWartBlock.AGE] >= 3

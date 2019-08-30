@@ -49,7 +49,9 @@ import one.oktw.galaxy.proxy.api.ProxyAPI.encode
 import one.oktw.galaxy.proxy.api.packet.CreateGalaxy
 import one.oktw.galaxy.proxy.api.packet.Packet
 import one.oktw.galaxy.proxy.api.packet.ProgressStage.*
+import one.oktw.galaxy.proxy.api.packet.ProgressStage.Queue
 import java.time.Duration
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
@@ -126,11 +128,11 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                     }
                     Creating -> {
                         val subText = LiteralText("星系載入中...").styled { style -> style.color = Formatting.AQUA }
-                        updateVisualStatus(source, text, subText, 20)
+                        updateVisualStatus(source, text, subText, 10)
                     }
                     Starting -> {
                         val subText = LiteralText("飛船正在飛向星系請稍後...").styled { style -> style.color = Formatting.AQUA }
-                        updateVisualStatus(source, text, subText, 40)
+                        updateVisualStatus(source, text, subText, 20)
                         val tipText = LiteralText("飛船正在飛向星系，請耐心等候").styled { style ->
                             style.color = Formatting.YELLOW
                         }
@@ -143,10 +145,10 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                             val targetSeconds = 300.0
                             while (seconds <= targetSeconds) {
                                 startingTarget[sourcePlayer.uuid] ?: break
-                                bossBar.value = if (seconds <= fastTargetSeconds) {
-                                    40 + (130 * (seconds / fastTargetSeconds)).toInt()
+                                bossBar.value += if (seconds >= fastTargetSeconds || bossBar.value > bossBar.maxValue * 0.9) {
+                                    Random().nextInt(9)
                                 } else {
-                                    170 + (29 * ((seconds - fastTargetSeconds) / (targetSeconds - fastTargetSeconds))).toInt()
+                                    Random().nextInt(20)
                                 }
                                 delay(Duration.ofMillis(500))
                                 seconds += 0.5
@@ -224,7 +226,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             val newBossBar = bossBarManager.add(identifier, LiteralText("請稍後..."))
             newBossBar.color = BossBar.Color.YELLOW
             newBossBar.isVisible = true
-            newBossBar.maxValue = 200
+            newBossBar.maxValue = 500
             newBossBar.addPlayer(player)
             newBossBar
         } else {

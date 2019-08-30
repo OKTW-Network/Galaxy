@@ -131,7 +131,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                     Starting -> {
                         val subText = LiteralText("飛船正在飛向星系請稍後...").styled { style -> style.color = Formatting.AQUA }
                         updateVisualStatus(source, text, subText, 40)
-                        val tipText = LiteralText("飛船正在飛向星系，約兩分鐘後抵達，請耐心等候").styled { style ->
+                        val tipText = LiteralText("飛船正在飛向星系，請耐心等候").styled { style ->
                             style.color = Formatting.YELLOW
                         }
                         source.sendFeedback(tipText, false)
@@ -150,15 +150,6 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                                 }
                                 delay(Duration.ofMillis(500))
                                 seconds += 0.5
-                                if (seconds >= 1) {
-                                    LiteralText("飛船正在飛向星系請稍後...").styled { style ->
-                                        style.color = Formatting.AQUA
-                                    }.append(
-                                        LiteralText(" 航行時間： ${seconds.toInt()} 秒").styled { style ->
-                                            style.color = Formatting.YELLOW
-                                        }
-                                    ).let(bossBar::setName)
-                                }
                             }
                         }
                     }

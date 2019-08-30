@@ -36,9 +36,9 @@ public class MixinPlayerInteractBlock_NetworkHandler {
 
     @Inject(method = "onPlayerInteractBlock", at = @At("HEAD"), cancellable = true)
     private void onPlayerInteractBlock(PlayerInteractBlockC2SPacket packet, CallbackInfo info) {
-        Main.Companion main = Main.Companion;
-        if (main.getMain() == null) return;
-        if (main.getMain().getEventManager().emit(new PlayerInteractBlockEvent(packet, player)).getCancel()) {
+        Main main = Main.Companion.getMain();
+        if (main == null) return;
+        if (main.getEventManager().emit(new PlayerInteractBlockEvent(packet, player)).getCancel()) {
             info.cancel();
         }
     }

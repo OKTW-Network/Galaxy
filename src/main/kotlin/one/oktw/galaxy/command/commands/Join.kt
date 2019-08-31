@@ -56,12 +56,14 @@ import java.util.concurrent.ConcurrentHashMap
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     private val lock = ConcurrentHashMap<ServerPlayerEntity, Mutex>()
     private val queueList = listOf(
-        "星系已經排入飛船目的地，請等待系統開始載入星系"
+        "星系已經排入飛船目的地，請等待系統開始載入星系",
+        "開始自我系統診斷..."
     )
     private val creatingList = listOf(
         "載入星系資料庫",
         "星系地形資料載入",
-        "正在嘗試連結至星系"
+        "正在嘗試連結至星系",
+        "載入現實..."
     )
     private val startingList = listOf(
         "掃描目標區域安全性",
@@ -71,7 +73,9 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
         "重新定位星系",
         "掃描星系周圍區域",
         "取得星系內星球位置",
-        "正在連結至星系"
+        "正在連結至星系",
+        "選擇最佳決策",
+        "正在嘗試路線方案"
     )
 
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {

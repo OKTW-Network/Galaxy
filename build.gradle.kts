@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     //    "maven-publish"
-    kotlin("jvm") version "1.3.50"
-    id("fabric-loom") version "0.2.5-SNAPSHOT"
+    kotlin("jvm") version "1.3.61"
+    id("fabric-loom") version "0.2.6-SNAPSHOT"
 }
 
 val version = "0.0.1"
@@ -15,7 +15,7 @@ repositories {
     mavenCentral()
     jcenter()
     maven(url = "https://jitpack.io")
-    maven(url = "http://maven.fabricmc.net/") {
+    maven(url = "https://maven.fabricmc.net/") {
         name = "Fabric"
     }
     maven(url = "https://kotlin.bintray.com/kotlinx") {
@@ -28,12 +28,16 @@ base {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions {
+        apiVersion = "1.3"
+        languageVersion = "1.3"
+        jvmTarget = "12"
+    }
 }
 
 minecraft {
@@ -41,21 +45,21 @@ minecraft {
 
 dependencies {
     // Core
-    minecraft(group = "com.mojang", name = "minecraft", version = "1.14.4")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.14.4+build.14")
-    modCompile(group = "net.fabricmc", name = "fabric-loader", version = "0.6.3+build.167")
+    minecraft(group = "com.mojang", name = "minecraft", version = "1.15.1")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.15.1+build.23", classifier = "v2")
+    modCompile(group = "net.fabricmc", name = "fabric-loader", version = "0.7.3+build.176")
 
     // fabric api/library
-    modCompile(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.50+build.3")
-    modCompile(group = "net.fabricmc.fabric-api", name = "fabric-commands", version = "0.1.0")
+    modCompile(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.61+build.1")
+    modCompile(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = "0.1.2+b7f9825de8")
 
     // galaxy api
     modCompile(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
 
     // Jar in Jar
-    include(group = "net.fabricmc.fabric-api", name = "fabric-commands", version = "0.1.0")
+    include(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = "0.1.2+b7f9825de8")
     include(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
-    include(group = "org.mongodb", name = "bson", version = "3.11.0")
+    include(group = "org.mongodb", name = "bson", version = "3.12.0")
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.

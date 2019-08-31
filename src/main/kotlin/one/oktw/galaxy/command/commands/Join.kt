@@ -165,9 +165,12 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                             var seconds = 0.0
                             val fastTargetSeconds = 120.0
                             val targetSeconds = 300.0
+                            var sentTip = true
                             while (seconds <= targetSeconds) {
                                 startingTarget[sourcePlayer.uuid] ?: break
-                                bossBar.value += if (seconds >= fastTargetSeconds || bossBar.value > bossBar.maxValue * 0.85) {
+                                bossBar.value += if (bossBar.value > bossBar.maxValue * 0.95) {
+                                    0
+                                } else if (seconds >= fastTargetSeconds || bossBar.value > bossBar.maxValue * 0.8) {
                                     tickTime = 1000
                                     randomInt(0, 5)
                                 } else {
@@ -176,10 +179,16 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                                 delay(Duration.ofMillis(tickTime.toLong()))
                                 seconds += tickTime / 1000
                                 if ((seconds.toInt() % 20) == 0) {
-                                    val tipText = LiteralText(startingList[randomInt(0, startingList.size)]).styled { style ->
-                                        style.color = Formatting.YELLOW
+                                    if (!sentTip) {
+                                        val tipText = LiteralText(startingList[randomInt(0, startingList.size)]).styled { style ->
+                                            style.color = Formatting.YELLOW
+                                        }
+                                        source.sendFeedback(tipText, false)
+                                        sentTip = true
+                                        bossBar.value += randomInt(1, 3)
                                     }
-                                    source.sendFeedback(tipText, false)
+                                } else {
+                                    sentTip = false
                                 }
                             }
                         }

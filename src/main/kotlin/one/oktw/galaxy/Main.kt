@@ -52,7 +52,7 @@ class Main : ModInitializer {
     override fun onInitialize() {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
-        playerControl = PlayerControl.new()
+        playerControl = PlayerControl.getInstance()
         commandRegister = CommandRegister()
         Exchange(eventManager)
         main = this

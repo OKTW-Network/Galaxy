@@ -35,12 +35,9 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class PlayerControl private constructor() {
-    private object Holder {
-        val INSTANCE = PlayerControl()
-    }
-
     companion object {
-        fun getInstance() = Holder.INSTANCE
+        private val INSTANCE = PlayerControl()
+        fun getInstance() = INSTANCE
     }
 
     private val completeID = ConcurrentHashMap<UUID, Int>()

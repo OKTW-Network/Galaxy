@@ -228,11 +228,8 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             main!!.eventManager.register(PacketReceiveEvent::class, listener = listener)
             delay(Duration.ofMinutes(5))
             main!!.eventManager.unregister(listener)
-            startingTarget.remove(sourcePlayer.uuid)
             lock[sourcePlayer]?.unlock()
             lock.remove(sourcePlayer)
-            delay(Duration.ofSeconds(5))
-            removeProcessBossBar(source)
         }
 
         return com.mojang.brigadier.Command.SINGLE_SUCCESS

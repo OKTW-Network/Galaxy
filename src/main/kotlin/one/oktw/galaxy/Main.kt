@@ -40,8 +40,6 @@ class Main : ModInitializer {
         private set
     lateinit var playerControl: PlayerControl
         private set
-    lateinit var commandRegister: CommandRegister
-        private set
 
     companion object {
         val PROXY_IDENTIFIER = Identifier("galaxy", "proxy")
@@ -53,7 +51,7 @@ class Main : ModInitializer {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
         playerControl = PlayerControl.getInstance()
-        commandRegister = CommandRegister()
+        CommandRegister()
         Exchange(eventManager)
         main = this
         val resourcePackUrl: String? = System.getenv("resourcePack")

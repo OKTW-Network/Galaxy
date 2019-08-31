@@ -139,18 +139,20 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                         startingTarget[sourcePlayer.uuid] = targetPlayer
                         launch {
                             val bossBar = getOrCreateProcessBossBar(source)
+                            var tickTime = 100
                             var seconds = 0.0
                             val fastTargetSeconds = 120.0
                             val targetSeconds = 300.0
                             while (seconds <= targetSeconds) {
                                 startingTarget[sourcePlayer.uuid] ?: break
-                                bossBar.value += if (seconds >= fastTargetSeconds || bossBar.value > bossBar.maxValue * 0.9) {
-                                    randomInt(1, 4)
+                                bossBar.value += if (seconds >= fastTargetSeconds || bossBar.value > bossBar.maxValue * 0.85) {
+                                    tickTime = 1000
+                                    randomInt(0, 5)
                                 } else {
-                                    randomInt(5, 8)
+                                    randomInt(5, 10)
                                 }
-                                delay(Duration.ofMillis(500))
-                                seconds += 0.5
+                                delay(Duration.ofMillis(tickTime.toLong()))
+                                seconds += tickTime / 1000
                             }
                         }
                     }
@@ -226,7 +228,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
         val bossBar = bossBarManager.get(identifier)
         return if (bossBar == null) {
             val newBossBar = bossBarManager.add(identifier, LiteralText("請稍後..."))
-            newBossBar.color = BossBar.Color.YELLOW
+            newBossBar.color = BossBar.Color.BLUE
             newBossBar.isVisible = true
             newBossBar.maxValue = 1000
             newBossBar.addPlayer(player)

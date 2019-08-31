@@ -55,6 +55,24 @@ import java.util.concurrent.ConcurrentHashMap
 
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     private val lock = ConcurrentHashMap<ServerPlayerEntity, Mutex>()
+    private val queueList = listOf(
+        "星系已經排入飛船目的地，請等待系統開始載入星系"
+    )
+    private val creatingList = listOf(
+        "載入星系資料庫",
+        "星系地形資料載入",
+        "正在嘗試連結至星系"
+    )
+    private val startingList = listOf(
+        "掃描目標區域安全性",
+        "演算最佳航行路線",
+        "正在進行空間跳躍",
+        "正在檢查路線安全性",
+        "重新定位星系",
+        "掃描星系周圍區域",
+        "取得星系內星球位置",
+        "正在連結至星系"
+    )
 
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
@@ -120,7 +138,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                     Queue -> {
                         val subText = LiteralText("飛船正在準備起飛...").styled { style -> style.color = Formatting.AQUA }
                         updateVisualStatus(source, text, subText, 0)
-                        val tipText = LiteralText("星系已經排入飛船目的地，請等待系統開始載入星系").styled { style ->
+                        val tipText = LiteralText(queueList[randomInt(0, queueList.size)]).styled { style ->
                             style.color = Formatting.YELLOW
                         }
                         source.sendFeedback(tipText, false)
@@ -128,14 +146,18 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                     Creating -> {
                         val subText = LiteralText("星系載入中...").styled { style -> style.color = Formatting.AQUA }
                         updateVisualStatus(source, text, subText, 10)
+                        val tipText = LiteralText(creatingList[randomInt(0, creatingList.size)]).styled { style ->
+                            style.color = Formatting.YELLOW
+                        }
+                        source.sendFeedback(tipText, false)
                     }
                     Starting -> {
                         val subText = LiteralText("飛船正在飛向星系請稍後...").styled { style -> style.color = Formatting.AQUA }
                         updateVisualStatus(source, text, subText, 20)
-                        val tipText = LiteralText("飛船正在飛向星系，請耐心等候").styled { style ->
+                        val tipFirstText = LiteralText("飛船正在飛向星系，請耐心等候").styled { style ->
                             style.color = Formatting.YELLOW
                         }
-                        source.sendFeedback(tipText, false)
+                        source.sendFeedback(tipFirstText, false)
                         startingTarget[sourcePlayer.uuid] = targetPlayer
                         launch {
                             val bossBar = getOrCreateProcessBossBar(source)
@@ -153,6 +175,12 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                                 }
                                 delay(Duration.ofMillis(tickTime.toLong()))
                                 seconds += tickTime / 1000
+                                if ((seconds.toInt() % 20) == 0) {
+                                    val tipText = LiteralText(startingList[randomInt(0, startingList.size)]).styled { style ->
+                                        style.color = Formatting.YELLOW
+                                    }
+                                    source.sendFeedback(tipText, false)
+                                }
                             }
                         }
                     }

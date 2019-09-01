@@ -31,7 +31,7 @@ import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 
-class Harvest {
+class Harvest private constructor() {
     companion object {
         private val INSTANCE = Harvest()
         fun getInstance() = INSTANCE

@@ -33,7 +33,8 @@ import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 
 class Harvest {
     companion object {
-         fun new() = Harvest()
+        private val INSTANCE = Harvest()
+        fun getInstance() = INSTANCE
     }
 
     fun registerEvent() {

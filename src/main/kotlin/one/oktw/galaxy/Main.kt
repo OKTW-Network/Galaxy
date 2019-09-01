@@ -54,7 +54,7 @@ class Main : ModInitializer {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
         commandRegister = CommandRegister()
-        harvest = Harvest.new()
+        harvest = Harvest.getInstance()
         Exchange(eventManager)
         main = this
         val resourcePackUrl: String? = System.getenv("resourcePack")

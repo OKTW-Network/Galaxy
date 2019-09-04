@@ -56,29 +56,31 @@ import java.util.concurrent.ConcurrentHashMap
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     private val lock = ConcurrentHashMap<ServerPlayerEntity, Mutex>()
     private val queueList = listOf(
-        "星系已經排入飛船目的地，請等待系統開始載入星系",
-        "開始自我系統診斷..."
+        "星系已經排入飛船目的地，請等待系統開始載入星系", // jimchen5209
+        "開始自我系統診斷..." // mmis1000
     )
     private val creatingList = listOf(
-        "載入星系資料庫",
-        "星系地形資料載入",
-        "正在嘗試連結至星系",
-        "載入現實...",
-        "正在定位目標星系"
+        "確認星系地形", // jimchen5209
+        "載入星系資料庫", // patyhank
+        "星系地形資料載入", // patyhank
+        "正在嘗試連結至星系", // WoodMan0708
+        "載入現實...", //mmis1000
+        "正在定位目標星系" // KolinFox
     )
     private val startingList = listOf(
-        "掃描目標區域安全性",
-        "演算最佳航行路線",
-        "正在進行空間跳躍",
-        "正在檢查路線安全性",
-        "重新定位星系",
-        "掃描星系周圍區域",
-        "取得星系內星球位置",
-        "正在連結至星系",
-        "選擇最佳決策",
-        "正在嘗試路線方案",
-        "正在尋找最佳路徑",
-        "即將抵達目標星系"
+        "選擇目標星系著陸點", // jimchen5209
+        "掃描目標區域安全性", // james58899
+        "演算最佳航行路線", // james58899
+        "正在進行空間跳躍", // james58899
+        "正在檢查路線安全性", // patyhank
+        "重新定位星系", // WoodMan0708
+        "掃描星系周圍區域", // WoodMan0708
+        "取得星系內星球位置", // WoodMan0708
+        "正在連結至星系", // WoodMan0708
+        "選擇最佳決策", // mmis1000
+        "正在嘗試路線方案", // mmis1000
+        "正在尋找最佳路徑", // KolinFox
+        "即將抵達目標星系" // KolinFox
     )
 
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {

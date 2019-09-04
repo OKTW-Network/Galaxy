@@ -63,7 +63,8 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
         "載入星系資料庫",
         "星系地形資料載入",
         "正在嘗試連結至星系",
-        "載入現實..."
+        "載入現實...",
+        "正在定位目標星系"
     )
     private val startingList = listOf(
         "掃描目標區域安全性",
@@ -75,7 +76,9 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
         "取得星系內星球位置",
         "正在連結至星系",
         "選擇最佳決策",
-        "正在嘗試路線方案"
+        "正在嘗試路線方案",
+        "正在尋找最佳路徑",
+        "即將抵達目標星系"
     )
 
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {

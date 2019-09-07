@@ -36,9 +36,9 @@ public class MixinRequestCompletions_NetworkHandler {
 
     @Inject(method = "onRequestCommandCompletions", at = @At("HEAD"), cancellable = true)
     private void onRequestCommandCompletions(RequestCommandCompletionsC2SPacket packet, CallbackInfo info) {
-        Main.Companion main = Main.Companion;
-        if (main.getMain() == null) return;
-        if (main.getMain().getEventManager().emit(new RequestCommandCompletionsEvent(packet, player)).getCancel()) {
+        Main main = Main.Companion.getMain();
+        if (main == null) return;
+        if (main.getEventManager().emit(new RequestCommandCompletionsEvent(packet, player)).getCancel()) {
             info.cancel();
         }
     }

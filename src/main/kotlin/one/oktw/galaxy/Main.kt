@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy
 
+import com.mojang.authlib.GameProfile
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -31,6 +32,8 @@ import one.oktw.galaxy.command.CommandRegister
 import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.player.PlayerControl
 import one.oktw.galaxy.resourcepack.ResourcePack
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 @Suppress("unused")
 class Main : ModInitializer {
@@ -39,6 +42,8 @@ class Main : ModInitializer {
     lateinit var eventManager: EventManager
         private set
     lateinit var playerControl: PlayerControl
+        private set
+    lateinit var startingTarget: ConcurrentHashMap<UUID, GameProfile>
         private set
     lateinit var commandRegister: CommandRegister
         private set
@@ -53,6 +58,7 @@ class Main : ModInitializer {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
         playerControl = PlayerControl.new()
+        startingTarget = ConcurrentHashMap()
         commandRegister = CommandRegister()
         Exchange(eventManager)
         main = this

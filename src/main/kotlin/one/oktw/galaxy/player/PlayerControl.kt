@@ -18,7 +18,6 @@
 
 package one.oktw.galaxy.player
 
-import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.netty.buffer.Unpooled.wrappedBuffer
 import net.minecraft.client.network.packet.CommandSuggestionsS2CPacket
@@ -46,7 +45,6 @@ class PlayerControl private constructor() {
 
     private var completeID = ConcurrentHashMap<UUID, Int>()
     private var completeInput = ConcurrentHashMap<UUID, String>()
-    val startingTarget = ConcurrentHashMap<UUID, GameProfile>()
 
     fun registerEvents() {
         // Events
@@ -93,6 +91,7 @@ class PlayerControl private constructor() {
     }
 
     private fun onPlayerConnect(event: PlayerConnectEvent) {
+        val startingTarget = main!!.startingTarget
         val identifier = Identifier("galaxy:process_${event.player.uuid}")
         val bossBarManager = main!!.server.bossBarManager
         val bossBar = bossBarManager.get(identifier)

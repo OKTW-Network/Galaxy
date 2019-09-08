@@ -45,8 +45,6 @@ class Main : ModInitializer {
         private set
     lateinit var startingTarget: ConcurrentHashMap<UUID, GameProfile>
         private set
-    lateinit var commandRegister: CommandRegister
-        private set
 
     companion object {
         val PROXY_IDENTIFIER = Identifier("galaxy", "proxy")
@@ -57,9 +55,9 @@ class Main : ModInitializer {
     override fun onInitialize() {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
-        playerControl = PlayerControl.new()
+        playerControl = PlayerControl.getInstance()
         startingTarget = ConcurrentHashMap()
-        commandRegister = CommandRegister()
+        CommandRegister()
         Exchange(eventManager)
         main = this
         val resourcePackUrl: String? = System.getenv("resourcePack")

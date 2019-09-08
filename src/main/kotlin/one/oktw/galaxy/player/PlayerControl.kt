@@ -40,7 +40,8 @@ import java.util.concurrent.ConcurrentHashMap
 
 class PlayerControl private constructor() {
     companion object {
-        fun new() = PlayerControl()
+        private val INSTANCE = PlayerControl()
+        fun getInstance() = INSTANCE
     }
 
     private var completeID = ConcurrentHashMap<UUID, Int>()

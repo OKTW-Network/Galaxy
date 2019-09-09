@@ -28,8 +28,8 @@ import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.chat.Exchange
 import one.oktw.galaxy.command.CommandRegister
-import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.event.EventManager
+import one.oktw.galaxy.player.PlayerControl
 import one.oktw.galaxy.resourcepack.ResourcePack
 
 @Suppress("unused")
@@ -38,7 +38,7 @@ class Main : ModInitializer {
         private set
     lateinit var eventManager: EventManager
         private set
-    lateinit var commandRegister: CommandRegister
+    lateinit var playerControl: PlayerControl
         private set
 
     companion object {
@@ -50,7 +50,8 @@ class Main : ModInitializer {
     override fun onInitialize() {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
-        commandRegister = CommandRegister()
+        playerControl = PlayerControl.getInstance()
+        CommandRegister()
         Exchange(eventManager)
         main = this
         val resourcePackUrl: String? = System.getenv("resourcePack")
@@ -63,6 +64,6 @@ class Main : ModInitializer {
             }
         }
         //Events
-        Join.registerEvent()
+        playerControl.registerEvents()
     }
 }

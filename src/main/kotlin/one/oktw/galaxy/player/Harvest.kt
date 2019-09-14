@@ -29,19 +29,12 @@ import net.minecraft.state.property.IntProperty
 import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 
-class Harvest private constructor() {
-    companion object {
-        private val INSTANCE = Harvest()
-        fun getInstance() = INSTANCE
-    }
-
-    fun registerEvent() {
-        main!!.eventManager.register(PlayerInteractBlockEvent::class, listener = ::onPlayerInteractBlock)
-    }
-
-    private fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
+class Harvest {
+    @EventListener
+    fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
         val world = main!!.server.getWorld(event.player.dimension)
         val hand = event.packet.hand
         if (hand != Hand.MAIN_HAND) {

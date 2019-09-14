@@ -24,7 +24,7 @@ import net.minecraft.client.network.packet.CommandSuggestionsS2CPacket
 import net.minecraft.client.network.packet.CustomPayloadS2CPacket
 import net.minecraft.util.PacketByteBuf
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
-import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PacketReceiveEvent
 import one.oktw.galaxy.event.type.RequestCommandCompletionsEvent
 import one.oktw.galaxy.proxy.api.ProxyAPI.decode
@@ -34,22 +34,12 @@ import one.oktw.galaxy.proxy.api.packet.SearchPlayer
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class PlayerControl private constructor() {
-    companion object {
-        private val INSTANCE = PlayerControl()
-        fun getInstance() = INSTANCE
-    }
-
+class PlayerControl {
     private val completeID = ConcurrentHashMap<UUID, Int>()
     private val completeInput = ConcurrentHashMap<UUID, String>()
 
-    fun registerEvents() {
-        // Events
-        main!!.eventManager.register(RequestCommandCompletionsEvent::class, listener = ::onRequestCommandComplete)
-        main!!.eventManager.register(PacketReceiveEvent::class, listener = ::onSearchResult)
-    }
-
-    private fun onRequestCommandComplete(event: RequestCommandCompletionsEvent) {
+    @EventListener
+    fun onRequestCommandComplete(event: RequestCommandCompletionsEvent) {
         val command = event.packet.partialCommand
 
         //取消原版自動完成並向 proxy 發請求
@@ -67,7 +57,8 @@ class PlayerControl private constructor() {
     }
 
     //從 proxy 接收回覆並送自動完成封包給玩家
-    private fun onSearchResult(event: PacketReceiveEvent) {
+    @EventListener
+    fun onSearchResult(event: PacketReceiveEvent) {
         if (event.channel != PROXY_IDENTIFIER) return
         val data = decode<Packet>(event.packet.nioBuffer()) as? SearchPlayer.Result ?: return
         val id = completeID[event.player.uuid] ?: return

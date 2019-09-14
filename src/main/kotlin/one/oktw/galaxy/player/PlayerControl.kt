@@ -27,6 +27,7 @@ import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.PacketByteBuf
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PacketReceiveEvent
 import one.oktw.galaxy.event.type.PlayerConnectEvent

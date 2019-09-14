@@ -28,9 +28,8 @@ import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.chat.Exchange
 import one.oktw.galaxy.command.CommandRegister
-import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.event.EventManager
-import one.oktw.galaxy.player.Harvest
+import one.oktw.galaxy.player.PlayerControl
 import one.oktw.galaxy.resourcepack.ResourcePack
 
 @Suppress("unused")
@@ -38,10 +37,6 @@ class Main : ModInitializer {
     lateinit var server: MinecraftDedicatedServer
         private set
     lateinit var eventManager: EventManager
-        private set
-    lateinit var commandRegister: CommandRegister
-        private set
-    lateinit var harvest: Harvest
         private set
 
     companion object {
@@ -53,9 +48,7 @@ class Main : ModInitializer {
     override fun onInitialize() {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
-        commandRegister = CommandRegister()
-        harvest = Harvest.getInstance()
-        Exchange(eventManager)
+        CommandRegister()
         main = this
         val resourcePackUrl: String? = System.getenv("resourcePack")
         if (resourcePackUrl != null) {
@@ -66,8 +59,9 @@ class Main : ModInitializer {
                 }
             }
         }
+
         //Events
-        Join.registerEvent()
-        harvest.registerEvent()
+        eventManager.register(Exchange())
+        eventManager.register(PlayerControl())
     }
 }

@@ -42,11 +42,11 @@ minecraft {
 dependencies {
     // Core
     minecraft(group = "com.mojang", name = "minecraft", version = "1.14.4")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.14.4+build.1")
-    modCompile(group = "net.fabricmc", name = "fabric-loader", version = "0.4.8+build.155")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.14.4+build.12")
+    modCompile(group = "net.fabricmc", name = "fabric-loader", version = "0.6.1+build.165")
 
     // fabric api/library
-    modCompile(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.40+build.1")
+    modCompile(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.50+build.3")
     modCompile(group = "net.fabricmc.fabric-api", name = "fabric-commands", version = "0.1.0")
 
     // galaxy api
@@ -55,7 +55,7 @@ dependencies {
     // Jar in Jar
     include(group = "net.fabricmc.fabric-api", name = "fabric-commands", version = "0.1.0")
     include(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
-    include(group = "org.mongodb", name = "bson", version = "3.10.2")
+    include(group = "org.mongodb", name = "bson", version = "3.11.0")
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.

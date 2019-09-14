@@ -20,7 +20,6 @@ package one.oktw.galaxy.command.commands
 
 import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.CommandDispatcher
-import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.netty.buffer.Unpooled.wrappedBuffer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +27,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.time.delay
-import net.minecraft.client.network.packet.CommandSuggestionsS2CPacket
 import net.minecraft.client.network.packet.CustomPayloadS2CPacket
 import net.minecraft.command.arguments.GameProfileArgumentType
 import net.minecraft.server.command.CommandManager
@@ -40,16 +38,12 @@ import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.event.type.PacketReceiveEvent
-import one.oktw.galaxy.event.type.RequestCommandCompletionsEvent
 import one.oktw.galaxy.proxy.api.ProxyAPI.decode
 import one.oktw.galaxy.proxy.api.ProxyAPI.encode
 import one.oktw.galaxy.proxy.api.packet.CreateGalaxy
 import one.oktw.galaxy.proxy.api.packet.Packet
 import one.oktw.galaxy.proxy.api.packet.ProgressStage.*
-import one.oktw.galaxy.proxy.api.packet.ProgressStage.Queue
-import one.oktw.galaxy.proxy.api.packet.SearchPlayer
 import java.time.Duration
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
@@ -72,53 +66,6 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                         }
                 )
         )
-    }
-
-    companion object {
-        private var completeID = ConcurrentHashMap<UUID, Int>()
-        private var completeInput = ConcurrentHashMap<UUID, String>()
-
-        fun registerEvent() {
-            val requestCompletionListener = fun(event: RequestCommandCompletionsEvent) {
-                val command = event.packet.partialCommand
-
-                //取消原版自動完成並向 proxy 發請求
-                if (command.startsWith("/join ")) {
-                    event.cancel = true
-                    completeID[event.player.uuid] = event.packet.completionId
-                    completeInput[event.player.uuid] = command
-                    event.player.networkHandler.sendPacket(
-                        CustomPayloadS2CPacket(
-                            PROXY_IDENTIFIER,
-                            PacketByteBuf(wrappedBuffer(encode(SearchPlayer(command.removePrefix("/join "), 10))))
-                        )
-                    )
-                }
-            }
-
-            //從 proxy 接收回覆並送自動完成封包給玩家
-            val searchResultListener = fun(event: PacketReceiveEvent) {
-                if (event.channel != PROXY_IDENTIFIER) return
-                val data = decode<Packet>(event.packet.nioBuffer()) as? SearchPlayer.Result ?: return
-                val id = completeID[event.player.uuid] ?: return
-                val input = completeInput[event.player.uuid] ?: return
-
-                val suggestion = SuggestionsBuilder(input, "/join ".length)
-                data.players.forEach { player ->
-                    suggestion.suggest(player)
-                }
-
-                event.player.networkHandler.sendPacket(
-                    CommandSuggestionsS2CPacket(
-                        id,
-                        suggestion.buildFuture().get()
-                    )
-                )
-            }
-
-            main!!.eventManager.register(RequestCommandCompletionsEvent::class, listener = requestCompletionListener)
-            main!!.eventManager.register(PacketReceiveEvent::class, listener = searchResultListener)
-        }
     }
 
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {
@@ -159,9 +106,9 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                 }
             }
 
-            main!!.eventManager.register(PacketReceiveEvent::class, listener = listener)
+            main!!.eventManager.register(PacketReceiveEvent::class, listener)
             delay(Duration.ofMinutes(5))
-            main!!.eventManager.unregister(listener)
+            main!!.eventManager.unregister(PacketReceiveEvent::class, listener)
             lock[sourcePlayer]?.unlock()
             lock.remove(sourcePlayer)
         }

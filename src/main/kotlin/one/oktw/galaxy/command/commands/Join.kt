@@ -230,9 +230,9 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                 }
             }
 
-            main!!.eventManager.register(PacketReceiveEvent::class, listener = listener)
+            main!!.eventManager.register(PacketReceiveEvent::class, listener)
             delay(Duration.ofMinutes(5))
-            main!!.eventManager.unregister(listener)
+            main!!.eventManager.unregister(PacketReceiveEvent::class, listener)
             lock[sourcePlayer]?.unlock()
             lock.remove(sourcePlayer)
         }

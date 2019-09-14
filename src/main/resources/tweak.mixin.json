@@ -3,7 +3,8 @@
   "package": "one.oktw.galaxy.mixin.tweak",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinRCON_RconClient"
+    "MixinRCON_RconClient",
+    "MixinPreGenSpawn_MinecraftServer"
   ],
   "client": [],
   "injectors": {

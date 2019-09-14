@@ -41,8 +41,6 @@ class Main : ModInitializer {
         private set
     lateinit var eventManager: EventManager
         private set
-    lateinit var playerControl: PlayerControl
-        private set
     lateinit var startingTarget: ConcurrentHashMap<UUID, GameProfile>
         private set
 
@@ -55,10 +53,8 @@ class Main : ModInitializer {
     override fun onInitialize() {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
-        playerControl = PlayerControl.getInstance()
         startingTarget = ConcurrentHashMap()
         CommandRegister()
-        Exchange(eventManager)
         main = this
         val resourcePackUrl: String? = System.getenv("resourcePack")
         if (resourcePackUrl != null) {
@@ -69,7 +65,9 @@ class Main : ModInitializer {
                 }
             }
         }
+
         //Events
-        playerControl.registerEvents()
+        eventManager.register(Exchange())
+        eventManager.register(PlayerControl())
     }
 }

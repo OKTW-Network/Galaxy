@@ -30,6 +30,7 @@ import net.minecraft.util.Identifier
 import one.oktw.galaxy.chat.Exchange
 import one.oktw.galaxy.command.CommandRegister
 import one.oktw.galaxy.event.EventManager
+import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.PlayerControl
 import one.oktw.galaxy.resourcepack.ResourcePack
 import java.util.*
@@ -69,5 +70,6 @@ class Main : ModInitializer {
         //Events
         eventManager.register(Exchange())
         eventManager.register(PlayerControl())
+        eventManager.register(Harvest())
     }
 }

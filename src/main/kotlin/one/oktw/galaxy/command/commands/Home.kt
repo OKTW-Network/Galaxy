@@ -41,10 +41,10 @@ class Home : Command {
 
     private fun execute(source: ServerCommandSource): Int {
         val player = source.player
-        GlobalScope.launch {
-            if(source.player.spawnPosition == null){
-                val component = LiteralText("找不到您的家 :(").styled { style -> style.color = Formatting.GREEN }
-            }else {
+        if (source.player.spawnPosition == null) {
+            player.sendMessage(LiteralText("找不到您的家 :(").styled { style -> style.color = Formatting.GREEN })
+        } else {
+            GlobalScope.launch {
                 for (i in 0..4) {
                     val component = LiteralText("請等待 ${5 - i} 秒鐘").styled { style -> style.color = Formatting.GREEN }
                     player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, component))

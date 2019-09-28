@@ -42,7 +42,7 @@ class Home : Command {
     private fun execute(source: ServerCommandSource): Int {
         val player = source.player
         if (source.player.spawnPosition == null) {
-            player.sendMessage(LiteralText("找不到您的家 :(").styled { style -> style.color = Formatting.GREEN })
+            player.sendMessage(LiteralText("找不到您的家").styled { style -> style.color = Formatting.RED })
         } else {
             GlobalScope.launch {
                 for (i in 0..4) {
@@ -55,7 +55,6 @@ class Home : Command {
                 }
             }
         }
-
         return com.mojang.brigadier.Command.SINGLE_SUCCESS
     }
 }

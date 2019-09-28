@@ -21,39 +21,41 @@ package one.oktw.galaxy.player
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.time.delay
 import kotlinx.coroutines.withContext
 import net.minecraft.block.*
 import net.minecraft.block.Blocks.*
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.IntProperty
 import net.minecraft.util.Hand
+import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
+import net.minecraft.world.RayTraceContext
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
+import one.oktw.galaxy.event.type.PlayerInteractItemEvent
+import one.oktw.galaxy.network.ItemFunctionAccessor
+import java.time.Duration
+import java.util.concurrent.ConcurrentHashMap
 
 class Harvest {
-    @EventListener
+    private val justHarvested = ConcurrentHashMap<BlockPos, Boolean>()
+    @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
         val world = main!!.server.getWorld(event.player.dimension)
         val hand = event.packet.hand
-        if (hand != Hand.MAIN_HAND) {
-            return
-        }
+
         val blockHitResult = event.packet.hitY
         val blockState = world.getBlockState(blockHitResult.blockPos)
 
-        val isMature = when (blockState.block) {
-            WHEAT, CARROTS, POTATOES -> blockState.let((blockState.block as CropBlock)::isMature)
-            BEETROOTS -> blockState.let((blockState.block as BeetrootsBlock)::isMature)
-            COCOA -> blockState[CocoaBlock.AGE] >= 2
-            NETHER_WART -> blockState[NetherWartBlock.AGE] >= 3
-            MELON -> isNextTo(world, blockHitResult.blockPos, ATTACHED_MELON_STEM)
-            PUMPKIN -> isNextTo(world, blockHitResult.blockPos, ATTACHED_PUMPKIN_STEM)
-            else -> false
-        }
+        val isMature = isMature(world, blockHitResult.blockPos, blockState)
 
         if (isMature) {
+            event.cancel = true
+            if (hand != Hand.MAIN_HAND) {
+                return
+            }
             val ageProperties = when (blockState.block) {
                 WHEAT, CARROTS, POTATOES -> CropBlock.AGE
                 BEETROOTS -> BeetrootsBlock.AGE
@@ -64,20 +66,58 @@ class Harvest {
             GlobalScope.launch {
                 withContext(main!!.server.asCoroutineDispatcher()) {
                     world.breakBlock(blockHitResult.blockPos, true)
-                    if (blockState.block != PUMPKIN && blockState.block != MELON){
+                    if (blockState.block != PUMPKIN && blockState.block != MELON) {
                         world.setBlockState(blockHitResult.blockPos, blockState.with(ageProperties, 0))
                         world.updateNeighbors(blockHitResult.blockPos, blockState.block)
                     }
                 }
+                justHarvested[blockHitResult.blockPos] = true
+                delay(Duration.ofSeconds(1))
+                justHarvested.remove(blockHitResult.blockPos)
             }
             return
         }
     }
 
+    @EventListener(true)
+    fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
+        val world = main!!.server.getWorld(event.player.dimension)
+
+        val itemStack = event.player.getStackInHand(event.packet.hand)
+        val item = itemStack.item as ItemFunctionAccessor
+        val blockHitResult = item.getRayTrace(world, event.player, RayTraceContext.FluidHandling.ANY) as BlockHitResult
+        val blockState = world.getBlockState(blockHitResult.blockPos)
+
+        val harvested = justHarvested[blockHitResult.blockPos] ?: false
+        if (isMature(world, blockHitResult.blockPos, blockState) || harvested) {
+            event.cancel = true
+            // not working
+//            val fluidPos = blockHitResult.blockPos.offset(blockHitResult.side)
+//            val fluidBlockState = world.getBlockState(fluidPos)
+//            GlobalScope.launch {
+//                delay(Duration.ofMillis(500))
+//                withContext(main!!.server.asCoroutineDispatcher()) {
+//                    world.setBlockState(fluidPos, fluidBlockState)
+//                    event.player.setStackInHand(event.packet.hand, itemStack)
+//                }
+//            }
+        }
+    }
+
+    private fun isMature(world: ServerWorld, blockPos: BlockPos, blockState: BlockState): Boolean = when (blockState.block) {
+        WHEAT, CARROTS, POTATOES -> blockState.let((blockState.block as CropBlock)::isMature)
+        BEETROOTS -> blockState.let((blockState.block as BeetrootsBlock)::isMature)
+        COCOA -> blockState[CocoaBlock.AGE] >= 2
+        NETHER_WART -> blockState[NetherWartBlock.AGE] >= 3
+        MELON -> isNextTo(world, blockPos, ATTACHED_MELON_STEM)
+        PUMPKIN -> isNextTo(world, blockPos, ATTACHED_PUMPKIN_STEM)
+        else -> false
+    }
+
     private fun isNextTo(world: ServerWorld, blockPos: BlockPos, block: Block): Boolean {
         return world.getBlockState(blockPos.add(1, 0, 0)).block == block ||
-                world.getBlockState(blockPos.add(0, 0, 1)).block == block ||
-                world.getBlockState(blockPos.add(-1, 0, 0)).block == block ||
-                world.getBlockState(blockPos.add(0, 0, -1)).block == block
+            world.getBlockState(blockPos.add(0, 0, 1)).block == block ||
+            world.getBlockState(blockPos.add(-1, 0, 0)).block == block ||
+            world.getBlockState(blockPos.add(0, 0, -1)).block == block
     }
 }

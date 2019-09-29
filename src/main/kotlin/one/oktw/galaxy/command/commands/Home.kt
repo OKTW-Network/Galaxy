@@ -25,11 +25,16 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Formatting
-import one.oktw.galaxy.Main.Companion.main
+import net.minecraft.server.network.ServerPlayerEntity
 import one.oktw.galaxy.command.Command
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 class Home : Command {
+
+    private val lock = ConcurrentHashMap.newKeySet<UUID>()
+
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
             CommandManager.literal("home")
@@ -41,6 +46,11 @@ class Home : Command {
 
     private fun execute(source: ServerCommandSource): Int {
         val player = source.player
+
+        if (source !is ServerPlayerEntity || lock.contains(source.player.uuid)) return com.mojang.brigadier.Command.SINGLE_SUCCESS
+
+        lock += source.player.uuid
+
         if (source.player.spawnPosition == null) {
             player.sendMessage(LiteralText("找不到您的家").styled { style -> style.color = Formatting.RED })
         } else {
@@ -50,9 +60,10 @@ class Home : Command {
                     player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, component))
                     delay(TimeUnit.SECONDS.toMillis(1))
                 }
-                withContext(main!!.server.asCoroutineDispatcher()) {
-                    player.setPositionAndAngles(source.player.spawnPosition, 0.0F, 0.0F)
+                withContext(player.server.asCoroutineDispatcher()) {
+                    player.requestTeleport(source.player.spawnPosition.x.toDouble(),source.player.spawnPosition.y.toDouble(),source.player.spawnPosition.z.toDouble())
                 }
+                lock -= source.player.uuid
             }
         }
         return com.mojang.brigadier.Command.SINGLE_SUCCESS

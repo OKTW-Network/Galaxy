@@ -10,6 +10,7 @@
     "MixinCustomBlockEntity_Clone",
     "MixinCustomBlockEntity_Structure",
     "MixinFixBeacon_BeaconBlockEntity",
+    "MixinItemStackEqualAllowNull_ItemStack",
     "MixinMapExistingChunk_FilledMapItem",
     "MixinOneSpawnChunk_MinecraftServer",
     "MixinOneSpawnChunk_ServerWorld",

@@ -26,6 +26,7 @@ import kotlinx.coroutines.withContext
 import net.minecraft.block.*
 import net.minecraft.block.Blocks.*
 import net.minecraft.client.network.packet.BlockUpdateS2CPacket
+import net.minecraft.client.network.packet.EntityAnimationS2CPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.IntProperty
@@ -66,9 +67,11 @@ class Harvest {
                 else -> IntProperty.of("AGE", 0, 1)
             }
             GlobalScope.launch {
-                withContext(main!!.server.asCoroutineDispatcher()) {
+                withContext(event.player.server.asCoroutineDispatcher()) {
                     world.breakBlock(blockHitResult.blockPos, true)
                     if (blockState.block != PUMPKIN && blockState.block != MELON) {
+                        event.player.swingHand(hand)
+                        event.player.networkHandler.sendPacket(EntityAnimationS2CPacket(event.player, if (hand == Hand.MAIN_HAND) 0 else 3))
                         world.setBlockState(blockHitResult.blockPos, blockState.with(ageProperties, 0))
                         world.updateNeighbors(blockHitResult.blockPos, blockState.block)
                         updateBlockAndInventory(event.player, world, blockHitResult.blockPos)

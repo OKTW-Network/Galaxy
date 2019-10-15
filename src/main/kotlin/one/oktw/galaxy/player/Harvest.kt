@@ -25,6 +25,8 @@ import kotlinx.coroutines.time.delay
 import kotlinx.coroutines.withContext
 import net.minecraft.block.*
 import net.minecraft.block.Blocks.*
+import net.minecraft.client.network.packet.BlockUpdateS2CPacket
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.IntProperty
 import net.minecraft.util.Hand
@@ -40,7 +42,7 @@ import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 
 class Harvest {
-    private val justHarvested = ConcurrentHashMap<BlockPos, Boolean>()
+    private val justHarvested = ConcurrentHashMap<ServerPlayerEntity, Boolean>()
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
         val world = main!!.server.getWorld(event.player.dimension)
@@ -69,11 +71,12 @@ class Harvest {
                     if (blockState.block != PUMPKIN && blockState.block != MELON) {
                         world.setBlockState(blockHitResult.blockPos, blockState.with(ageProperties, 0))
                         world.updateNeighbors(blockHitResult.blockPos, blockState.block)
+                        updateBlockAndInventory(event.player, world, blockHitResult.blockPos)
                     }
                 }
-                justHarvested[blockHitResult.blockPos] = true
+                justHarvested[event.player] = true
                 delay(Duration.ofSeconds(1))
-                justHarvested.remove(blockHitResult.blockPos)
+                justHarvested.remove(event.player)
             }
             return
         }
@@ -88,19 +91,10 @@ class Harvest {
         val blockHitResult = item.getRayTrace(world, event.player, RayTraceContext.FluidHandling.ANY) as BlockHitResult
         val blockState = world.getBlockState(blockHitResult.blockPos)
 
-        val harvested = justHarvested[blockHitResult.blockPos] ?: false
+        val harvested = justHarvested[event.player] ?: false
         if (isMature(world, blockHitResult.blockPos, blockState) || harvested) {
             event.cancel = true
-            // not working
-//            val fluidPos = blockHitResult.blockPos.offset(blockHitResult.side)
-//            val fluidBlockState = world.getBlockState(fluidPos)
-//            GlobalScope.launch {
-//                delay(Duration.ofMillis(500))
-//                withContext(main!!.server.asCoroutineDispatcher()) {
-//                    world.setBlockState(fluidPos, fluidBlockState)
-//                    event.player.setStackInHand(event.packet.hand, itemStack)
-//                }
-//            }
+            updateBlockAndInventory(event.player, world, blockHitResult.blockPos)
         }
     }
 
@@ -112,6 +106,18 @@ class Harvest {
         MELON -> isNextTo(world, blockPos, ATTACHED_MELON_STEM)
         PUMPKIN -> isNextTo(world, blockPos, ATTACHED_PUMPKIN_STEM)
         else -> false
+    }
+
+    private fun updateBlockAndInventory(player: ServerPlayerEntity, world: ServerWorld, blockPos: BlockPos) {
+        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos))
+        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(1, 0, 0)))
+        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, 0, 1)))
+        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(-1, 0, 0)))
+        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, 0, -1)))
+        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, 1, 0)))
+        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, -1, 0)))
+        player.onContainerRegistered(player.container, player.container.stacks)
+
     }
 
     private fun isNextTo(world: ServerWorld, blockPos: BlockPos, block: Block): Boolean {

@@ -18,6 +18,8 @@
 
 package one.oktw.galaxy.block.type
 
-enum class BlockType(val itemModelData: Int, val blockModelData: Int, val languageKey: String) {
-    DUMMY(0, 0, "")
+enum class BlockType(val itemModelData: Int?, val blockModelData: Int?, val languageKey: String) {
+    DUMMY(0, 0, ""),
+    CONTROL_PANEL(null, null, ""),
+    PLANET_TERMINAL(null, null, "")
 }

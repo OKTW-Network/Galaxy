@@ -16,17 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.block
+package one.oktw.galaxy.block.util
 
 import net.minecraft.util.math.BlockPos
-import one.oktw.galaxy.block.item.BlockItem
 import one.oktw.galaxy.block.type.BlockType
-import one.oktw.galaxy.block.type.BlockType.DUMMY
-import one.oktw.galaxy.block.util.BlockUtil
 
-class Block(val type: BlockType = DUMMY) {
-    val item = if (type.itemModelData != null) BlockItem(type) else null
+object BlockUtil {
+    fun placeAndRegisterBlock(blockType: BlockType, blockPos: BlockPos) {
+        // TODO
+        registerBlock(blockType, blockPos)
+    }
 
-    fun activate(blockPos: BlockPos) =
-        if (type.blockModelData != null) BlockUtil.placeAndRegisterBlock(type, blockPos) else BlockUtil.registerBlock(type, blockPos)
+    fun registerBlock(blockType: BlockType, blockPos: BlockPos) {
+        // TODO
+    }
 }

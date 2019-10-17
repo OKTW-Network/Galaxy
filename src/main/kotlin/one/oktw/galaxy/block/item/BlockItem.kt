@@ -34,7 +34,7 @@ class BlockItem(val type: BlockType = DUMMY) : Item {
     override fun createItemStack(): ItemStack {
         val item = CustomItemBuilder()
             .setBaseItem(WOODEN_SWORD)
-            .setModel(type.itemModelData)
+            .setModel(type.itemModelData!!)
             .setUnbreakable()
             .hideAllFlags()
             .removeAllModifiers()

@@ -16,18 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.type
+package one.oktw.galaxy.block.type
 
-enum class ItemType {
-    // System
-    DUMMY,
-    BUTTON,
-    GUI,
-    BLOCK,
-
-    // Weapons & Tools
-    MATERIAL,
-    WEAPON,
-    TOOL,
-    UPGRADE
+enum class BlockType(val itemModelData: Int, val blockModelData: Int, val languageKey: String) {
+    DUMMY(0, 0, "")
 }

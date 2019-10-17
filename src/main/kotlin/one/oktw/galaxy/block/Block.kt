@@ -16,18 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.type
+package one.oktw.galaxy.block
 
-enum class ItemType {
-    // System
-    DUMMY,
-    BUTTON,
-    GUI,
-    BLOCK,
+import one.oktw.galaxy.block.item.BlockItem
+import one.oktw.galaxy.block.type.BlockType
+import one.oktw.galaxy.block.type.BlockType.DUMMY
 
-    // Weapons & Tools
-    MATERIAL,
-    WEAPON,
-    TOOL,
-    UPGRADE
+class Block(val type: BlockType = DUMMY) {
+    val item = BlockItem(type)
+
+    fun placeBlock() {
+        //TODO
+    }
 }

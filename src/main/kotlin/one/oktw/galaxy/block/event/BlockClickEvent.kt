@@ -16,18 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.type
+package one.oktw.galaxy.block.event
 
-enum class ItemType {
-    // System
-    DUMMY,
-    BUTTON,
-    GUI,
-    BLOCK,
+import one.oktw.galaxy.event.annotation.EventListener
+import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 
-    // Weapons & Tools
-    MATERIAL,
-    WEAPON,
-    TOOL,
-    UPGRADE
+class BlockClickEvent {
+    @EventListener
+    fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
+        // TODO
+    }
 }

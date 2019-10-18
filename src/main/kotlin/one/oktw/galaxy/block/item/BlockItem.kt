@@ -34,6 +34,8 @@ class BlockItem(val type: BlockType = DUMMY) : Item {
         val item = CustomItemBuilder()
             .setBaseItem(WOODEN_SWORD)
             .setModel(type.itemModelData!!)
+            .setItemType(itemType)
+            .setBlockType(type)
             .setUnbreakable()
             .hideAllFlags()
             .removeAllModifiers()

@@ -24,6 +24,7 @@ import net.minecraft.item.Items.AIR
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.text.Text
+import one.oktw.galaxy.item.type.ItemType
 
 class CustomItemBuilder {
     private var baseItem: ItemConvertible = AIR
@@ -70,6 +71,11 @@ class CustomItemBuilder {
 
     fun removeAllModifiers(): CustomItemBuilder {
         this.tags.put("AttributeModifiers", ListTag())
+        return this
+    }
+
+    fun setItemType(itemType: ItemType): CustomItemBuilder {
+        this.tags.putString("customItemType", itemType.name)
         return this
     }
 

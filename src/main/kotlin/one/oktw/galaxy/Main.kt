@@ -26,6 +26,7 @@ import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
+import one.oktw.galaxy.block.event.BlockEvents
 import one.oktw.galaxy.chat.Exchange
 import one.oktw.galaxy.command.CommandRegister
 import one.oktw.galaxy.event.EventManager
@@ -65,5 +66,6 @@ class Main : ModInitializer {
         eventManager.register(Exchange())
         eventManager.register(PlayerControl())
         eventManager.register(Harvest())
+        eventManager.register(BlockEvents())
     }
 }

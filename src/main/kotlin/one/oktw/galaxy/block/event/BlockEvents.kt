@@ -18,12 +18,29 @@
 
 package one.oktw.galaxy.block.event
 
+import one.oktw.galaxy.block.Block
+import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
+import one.oktw.galaxy.item.type.ItemType
 
-class BlockClickEvent {
-    @EventListener
+class BlockEvents {
+    @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
-        // TODO
+        val position = event.packet.hitY.blockPos
+        val placePosition = position.offset(event.packet.hitY.side)
+
+        val hand = event.packet.hand
+
+        val itemStack = event.player.getStackInHand(hand)
+
+        val tag = itemStack.tag ?: return
+        val itemType = tag.getString("customItemType") ?: return
+        if (itemType != ItemType.BLOCK.name) return
+
+        val itemBlock = Block(BlockType.valueOf(tag.getString("customBlockType") ?: return))
+
+        //TODO Check for GUI, hand, sneak
+        itemBlock.activate(placePosition)
     }
 }

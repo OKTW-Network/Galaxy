@@ -24,6 +24,8 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.CommandSource
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.TranslatableText
+import one.oktw.galaxy.block.Block
+import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.item.*
 import one.oktw.galaxy.item.type.*
 
@@ -36,6 +38,7 @@ class GetItem {
             .then(GetItem().tool)
             .then(GetItem().upgrade)
             .then(GetItem().weapon)
+            .then(GetItem().block)
     }
 
     private val button =
@@ -125,6 +128,24 @@ class GetItem {
                     }
                     .executes { context ->
                         getItem(context.source, Weapon(WeaponType.valueOf(StringArgumentType.getString(context, "item"))))
+                    }
+            )
+
+    private val block =
+        CommandManager.literal("block")
+            .then(
+                CommandManager.argument("item", StringArgumentType.string())
+                    .suggests { _, builder ->
+                        val blocks: MutableList<String> = mutableListOf()
+                        BlockType.values().forEach { block ->
+                            if (block.customModelData != null) {
+                                blocks.add(block.name)
+                            }
+                        }
+                        return@suggests CommandSource.suggestMatching(blocks, builder)
+                    }
+                    .executes { context ->
+                        getItem(context.source, Block(BlockType.valueOf(StringArgumentType.getString(context, "item"))).item!!)
                     }
             )
 

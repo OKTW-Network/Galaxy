@@ -25,8 +25,8 @@ import one.oktw.galaxy.block.type.BlockType.DUMMY
 import one.oktw.galaxy.block.util.BlockUtil
 
 class Block(val type: BlockType = DUMMY) {
-    val item = if (type.itemModelData != null) BlockItem(type) else null
+    val item = if (type.customModelData != null) BlockItem(type) else null
 
     fun activate(blockPos: BlockPos) =
-        if (type.blockModelData != null) BlockUtil.placeAndRegisterBlock(type, blockPos) else BlockUtil.registerBlock(type, blockPos)
+        if (type.customModelData != null) BlockUtil.placeAndRegisterBlock(type, blockPos) else BlockUtil.registerBlock(type, blockPos)
 }

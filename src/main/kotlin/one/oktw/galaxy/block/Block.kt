@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy.block
 
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.item.BlockItem
 import one.oktw.galaxy.block.type.BlockType
@@ -27,6 +28,10 @@ import one.oktw.galaxy.block.util.BlockUtil
 class Block(val type: BlockType = DUMMY) {
     val item = if (type.customModelData != null) BlockItem(type) else null
 
-    fun activate(blockPos: BlockPos) =
-        if (type.customModelData != null) BlockUtil.placeAndRegisterBlock(type, blockPos) else BlockUtil.registerBlock(type, blockPos)
+    suspend fun activate(world: ServerWorld, blockPos: BlockPos) =
+        if (type.customModelData != null) {
+            BlockUtil.placeAndRegisterBlock(world, this.item!!.createItemStack(), type, blockPos)
+        } else {
+            BlockUtil.registerBlock(world, type, blockPos)
+        }
 }

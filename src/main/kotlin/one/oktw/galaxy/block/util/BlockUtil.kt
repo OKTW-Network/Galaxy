@@ -18,16 +18,52 @@
 
 package one.oktw.galaxy.block.util
 
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.withContext
+import net.minecraft.block.Blocks.BARRIER
+import net.minecraft.item.ItemStack
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Box
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.block.type.BlockType
 
 object BlockUtil {
-    fun placeAndRegisterBlock(blockType: BlockType, blockPos: BlockPos) {
-        // TODO
-        registerBlock(blockType, blockPos)
+    suspend fun placeAndRegisterBlock(world: ServerWorld, blockItem: ItemStack, blockType: BlockType, blockPos: BlockPos): Boolean {
+        val entities = world.getEntities(null, Box(blockPos))
+        entities.forEach { entity ->
+            if (entity.scoreboardTags.contains("BLOCK")) return false
+        }
+        withContext(main!!.server.asCoroutineDispatcher()) {
+            world.setBlockState(blockPos, BARRIER.defaultState)
+            CustomBlockEntityBuilder()
+                .setBlockItem(blockItem)
+                .setBlockType(blockType)
+                .setPosition(blockPos)
+                .setWorld(world)
+                .setSmall()
+                .create()
+        }
+        return true
     }
 
-    fun registerBlock(blockType: BlockType, blockPos: BlockPos) {
-        // TODO
+    suspend fun registerBlock(world: ServerWorld, blockType: BlockType, blockPos: BlockPos): Boolean {
+        val entities = world.getEntities(null, Box(blockPos))
+        entities.forEach { entity ->
+            if (entity.scoreboardTags.contains("BLOCK")) return false
+        }
+        withContext(main!!.server.asCoroutineDispatcher()) {
+            CustomBlockEntityBuilder()
+                .setBlockType(blockType)
+                .setPosition(blockPos)
+                .setWorld(world)
+                .setSmall()
+                .create()
+        }
+        return true
+    }
+
+    fun removeBlock() {
+
     }
 }

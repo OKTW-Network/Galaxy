@@ -30,8 +30,8 @@ class Block(val type: BlockType = DUMMY) {
 
     suspend fun activate(world: ServerWorld, blockPos: BlockPos) =
         if (type.customModelData != null) {
-            BlockUtil.placeAndRegisterBlock(world, this.item!!.createItemStack(), type, blockPos)
+            BlockUtil.placeAndRegisterBlock(world, blockPos, this.item!!.createItemStack(), type)
         } else {
-            BlockUtil.registerBlock(world, type, blockPos)
+            BlockUtil.registerBlock(world, blockPos, type)
         }
 }

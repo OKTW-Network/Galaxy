@@ -62,7 +62,7 @@ class CustomBlockEntityBuilder {
     fun create(): Entity {
         if (this.world == null) throw RuntimeException("World is null!")
         this.tags.putString("id", "minecraft:armor_stand")
-//        this.tags.putBoolean("Invisible", true)
+        this.tags.putBoolean("Invisible", true)
         this.tags.putBoolean("Invulnerable", true)
         this.tags.putBoolean("NoGravity", true)
         this.tags.putBoolean("Silent", true)

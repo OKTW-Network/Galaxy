@@ -20,20 +20,24 @@ package one.oktw.galaxy.block.util
 
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
+import net.minecraft.block.Blocks
 import net.minecraft.block.Blocks.BARRIER
+import net.minecraft.entity.Entity
 import net.minecraft.item.ItemStack
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import one.oktw.galaxy.Main.Companion.main
+import one.oktw.galaxy.block.Block
 import one.oktw.galaxy.block.type.BlockType
+import net.minecraft.block.Block as minecraftBlock
 
 object BlockUtil {
-    suspend fun placeAndRegisterBlock(world: ServerWorld, blockItem: ItemStack, blockType: BlockType, blockPos: BlockPos): Boolean {
+    suspend fun placeAndRegisterBlock(world: ServerWorld, blockPos: BlockPos, blockItem: ItemStack, blockType: BlockType): Boolean {
         val entities = world.getEntities(null, Box(blockPos))
-        entities.forEach { entity ->
-            if (entity.scoreboardTags.contains("BLOCK")) return false
-        }
+        if (entities.isNotEmpty()) return false
         withContext(main!!.server.asCoroutineDispatcher()) {
             world.setBlockState(blockPos, BARRIER.defaultState)
             CustomBlockEntityBuilder()
@@ -44,14 +48,13 @@ object BlockUtil {
                 .setSmall()
                 .create()
         }
+        playSound(world, blockPos)
         return true
     }
 
-    suspend fun registerBlock(world: ServerWorld, blockType: BlockType, blockPos: BlockPos): Boolean {
-        val entities = world.getEntities(null, Box(blockPos))
-        entities.forEach { entity ->
-            if (entity.scoreboardTags.contains("BLOCK")) return false
-        }
+    suspend fun registerBlock(world: ServerWorld, blockPos: BlockPos, blockType: BlockType): Boolean {
+        val entity = detectBlock(world, blockPos)
+        if (entity != null) return false
         withContext(main!!.server.asCoroutineDispatcher()) {
             CustomBlockEntityBuilder()
                 .setBlockType(blockType)
@@ -63,7 +66,31 @@ object BlockUtil {
         return true
     }
 
-    fun removeBlock() {
+    fun removeBlock(world: ServerWorld, blockPos: BlockPos) {
+        val entity = detectBlock(world, blockPos) ?: return
+        val block = Block(getTypeFromBlock(entity) ?: return)
+        world.setBlockState(blockPos, Blocks.AIR.defaultState)
+        entity.kill()
+        minecraftBlock.dropStack(world, blockPos, block.item!!.createItemStack())
+    }
 
+    fun unregisterBlock(world: ServerWorld, blockPos: BlockPos): Boolean {
+        val entity = detectBlock(world, blockPos) ?: return false
+        entity.kill()
+        return true
+    }
+
+    fun detectBlock(world: ServerWorld, blockPos: BlockPos): Entity? {
+        val entities = world.getEntities(null, Box(blockPos))
+        return entities.firstOrNull { entity -> entity.scoreboardTags.contains("BLOCK") }
+    }
+
+    fun getTypeFromBlock(entity: Entity): BlockType? {
+        val tag = entity.scoreboardTags.firstOrNull { string -> BlockType.values().map { it.name }.contains(string) }
+        return if (tag != null) BlockType.valueOf(tag) else null
+    }
+
+    private fun playSound(world: ServerWorld, blockPos: BlockPos) {
+        world.playSound(null, blockPos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
     }
 }

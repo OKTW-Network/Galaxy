@@ -134,7 +134,7 @@ class GetItem {
     private val block =
         CommandManager.literal("block")
             .then(
-                CommandManager.argument("item", StringArgumentType.string())
+                CommandManager.argument("block", StringArgumentType.string())
                     .suggests { _, builder ->
                         val blocks: MutableList<String> = mutableListOf()
                         BlockType.values().forEach { block ->
@@ -145,7 +145,7 @@ class GetItem {
                         return@suggests CommandSource.suggestMatching(blocks, builder)
                     }
                     .executes { context ->
-                        getItem(context.source, Block(BlockType.valueOf(StringArgumentType.getString(context, "item"))).item!!)
+                        getItem(context.source, Block(BlockType.valueOf(StringArgumentType.getString(context, "block"))).item!!)
                     }
             )
 

@@ -23,6 +23,8 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.command.commands.admin.GetItem
+import one.oktw.galaxy.command.commands.admin.RegisterBlock
+import one.oktw.galaxy.command.commands.admin.UnregisterBlock
 
 class Admin : Command {
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
@@ -30,6 +32,8 @@ class Admin : Command {
             CommandManager.literal("admin")
                 .requires { source -> source.hasPermissionLevel(2) }
                 .then(GetItem.command)
+                .then(RegisterBlock.command)
+                .then(UnregisterBlock.command)
         )
     }
 }

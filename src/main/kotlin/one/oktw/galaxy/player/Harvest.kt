@@ -68,10 +68,10 @@ class Harvest {
             }
             GlobalScope.launch {
                 withContext(event.player.server.asCoroutineDispatcher()) {
+                    event.player.swingHand(hand)
+                    event.player.networkHandler.sendPacket(EntityAnimationS2CPacket(event.player, if (hand == Hand.MAIN_HAND) 0 else 3))
                     world.breakBlock(blockHitResult.blockPos, true)
                     if (blockState.block != PUMPKIN && blockState.block != MELON) {
-                        event.player.swingHand(hand)
-                        event.player.networkHandler.sendPacket(EntityAnimationS2CPacket(event.player, if (hand == Hand.MAIN_HAND) 0 else 3))
                         world.setBlockState(blockHitResult.blockPos, blockState.with(ageProperties, 0))
                         world.updateNeighbors(blockHitResult.blockPos, blockState.block)
                         updateBlockAndInventory(event.player, world, blockHitResult.blockPos)

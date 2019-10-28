@@ -74,8 +74,8 @@ class Harvest {
                     if (blockState.block != PUMPKIN && blockState.block != MELON) {
                         world.setBlockState(blockHitResult.blockPos, blockState.with(ageProperties, 0))
                         world.updateNeighbors(blockHitResult.blockPos, blockState.block)
-                        updateBlockAndInventory(event.player, world, blockHitResult.blockPos)
                     }
+                    updateBlockAndInventory(event.player, world, blockHitResult.blockPos)
                 }
                 justHarvested[event.player] = true
                 delay(Duration.ofSeconds(1))

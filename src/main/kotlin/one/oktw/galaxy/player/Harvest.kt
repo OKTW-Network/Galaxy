@@ -19,10 +19,8 @@
 package one.oktw.galaxy.player
 
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.time.delay
-import kotlinx.coroutines.withContext
 import net.minecraft.block.*
 import net.minecraft.block.Blocks.*
 import net.minecraft.client.network.packet.BlockUpdateS2CPacket
@@ -63,17 +61,15 @@ class Harvest {
                 NETHER_WART -> NetherWartBlock.AGE
                 else -> IntProperty.of("AGE", 0, 1)
             }
+            event.player.swingHand(hand)
+            event.player.networkHandler.sendPacket(EntityAnimationS2CPacket(event.player, if (hand == Hand.MAIN_HAND) 0 else 3))
+            world.breakBlock(blockHitResult.blockPos, true)
+            if (blockState.block != PUMPKIN && blockState.block != MELON) {
+                world.setBlockState(blockHitResult.blockPos, blockState.with(ageProperties, 0))
+                world.updateNeighbors(blockHitResult.blockPos, blockState.block)
+            }
+            updateBlockAndInventory(event.player, world, blockHitResult.blockPos)
             GlobalScope.launch {
-                withContext(event.player.server.asCoroutineDispatcher()) {
-                    event.player.swingHand(hand)
-                    event.player.networkHandler.sendPacket(EntityAnimationS2CPacket(event.player, if (hand == Hand.MAIN_HAND) 0 else 3))
-                    world.breakBlock(blockHitResult.blockPos, true)
-                    if (blockState.block != PUMPKIN && blockState.block != MELON) {
-                        world.setBlockState(blockHitResult.blockPos, blockState.with(ageProperties, 0))
-                        world.updateNeighbors(blockHitResult.blockPos, blockState.block)
-                    }
-                    updateBlockAndInventory(event.player, world, blockHitResult.blockPos)
-                }
                 justHarvested[event.player] = true
                 delay(Duration.ofSeconds(1))
                 justHarvested.remove(event.player)

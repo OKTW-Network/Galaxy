@@ -34,7 +34,6 @@ import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.RayTraceContext
-import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
@@ -46,7 +45,7 @@ class Harvest {
     private val justHarvested = ConcurrentHashMap<ServerPlayerEntity, Boolean>()
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
-        val world = main!!.server.getWorld(event.player.dimension)
+        val world = event.player.serverWorld
         val hand = event.packet.hand
 
         val blockHitResult = event.packet.hitY
@@ -87,7 +86,7 @@ class Harvest {
 
     @EventListener(true)
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
-        val world = main!!.server.getWorld(event.player.dimension)
+        val world = event.player.serverWorld
 
         val itemStack = event.player.getStackInHand(event.packet.hand)
         val item = itemStack.item as ItemFunctionAccessor

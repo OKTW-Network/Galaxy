@@ -51,9 +51,7 @@ class Harvest {
         val blockHitResult = event.packet.hitY
         val blockState = world.getBlockState(blockHitResult.blockPos)
 
-        val isMature = isMature(world, blockHitResult.blockPos, blockState)
-
-        if (isMature) {
+        if (isMature(world, blockHitResult.blockPos, blockState)) {
             event.cancel = true
             if (hand != Hand.MAIN_HAND) {
                 return

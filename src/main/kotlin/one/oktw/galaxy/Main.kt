@@ -85,6 +85,8 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(Harvest())
             eventManager.register(Sign())
         })
-        server.log("current server id is $selfUID")
+
+        // server.log("current server id is $selfUID
+        println("current server id is $selfUID")
     }
 }

@@ -34,10 +34,9 @@ import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
 import one.oktw.galaxy.network.ItemFunctionAccessor
-import java.util.concurrent.ConcurrentHashMap
 
 class Harvest {
-    private val justHarvested = ConcurrentHashMap.newKeySet<ServerPlayerEntity>()
+    private val justHarvested = HashSet<ServerPlayerEntity>()
 
     init {
         ServerTickCallback.EVENT.register(

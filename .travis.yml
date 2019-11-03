@@ -6,6 +6,7 @@ before_cache:
   - rm -f  $HOME/.gradle/caches/minecraft/deobfedDeps/compileDummy.jar
 cache:
   directories:
+    - $HOME/.gradle/loom-cache/
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 script: ./gradlew build

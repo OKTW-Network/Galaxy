@@ -18,9 +18,7 @@
 
 package one.oktw.galaxy.player
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.time.delay
+import net.fabricmc.fabric.api.event.server.ServerTickCallback
 import net.minecraft.block.*
 import net.minecraft.block.Blocks.*
 import net.minecraft.client.network.packet.BlockUpdateS2CPacket
@@ -36,11 +34,19 @@ import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
 import one.oktw.galaxy.network.ItemFunctionAccessor
-import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 
 class Harvest {
-    private val justHarvested = ConcurrentHashMap<ServerPlayerEntity, Boolean>()
+    private val justHarvested = ConcurrentHashMap.newKeySet<ServerPlayerEntity>()
+
+    init {
+        ServerTickCallback.EVENT.register(
+            ServerTickCallback {
+                justHarvested.clear()
+            }
+        )
+    }
+
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
         val world = event.player.serverWorld
@@ -69,11 +75,7 @@ class Harvest {
                 world.updateNeighbors(blockHitResult.blockPos, blockState.block)
             }
             updateBlockAndInventory(event.player, world, blockHitResult.blockPos)
-            GlobalScope.launch {
-                justHarvested[event.player] = true
-                delay(Duration.ofSeconds(1))
-                justHarvested.remove(event.player)
-            }
+            justHarvested.add(event.player)
             return
         }
     }
@@ -87,8 +89,7 @@ class Harvest {
         val blockHitResult = item.getRayTrace(world, event.player, RayTraceContext.FluidHandling.ANY) as BlockHitResult
         val blockState = world.getBlockState(blockHitResult.blockPos)
 
-        val harvested = justHarvested[event.player] ?: false
-        if (isMature(world, blockHitResult.blockPos, blockState) || harvested) {
+        if (isMature(world, blockHitResult.blockPos, blockState) || justHarvested.contains(event.player)) {
             event.cancel = true
             updateBlockAndInventory(event.player, world, blockHitResult.blockPos)
         }

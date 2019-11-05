@@ -41,14 +41,25 @@ import java.time.Duration
 class BlockEvents {
     private val eventLock = HashSet<PlayerInteractBlockC2SPacket>()
     private val mainHandUsedLock = HashSet<ServerPlayerEntity>()
+    private val guiTriggered = HashSet<PlayerInteractBlockC2SPacket>()
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
+        if (guiTriggered.contains(event.packet)) event.cancel = true
         if (eventLock.contains(event.packet) || mainHandUsedLock.contains(event.player)) return
         eventLock.add(event.packet)
         if (tryBreakBlock(event.packet, event.player, event.packet.hand)) return
         if (tryOpenGUI(event)) return
         waitAndUnlock(event.packet)
         tryPlaceBlock(event.packet, event.player)
+    }
+
+    private fun setGUITriggered(packet: PlayerInteractBlockC2SPacket) {
+        // todo remove when #282 merged
+        GlobalScope.launch {
+            guiTriggered.add(packet)
+            delay(Duration.ofMillis(50))
+            guiTriggered.remove(packet)
+        }
     }
 
     private fun setMainHandUsed(player: ServerPlayerEntity) {
@@ -90,6 +101,7 @@ class BlockEvents {
             val entity = BlockUtil.detectBlock(world, position) ?: return false
             val blockType = BlockUtil.getTypeFromBlock(entity) ?: return false
             if (blockType.hasGUI && hand == Hand.MAIN_HAND) openGUI(blockType, event.player, event)
+            setGUITriggered(event.packet)
             waitAndUnlock(event.packet)
             if (hand == Hand.MAIN_HAND) setMainHandUsed(event.player)
             return true

@@ -127,19 +127,17 @@ class BlockEvents {
         if (position.y < server.worldHeight - 1 || packet.hitY.side != Direction.UP && position.y < server.worldHeight) {
             // player modifiable world check
             if (world.canPlayerModifyAt(player, placePosition) && player.interactionManager.gameMode != GameMode.SPECTATOR) {
-                GlobalScope.launch {
-                    if (hand == Hand.MAIN_HAND) setMainHandUsed(player)
+                if (hand == Hand.MAIN_HAND) setMainHandUsed(player)
 
-                    val success = itemBlock.activate(world, placePosition)
+                val success = itemBlock.activate(world, placePosition)
 
-                    if (success) {
-                        if (player.interactionManager.gameMode != GameMode.CREATIVE) {
-                            itemStack.decrement(1)
-                            player.setStackInHand(hand, itemStack)
-                        }
-                    } else if (hand == Hand.MAIN_HAND) { // if place failed try fire again offhand action (Because it was cancelled before)
-                        tryBreakBlock(packet, player, Hand.OFF_HAND)
+                if (success) {
+                    if (player.interactionManager.gameMode != GameMode.CREATIVE) {
+                        itemStack.decrement(1)
+                        player.setStackInHand(hand, itemStack)
                     }
+                } else if (hand == Hand.MAIN_HAND) { // if place failed try fire again offhand action (Because it was cancelled before)
+                    tryBreakBlock(packet, player, Hand.OFF_HAND)
                 }
             }
         }

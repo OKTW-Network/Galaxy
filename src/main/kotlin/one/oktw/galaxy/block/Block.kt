@@ -28,7 +28,7 @@ import one.oktw.galaxy.block.util.BlockUtil
 class Block(val type: BlockType = DUMMY) {
     val item = if (type.customModelData != null) BlockItem(type) else null
 
-    suspend fun activate(world: ServerWorld, blockPos: BlockPos) =
+    fun activate(world: ServerWorld, blockPos: BlockPos) =
         if (type.customModelData != null) {
             BlockUtil.placeAndRegisterBlock(world, blockPos, this.item!!.createItemStack(), type)
         } else {

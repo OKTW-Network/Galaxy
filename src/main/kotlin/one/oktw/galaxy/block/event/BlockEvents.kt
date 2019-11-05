@@ -39,8 +39,8 @@ import one.oktw.galaxy.item.type.ToolType
 import java.time.Duration
 
 class BlockEvents {
-    private val eventLock: MutableList<PlayerInteractBlockC2SPacket> = mutableListOf()
-    private val mainHandUsedLock: MutableList<ServerPlayerEntity> = mutableListOf()
+    private val eventLock = HashSet<PlayerInteractBlockC2SPacket>()
+    private val mainHandUsedLock = HashSet<ServerPlayerEntity>()
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
         if (eventLock.contains(event.packet) || mainHandUsedLock.contains(event.player)) return
@@ -52,6 +52,7 @@ class BlockEvents {
     }
 
     private fun setMainHandUsed(player: ServerPlayerEntity) {
+        // todo remove when #282 merged
         GlobalScope.launch {
             mainHandUsedLock.add(player)
             delay(Duration.ofMillis(50))
@@ -60,6 +61,7 @@ class BlockEvents {
     }
 
     private fun waitAndUnlock(packet: PlayerInteractBlockC2SPacket) {
+        // todo remove when #282 merged
         GlobalScope.launch {
             delay(Duration.ofSeconds(1))
             eventLock.remove(packet)

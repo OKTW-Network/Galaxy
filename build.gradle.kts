@@ -60,9 +60,6 @@ dependencies {
     include(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = "0.1.2+b7f9825de8")
     include(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
     include(group = "org.mongodb", name = "bson", version = "3.12.0")
-
-    // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
-    // You may need to force-disable transitiveness on them.
 }
 
 tasks.getByName<ProcessResources>("processResources") {
@@ -81,24 +78,3 @@ tasks.getByName<ProcessResources>("processResources") {
 tasks.getByName<Jar>("jar") {
     from("LICENSE")
 }
-
-// configure the maven publication
-//publishing {
-//    publications {
-//        mavenJava(MavenPublication) {
-//            // add all the jars that should be included when publishing to maven
-//            artifact(jar) {
-//                builtBy remapJar
-//            }
-//            artifact(sourcesJar) {
-//                builtBy remapSourcesJar
-//            }
-//        }
-//    }
-//
-//    // select the repositories you want to publish to
-//    repositories {
-//        // uncomment to publish to the local maven
-//        // mavenLocal()
-//    }
-//}

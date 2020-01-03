@@ -26,8 +26,8 @@
     "tweak.mixin.json"
   ],
   "requires": {
-    "fabricloader": ">=0.4.0",
-    "fabric-language-kotlin": ">=1.3.31",
+    "fabricloader": ">=0.7.0",
+    "fabric-language-kotlin": ">=1.3.61",
     "fabric": "*"
   },
   "suggests": {}

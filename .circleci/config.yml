@@ -31,7 +31,9 @@ jobs:
       - run: ./gradlew build
 
       - save_cache:
-          paths: [~/.gradle]
+          paths:
+            - ~/.gradle
+            - .gradle/loom-cache
           key: dependencies-v5-{{ .Branch }}-{{ .Revision }}
 
       - store_artifacts:

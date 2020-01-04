@@ -34,6 +34,7 @@ class Tool(val type: ToolType = DUMMY) : Item {
         val item = CustomItemBuilder()
             .setBaseItem(IRON_SWORD)
             .setModel(type.customModelData)
+            .setItemType(itemType)
             .setUnbreakable()
             .hideAllFlags()
             .removeAllModifiers()

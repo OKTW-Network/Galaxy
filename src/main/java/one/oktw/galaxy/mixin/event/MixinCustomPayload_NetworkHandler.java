@@ -39,10 +39,10 @@ public class MixinCustomPayload_NetworkHandler {
 
     @Inject(method = "onCustomPayload", at = @At("HEAD"), cancellable = true)
     private void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo info) {
-        Identifier channel = ((CustomPayloadC2SPacketAccessor) packet).getChannel();
-
         Main main = Main.Companion.getMain();
         if (main == null) return;
+
+        Identifier channel = ((CustomPayloadC2SPacketAccessor) packet).getChannel();
         PacketByteBuf buff = ((CustomPayloadC2SPacketAccessor) packet).getData();
         main.getEventManager().emit(new PacketReceiveEvent(channel, buff, player));
     }

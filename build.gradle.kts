@@ -9,6 +9,7 @@ plugins {
 val version = "0.0.1"
 val group = "one.oktw"
 
+val fabricVersion = "0.1.2+b7f9825de8"
 val proxyApiVersion = "0.1.0"
 
 repositories {
@@ -50,14 +51,16 @@ dependencies {
     modCompile(group = "net.fabricmc", name = "fabric-loader", version = "0.7.3+build.176")
 
     // fabric api/library
-    modCompile(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.61+build.1")
-    modCompile(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = "0.1.2+b7f9825de8")
+    modImplementation(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.61+build.2")
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api-base", version = fabricVersion)
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = fabricVersion)
 
     // galaxy api
-    modCompile(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
+    modImplementation(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
 
     // Jar in Jar
-    include(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = "0.1.2+b7f9825de8")
+    include(group = "net.fabricmc.fabric-api", name = "fabric-api-base", version = fabricVersion)
+    include(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = fabricVersion)
     include(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
     include(group = "org.mongodb", name = "bson", version = "3.12.0")
 }

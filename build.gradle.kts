@@ -48,12 +48,16 @@ dependencies {
     // fabric api/library
     modCompile(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.50+build.3")
     modCompile(group = "net.fabricmc.fabric-api", name = "fabric-commands", version = "0.1.0")
+    modCompile(group = "net.fabricmc.fabric-api", name = "fabric-events-lifecycle-v0", version = "0.1.1+eff46b3db4")
+    modCompile(group = "net.fabricmc.fabric-api", name = "fabric-api-base", version = "0.1.1+38a28ddb96")
 
     // galaxy api
     modCompile(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
 
     // Jar in Jar
     include(group = "net.fabricmc.fabric-api", name = "fabric-commands", version = "0.1.0")
+    include(group = "net.fabricmc.fabric-api", name = "fabric-events-lifecycle-v0", version = "0.1.1+eff46b3db4")
+    include(group = "net.fabricmc.fabric-api", name = "fabric-api-base", version = "0.1.1+38a28ddb96")
     include(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
     include(group = "org.mongodb", name = "bson", version = "3.11.0")
 

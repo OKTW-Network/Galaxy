@@ -64,6 +64,9 @@ public abstract class LivingEntityMixin_RealTime extends EntityMixin_RealTime {
     @Shadow
     protected int lastAttackedTicks;
 
+    @Shadow
+    public int hurtTime;
+
     @Redirect(method = "updatePostDeath",
         at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;deathTime:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
     private void realTimeImpl$adjustForRealTimeDeathTime(final LivingEntity self, final int vanillaNewDeathTime) {
@@ -84,5 +87,17 @@ public abstract class LivingEntityMixin_RealTime extends EntityMixin_RealTime {
     private void realTimeImpl$adjustForRealTimeUseTime(final LivingEntity self, final int modifier) {
         final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         itemUseTimeLeft -= Math.min(itemUseTimeLeft, ticks);
+    }
+
+    @Redirect(method = "baseTick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;hurtTime:I", opcode = Opcodes.PUTFIELD))
+    private void realTimeImpl$adjustForRealTimeHurtTime(final LivingEntity self, final int modifier) {
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
+        hurtTime -= Math.min(hurtTime, ticks);
+    }
+
+    @Redirect(method = "baseTick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;timeUntilRegen:I", opcode = Opcodes.PUTFIELD))
+    private void realTimeImpl$adjustForRealTimeUntilRegen(final LivingEntity self, final int modifier) {
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
+        timeUntilRegen -= Math.min(timeUntilRegen, ticks);
     }
 }

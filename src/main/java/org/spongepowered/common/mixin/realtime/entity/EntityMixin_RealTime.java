@@ -45,6 +45,9 @@ public abstract class EntityMixin_RealTime {
     @Shadow
     protected int netherPortalTime;
 
+    @Shadow
+    public int timeUntilRegen;
+
     @Redirect(method = "baseTick",
         at = @At(
             value = "FIELD",

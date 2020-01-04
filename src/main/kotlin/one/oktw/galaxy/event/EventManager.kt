@@ -19,7 +19,7 @@
 package one.oktw.galaxy.event
 
 import kotlinx.coroutines.*
-import net.minecraft.util.ThreadExecutor
+import net.minecraft.util.thread.ThreadExecutor
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.Event
 import java.util.concurrent.ConcurrentHashMap

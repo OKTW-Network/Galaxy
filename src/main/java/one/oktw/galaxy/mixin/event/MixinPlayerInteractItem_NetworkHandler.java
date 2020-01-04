@@ -20,12 +20,9 @@ package one.oktw.galaxy.mixin.event;
 
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.packet.CustomPayloadC2SPacket;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.server.network.packet.PlayerInteractItemC2SPacket;
 import one.oktw.galaxy.Main;
-import one.oktw.galaxy.event.type.PacketReceiveEvent;
-import one.oktw.galaxy.network.CustomPayloadC2SPacketAccessor;
+import one.oktw.galaxy.event.type.PlayerInteractItemEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,17 +30,16 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayNetworkHandler.class)
-public class MixinCustomPayload_NetworkHandler {
+public class MixinPlayerInteractItem_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Inject(method = "onCustomPayload", at = @At("HEAD"), cancellable = true)
-    private void onCustomPayload(CustomPayloadC2SPacket packet, CallbackInfo info) {
+    @Inject(method = "onPlayerInteractItem", at = @At("HEAD"), cancellable = true)
+    private void onPlayerInteractItem(PlayerInteractItemC2SPacket packet, CallbackInfo info) {
         Main main = Main.Companion.getMain();
         if (main == null) return;
-
-        Identifier channel = ((CustomPayloadC2SPacketAccessor) packet).getChannel();
-        PacketByteBuf buff = ((CustomPayloadC2SPacketAccessor) packet).getData();
-        main.getEventManager().emit(new PacketReceiveEvent(channel, buff, player));
+        if (main.getEventManager().emit(new PlayerInteractItemEvent(packet, player)).getCancel()) {
+            info.cancel();
+        }
     }
 }

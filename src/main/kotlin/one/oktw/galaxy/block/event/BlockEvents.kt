@@ -18,9 +18,6 @@
 
 package one.oktw.galaxy.block.event
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.time.delay
 import net.fabricmc.fabric.api.event.server.ServerTickCallback
 import net.minecraft.block.Blocks
 import net.minecraft.server.network.ServerPlayerEntity
@@ -38,36 +35,27 @@ import one.oktw.galaxy.event.util.BlockEventUtil.updateBlockAndInventory
 import one.oktw.galaxy.item.Tool
 import one.oktw.galaxy.item.type.ItemType
 import one.oktw.galaxy.item.type.ToolType
-import java.time.Duration
 
 class BlockEvents {
     private val eventLock = HashSet<PlayerInteractBlockC2SPacket>()
     private val mainHandUsedLock = HashSet<ServerPlayerEntity>()
+
+    init {
+        ServerTickCallback.EVENT.register(
+            ServerTickCallback {
+                eventLock.clear()
+                mainHandUsedLock.clear()
+            }
+        )
+    }
+
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
         if (eventLock.contains(event.packet) || mainHandUsedLock.contains(event.player)) return
         eventLock.add(event.packet)
         if (tryBreakBlock(event.packet, event.player, event.packet.hand)) return
         if (tryOpenGUI(event)) return
-        waitAndUnlock(event.packet)
         tryPlaceBlock(event.packet, event.player)
-    }
-
-    private fun setMainHandUsed(player: ServerPlayerEntity) {
-        // todo remove when #282 merged
-        GlobalScope.launch {
-            mainHandUsedLock.add(player)
-            delay(Duration.ofMillis(50))
-            mainHandUsedLock.remove(player)
-        }
-    }
-
-    private fun waitAndUnlock(packet: PlayerInteractBlockC2SPacket) {
-        // todo remove when #282 merged
-        GlobalScope.launch {
-            delay(Duration.ofSeconds(1))
-            eventLock.remove(packet)
-        }
     }
 
     private fun tryBreakBlock(packet: PlayerInteractBlockC2SPacket, player: ServerPlayerEntity, hand: Hand): Boolean {
@@ -77,8 +65,7 @@ class BlockEvents {
         if (player.isSneaking && player.getStackInHand(hand).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
             BlockUtil.detectBlock(world, position) ?: return false
             BlockUtil.removeBlock(world, position)
-            waitAndUnlock(packet)
-            if (hand == Hand.MAIN_HAND) setMainHandUsed(player)
+            if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(player)
             return true
         }
         return false
@@ -92,8 +79,7 @@ class BlockEvents {
             val entity = BlockUtil.detectBlock(world, position) ?: return false
             val blockType = BlockUtil.getTypeFromBlock(entity) ?: return false
             if (blockType.hasGUI && hand == Hand.MAIN_HAND) openGUI(blockType, event.player, event)
-            waitAndUnlock(event.packet)
-            if (hand == Hand.MAIN_HAND) setMainHandUsed(event.player)
+            if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(event.player)
             return true
         }
         return false
@@ -132,7 +118,7 @@ class BlockEvents {
         if (position.y < server.worldHeight - 1 || packet.hitY.side != Direction.UP && position.y < server.worldHeight) {
             // player modifiable world check
             if (world.canPlayerModifyAt(player, placePosition) && player.interactionManager.gameMode != GameMode.SPECTATOR) {
-                if (hand == Hand.MAIN_HAND) setMainHandUsed(player)
+                if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(player)
 
                 val success = itemBlock.activate(world, placePosition)
 

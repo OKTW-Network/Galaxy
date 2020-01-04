@@ -9,7 +9,9 @@
     "MixinCustomPayload_CustomPayloadC2SPacket",
     "MixinCustomPayload_NetworkHandler",
     "MixinRequestCompletions_NetworkHandler",
-    "MixinPlayerInteractBlock_NetworkHandler"
+    "MixinPlayerInteractBlock_NetworkHandler",
+    "MixinPlayerInteractItem_NetworkHandler",
+    "MixinItem_Item"
   ],
   "client": [],
   "injectors": {

@@ -21,14 +21,12 @@ package one.oktw.galaxy.block.event
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.time.delay
+import net.fabricmc.fabric.api.event.server.ServerTickCallback
 import net.minecraft.block.Blocks
-import net.minecraft.client.network.packet.BlockUpdateS2CPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.network.packet.PlayerInteractBlockC2SPacket
-import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Hand
-import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.GameMode
 import one.oktw.galaxy.block.Block
@@ -36,6 +34,7 @@ import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.block.util.BlockUtil
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
+import one.oktw.galaxy.event.util.BlockEventUtil.updateBlockAndInventory
 import one.oktw.galaxy.item.Tool
 import one.oktw.galaxy.item.type.ItemType
 import one.oktw.galaxy.item.type.ToolType
@@ -52,18 +51,6 @@ class BlockEvents {
         if (tryOpenGUI(event)) return
         waitAndUnlock(event.packet)
         tryPlaceBlock(event.packet, event.player)
-    }
-
-    private fun updateBlockAndInventory(player: ServerPlayerEntity, world: ServerWorld, blockPos: BlockPos) {
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(1, 0, 0)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, 0, 1)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(-1, 0, 0)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, 0, -1)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, 1, 0)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, -1, 0)))
-        player.onContainerRegistered(player.container, player.container.stacks)
-
     }
 
     private fun setMainHandUsed(player: ServerPlayerEntity) {

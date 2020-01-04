@@ -21,7 +21,6 @@ package one.oktw.galaxy.player
 import net.fabricmc.fabric.api.event.server.ServerTickCallback
 import net.minecraft.block.*
 import net.minecraft.block.Blocks.*
-import net.minecraft.client.network.packet.BlockUpdateS2CPacket
 import net.minecraft.client.network.packet.EntityAnimationS2CPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
@@ -33,6 +32,8 @@ import net.minecraft.world.RayTraceContext
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
+import one.oktw.galaxy.event.util.BlockEventUtil.isNextTo
+import one.oktw.galaxy.event.util.BlockEventUtil.updateBlockAndInventory
 import one.oktw.galaxy.network.ItemFunctionAccessor
 
 class Harvest {
@@ -102,24 +103,5 @@ class Harvest {
         MELON -> isNextTo(world, blockPos, ATTACHED_MELON_STEM)
         PUMPKIN -> isNextTo(world, blockPos, ATTACHED_PUMPKIN_STEM)
         else -> false
-    }
-
-    private fun updateBlockAndInventory(player: ServerPlayerEntity, world: ServerWorld, blockPos: BlockPos) {
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(1, 0, 0)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, 0, 1)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(-1, 0, 0)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, 0, -1)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, 1, 0)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, -1, 0)))
-        player.onContainerRegistered(player.container, player.container.stacks)
-
-    }
-
-    private fun isNextTo(world: ServerWorld, blockPos: BlockPos, block: Block): Boolean {
-        return world.getBlockState(blockPos.add(1, 0, 0)).block == block ||
-            world.getBlockState(blockPos.add(0, 0, 1)).block == block ||
-            world.getBlockState(blockPos.add(-1, 0, 0)).block == block ||
-            world.getBlockState(blockPos.add(0, 0, -1)).block == block
     }
 }

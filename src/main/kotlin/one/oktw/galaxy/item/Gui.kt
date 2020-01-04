@@ -33,6 +33,7 @@ class Gui(val type: GuiType = BLANK) : Item {
         val item = CustomItemBuilder()
             .setBaseItem(DIAMOND_HOE)
             .setModel(type.customModelData)
+            .setItemType(itemType)
             .setUnbreakable()
             .hideAllFlags()
             .removeAllModifiers()

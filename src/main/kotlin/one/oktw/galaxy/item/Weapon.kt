@@ -34,6 +34,7 @@ class Weapon(val type: WeaponType = DUMMY) : Item {
         val item = CustomItemBuilder()
             .setBaseItem(DIAMOND_SWORD)
             .setModel(type.customModelData)
+            .setItemType(itemType)
             .setUnbreakable()
             .hideAllFlags()
             .removeAllModifiers()

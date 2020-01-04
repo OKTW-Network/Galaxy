@@ -61,6 +61,9 @@ public abstract class LivingEntityMixin_RealTime extends EntityMixin_RealTime {
     @Shadow
     protected int itemUseTimeLeft;
 
+    @Shadow
+    protected int lastAttackedTicks;
+
     @Redirect(method = "updatePostDeath",
         at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;deathTime:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
     private void realTimeImpl$adjustForRealTimeDeathTime(final LivingEntity self, final int vanillaNewDeathTime) {

@@ -94,4 +94,10 @@ public abstract class PlayerEntityMixin_RealTime extends LivingEntityMixin_RealT
         final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         this.sleepTimer += ticks;
     }
+
+    @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerEntity;lastAttackedTicks:I", opcode = Opcodes.PUTFIELD))
+    private void realTimeImpl$adjustForRealTimeAttackCoolDown(final PlayerEntity self, final int modifier) {
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
+        this.lastAttackedTicks += ticks;
+    }
 }

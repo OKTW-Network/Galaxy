@@ -43,7 +43,7 @@
 package org.spongepowered.common.mixin.realtime.entity;
 
 import net.minecraft.entity.ExperienceOrbEntity;
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -64,16 +64,6 @@ public abstract class ExperienceOrbEntityMixin_RealTime extends EntityMixin_Real
             value = "FIELD",
             target = "Lnet/minecraft/entity/ExperienceOrbEntity;pickupDelay:I",
             opcode = Opcodes.PUTFIELD
-        ),
-        slice = @Slice(
-            from = @At(
-                value = "INVOKE",
-                target = "Lnet/minecraft/entity/Entity;tick()V"
-            ),
-            to = @At(
-                value = "INVOKE",
-                target = "Lnet/minecraft/entity/ExperienceOrbEntity;hasNoGravity()Z"
-            )
         )
     )
     private void realTimeImpl$adjustForRealTimePickupDelay(final ExperienceOrbEntity self, final int modifier) {

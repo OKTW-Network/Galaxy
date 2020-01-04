@@ -25,12 +25,10 @@
 package org.spongepowered.common.mixin.realtime.entity.mob;
 
 import net.minecraft.entity.mob.ZombieVillagerEntity;
-import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 import org.spongepowered.common.mixin.realtime.entity.LivingEntityMixin_RealTime;
 
@@ -45,17 +43,6 @@ public abstract class ZombieVillagerEntityMixin_RealTime extends LivingEntityMix
             value = "INVOKE",
             target = "Lnet/minecraft/entity/mob/ZombieVillagerEntity;getConversionRate()I",
             ordinal = 0
-        ),
-        slice = @Slice(
-            from = @At(
-                value = "INVOKE",
-                target = "Lnet/minecraft/entity/mob/ZombieVillagerEntity;isConverting()Z"
-            ),
-            to = @At(
-                value = "FIELD",
-                target = "Lnet/minecraft/entity/mob/ZombieVillagerEntity;conversionTimer:I",
-                opcode = Opcodes.GETFIELD
-            )
         )
     )
     private int realTimeImpl$adjustForRealTimeConversionTimeBoost(final ZombieVillagerEntity self) {

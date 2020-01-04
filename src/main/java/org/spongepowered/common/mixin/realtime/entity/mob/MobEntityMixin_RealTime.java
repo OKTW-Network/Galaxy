@@ -43,11 +43,10 @@
 package org.spongepowered.common.mixin.realtime.entity.mob;
 
 import net.minecraft.entity.mob.MobEntity;
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 import org.spongepowered.common.mixin.realtime.entity.LivingEntityMixin_RealTime;
 
@@ -59,14 +58,6 @@ public abstract class MobEntityMixin_RealTime extends LivingEntityMixin_RealTime
             value = "FIELD",
             target = "Lnet/minecraft/entity/mob/MobEntity;despawnCounter:I",
             opcode = Opcodes.PUTFIELD
-        ),
-        slice = @Slice(
-            from = @At("HEAD"),
-            to = @At(
-                value = "CONSTANT",
-                args = "stringValue=checkDespawn"
-
-            )
         )
     )
     private void realTimeImpl$adjustForRealTimeEntityDespawnAge(final MobEntity self, final int modifier) {

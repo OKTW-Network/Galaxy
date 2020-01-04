@@ -43,30 +43,21 @@
 package org.spongepowered.common.mixin.realtime.server.network;
 
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 import org.spongepowered.common.mixin.realtime.entity.player.PlayerEntityMixin_RealTime;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin_RealTime extends PlayerEntityMixin_RealTime {
     @Redirect(
-        method = "tickPortalCooldown",
+        method = "tickNetherPortalCooldown",
         at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/server/network/ServerPlayerEntity;portalCooldown:I",
+            target = "Lnet/minecraft/server/network/ServerPlayerEntity;netherPortalCooldown:I",
             opcode = Opcodes.PUTFIELD
-        ),
-        slice = @Slice(
-            from = @At(
-                value = "FIELD",
-                target = "Lnet/minecraft/server/network/ServerPlayerEntity;inTeleportationState:Z",
-                opcode = Opcodes.GETFIELD
-            ),
-            to = @At("RETURN")
         )
     )
     private void realTimeImpl$adjustForRealTimePortalCooldown(final ServerPlayerEntity self, final int modifier) {
@@ -81,6 +72,6 @@ public abstract class ServerPlayerEntityMixin_RealTime extends PlayerEntityMixin
         // timeUntilPortal at 1. If setPortal() does not reset it (the player
         // exits the portal), modifier will become 0, indicating that it is
         // OK to teleport the player.
-        this.portalCooldown = Math.max(modifier > 0 ? 1 : 0, this.portalCooldown - ticks);
+        this.netherPortalCooldown = Math.max(modifier > 0 ? 1 : 0, this.netherPortalCooldown - ticks);
     }
 }

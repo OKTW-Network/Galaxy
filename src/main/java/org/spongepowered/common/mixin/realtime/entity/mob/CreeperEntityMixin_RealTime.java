@@ -43,7 +43,7 @@
 package org.spongepowered.common.mixin.realtime.entity.mob;
 
 import net.minecraft.entity.mob.CreeperEntity;
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -57,12 +57,11 @@ public abstract class CreeperEntityMixin_RealTime {
 
     @Shadow
     private int currentFuseTime;
+    @Shadow
+    private int fuseTime;
 
     @Shadow
     public abstract int getFuseSpeed();
-
-    @Shadow
-    private int fuseTime;
 
     @Redirect(
         method = "tick",

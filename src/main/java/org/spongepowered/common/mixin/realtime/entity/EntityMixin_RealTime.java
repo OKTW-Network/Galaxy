@@ -26,7 +26,7 @@ package org.spongepowered.common.mixin.realtime.entity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -39,11 +39,11 @@ public abstract class EntityMixin_RealTime {
     @Shadow
     public World world;
     @Shadow
-    public int portalCooldown;
+    public int netherPortalCooldown;
     @Shadow
     protected int ridingCooldown;
     @Shadow
-    protected int portalTime;
+    protected int netherPortalTime;
 
     @Redirect(method = "baseTick",
         at = @At(
@@ -68,19 +68,19 @@ public abstract class EntityMixin_RealTime {
         this.ridingCooldown = Math.max(0, this.ridingCooldown - ticks);
     }
 
-    @Redirect(method = "tickPortal",
+    @Redirect(method = "tickNetherPortal",
         at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/entity/Entity;portalTime:I",
+            target = "Lnet/minecraft/entity/Entity;netherPortalTime:I",
             opcode = Opcodes.PUTFIELD, ordinal = 0
         ),
         slice = @Slice(
-            from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getMaxPortalTime()I"),
-            to = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getDefaultPortalCooldown()I")
+            from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getMaxNetherPortalTime()I"),
+            to = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getDefaultNetherPortalCooldown()I")
         )
     )
     private void realTimeImpl$adjustForRealTimePortalCounter(final Entity self, final int modifier) {
         final int ticks = (int) ((RealTimeTrackingBridge) this.world).realTimeBridge$getRealTimeTicks();
-        this.portalTime += ticks;
+        this.netherPortalTime += ticks;
     }
 }

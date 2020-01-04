@@ -43,7 +43,7 @@
 package org.spongepowered.common.mixin.realtime.entity;
 
 import net.minecraft.entity.LivingEntity;
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -77,7 +77,7 @@ public abstract class LivingEntityMixin_RealTime extends EntityMixin_RealTime {
         this.deathTime = newDeathTime;
     }
 
-    @Redirect(method = "method_6076", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;itemUseTimeLeft:I", opcode = Opcodes.PUTFIELD))
+    @Redirect(method = "tickActiveItemStack", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;itemUseTimeLeft:I", opcode = Opcodes.PUTFIELD))
     private void realTimeImpl$adjustForRealTimeUseTime(final LivingEntity self, final int modifier) {
         final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         itemUseTimeLeft -= Math.min(itemUseTimeLeft, ticks);

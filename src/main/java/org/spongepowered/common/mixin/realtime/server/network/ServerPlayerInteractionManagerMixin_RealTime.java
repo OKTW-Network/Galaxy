@@ -24,45 +24,33 @@
  */
 package org.spongepowered.common.mixin.realtime.server.network;
 
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
 @Mixin(ServerPlayerInteractionManager.class)
 public abstract class ServerPlayerInteractionManagerMixin_RealTime {
     @Shadow
-    public ServerPlayerEntity player;
-    @Shadow
     public ServerWorld world;
+
     @Shadow
-    private int field_14000;
+    private int tickCounter;
 
     @Redirect(
         method = "update",
         at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;field_14000:I",
+            target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;tickCounter:I",
             opcode = Opcodes.PUTFIELD
-        ),
-        slice = @Slice(
-            from = @At("HEAD"),
-            to = @At(
-                value = "FIELD",
-                target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;field_20328:Z",
-                opcode = Opcodes.GETFIELD,
-                ordinal = 0
-            )
         )
     )
     private void realTimeImpl$adjustForRealTimeDiggingTime(final ServerPlayerInteractionManager self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) this.world.getServer()).realTimeBridge$getRealTimeTicks();
-        this.field_14000 += ticks;
+        final int ticks = (int) ((RealTimeTrackingBridge) world.getServer()).realTimeBridge$getRealTimeTicks();
+        this.tickCounter += ticks;
     }
 }

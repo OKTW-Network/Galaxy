@@ -129,6 +129,8 @@ class BlockEvents {
 
         val itemStack = player.getStackInHand(hand)
 
+        if (itemStack.count <= 0) return
+
         val tag = itemStack.tag ?: return
         val itemType = tag.getString("customItemType") ?: return
         if (itemType != ItemType.BLOCK.name) return

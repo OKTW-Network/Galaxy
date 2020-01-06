@@ -24,17 +24,21 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.network.packet.PlayerInteractBlockC2SPacket
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Hand
+import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.Direction
 import net.minecraft.world.GameMode
+import net.minecraft.world.RayTraceContext
 import one.oktw.galaxy.block.Block
 import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.block.util.BlockUtil
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
+import one.oktw.galaxy.event.type.PlayerInteractItemEvent
 import one.oktw.galaxy.event.util.BlockEventUtil.updateBlockAndInventory
 import one.oktw.galaxy.item.Tool
 import one.oktw.galaxy.item.type.ItemType
 import one.oktw.galaxy.item.type.ToolType
+import one.oktw.galaxy.network.ItemFunctionAccessor
 
 class BlockEvents {
     private val eventLock = HashSet<PlayerInteractBlockC2SPacket>()
@@ -56,6 +60,23 @@ class BlockEvents {
         if (tryBreakBlock(event.packet, event.player, event.packet.hand)) return
         if (tryOpenGUI(event)) return
         tryPlaceBlock(event.packet, event.player)
+    }
+
+    @Suppress("DuplicatedCode")
+    @EventListener(true)
+    fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
+        val world = event.player.serverWorld
+
+        val itemStack = event.player.getStackInHand(event.packet.hand)
+        val item = itemStack.item as ItemFunctionAccessor
+        val blockHitResult = item.getRayTrace(world, event.player, RayTraceContext.FluidHandling.ANY) as BlockHitResult
+        val entity = BlockUtil.detectBlock(world, blockHitResult.blockPos) ?: return
+        val blockType = BlockUtil.getTypeFromBlock(entity) ?: return
+
+        if (blockType.hasGUI && event.packet.hand == Hand.MAIN_HAND) {
+            event.cancel = true
+            updateBlockAndInventory(event.player, world, blockHitResult.blockPos)
+        }
     }
 
     private fun tryBreakBlock(packet: PlayerInteractBlockC2SPacket, player: ServerPlayerEntity, hand: Hand): Boolean {

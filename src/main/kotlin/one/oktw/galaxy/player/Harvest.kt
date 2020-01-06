@@ -80,6 +80,7 @@ class Harvest {
         }
     }
 
+    @Suppress("DuplicatedCode")
     @EventListener(true)
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
         val world = event.player.serverWorld

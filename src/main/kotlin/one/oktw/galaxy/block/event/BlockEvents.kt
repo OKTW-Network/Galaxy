@@ -101,7 +101,7 @@ class BlockEvents {
             val blockType = BlockUtil.getTypeFromBlock(entity) ?: return false
             if (blockType.hasGUI && hand == Hand.MAIN_HAND) openGUI(blockType, event.player, event)
             if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(event.player)
-            return true
+            return blockType.hasGUI
         }
         return false
     }

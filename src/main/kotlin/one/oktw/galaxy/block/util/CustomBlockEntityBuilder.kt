@@ -69,7 +69,7 @@ class CustomBlockEntityBuilder {
         val entity = EntityType.getEntityFromTag(this.tags, this.world).get()
         entity.setPositionAndAngles(this.blockPos, 0.0F, 0.0F)
         if (this.blockItem != null) {
-            entity.equip(EquipmentSlot.HEAD.armorStandSlotId, this.blockItem)
+            entity.equip(100 + EquipmentSlot.HEAD.entitySlotId, this.blockItem)
         }
         entity.addScoreboardTag("BLOCK")
         entity.addScoreboardTag(this.blockType.name)

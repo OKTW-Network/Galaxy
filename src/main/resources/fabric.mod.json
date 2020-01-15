@@ -23,7 +23,8 @@
   },
   "mixins": [
     "galaxy.mixin.json",
-    "tweak.mixin.json"
+    "tweak.mixin.json",
+    "sponge.realtime.mixin.json"
   ],
   "depends": {
     "fabricloader": ">=0.7.2",

@@ -42,7 +42,7 @@ jobs:
             gradle-loom-
 
       - name: Build
-        run: ./gradlew build
+        run: ./gradlew --no-daemon build
 
       - name: Upload-Artifact
         uses: actions/upload-artifact@master

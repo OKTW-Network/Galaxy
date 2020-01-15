@@ -54,7 +54,7 @@ dependencies {
     modImplementation(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.61+build.2")
     modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api-base", version = fabricVersion)
     modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = fabricVersion)
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-events-lifecycle-v0", version = "0.1.1+eff46b3db4")
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-events-lifecycle-v0", version = fabricVersion)
 
     // galaxy api
     modImplementation(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)

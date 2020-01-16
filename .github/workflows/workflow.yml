@@ -51,16 +51,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Checkout submodules
-          shell: bash
-          run: |
-            auth_header="$(git config --local --get http.https://github.com/.extraheader)"
-            git submodule sync --recursive
-            git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+        shell: bash
+        run: |
+          auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+          git submodule sync --recursive
+          git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
 
       - uses: actions/download-artifact@v1
         with:
           name: jar
           path: docker/mods/Galaxy.jar
       - name: build
-          working-directory: ./docker
-          run: docker build .
+        working-directory: ./docker
+        run: docker build .

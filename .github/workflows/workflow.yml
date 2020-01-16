@@ -7,12 +7,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Checkout submodules
-        shell: bash
-        run: |
-          auth_header="$(git config --local --get http.https://github.com/.extraheader)"
-          git submodule sync --recursive
-          git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
 
       - name: JDK 12
         uses: actions/setup-java@v1
@@ -47,5 +41,26 @@ jobs:
       - name: Upload-Artifact
         uses: actions/upload-artifact@master
         with:
-          name: artifact
-          path: build/libs/
+          name: jar
+          path: build/libs/Galaxy.jar
+
+  Docker-image:
+    needs: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Checkout submodules
+          shell: bash
+          run: |
+            auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+            git submodule sync --recursive
+            git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+
+      - uses: actions/download-artifact@v1
+        with:
+          name: jar
+          path: docker/mods/Galaxy.jar
+      - name: build
+          working-directory: ./docker
+          run: docker build .

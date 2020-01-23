@@ -52,6 +52,7 @@ class Home : Command {
 
         if (source.player.spawnPosition == null) {
             player.sendMessage(LiteralText("找不到您的家").styled { style -> style.color = Formatting.RED })
+            lock -= source.player.uuid
         } else {
             GlobalScope.launch {
                 for (i in 0..4) {

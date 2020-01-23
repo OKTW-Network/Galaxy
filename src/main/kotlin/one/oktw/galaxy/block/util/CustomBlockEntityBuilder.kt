@@ -67,7 +67,7 @@ class CustomBlockEntityBuilder {
         this.tags.putBoolean("NoGravity", true)
         this.tags.putBoolean("Silent", true)
         val entity = EntityType.getEntityFromTag(this.tags, this.world).get()
-        entity.setPositionAndAngles(this.blockPos, 0.0F, 0.0F)
+        entity.refreshPositionAndAngles(this.blockPos, 0.0F, 0.0F)
         if (this.blockItem != null) {
             entity.equip(100 + EquipmentSlot.HEAD.entitySlotId, this.blockItem)
         }

@@ -25,6 +25,7 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Formatting
+import net.minecraft.world.dimension.DimensionType
 import one.oktw.galaxy.command.Command
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -61,7 +62,14 @@ class Home : Command {
                     delay(TimeUnit.SECONDS.toMillis(1))
                 }
                 withContext(player.server.asCoroutineDispatcher()) {
-                    player.requestTeleport(source.player.spawnPosition.x.toDouble(),source.player.spawnPosition.y.toDouble(),source.player.spawnPosition.z.toDouble())
+                    player.teleport(
+                        source.minecraftServer.getWorld(DimensionType.OVERWORLD),
+                        source.player.spawnPosition.x.toDouble(),
+                        source.player.spawnPosition.y.toDouble(),
+                        source.player.spawnPosition.z.toDouble(),
+                        0.0F,
+                        0.0F
+                    )
                 }
                 lock -= source.player.uuid
             }

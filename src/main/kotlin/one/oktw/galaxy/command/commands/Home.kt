@@ -25,7 +25,6 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Formatting
-import net.minecraft.server.network.ServerPlayerEntity
 import one.oktw.galaxy.command.Command
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -47,7 +46,7 @@ class Home : Command {
     private fun execute(source: ServerCommandSource): Int {
         val player = source.player
 
-        if (source !is ServerPlayerEntity || lock.contains(source.player.uuid)) return com.mojang.brigadier.Command.SINGLE_SUCCESS
+        if (player == null || lock.contains(source.player.uuid)) return com.mojang.brigadier.Command.SINGLE_SUCCESS
 
         lock += source.player.uuid
 

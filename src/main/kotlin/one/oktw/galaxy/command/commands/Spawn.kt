@@ -50,7 +50,7 @@ class Spawn : Command {
             }
             withContext(main!!.server.asCoroutineDispatcher()) {
                 // TODO (Broken spawnPos)
-                player.setPositionAndAngles(source.world.spawnPos, 0.0F, 0.0F)
+                player.refreshPositionAndAngles(source.world.spawnPos, 0.0F, 0.0F)
             }
         }
 

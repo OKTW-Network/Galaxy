@@ -19,14 +19,10 @@
 package one.oktw.galaxy.player
 
 import net.minecraft.block.entity.SignBlockEntity
-import net.minecraft.network.MessageType
-import net.minecraft.text.LiteralText
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 
-
 class Sign {
-
     @EventListener(sync = true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
         val world = event.player.serverWorld
@@ -40,8 +36,5 @@ class Sign {
                 }
             }
         }
-
-
     }
-
 }

@@ -36,7 +36,6 @@ class Sign {
             if (entity is SignBlockEntity) {
                 val signBlockEntity = entity as SignBlockEntity?
                 if (signBlockEntity != null) {
-                    event.player.sendMessage(LiteralText("successful open the editor"))
                     event.player.openEditSignScreen(signBlockEntity)
                 }
             }

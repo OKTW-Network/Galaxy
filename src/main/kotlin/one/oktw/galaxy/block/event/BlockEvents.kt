@@ -85,6 +85,7 @@ class BlockEvents {
         if (world.getBlockState(position).block != Blocks.BARRIER) return false
         if (player.isSneaking && player.getStackInHand(hand).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
             BlockUtil.detectBlock(world, position) ?: return false
+            player.swingHand(hand)
             BlockUtil.removeBlock(world, position)
             if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(player)
             return true
@@ -109,6 +110,7 @@ class BlockEvents {
     private fun openGUI(blockType: BlockType, player: ServerPlayerEntity, event: PlayerInteractBlockEvent) {
         event.cancel = true
         updateBlockAndInventory(player, player.serverWorld, event.packet.hitY.blockPos)
+        player.swingHand(event.packet.hand)
         when (blockType) {
             BlockType.CONTROL_PANEL -> player.sendMessage(LiteralText("Control Panel"))
             BlockType.PLANET_TERMINAL -> player.sendMessage(LiteralText("Planet Terminal"))
@@ -143,6 +145,7 @@ class BlockEvents {
             if (world.canPlayerModifyAt(player, placePosition) && player.interactionManager.gameMode != GameMode.SPECTATOR) {
                 if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(player)
 
+                player.swingHand(hand)
                 val success = itemBlock.activate(world, placePosition)
 
                 if (success) {

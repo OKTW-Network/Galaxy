@@ -20,6 +20,7 @@ package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.server.ServerTickCallback
 import net.minecraft.block.Blocks
+import net.minecraft.client.network.packet.EntityAnimationS2CPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.network.packet.PlayerInteractBlockC2SPacket
 import net.minecraft.text.LiteralText
@@ -86,6 +87,7 @@ class BlockEvents {
         if (player.isSneaking && player.getStackInHand(hand).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
             BlockUtil.detectBlock(world, position) ?: return false
             player.swingHand(hand)
+            player.networkHandler.sendPacket(EntityAnimationS2CPacket(player, if (hand == Hand.MAIN_HAND) 0 else 3))
             BlockUtil.removeBlock(world, position)
             if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(player)
             return true
@@ -110,7 +112,9 @@ class BlockEvents {
     private fun openGUI(blockType: BlockType, player: ServerPlayerEntity, event: PlayerInteractBlockEvent) {
         event.cancel = true
         updateBlockAndInventory(player, player.serverWorld, event.packet.hitY.blockPos)
-        player.swingHand(event.packet.hand)
+        val hand = event.packet.hand
+        player.swingHand(hand)
+        player.networkHandler.sendPacket(EntityAnimationS2CPacket(player, if (hand == Hand.MAIN_HAND) 0 else 3))
         when (blockType) {
             BlockType.CONTROL_PANEL -> player.sendMessage(LiteralText("Control Panel"))
             BlockType.PLANET_TERMINAL -> player.sendMessage(LiteralText("Planet Terminal"))
@@ -146,6 +150,7 @@ class BlockEvents {
                 if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(player)
 
                 player.swingHand(hand)
+                player.networkHandler.sendPacket(EntityAnimationS2CPacket(player, if (hand == Hand.MAIN_HAND) 0 else 3))
                 val success = itemBlock.activate(world, placePosition)
 
                 if (success) {

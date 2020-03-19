@@ -58,9 +58,9 @@ class BlockEvents {
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
         if (eventLock.contains(event.packet) || mainHandUsedLock.contains(event.player)) return
         eventLock.add(event.packet)
-        if (tryBreakBlock(event.packet, event.player, event.packet.hand)) return
+        if (tryBreakBlock(event, event.packet.hand)) return
         if (tryOpenGUI(event)) return
-        tryPlaceBlock(event.packet, event.player)
+        tryPlaceBlock(event)
     }
 
     @Suppress("DuplicatedCode")
@@ -80,16 +80,16 @@ class BlockEvents {
         }
     }
 
-    private fun tryBreakBlock(packet: PlayerInteractBlockC2SPacket, player: ServerPlayerEntity, hand: Hand): Boolean {
-        val world = player.serverWorld
-        val position = packet.hitY.blockPos
+    private fun tryBreakBlock(event: PlayerInteractBlockEvent, hand: Hand): Boolean {
+        val world = event.player.serverWorld
+        val position = event.packet.hitY.blockPos
         if (world.getBlockState(position).block != Blocks.BARRIER) return false
-        if (player.isSneaking && player.getStackInHand(hand).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
+        if (event.player.isSneaking && event.player.getStackInHand(hand).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
             BlockUtil.detectBlock(world, position) ?: return false
-            player.swingHand(hand, true)
-            player.networkHandler.sendPacket(EntityAnimationS2CPacket(player, if (hand == Hand.MAIN_HAND) 0 else 3))
+            event.player.swingHand(hand, true)
+            event.player.networkHandler.sendPacket(EntityAnimationS2CPacket(event.player, if (hand == Hand.MAIN_HAND) 0 else 3))
             BlockUtil.removeBlock(world, position)
-            if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(player)
+            if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(event.player)
             return true
         }
         return false
@@ -102,38 +102,38 @@ class BlockEvents {
         if (!event.player.isSneaking) {
             val entity = BlockUtil.detectBlock(world, position) ?: return false
             val blockType = BlockUtil.getTypeFromBlock(entity) ?: return false
-            if (blockType.hasGUI && hand == Hand.MAIN_HAND) openGUI(blockType, event.player, event)
+            if (blockType.hasGUI && hand == Hand.MAIN_HAND) openGUI(blockType, event)
             if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(event.player)
             return blockType.hasGUI
         }
         return false
     }
 
-    private fun openGUI(blockType: BlockType, player: ServerPlayerEntity, event: PlayerInteractBlockEvent) {
+    private fun openGUI(blockType: BlockType, event: PlayerInteractBlockEvent) {
         event.cancel = true
-        updateBlockAndInventory(player, player.serverWorld, event.packet.hitY.blockPos)
+        updateBlockAndInventory(event.player, event.player.serverWorld, event.packet.hitY.blockPos)
         val hand = event.packet.hand
-        player.swingHand(hand, true)
-        player.networkHandler.sendPacket(EntityAnimationS2CPacket(player, if (hand == Hand.MAIN_HAND) 0 else 3))
+        event.player.swingHand(hand, true)
+        event.player.networkHandler.sendPacket(EntityAnimationS2CPacket(event.player, if (hand == Hand.MAIN_HAND) 0 else 3))
         when (blockType) {
-            BlockType.CONTROL_PANEL -> player.sendMessage(LiteralText("Control Panel"))
-            BlockType.PLANET_TERMINAL -> player.sendMessage(LiteralText("Planet Terminal"))
-            BlockType.HT_CRAFTING_TABLE -> player.sendMessage(LiteralText("HTCT"))
-            BlockType.TELEPORTER_CORE_BASIC -> player.sendMessage(LiteralText("Basic Teleporter"))
-            BlockType.TELEPORTER_CORE_ADVANCE -> player.sendMessage(LiteralText("Advanced Teleporter"))
+            BlockType.CONTROL_PANEL -> event.player.sendMessage(LiteralText("Control Panel"))
+            BlockType.PLANET_TERMINAL -> event.player.sendMessage(LiteralText("Planet Terminal"))
+            BlockType.HT_CRAFTING_TABLE -> event.player.sendMessage(LiteralText("HTCT"))
+            BlockType.TELEPORTER_CORE_BASIC -> event.player.sendMessage(LiteralText("Basic Teleporter"))
+            BlockType.TELEPORTER_CORE_ADVANCE -> event.player.sendMessage(LiteralText("Advanced Teleporter"))
             else -> Unit
         }
     }
 
-    private fun tryPlaceBlock(packet: PlayerInteractBlockC2SPacket, player: ServerPlayerEntity) {
-        val world = player.serverWorld
-        val server = player.server
-        val position = packet.hitY.blockPos
-        val placePosition = position.offset(packet.hitY.side)
+    private fun tryPlaceBlock(event: PlayerInteractBlockEvent) {
+        val world = event.player.serverWorld
+        val server = event.player.server
+        val position = event.packet.hitY.blockPos
+        val placePosition = position.offset(event.packet.hitY.side)
 
-        val hand = packet.hand
+        val hand = event.packet.hand
 
-        val itemStack = player.getStackInHand(hand)
+        val itemStack = event.player.getStackInHand(hand)
 
         if (itemStack.count <= 0) return
 
@@ -144,22 +144,22 @@ class BlockEvents {
         val itemBlock = Block(BlockType.valueOf(tag.getString("customBlockType") ?: return))
 
         // server world height check
-        if (position.y < server.worldHeight - 1 || packet.hitY.side != Direction.UP && position.y < server.worldHeight) {
+        if (position.y < server.worldHeight - 1 || event.packet.hitY.side != Direction.UP && position.y < server.worldHeight) {
             // player modifiable world check
-            if (world.canPlayerModifyAt(player, placePosition) && player.interactionManager.gameMode != GameMode.SPECTATOR) {
-                if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(player)
+            if (world.canPlayerModifyAt(event.player, placePosition) && event.player.interactionManager.gameMode != GameMode.SPECTATOR) {
+                if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(event.player)
 
-                player.swingHand(hand, true)
-                player.networkHandler.sendPacket(EntityAnimationS2CPacket(player, if (hand == Hand.MAIN_HAND) 0 else 3))
+                event.player.swingHand(hand, true)
+                event.player.networkHandler.sendPacket(EntityAnimationS2CPacket(event.player, if (hand == Hand.MAIN_HAND) 0 else 3))
                 val success = itemBlock.activate(world, placePosition)
 
                 if (success) {
-                    if (player.interactionManager.gameMode != GameMode.CREATIVE) {
+                    if (event.player.interactionManager.gameMode != GameMode.CREATIVE) {
                         itemStack.decrement(1)
-                        player.setStackInHand(hand, itemStack)
+                        event.player.setStackInHand(hand, itemStack)
                     }
                 } else if (hand == Hand.MAIN_HAND) { // if place failed try fire again offhand action (Because it was cancelled before)
-                    tryBreakBlock(packet, player, Hand.OFF_HAND)
+                    tryBreakBlock(event, Hand.OFF_HAND)
                 }
             }
         }

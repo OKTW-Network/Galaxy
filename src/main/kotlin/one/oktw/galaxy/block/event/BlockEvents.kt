@@ -86,7 +86,7 @@ class BlockEvents {
         if (world.getBlockState(position).block != Blocks.BARRIER) return false
         if (player.isSneaking && player.getStackInHand(hand).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
             BlockUtil.detectBlock(world, position) ?: return false
-            player.swingHand(hand)
+            player.swingHand(hand, true)
             player.networkHandler.sendPacket(EntityAnimationS2CPacket(player, if (hand == Hand.MAIN_HAND) 0 else 3))
             BlockUtil.removeBlock(world, position)
             if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(player)
@@ -113,7 +113,7 @@ class BlockEvents {
         event.cancel = true
         updateBlockAndInventory(player, player.serverWorld, event.packet.hitY.blockPos)
         val hand = event.packet.hand
-        player.swingHand(hand)
+        player.swingHand(hand, true)
         player.networkHandler.sendPacket(EntityAnimationS2CPacket(player, if (hand == Hand.MAIN_HAND) 0 else 3))
         when (blockType) {
             BlockType.CONTROL_PANEL -> player.sendMessage(LiteralText("Control Panel"))
@@ -149,7 +149,7 @@ class BlockEvents {
             if (world.canPlayerModifyAt(player, placePosition) && player.interactionManager.gameMode != GameMode.SPECTATOR) {
                 if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(player)
 
-                player.swingHand(hand)
+                player.swingHand(hand, true)
                 player.networkHandler.sendPacket(EntityAnimationS2CPacket(player, if (hand == Hand.MAIN_HAND) 0 else 3))
                 val success = itemBlock.activate(world, placePosition)
 

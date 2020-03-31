@@ -19,16 +19,23 @@
 package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.server.ServerTickCallback
+import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
+import net.minecraft.block.entity.BlockEntity
 import net.minecraft.client.network.packet.EntityAnimationS2CPacket
+import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.ItemStack
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.network.packet.PlayerInteractBlockC2SPacket
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
+import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.GameMode
 import net.minecraft.world.RayTraceContext
+import net.minecraft.world.World
 import one.oktw.galaxy.block.Block
 import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.block.util.BlockUtil
@@ -54,6 +61,7 @@ class BlockEvents {
         )
     }
 
+    @Suppress("unused")
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
         if (eventLock.contains(event.packet) || mainHandUsedLock.contains(event.player)) return
@@ -69,7 +77,7 @@ class BlockEvents {
         }
     }
 
-    @Suppress("DuplicatedCode")
+    @Suppress("DuplicatedCode", "unused")
     @EventListener(true)
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
         val world = event.player.serverWorld
@@ -84,6 +92,21 @@ class BlockEvents {
             event.cancel = true
             updateBlockAndInventory(event.player, world, blockHitResult.blockPos)
         }
+    }
+
+    @Suppress("UNUSED_PARAMETER", "unused")
+    @EventListener(true)
+    fun onBlockBreak(
+        world: World,
+        player: PlayerEntity,
+        pos: BlockPos,
+        state: BlockState,
+        blockEntity: BlockEntity?,
+        stack: ItemStack
+    ) {
+        if (state.block != Blocks.BARRIER) return
+        BlockUtil.detectBlock((world as ServerWorld), pos) ?: return
+        BlockUtil.removeBlock(world, pos)
     }
 
     private fun tryBreakBlock(packet: PlayerInteractBlockC2SPacket, player: ServerPlayerEntity, hand: Hand): Boolean {

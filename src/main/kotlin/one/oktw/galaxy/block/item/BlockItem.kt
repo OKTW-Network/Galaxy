@@ -19,7 +19,7 @@
 package one.oktw.galaxy.block.item
 
 import net.minecraft.item.ItemStack
-import net.minecraft.item.Items.WOODEN_SWORD
+import net.minecraft.item.Items.COMMAND_BLOCK
 import net.minecraft.text.TranslatableText
 import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.block.type.BlockType.DUMMY
@@ -32,7 +32,7 @@ class BlockItem(val type: BlockType = DUMMY) : Item {
 
     override fun createItemStack(): ItemStack {
         val item = CustomItemBuilder()
-            .setBaseItem(WOODEN_SWORD)
+            .setBaseItem(COMMAND_BLOCK)
             .setModel(type.customModelData!!)
             .setItemType(itemType)
             .setBlockType(type)

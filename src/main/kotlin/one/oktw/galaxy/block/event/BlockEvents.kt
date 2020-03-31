@@ -20,6 +20,7 @@ package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.server.ServerTickCallback
 import net.minecraft.block.Blocks
+import net.minecraft.client.network.packet.EntityAnimationS2CPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.network.packet.PlayerInteractBlockC2SPacket
 import net.minecraft.text.LiteralText
@@ -57,9 +58,15 @@ class BlockEvents {
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
         if (eventLock.contains(event.packet) || mainHandUsedLock.contains(event.player)) return
         eventLock.add(event.packet)
-        if (tryBreakBlock(event.packet, event.player, event.packet.hand)) return
-        if (tryOpenGUI(event)) return
-        tryPlaceBlock(event.packet, event.player)
+
+        var finished: Boolean
+        finished = tryBreakBlock(event.packet, event.player, event.packet.hand)
+        if (!finished) finished = tryOpenGUI(event)
+        if (!finished) finished = tryPlaceBlock(event.packet, event.player)
+        if (finished) {
+            event.player.swingHand(event.packet.hand)
+            event.player.networkHandler.sendPacket(EntityAnimationS2CPacket(event.player, if (event.packet.hand == Hand.MAIN_HAND) 0 else 3))
+        }
     }
 
     @Suppress("DuplicatedCode")
@@ -119,7 +126,7 @@ class BlockEvents {
         }
     }
 
-    private fun tryPlaceBlock(packet: PlayerInteractBlockC2SPacket, player: ServerPlayerEntity) {
+    private fun tryPlaceBlock(packet: PlayerInteractBlockC2SPacket, player: ServerPlayerEntity): Boolean {
         val world = player.serverWorld
         val server = player.server
         val position = packet.hitY.blockPos
@@ -129,13 +136,13 @@ class BlockEvents {
 
         val itemStack = player.getStackInHand(hand)
 
-        if (itemStack.count <= 0) return
+        if (itemStack.count <= 0) return false
 
-        val tag = itemStack.tag ?: return
-        val itemType = tag.getString("customItemType") ?: return
-        if (itemType != ItemType.BLOCK.name) return
+        val tag = itemStack.tag ?: return false
+        val itemType = tag.getString("customItemType") ?: return false
+        if (itemType != ItemType.BLOCK.name) return false
 
-        val itemBlock = Block(BlockType.valueOf(tag.getString("customBlockType") ?: return))
+        val itemBlock = Block(BlockType.valueOf(tag.getString("customBlockType") ?: return false))
 
         // server world height check
         if (position.y < server.worldHeight - 1 || packet.hitY.side != Direction.UP && position.y < server.worldHeight) {
@@ -150,10 +157,12 @@ class BlockEvents {
                         itemStack.decrement(1)
                         player.setStackInHand(hand, itemStack)
                     }
+                    return true
                 } else if (hand == Hand.MAIN_HAND) { // if place failed try fire again offhand action (Because it was cancelled before)
-                    tryBreakBlock(packet, player, Hand.OFF_HAND)
+                    return tryBreakBlock(packet, player, Hand.OFF_HAND)
                 }
             }
         }
+        return false
     }
 }

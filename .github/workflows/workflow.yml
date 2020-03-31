@@ -61,10 +61,16 @@ jobs:
         with:
           name: jar
           path: docker/mods/Galaxy.jar
+          
+      - uses: azure/docker-login@v1
+        with:
+          login-server: registry.oktw.one
+          username: ${{ secrets.OKTW_REGISTRY_PASSWORD }}
+          password: ${{ secrets.OKTW_REGISTRY_USERNAME }}
+
       - name: build and push
         working-directory: ./docker
         run: |
           REF_SLUG=$([ "$GITHUB_REF" = "refs/heads/master" ] && echo "latest" || echo "$GITHUB_REF" | sed -E 's/refs\/[a-z]+\/|\/[a-z]+//g')
-          echo "${{ secrets.OKTW_REGISTRY_PASSWORD }}" | docker login registry.oktw.one -u "${{ secrets.OKTW_REGISTRY_USERNAME }}" --password-stdin
           docker build -t registry.oktw.one/galaxy/galaxy:$REF_SLUG .
           docker push registry.oktw.one/galaxy/galaxy:$REF_SLUG

@@ -1,5 +1,5 @@
 name: Galaxy Actions
-on: [push, pull_request]
+on: [push]
 
 jobs:
   Build:
@@ -64,9 +64,7 @@ jobs:
       - name: build and push
         working-directory: ./docker
         run: |
-          echo $GITHUB_REF
           REF_SLUG=$([ "$GITHUB_REF" = "refs/heads/master" ] && echo "latest" || echo ${GITHUB_REF##*/})
-          echo $REF_SLUG
           docker login registry.oktw.one -u "${{ secrets.OKTW_REGISTRY_USERNAME }}" -p "${{ secrets.OKTW_REGISTRY_PASSWORD }}"
           docker build -t registry.oktw.one/galaxy/galaxy:$REF_SLUG .
           docker push registry.oktw.one/galaxy/galaxy:$REF_SLUG

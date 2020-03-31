@@ -61,6 +61,10 @@ jobs:
         with:
           name: jar
           path: docker/mods/Galaxy.jar
-      - name: build
+      - name: build and push
         working-directory: ./docker
-        run: docker build .
+        run: |
+          REF_SLUG="$(echo ${{ github.ref }} | sed -E 's/refs\/[a-z]+\/|\/[a-z]+//g')"
+          docker login registry.oktw.one -u "${{secrets.OKTW_USERNAME}}" -p "${{ secrets.OKTW_PASSWORD }}"
+          docker build -t registry.oktw.one/galaxy/galaxy:$REF_SLUG .
+          docker push registry.oktw.one/galaxy/galaxy:$REF_SLUG

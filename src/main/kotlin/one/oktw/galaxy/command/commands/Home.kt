@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -51,17 +51,18 @@ class Home : Command {
 
         lock += source.player.uuid
 
-        if (source.player.spawnPosition == null) {
-            player.sendMessage(LiteralText("找不到您的家").styled { style -> style.color = Formatting.RED })
+        val spawnPos = source.player.spawnPointPosition
+        if (spawnPos == null) {
+            player.sendMessage(LiteralText("找不到您的家").styled { it.withColor(Formatting.RED) }, false)
         } else {
             GlobalScope.launch {
                 for (i in 0..4) {
-                    val component = LiteralText("請等待 ${5 - i} 秒鐘").styled { style -> style.color = Formatting.GREEN }
+                    val component = LiteralText("請等待 ${5 - i} 秒鐘").styled { it.withColor(Formatting.GREEN) }
                     player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, component))
                     delay(TimeUnit.SECONDS.toMillis(1))
                 }
                 withContext(player.server.asCoroutineDispatcher()) {
-                    player.requestTeleport(source.player.spawnPosition.x.toDouble(),source.player.spawnPosition.y.toDouble(),source.player.spawnPosition.z.toDouble())
+                    player.requestTeleport(spawnPos.x.toDouble(), spawnPos.y.toDouble(), spawnPos.z.toDouble())
                 }
                 lock -= source.player.uuid
             }

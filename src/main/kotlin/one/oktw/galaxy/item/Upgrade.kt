@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -43,9 +43,7 @@ class Upgrade(val type: UpgradeType = DUMMY) : Item {
             if (type.level > 0) {
                 name.append(" Lv.${type.level}")
             }
-            name.styled { style ->
-                style.isItalic = false
-            }.let(item::setName)
+            name.styled { it.withItalic(false) }.let(item::setName)
         }
         return item.build()
     }

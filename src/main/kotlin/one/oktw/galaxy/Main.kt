@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,7 +22,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.fabricmc.api.ModInitializer
+import net.fabricmc.api.DedicatedServerModInitializer
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
@@ -35,7 +35,7 @@ import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.resourcepack.ResourcePack
 
 @Suppress("unused")
-class Main : ModInitializer {
+class Main : DedicatedServerModInitializer {
     lateinit var server: MinecraftDedicatedServer
         private set
     lateinit var eventManager: EventManager
@@ -47,7 +47,7 @@ class Main : ModInitializer {
             private set
     }
 
-    override fun onInitialize() {
+    override fun onInitializeServer() {
         server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
         eventManager = EventManager(server)
         CommandRegister()

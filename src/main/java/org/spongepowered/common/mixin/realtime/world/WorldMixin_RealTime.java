@@ -1,4 +1,22 @@
 /*
+ * OKTW Galaxy Project
+ * Copyright (C) 2018-2020
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/*
  * This file is part of Sponge, licensed under the MIT License (MIT).
  *
  * Copyright (c) SpongePowered <https://www.spongepowered.org>
@@ -25,11 +43,14 @@
 package org.spongepowered.common.mixin.realtime.world;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.profiler.Profiler;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
-import net.minecraft.world.level.LevelProperties;
+import net.minecraft.world.dimension.DimensionType;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,18 +58,20 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
-@Mixin(World.class)
-public abstract class WorldMixin_RealTime implements RealTimeTrackingBridge {
-    @Shadow
-    @Final
-    protected LevelProperties properties;
+import java.util.function.Supplier;
+
+@Mixin(ServerWorld.class)
+public abstract class WorldMixin_RealTime extends World implements RealTimeTrackingBridge {
+    protected WorldMixin_RealTime(MutableWorldProperties mutableWorldProperties, RegistryKey<World> registryKey, RegistryKey<DimensionType> registryKey2, DimensionType dimensionType, Supplier<Profiler> profiler, boolean bl, boolean bl2, long l) {
+        super(mutableWorldProperties, registryKey, registryKey2, dimensionType, profiler, bl, bl2, l);
+    }
 
     @Shadow
     @Nullable
     public abstract MinecraftServer getServer();
 
     @Shadow
-    public abstract void setTimeOfDay(long long_1);
+    public abstract void method_29199(long long_1);
 
     @Inject(method = "tickTime", at = @At("HEAD"))
     private void realTimeImpl$fixTimeOfDayForRealTime(CallbackInfo ci) {
@@ -57,7 +80,7 @@ public abstract class WorldMixin_RealTime implements RealTimeTrackingBridge {
             long diff = this.realTimeBridge$getRealTimeTicks() - 1;
             // Don't set if we're not changing it as other mods might be listening for changes
             if (diff > 0) {
-                this.setTimeOfDay(this.properties.getTimeOfDay() + diff);
+                this.method_29199(this.properties.getTimeOfDay() + diff);
             }
         }
     }

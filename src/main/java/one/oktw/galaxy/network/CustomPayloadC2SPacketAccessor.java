@@ -18,8 +18,8 @@
 
 package one.oktw.galaxy.network;
 
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
 
 public interface CustomPayloadC2SPacketAccessor {
     Identifier getChannel();

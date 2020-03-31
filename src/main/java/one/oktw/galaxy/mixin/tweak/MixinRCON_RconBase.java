@@ -18,25 +18,17 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.server.rcon.RconClient;
+import net.minecraft.server.rcon.RconBase;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.net.Socket;
+@Mixin(RconBase.class)
+public class MixinRCON_RconBase {
+    boolean isLocal = false;
 
-@Mixin(RconClient.class)
-public class MixinRCON_RconClient extends MixinRCON_RconBase {
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void checkLocal(DedicatedServer server, String password, Socket socket, CallbackInfo ci) {
-        if (socket.getInetAddress().isLoopbackAddress()) isLocal = true;
-    }
-
-    @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lorg/apache/logging/log4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V"))
+    @Redirect(method = "start", at = @At(value = "INVOKE", target = "Lorg/apache/logging/log4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V"))
     private void noLocalLog(Logger logger, String message, Object description) {
         if (!isLocal) logger.info(message, description);
     }

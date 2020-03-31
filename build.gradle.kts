@@ -2,15 +2,17 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     //    "maven-publish"
-    kotlin("jvm") version "1.3.71"
-    id("fabric-loom") version "0.2.7-SNAPSHOT"
+    kotlin("jvm") version "1.3.72"
+    id("fabric-loom") version "0.4-SNAPSHOT"
 }
 
 val version = "0.0.1"
 val group = "one.oktw"
 
-val fabricVersion = "0.1.2+b7f9825d0c"
+val fabricVersion = "0.13.1+build.370-1.16"
 val proxyApiVersion = "0.1.0"
+val kotlinVersion = "1.3.72"
+val coroutinesVersion = "1.3.7"
 
 repositories {
     mavenCentral()
@@ -40,24 +42,26 @@ minecraft {
 
 dependencies {
     // Core
-    minecraft(group = "com.mojang", name = "minecraft", version = "1.15.2")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.15.2+build.15", classifier = "v2")
-    modCompile(group = "net.fabricmc", name = "fabric-loader", version = "0.8.2+build.194")
+    minecraft(group = "com.mojang", name = "minecraft", version = "1.16")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.16+build.1", classifier = "v2")
+    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.8.8+build.202")
 
     // fabric api/library
-    modImplementation(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.71+build.1")
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api-base", version = fabricVersion)
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = fabricVersion)
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-events-lifecycle-v0", version = fabricVersion)
+    implementation(kotlin("stdlib"))
+    implementation(kotlin("reflect"))
+    implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = coroutinesVersion)
+//    modImplementation(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.71+build.1")
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = fabricVersion)
 
     // galaxy api
     modImplementation(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
 
     // Jar in Jar
-    include(group = "net.fabricmc.fabric-api", name = "fabric-api-base", version = fabricVersion)
-    include(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = fabricVersion)
-    include(group = "net.fabricmc.fabric-api", name = "fabric-crash-report-info-v1", version = fabricVersion)
-    include(group = "net.fabricmc.fabric-api", name = "fabric-events-lifecycle-v0", version = fabricVersion)
+    include(kotlin("stdlib", kotlinVersion))
+    include(kotlin("stdlib-jdk7"))
+    include(kotlin("stdlib-jdk8"))
+    include(kotlin("reflect"))
+    include(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = coroutinesVersion)
     include(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion, classifier = "all")
 }
 

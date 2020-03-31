@@ -65,6 +65,6 @@ jobs:
         working-directory: ./docker
         run: |
           REF_SLUG=$([ "$GITHUB_REF" = "refs/heads/master" ] && echo "latest" || echo ${GITHUB_REF##*/})
-          docker login registry.oktw.one -u "${{secrets.OKTW_USERNAME}}" -p "${{ secrets.OKTW_PASSWORD }}"
+          docker login registry.oktw.one -u "${{ secrets.OKTW_REGISTRY_USERNAME }}" -p "${{ secrets.OKTW_REGISTRY_PASSWORD }}"
           docker build -t registry.oktw.one/galaxy/galaxy:$REF_SLUG .
           docker push registry.oktw.one/galaxy/galaxy:$REF_SLUG

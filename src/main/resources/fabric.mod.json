@@ -23,12 +23,13 @@
   },
   "mixins": [
     "galaxy.mixin.json",
-    "tweak.mixin.json"
+    "tweak.mixin.json",
+    "sponge.realtime.mixin.json"
   ],
-  "requires": {
-    "fabricloader": ">=0.4.0",
-    "fabric-language-kotlin": ">=1.3.31",
-    "fabric": "*"
+  "depends": {
+    "fabricloader": ">=0.7.2",
+    "fabric-language-kotlin": ">=1.3.61",
+    "minecraft": "1.15.x"
   },
   "suggests": {}
 }

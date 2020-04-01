@@ -58,7 +58,7 @@ class Main : ModInitializer {
         CommandRegister()
         main = this
         val resourcePackUrl: String? = System.getenv("resourcePack")
-        if (resourcePackUrl != null) {
+        if (!resourcePackUrl.isNullOrBlank()) {
             GlobalScope.launch {
                 val resourcePack = ResourcePack.new(resourcePackUrl)
                 withContext(server.asCoroutineDispatcher()) {

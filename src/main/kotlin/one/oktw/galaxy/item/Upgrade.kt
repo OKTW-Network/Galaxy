@@ -33,6 +33,7 @@ class Upgrade(val type: UpgradeType = DUMMY) : Item {
         val item = CustomItemBuilder()
             .setBaseItem(DIAMOND_SWORD)
             .setModel(type.customModelData)
+            .setItemType(itemType)
             .setUnbreakable()
             .hideAllFlags()
             .removeAllModifiers()

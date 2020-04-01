@@ -1,0 +1,29 @@
+{
+  "required": true,
+  "package": "org.spongepowered.common.mixin.realtime",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "blockentity.AbstractFurnaceBlockEntityMixin_RealTime",
+    "blockentity.BrewingStandBlockEntityMixin_RealTime",
+    "entity.mob.CreeperEntityMixin_RealTime",
+    "entity.mob.MobEntityMixin_RealTime",
+    "entity.mob.ZombieVillagerEntityMixin_RealTime",
+    "entity.passive.PassiveEntityMixin_RealTime",
+    "entity.player.ItemCooldownManagerMixin_RealTime",
+    "entity.player.PlayerEntityMixin_RealTime",
+    "entity.EntityMixin_RealTime",
+    "entity.ExperienceOrbEntityMixin_RealTime",
+    "entity.ItemEntityMixin_RealTime",
+    "entity.LivingEntityMixin_RealTime",
+    "server.network.ServerPlayerEntityMixin_RealTime",
+    "server.network.ServerPlayerInteractionManagerMixin_RealTime",
+    "server.network.ServerPlayNetworkHandlerMixin_RealTime",
+    "server.MinecraftServerMixin_RealTime",
+    "world.WorldMixin_RealTime"
+  ],
+  "server": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

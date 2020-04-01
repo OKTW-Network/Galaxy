@@ -33,6 +33,7 @@ class Material(val type: MaterialType = DUMMY) : Item {
         val item = CustomItemBuilder()
             .setBaseItem(STONE_SWORD)
             .setModel(type.customModelData)
+            .setItemType(itemType)
             .setUnbreakable()
             .hideAllFlags()
             .removeAllModifiers()

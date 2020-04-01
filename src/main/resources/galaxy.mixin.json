@@ -11,6 +11,8 @@
     "MixinRequestCompletions_NetworkHandler",
     "MixinPlayerInteractBlock_NetworkHandler",
     "MixinOnPlayerConnect_PlayerManager"
+    "MixinPlayerInteractItem_NetworkHandler",
+    "MixinItem_Item"
   ],
   "client": [],
   "injectors": {

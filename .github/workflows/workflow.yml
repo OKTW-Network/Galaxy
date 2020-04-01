@@ -72,9 +72,8 @@ jobs:
 
       - name: build and push
         working-directory: ./docker
-        env:
-          REF_SLUG: $([ "$GITHUB_REF" = "refs/heads/master" ] && echo "latest" || echo "$GITHUB_REF" | sed -E 's/refs\/[a-z]+\/|\/[a-z]+//g') 
         run: |
+          REF_SLUG=$([ "$GITHUB_REF" = "refs/heads/master" ] && echo "latest" || echo "$GITHUB_REF" | sed -E 's/refs\/[a-z]+\/|\/[a-z]+//g')
           docker build -t registry.oktw.one/galaxy/galaxy:$REF_SLUG . 
           if [ "${{ github.event_name }}" == "push" ]; then
             docker push registry.oktw.one/galaxy/galaxy:$REF_SLUG

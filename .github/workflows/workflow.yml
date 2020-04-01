@@ -1,5 +1,5 @@
 name: Galaxy Actions
-on: [push]
+on: [push, pull_request]
 
 jobs:
   Build:
@@ -62,7 +62,9 @@ jobs:
           name: jar
           path: docker/mods/Galaxy.jar
           
-      - uses: azure/docker-login@v1
+      - name: login
+        if: github.event_name == 'push'
+        uses: azure/docker-login@v1
         with:
           login-server: registry.oktw.one
           username: ${{ secrets.OKTW_REGISTRY_USERNAME }}
@@ -70,7 +72,10 @@ jobs:
 
       - name: build and push
         working-directory: ./docker
+        env:
+          REF_SLUG: $([ "$GITHUB_REF" = "refs/heads/master" ] && echo "latest" || echo "$GITHUB_REF" | sed -E 's/refs\/[a-z]+\/|\/[a-z]+//g') 
         run: |
-          REF_SLUG=$([ "$GITHUB_REF" = "refs/heads/master" ] && echo "latest" || echo "$GITHUB_REF" | sed -E 's/refs\/[a-z]+\/|\/[a-z]+//g')
-          docker build -t registry.oktw.one/galaxy/galaxy:$REF_SLUG .
-          docker push registry.oktw.one/galaxy/galaxy:$REF_SLUG
+          docker build -t registry.oktw.one/galaxy/galaxy:$REF_SLUG . 
+          if [ "${{ github.event_name }}" == "push" ]; then
+            docker push registry.oktw.one/galaxy/galaxy:$REF_SLUG
+          fi

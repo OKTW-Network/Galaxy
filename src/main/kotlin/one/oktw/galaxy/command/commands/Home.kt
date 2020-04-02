@@ -48,13 +48,13 @@ class Home : Command {
     private fun execute(source: ServerCommandSource): Int {
         val player = source.player
 
-        if (player == null || lock.contains(source.player.uuid)) return com.mojang.brigadier.Command.SINGLE_SUCCESS
+        if (player == null || lock.contains(player.uuid)) return com.mojang.brigadier.Command.SINGLE_SUCCESS
 
-        lock += source.player.uuid
+        lock += player.uuid
 
-        if (source.player.spawnPosition == null) {
+        if (player.spawnPosition == null) {
             player.sendMessage(TranslatableText("block.minecraft.bed.not_valid").styled { style -> style.color = Formatting.RED })
-            lock -= source.player.uuid
+            lock -= player.uuid
         } else {
             GlobalScope.launch {
                 for (i in 0..4) {
@@ -65,14 +65,14 @@ class Home : Command {
                 withContext(player.server.asCoroutineDispatcher()) {
                     player.teleport(
                         source.minecraftServer.getWorld(DimensionType.OVERWORLD),
-                        source.player.spawnPosition.x.toDouble(),
-                        source.player.spawnPosition.y.toDouble(),
-                        source.player.spawnPosition.z.toDouble(),
+                        player.spawnPosition.x.toDouble(),
+                        player.spawnPosition.y.toDouble(),
+                        player.spawnPosition.z.toDouble(),
                         0.0F,
                         0.0F
                     )
                 }
-                lock -= source.player.uuid
+                lock -= player.uuid
             }
         }
         return com.mojang.brigadier.Command.SINGLE_SUCCESS

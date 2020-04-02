@@ -21,6 +21,7 @@ package one.oktw.galaxy.command.commands
 import com.mojang.brigadier.CommandDispatcher
 import kotlinx.coroutines.*
 import net.minecraft.client.network.packet.TitleS2CPacket
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
@@ -52,7 +53,13 @@ class Home : Command {
 
         lock += player.uuid
 
-        if (player.spawnPosition == null) {
+        val spawnPoint = PlayerEntity.findRespawnPosition(
+            source.minecraftServer.getWorld(player.dimension),
+            player.spawnPosition,
+            player.isSpawnForced
+        )
+
+        if (!spawnPoint.isPresent) {
             player.sendMessage(TranslatableText("block.minecraft.bed.not_valid").styled { style -> style.color = Formatting.RED })
             lock -= player.uuid
         } else {

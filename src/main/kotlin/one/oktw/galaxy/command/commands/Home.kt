@@ -24,6 +24,7 @@ import net.minecraft.client.network.packet.TitleS2CPacket
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
+import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import net.minecraft.world.dimension.DimensionType
 import one.oktw.galaxy.command.Command
@@ -52,7 +53,7 @@ class Home : Command {
         lock += source.player.uuid
 
         if (source.player.spawnPosition == null) {
-            player.sendMessage(LiteralText("找不到您的家").styled { style -> style.color = Formatting.RED })
+            player.sendMessage(TranslatableText("block.minecraft.bed.not_valid").styled { style -> style.color = Formatting.RED })
             lock -= source.player.uuid
         } else {
             GlobalScope.launch {

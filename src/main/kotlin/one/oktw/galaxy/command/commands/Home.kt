@@ -27,7 +27,6 @@ import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
-import net.minecraft.world.dimension.DimensionType
 import one.oktw.galaxy.command.Command
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -64,6 +63,7 @@ class Home : Command {
             lock -= player.uuid
         } else {
             GlobalScope.launch {
+                val position = spawnPoint.get()
                 for (i in 0..4) {
                     val component = LiteralText("請等待 ${5 - i} 秒鐘").styled { style -> style.color = Formatting.GREEN }
                     player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, component))
@@ -71,10 +71,10 @@ class Home : Command {
                 }
                 withContext(player.server.asCoroutineDispatcher()) {
                     player.teleport(
-                        source.minecraftServer.getWorld(DimensionType.OVERWORLD),
-                        player.spawnPosition.x.toDouble(),
-                        player.spawnPosition.y.toDouble(),
-                        player.spawnPosition.z.toDouble(),
+                        source.minecraftServer.getWorld(player.dimension),
+                        position.x,
+                        position.y,
+                        position.z,
                         0.0F,
                         0.0F
                     )

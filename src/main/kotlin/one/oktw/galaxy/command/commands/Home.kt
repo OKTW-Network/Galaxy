@@ -75,8 +75,8 @@ class Home : Command {
                         position.x,
                         position.y,
                         position.z,
-                        0.0F,
-                        0.0F
+                        player.yaw,
+                        player.pitch
                     )
                 }
                 lock -= player.uuid

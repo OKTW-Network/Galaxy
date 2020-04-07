@@ -52,6 +52,12 @@ class Home : Command {
 
         lock += player.uuid
 
+        if (player.spawnPosition == null) {
+            player.sendMessage(TranslatableText("block.minecraft.bed.not_valid").styled { style -> style.color = Formatting.RED })
+            lock -= player.uuid
+            return com.mojang.brigadier.Command.SINGLE_SUCCESS
+        }
+
         val spawnPoint = PlayerEntity.findRespawnPosition(
             source.minecraftServer.getWorld(player.dimension),
             player.spawnPosition,

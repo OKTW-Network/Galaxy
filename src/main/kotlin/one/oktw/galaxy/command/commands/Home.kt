@@ -69,12 +69,25 @@ class Home : Command {
             lock -= player.uuid
         } else {
             GlobalScope.launch {
-                val position = spawnPoint.get()
                 for (i in 0..4) {
                     val component = LiteralText("請等待 ${5 - i} 秒鐘").styled { style -> style.color = Formatting.GREEN }
                     player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, component))
                     delay(TimeUnit.SECONDS.toMillis(1))
                 }
+
+                // Check Again
+                val checkAgain = PlayerEntity.findRespawnPosition(
+                    source.minecraftServer.getWorld(player.dimension),
+                    player.spawnPosition,
+                    player.isSpawnForced
+                )
+                if (!checkAgain.isPresent) {
+                    player.sendMessage(TranslatableText("block.minecraft.bed.not_valid").styled { style -> style.color = Formatting.RED })
+                    lock -= player.uuid
+                    return@launch
+                }
+                val position = checkAgain.get()
+
                 withContext(player.server.asCoroutineDispatcher()) {
                     player.teleport(
                         source.minecraftServer.getWorld(player.dimension),

@@ -18,9 +18,9 @@
 
 package one.oktw.galaxy.mixin.event;
 
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.packet.PlayerInteractItemC2SPacket;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent;
 import org.spongepowered.asm.mixin.Mixin;

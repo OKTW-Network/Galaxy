@@ -21,8 +21,8 @@ package one.oktw.galaxy.player
 import net.fabricmc.fabric.api.event.server.ServerTickCallback
 import net.minecraft.block.*
 import net.minecraft.block.Blocks.*
-import net.minecraft.client.network.packet.BlockUpdateS2CPacket
-import net.minecraft.client.network.packet.EntityAnimationS2CPacket
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket
+import net.minecraft.network.packet.s2c.play.EntityAnimationS2CPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.IntProperty

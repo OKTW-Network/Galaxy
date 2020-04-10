@@ -21,14 +21,10 @@ package one.oktw.galaxy.command.commands
 import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.CommandDispatcher
 import io.netty.buffer.Unpooled.wrappedBuffer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.time.delay
-import net.minecraft.client.network.packet.CustomPayloadS2CPacket
 import net.minecraft.command.arguments.GameProfileArgumentType
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
@@ -107,7 +103,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             }
 
             main!!.eventManager.register(PacketReceiveEvent::class, listener)
-            delay(Duration.ofMinutes(5))
+            delay(Duration.ofMinutes(5).toMillis()) // TODO change to kotlin Duration
             main!!.eventManager.unregister(PacketReceiveEvent::class, listener)
             lock[sourcePlayer]?.unlock()
             lock.remove(sourcePlayer)

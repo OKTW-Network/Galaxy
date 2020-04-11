@@ -52,6 +52,8 @@ jobs:
   Docker-image:
     needs: Build
     runs-on: ubuntu-latest
+    env:
+      REGISTRY_IMAGE: registry.oktw.one/galaxy/galaxy
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -61,12 +63,10 @@ jobs:
           auth_header="$(git config --local --get http.https://github.com/.extraheader)"
           git submodule sync --recursive
           git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
-
       - uses: actions/download-artifact@v1
         with:
           name: jar
           path: docker/mods/Galaxy.jar
-          
       - name: login
         if: github.event_name == 'push'
         uses: azure/docker-login@v1
@@ -74,12 +74,24 @@ jobs:
           login-server: registry.oktw.one
           username: ${{ secrets.OKTW_REGISTRY_USERNAME }}
           password: ${{ secrets.OKTW_REGISTRY_PASSWORD }}
-
-      - name: build and push
+      - name: pull cache
+        if: github.event_name == 'push'
+        run: |
+          docker pull $REGISTRY_IMAGE:build-cache || true
+          docker pull $REGISTRY_IMAGE:latest || true
+      - name: build cache
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        working-directory: ./docker
+        run: |
+          docker build --pull --cache-from $REGISTRY_IMAGE:build-cache -t $REGISTRY_IMAGE:build-cache --target builder .
+          docker push $REGISTRY_IMAGE:build-cache
+      - name: build
         working-directory: ./docker
         run: |
           REF_SLUG=$([ "$GITHUB_REF" = "refs/heads/master" ] && echo "latest" || echo ${GITHUB_REF##*/})
-          docker build -t registry.oktw.one/galaxy/galaxy:$REF_SLUG . 
-          if [ "${{ github.event_name }}" == "push" ]; then
-            docker push registry.oktw.one/galaxy/galaxy:$REF_SLUG
-          fi
+          docker build --cache-from $REGISTRY_IMAGE:build-cache --cache-from $REGISTRY_IMAGE:latest -t $REGISTRY_IMAGE:$REF_SLUG .
+      - name: push
+        if: github.event_name == 'push'
+        run: |
+          REF_SLUG=$([ "$GITHUB_REF" = "refs/heads/master" ] && echo "latest" || echo ${GITHUB_REF##*/})
+          docker push $REGISTRY_IMAGE:$REF_SLUG

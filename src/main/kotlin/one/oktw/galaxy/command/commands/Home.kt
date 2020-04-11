@@ -70,7 +70,8 @@ class Home : Command {
         } else {
             GlobalScope.launch {
                 for (i in 0..4) {
-                    val component = LiteralText("請等待 ${5 - i} 秒鐘").styled { style -> style.color = Formatting.GREEN }
+                    val component = TranslatableText("Respond.commandCountdown", arrayOf(LiteralText("${5 - i}")))
+                        .styled { style -> style.color = Formatting.GREEN }
                     player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, component))
                     delay(TimeUnit.SECONDS.toMillis(1))
                 }

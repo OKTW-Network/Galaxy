@@ -27,6 +27,7 @@ import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
+import net.minecraft.world.dimension.DimensionType
 import one.oktw.galaxy.command.Command
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -59,7 +60,7 @@ class Home : Command {
         }
 
         val spawnPoint = PlayerEntity.findRespawnPosition(
-            source.minecraftServer.getWorld(player.dimension),
+            source.minecraftServer.getWorld(DimensionType.OVERWORLD),
             player.spawnPosition,
             player.isSpawnForced
         )
@@ -78,7 +79,7 @@ class Home : Command {
 
                 // Check Again
                 val checkAgain = PlayerEntity.findRespawnPosition(
-                    source.minecraftServer.getWorld(player.dimension),
+                    source.minecraftServer.getWorld(DimensionType.OVERWORLD),
                     player.spawnPosition,
                     player.isSpawnForced
                 )
@@ -91,7 +92,7 @@ class Home : Command {
 
                 withContext(player.server.asCoroutineDispatcher()) {
                     player.teleport(
-                        source.minecraftServer.getWorld(player.dimension),
+                        source.minecraftServer.getWorld(DimensionType.OVERWORLD),
                         position.x,
                         position.y,
                         position.z,

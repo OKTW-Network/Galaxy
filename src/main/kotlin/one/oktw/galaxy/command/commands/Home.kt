@@ -33,6 +33,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
+@Suppress("DuplicatedCode")
 class Home : Command {
 
     private val lock = ConcurrentHashMap.newKeySet<UUID>()

@@ -25,7 +25,6 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
-import net.minecraft.world.dimension.DimensionType
 import one.oktw.galaxy.command.Command
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -60,14 +59,13 @@ class Spawn : Command {
             }
 
             withContext(player.server.asCoroutineDispatcher()) {
-                val world = player.server.getWorld(DimensionType.OVERWORLD)
-                val spawnPos = world.spawnPos
+                val spawnPos = player.serverWorld.spawnPos
                 player.stopRiding()
                 if (player.isSleeping) {
                     player.wakeUp(true, true)
                 }
                 player.teleport(
-                    world,
+                    player.serverWorld,
                     spawnPos.x.toDouble(),
                     spawnPos.y.toDouble(),
                     spawnPos.z.toDouble(),

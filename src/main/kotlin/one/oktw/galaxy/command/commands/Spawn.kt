@@ -51,6 +51,8 @@ class Spawn : Command {
 
         lock += player.uuid
         GlobalScope.launch {
+            val world = player.serverWorld
+            val level = world.levelProperties
             for (i in 0..4) {
                 val component = TranslatableText("Respond.commandCountdown", 5 - i)
                     .styled { style -> style.color = Formatting.GREEN }
@@ -59,16 +61,15 @@ class Spawn : Command {
             }
 
             withContext(player.server.asCoroutineDispatcher()) {
-                val spawnPos = player.serverWorld.spawnPos
                 player.stopRiding()
                 if (player.isSleeping) {
                     player.wakeUp(true, true)
                 }
                 player.teleport(
                     player.serverWorld,
-                    spawnPos.x.toDouble(),
-                    spawnPos.y.toDouble(),
-                    spawnPos.z.toDouble(),
+                    level.spawnX.toDouble(),
+                    level.spawnY.toDouble(),
+                    level.spawnZ.toDouble(),
                     player.yaw,
                     player.pitch
                 )

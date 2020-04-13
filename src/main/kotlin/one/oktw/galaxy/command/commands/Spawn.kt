@@ -23,7 +23,6 @@ import kotlinx.coroutines.*
 import net.minecraft.client.network.packet.TitleS2CPacket
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.text.LiteralText
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import net.minecraft.world.dimension.DimensionType
@@ -57,7 +56,7 @@ class Spawn : Command {
             val spawnPos = world.spawnPos
 
             for (i in 0..4) {
-                val component = TranslatableText("Respond.commandCountdown", arrayOf(LiteralText("${5 - i}")))
+                val component = TranslatableText("Respond.commandCountdown", 5 - i)
                     .styled { style -> style.color = Formatting.GREEN }
                 player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, component))
                 delay(TimeUnit.SECONDS.toMillis(1))

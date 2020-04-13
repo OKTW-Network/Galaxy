@@ -52,16 +52,16 @@ class Spawn : Command {
 
         lock += player.uuid
         GlobalScope.launch {
-            val world = player.server.getWorld(DimensionType.OVERWORLD)
-            val spawnPos = world.spawnPos
-
             for (i in 0..4) {
                 val component = TranslatableText("Respond.commandCountdown", 5 - i)
                     .styled { style -> style.color = Formatting.GREEN }
                 player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, component))
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
+
             withContext(player.server.asCoroutineDispatcher()) {
+                val world = player.server.getWorld(DimensionType.OVERWORLD)
+                val spawnPos = world.spawnPos
                 player.stopRiding()
                 if (player.isSleeping) {
                     player.wakeUp(true, true)

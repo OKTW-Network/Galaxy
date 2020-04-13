@@ -53,20 +53,25 @@ class Spawn : Command {
 
         lock += player.uuid
         GlobalScope.launch {
-            val world = source.minecraftServer.getWorld(DimensionType.OVERWORLD)
+            val world = player.server.getWorld(DimensionType.OVERWORLD)
+            val spawnPos = world.spawnPos
+
             for (i in 0..4) {
                 val component = TranslatableText("Respond.commandCountdown", arrayOf(LiteralText("${5 - i}")))
                     .styled { style -> style.color = Formatting.GREEN }
                 player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, component))
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
-
             withContext(player.server.asCoroutineDispatcher()) {
+                player.stopRiding()
+                if (player.isSleeping) {
+                    player.wakeUp(true, true)
+                }
                 player.teleport(
                     world,
-                    world.spawnPos.x.toDouble(),
-                    world.spawnPos.y.toDouble(),
-                    world.spawnPos.z.toDouble(),
+                    spawnPos.x.toDouble(),
+                    spawnPos.y.toDouble(),
+                    spawnPos.z.toDouble(),
                     player.yaw,
                     player.pitch
                 )

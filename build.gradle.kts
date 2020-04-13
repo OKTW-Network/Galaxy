@@ -9,6 +9,7 @@ plugins {
 val version = "0.0.1"
 val group = "one.oktw"
 
+val fabricVersion = "0.1.2+b7f9825d0c"
 val proxyApiVersion = "0.1.0"
 
 repositories {
@@ -22,8 +23,8 @@ base {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_13
-    targetCompatibility = JavaVersion.VERSION_13
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 tasks.withType<KotlinCompile> {
@@ -45,17 +46,18 @@ dependencies {
 
     // fabric api/library
     modImplementation(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.71+build.1")
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api-base", version = "0.1.3+12a8474c88")
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = "0.1.3+c808269f41")
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-events-lifecycle-v0", version = "0.1.2+b7f9825d88")
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api-base", version = fabricVersion)
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = fabricVersion)
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-events-lifecycle-v0", version = fabricVersion)
 
     // galaxy api
     modImplementation(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
 
     // Jar in Jar
-    include(group = "net.fabricmc.fabric-api", name = "fabric-api-base", version = "0.1.3+12a8474c88")
-    include(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = "0.1.3+c808269f41")
-    include(group = "net.fabricmc.fabric-api", name = "fabric-events-lifecycle-v0", version = "0.1.2+b7f9825d88")
+    include(group = "net.fabricmc.fabric-api", name = "fabric-api-base", version = fabricVersion)
+    include(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = fabricVersion)
+    include(group = "net.fabricmc.fabric-api", name = "fabric-crash-report-info-v1", version = fabricVersion)
+    include(group = "net.fabricmc.fabric-api", name = "fabric-events-lifecycle-v0", version = fabricVersion)
     include(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion, classifier = "all")
 }
 

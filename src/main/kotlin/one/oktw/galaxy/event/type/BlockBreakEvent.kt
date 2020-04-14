@@ -19,17 +19,8 @@
 package one.oktw.galaxy.event.type
 
 import net.minecraft.block.BlockState
-import net.minecraft.block.entity.BlockEntity
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
-class BlockBreakEvent(
-    val world: World,
-    val player: PlayerEntity,
-    val pos: BlockPos,
-    val state: BlockState,
-    val blockEntity: BlockEntity?,
-    val stack: ItemStack
-) : CancelableEvent()
+class BlockBreakEvent(val world: World, val pos: BlockPos, val state: BlockState, val player: PlayerEntity) : CancelableEvent()

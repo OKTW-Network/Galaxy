@@ -20,36 +20,24 @@ package one.oktw.galaxy.mixin.event;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.BlockBreakEvent;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Block.class)
-public class MixinBlockBreak_Block {
-
-    @Inject(method = "afterBreak", at = @At("HEAD"), cancellable = true)
-    private void onBlockBreak(
-        World world,
-        PlayerEntity player,
-        BlockPos pos,
-        BlockState state,
-        @Nullable BlockEntity blockEntity,
-        ItemStack stack,
-        CallbackInfo info
-    ) {
+public class MixinPlayerBlockBreak_Block {
+    @Inject(method = "onBreak", at = @At("HEAD"), cancellable = true)
+    private void onBlockBreak(World world, BlockPos pos, BlockState state, PlayerEntity player, CallbackInfo ci) {
         Main main = Main.Companion.getMain();
         if (main == null) return;
-        if (main.getEventManager().emit(new BlockBreakEvent(world, player, pos, state, blockEntity, stack)).getCancel()) {
-            info.cancel();
+        if (main.getEventManager().emit(new BlockBreakEvent(world, pos, state, player)).getCancel()) {
+            ci.cancel();
         }
     }
 }

@@ -3,15 +3,16 @@
   "package": "one.oktw.galaxy.mixin.event",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "MixinCustomPayload_CustomPayloadC2SPacket",
+    "MixinCustomPayload_NetworkHandler",
+    "MixinItem_Item",
+    "MixinPlayerBlockBreak_Block",
     "MixinPlayerChat_MeCommand",
     "MixinPlayerChat_NetworkHandler",
     "MixinPlayerChat_SayCommand",
-    "MixinCustomPayload_CustomPayloadC2SPacket",
-    "MixinCustomPayload_NetworkHandler",
-    "MixinRequestCompletions_NetworkHandler",
     "MixinPlayerInteractBlock_NetworkHandler",
     "MixinPlayerInteractItem_NetworkHandler",
-    "MixinItem_Item"
+    "MixinRequestCompletions_NetworkHandler"
   ],
   "client": [],
   "injectors": {

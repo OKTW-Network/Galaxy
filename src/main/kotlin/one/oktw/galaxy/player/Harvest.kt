@@ -21,29 +21,21 @@ package one.oktw.galaxy.player
 import net.fabricmc.fabric.api.event.server.ServerTickCallback
 import net.minecraft.block.*
 import net.minecraft.block.Blocks.*
-import net.minecraft.client.network.packet.BlockUpdateS2CPacket
 import net.minecraft.client.network.packet.EntityAnimationS2CPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.IntProperty
 import net.minecraft.util.Hand
-import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.RayTraceContext
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
-import one.oktw.galaxy.network.ItemFunctionAccessor
 
 class Harvest {
     private val justHarvested = HashSet<ServerPlayerEntity>()
 
     init {
-        ServerTickCallback.EVENT.register(
-            ServerTickCallback {
-                justHarvested.clear()
-            }
-        )
+        ServerTickCallback.EVENT.register(ServerTickCallback { justHarvested.clear() })
     }
 
     @EventListener(true)
@@ -73,7 +65,6 @@ class Harvest {
                 world.setBlockState(blockHitResult.blockPos, blockState.with(ageProperties, 0))
                 world.updateNeighbors(blockHitResult.blockPos, blockState.block)
             }
-            updateBlockAndInventory(event.player, world, blockHitResult.blockPos)
             justHarvested.add(event.player)
             return
         }
@@ -81,17 +72,7 @@ class Harvest {
 
     @EventListener(true)
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
-        val world = event.player.serverWorld
-
-        val itemStack = event.player.getStackInHand(event.packet.hand)
-        val item = itemStack.item as ItemFunctionAccessor
-        val blockHitResult = item.getRayTrace(world, event.player, RayTraceContext.FluidHandling.ANY) as BlockHitResult
-        val blockState = world.getBlockState(blockHitResult.blockPos)
-
-        if (isMature(world, blockHitResult.blockPos, blockState) || justHarvested.contains(event.player)) {
-            event.cancel = true
-            updateBlockAndInventory(event.player, world, blockHitResult.blockPos)
-        }
+        if (event.player in justHarvested) event.cancel = true
     }
 
     private fun isMature(world: ServerWorld, blockPos: BlockPos, blockState: BlockState): Boolean = when (blockState.block) {
@@ -102,18 +83,6 @@ class Harvest {
         MELON -> isNextTo(world, blockPos, ATTACHED_MELON_STEM)
         PUMPKIN -> isNextTo(world, blockPos, ATTACHED_PUMPKIN_STEM)
         else -> false
-    }
-
-    private fun updateBlockAndInventory(player: ServerPlayerEntity, world: ServerWorld, blockPos: BlockPos) {
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(1, 0, 0)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, 0, 1)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(-1, 0, 0)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, 0, -1)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, 1, 0)))
-        player.networkHandler.sendPacket(BlockUpdateS2CPacket(world, blockPos.add(0, -1, 0)))
-        player.onContainerRegistered(player.container, player.container.stacks)
-
     }
 
     private fun isNextTo(world: ServerWorld, blockPos: BlockPos, block: Block): Boolean {

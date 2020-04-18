@@ -21,7 +21,6 @@ package one.oktw.galaxy.player
 import net.fabricmc.fabric.api.event.server.ServerTickCallback
 import net.minecraft.block.*
 import net.minecraft.block.Blocks.*
-import net.minecraft.client.network.packet.EntityAnimationS2CPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.IntProperty
@@ -40,17 +39,15 @@ class Harvest {
 
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
-        val world = event.player.serverWorld
-        val hand = event.packet.hand
+        val player = event.player
+        if (player in justHarvested) event.cancel = true
 
-        val blockHitResult = event.packet.hitY
-        val blockState = world.getBlockState(blockHitResult.blockPos)
+        val world = player.serverWorld
+        val blockPos = event.packet.hitY.blockPos
+        val blockState = world.getBlockState(blockPos)
 
-        if (isMature(world, blockHitResult.blockPos, blockState)) {
+        if (event.packet.hand == Hand.MAIN_HAND && !player.isSneaking && isMature(world, blockPos, blockState)) {
             event.cancel = true
-            if (hand != Hand.MAIN_HAND) {
-                return
-            }
             val ageProperties = when (blockState.block) {
                 WHEAT, CARROTS, POTATOES -> CropBlock.AGE
                 BEETROOTS -> BeetrootsBlock.AGE
@@ -58,15 +55,14 @@ class Harvest {
                 NETHER_WART -> NetherWartBlock.AGE
                 else -> IntProperty.of("AGE", 0, 1)
             }
-            event.player.swingHand(hand)
-            event.player.networkHandler.sendPacket(EntityAnimationS2CPacket(event.player, if (hand == Hand.MAIN_HAND) 0 else 3))
-            world.breakBlock(blockHitResult.blockPos, true)
+            player.swingHand(Hand.MAIN_HAND, true)
+            world.breakBlock(blockPos, false)
+            Block.dropStacks(blockState, world, blockPos, world.getBlockEntity(blockPos), player, player.mainHandStack) // Fortune drop
             if (blockState.block != PUMPKIN && blockState.block != MELON) {
-                world.setBlockState(blockHitResult.blockPos, blockState.with(ageProperties, 0))
-                world.updateNeighbors(blockHitResult.blockPos, blockState.block)
+                world.setBlockState(blockPos, blockState.with(ageProperties, 0))
+                world.updateNeighbors(blockPos, blockState.block)
             }
-            justHarvested.add(event.player)
-            return
+            justHarvested.add(player)
         }
     }
 
@@ -76,8 +72,7 @@ class Harvest {
     }
 
     private fun isMature(world: ServerWorld, blockPos: BlockPos, blockState: BlockState): Boolean = when (blockState.block) {
-        WHEAT, CARROTS, POTATOES -> blockState.let((blockState.block as CropBlock)::isMature)
-        BEETROOTS -> blockState.let((blockState.block as BeetrootsBlock)::isMature)
+        WHEAT, CARROTS, POTATOES, BEETROOTS -> blockState.let((blockState.block as CropBlock)::isMature)
         COCOA -> blockState[CocoaBlock.AGE] >= 2
         NETHER_WART -> blockState[NetherWartBlock.AGE] >= 3
         MELON -> isNextTo(world, blockPos, ATTACHED_MELON_STEM)

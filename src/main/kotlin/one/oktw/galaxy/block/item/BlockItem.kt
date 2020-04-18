@@ -21,6 +21,7 @@ package one.oktw.galaxy.block.item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.COMMAND_BLOCK
 import net.minecraft.text.TranslatableText
+import net.minecraft.util.Formatting
 import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.block.type.BlockType.DUMMY
 import one.oktw.galaxy.item.Item
@@ -42,6 +43,7 @@ class BlockItem(val type: BlockType = DUMMY) : Item {
 
         if (type.languageKey != "") {
             TranslatableText(type.languageKey).styled { style ->
+                style.color = Formatting.RESET
                 style.isItalic = false
             }.let(item::setName)
         }

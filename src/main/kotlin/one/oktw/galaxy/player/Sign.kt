@@ -19,7 +19,12 @@
 package one.oktw.galaxy.player
 
 import net.minecraft.block.entity.SignBlockEntity
+import net.minecraft.item.AirBlockItem
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
+import net.minecraft.item.Items
 import net.minecraft.text.LiteralText
+import net.minecraft.util.Hand
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerUpdateSignEvent
@@ -28,7 +33,8 @@ import kotlin.math.sign
 class Sign {
     @EventListener(sync = true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
-        if (event.player.isSneaking) {
+        val hand = event.player.getStackInHand(Hand.MAIN_HAND).isEmpty
+        if (event.player.isSneaking && hand) {
             val world = event.player.serverWorld
             val blockHitResult = event.packet.hitY
             val entity = world.getBlockEntity(blockHitResult.blockPos)

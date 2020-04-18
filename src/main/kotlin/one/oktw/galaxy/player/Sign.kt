@@ -33,8 +33,9 @@ import kotlin.math.sign
 class Sign {
     @EventListener(sync = true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
-        val hand = event.player.getStackInHand(Hand.MAIN_HAND).isEmpty
-        if (event.player.isSneaking && hand) {
+        val mainhand = event.player.getStackInHand(Hand.MAIN_HAND).isEmpty
+        val offhand = event.player.getStackInHand(Hand.OFF_HAND).isEmpty
+        if (event.player.isSneaking && mainhand && offhand) {
             val world = event.player.serverWorld
             val blockHitResult = event.packet.hitY
             val entity = world.getBlockEntity(blockHitResult.blockPos)

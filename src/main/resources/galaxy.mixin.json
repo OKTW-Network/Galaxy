@@ -11,6 +11,7 @@
     "MixinRequestCompletions_NetworkHandler",
     "MixinPlayerInteractBlock_NetworkHandler",
     "MixinPlayerInteractItem_NetworkHandler",
+    "MixinPlayerUpdateSign_NetworkHandler",
     "MixinItem_Item"
   ],
   "client": [],

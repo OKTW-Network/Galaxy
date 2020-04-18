@@ -19,22 +19,38 @@
 package one.oktw.galaxy.player
 
 import net.minecraft.block.entity.SignBlockEntity
+import net.minecraft.text.LiteralText
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
+import one.oktw.galaxy.event.type.PlayerUpdateSignEvent
+import kotlin.math.sign
 
 class Sign {
     @EventListener(sync = true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
-        val world = event.player.serverWorld
-        val blockHitResult = event.packet.hitY
-        val entity = world.getBlockEntity(blockHitResult.blockPos)
         if (event.player.isSneaking) {
+            val world = event.player.serverWorld
+            val blockHitResult = event.packet.hitY
+            val entity = world.getBlockEntity(blockHitResult.blockPos)
             if (entity is SignBlockEntity) {
                 val signBlockEntity = entity as? SignBlockEntity ?: return
-                if (signBlockEntity != null) {
-                    event.player.openEditSignScreen(signBlockEntity)
-                }
+                event.player.openEditSignScreen(signBlockEntity)
             }
+        }
+    }
+
+    @EventListener(sync = true)
+    fun onPlayerUpdateSign(event: PlayerUpdateSignEvent) {
+        val world = event.player.serverWorld
+        val entity = world.getBlockEntity(event.packet.pos)
+        if (entity != null) {
+            val signBlockEntity = entity as? SignBlockEntity ?: return
+            for (i in 0..3) {
+                val line = event.packet.text[i].replace("&", "§")
+                signBlockEntity.setTextOnRow(i, LiteralText(line))
+            }
+            event.cancel = true
+            event.player.networkHandler.sendPacket(signBlockEntity.toUpdatePacket())
         }
     }
 }

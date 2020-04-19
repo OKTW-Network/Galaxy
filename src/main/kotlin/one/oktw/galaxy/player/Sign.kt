@@ -53,7 +53,8 @@ class Sign {
         if (entity != null) {
             val signBlockEntity = entity as? SignBlockEntity ?: return
             for (i in 0..3) {
-                val line = event.packet.text[i].replace("&", "§")
+                val r = Regex("(?<![\\S|\\W])&(?![\\W])")
+                val line = r.replace(event.packet.text[i],"§")
                 signBlockEntity.setTextOnRow(i, LiteralText(line))
             }
             event.cancel = true

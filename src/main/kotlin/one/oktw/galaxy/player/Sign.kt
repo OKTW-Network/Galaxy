@@ -47,7 +47,7 @@ class Sign {
         val entity = world.getBlockEntity(event.packet.pos)
         val signBlockEntity = entity as? SignBlockEntity ?: return
         for (i in 0..3) {
-            val r = Regex("(?<![\\S])&(?=[a-f|0-9|k-o|r])")
+            val r = Regex("&(?=[a-f|0-9|k-o|r])")
             val line = r.replace(event.packet.text[i], "§")
             signBlockEntity.setTextOnRow(i, LiteralText(line))
         }

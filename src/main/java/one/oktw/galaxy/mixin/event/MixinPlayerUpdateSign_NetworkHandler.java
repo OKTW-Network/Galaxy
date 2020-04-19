@@ -18,13 +18,17 @@
 
 package one.oktw.galaxy.mixin.event;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.SignBlockEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.packet.PlayerInteractBlockC2SPacket;
 import net.minecraft.server.network.packet.UpdateSignC2SPacket;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import one.oktw.galaxy.Main;
-import one.oktw.galaxy.event.type.PlayerInteractBlockEvent;
 import one.oktw.galaxy.event.type.PlayerUpdateSignEvent;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -36,12 +40,27 @@ public class MixinPlayerUpdateSign_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Inject(method = "onSignUpdate", at = @At("HEAD"), cancellable = true)
+    @Shadow
+    @Final
+    private MinecraftServer server;
+
+    @Inject(method = "onSignUpdate", at = @At(
+        value = "INVOKE",
+        target = "Lnet/minecraft/server/network/packet/UpdateSignC2SPacket;getText()[Ljava/lang/String;"
+    ), cancellable = true)
     private void onSignUpdate(UpdateSignC2SPacket packet, CallbackInfo info) {
         Main main = Main.Companion.getMain();
         if (main == null) return;
         if (main.getEventManager().emit(new PlayerUpdateSignEvent(packet, player)).getCancel()) {
             info.cancel();
+            World world = player.world;
+            BlockPos blockPos = packet.getPos();
+            SignBlockEntity signBlockEntity = (SignBlockEntity) world.getBlockEntity(blockPos);
+            if (signBlockEntity != null) {
+                BlockState blockState = world.getBlockState(blockPos);
+                signBlockEntity.markDirty();
+                world.updateListeners(blockPos, blockState, blockState, 3);
+            }
         }
     }
 }

@@ -52,10 +52,5 @@ class Sign {
             signBlockEntity.setTextOnRow(i, LiteralText(line))
         }
         event.cancel = true
-        world.players.forEach {
-            it.networkHandler.sendPacket(signBlockEntity.toUpdatePacket())
-        }
-        event.player.networkHandler.sendPacket(signBlockEntity.toUpdatePacket())
-
     }
 }

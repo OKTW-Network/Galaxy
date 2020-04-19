@@ -19,16 +19,11 @@
 package one.oktw.galaxy.player
 
 import net.minecraft.block.entity.SignBlockEntity
-import net.minecraft.item.AirBlockItem
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Hand
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerUpdateSignEvent
-import kotlin.math.sign
 
 class Sign {
     @EventListener(sync = true)
@@ -50,18 +45,17 @@ class Sign {
     fun onPlayerUpdateSign(event: PlayerUpdateSignEvent) {
         val world = event.player.serverWorld
         val entity = world.getBlockEntity(event.packet.pos)
-        if (entity != null) {
-            val signBlockEntity = entity as? SignBlockEntity ?: return
-            for (i in 0..3) {
-                val r = Regex("(?<![\\S|\\W])&(?![\\W])")
-                val line = r.replace(event.packet.text[i],"§")
-                signBlockEntity.setTextOnRow(i, LiteralText(line))
-            }
-            event.cancel = true
-            world.players.forEach {
-                it.networkHandler.sendPacket(signBlockEntity.toUpdatePacket())
-            }
-            event.player.networkHandler.sendPacket(signBlockEntity.toUpdatePacket())
+        val signBlockEntity = entity as? SignBlockEntity ?: return
+        for (i in 0..3) {
+            val r = Regex("(?<![\\S|\\W])&(?![\\W])")
+            val line = r.replace(event.packet.text[i], "§")
+            signBlockEntity.setTextOnRow(i, LiteralText(line))
         }
+        event.cancel = true
+        world.players.forEach {
+            it.networkHandler.sendPacket(signBlockEntity.toUpdatePacket())
+        }
+        event.player.networkHandler.sendPacket(signBlockEntity.toUpdatePacket())
+        
     }
 }

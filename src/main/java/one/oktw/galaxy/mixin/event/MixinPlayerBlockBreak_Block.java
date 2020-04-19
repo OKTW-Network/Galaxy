@@ -18,26 +18,36 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.network.ServerPlayerInteractionManager;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.BlockBreakEvent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(Block.class)
+@Mixin(ServerPlayerInteractionManager.class)
 public class MixinPlayerBlockBreak_Block {
-    @Inject(method = "onBreak", at = @At("HEAD"), cancellable = true)
-    private void onBlockBreak(World world, BlockPos pos, BlockState state, PlayerEntity player, CallbackInfo ci) {
+    @Shadow
+    public ServerWorld world;
+
+    @Shadow
+    public ServerPlayerEntity player;
+
+    @Inject(method = "tryBreakBlock", at = @At(
+        value = "INVOKE",
+        target = "Lnet/minecraft/block/Block;onBreak(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;)V"
+    ), cancellable = true)
+    private void onBlockBreak(BlockPos blockPos, CallbackInfoReturnable<Boolean> cir) {
         Main main = Main.Companion.getMain();
         if (main == null) return;
-        if (main.getEventManager().emit(new BlockBreakEvent(world, pos, state, player)).getCancel()) {
-            ci.cancel();
+        if (main.getEventManager().emit(new BlockBreakEvent(world, blockPos, world.getBlockState(blockPos), player)).getCancel()) {
+            cir.setReturnValue(false);
+            cir.cancel();
         }
     }
 }

@@ -94,7 +94,7 @@ class BlockEvents {
     fun onBlockBreak(event: BlockBreakEvent) {
         if (event.state.block != Blocks.BARRIER) return
         BlockUtil.detectBlock((event.world as ServerWorld), event.pos) ?: return
-        BlockUtil.removeBlock(event.world, event.pos)
+        event.cancel = true
     }
 
     private fun tryBreakBlock(packet: PlayerInteractBlockC2SPacket, player: ServerPlayerEntity, hand: Hand): Boolean {

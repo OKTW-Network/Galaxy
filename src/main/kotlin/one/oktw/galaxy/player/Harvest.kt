@@ -29,7 +29,6 @@ import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
-import one.oktw.galaxy.event.util.BlockEventUtil.isNextTo
 
 class Harvest {
     private val justHarvested = HashSet<ServerPlayerEntity>()
@@ -79,5 +78,12 @@ class Harvest {
         MELON -> isNextTo(world, blockPos, ATTACHED_MELON_STEM)
         PUMPKIN -> isNextTo(world, blockPos, ATTACHED_PUMPKIN_STEM)
         else -> false
+    }
+
+    private fun isNextTo(world: ServerWorld, blockPos: BlockPos, block: Block): Boolean {
+        return world.getBlockState(blockPos.add(1, 0, 0)).block == block ||
+            world.getBlockState(blockPos.add(0, 0, 1)).block == block ||
+            world.getBlockState(blockPos.add(-1, 0, 0)).block == block ||
+            world.getBlockState(blockPos.add(0, 0, -1)).block == block
     }
 }

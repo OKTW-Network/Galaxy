@@ -67,7 +67,6 @@ class Spawn : Command {
                 if (player.isSleeping) {
                     player.wakeUp(true, true)
                 }
-                Random()
                 val spawnRadius = level.gameRules.getInt(GameRules.SPAWN_RADIUS).toDouble()
                 player.teleport(
                     player.serverWorld,

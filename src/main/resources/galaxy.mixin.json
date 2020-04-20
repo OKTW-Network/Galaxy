@@ -10,6 +10,7 @@
     "MixinPlayerChat_SayCommand",
     "MixinPlayerInteractBlock_NetworkHandler",
     "MixinPlayerInteractItem_NetworkHandler",
+    "MixinPlayerUpdateSign_NetworkHandler",
     "MixinRequestCompletions_NetworkHandler"
   ],
   "client": [],

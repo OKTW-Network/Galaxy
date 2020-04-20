@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy.mixin.event;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.packet.PlayerInteractItemC2SPacket;
@@ -34,12 +35,18 @@ public class MixinPlayerInteractItem_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Inject(method = "onPlayerInteractItem", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "onPlayerInteractItem", at = @At(
+        value = "INVOKE",
+        target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;interactItem(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;"
+    ), cancellable = true)
     private void onPlayerInteractItem(PlayerInteractItemC2SPacket packet, CallbackInfo info) {
         Main main = Main.Companion.getMain();
         if (main == null) return;
         if (main.getEventManager().emit(new PlayerInteractItemEvent(packet, player)).getCancel()) {
             info.cancel();
+            ItemStack item = player.getStackInHand(packet.getHand());
+            player.setStackInHand(packet.getHand(), ItemStack.EMPTY);
+            player.setStackInHand(packet.getHand(), item);
         }
     }
 }

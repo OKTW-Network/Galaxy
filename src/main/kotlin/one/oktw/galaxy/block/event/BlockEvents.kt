@@ -20,16 +20,13 @@ package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.server.ServerTickCallback
 import net.minecraft.block.Blocks
-import net.minecraft.client.network.packet.EntityAnimationS2CPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.network.packet.PlayerInteractBlockC2SPacket
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Hand
-import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.Direction
 import net.minecraft.world.GameMode
-import net.minecraft.world.RayTraceContext
 import one.oktw.galaxy.block.Block
 import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.block.util.BlockUtil
@@ -37,21 +34,19 @@ import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.BlockBreakEvent
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
-import one.oktw.galaxy.event.util.BlockEventUtil.updateBlockAndInventory
 import one.oktw.galaxy.item.Tool
 import one.oktw.galaxy.item.type.ItemType
 import one.oktw.galaxy.item.type.ToolType
-import one.oktw.galaxy.network.ItemFunctionAccessor
 
 class BlockEvents {
     private val eventLock = HashSet<PlayerInteractBlockC2SPacket>()
-    private val mainHandUsedLock = HashSet<ServerPlayerEntity>()
+    private val usedLock = HashSet<ServerPlayerEntity>()
 
     init {
         ServerTickCallback.EVENT.register(
             ServerTickCallback {
                 eventLock.clear()
-                mainHandUsedLock.clear()
+                usedLock.clear()
             }
         )
     }
@@ -59,7 +54,7 @@ class BlockEvents {
     @Suppress("unused")
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
-        if (eventLock.contains(event.packet) || mainHandUsedLock.contains(event.player)) return
+        if (eventLock.contains(event.packet) || usedLock.contains(event.player)) return
         eventLock.add(event.packet)
 
         var finished: Boolean
@@ -67,26 +62,15 @@ class BlockEvents {
         if (!finished) finished = tryOpenGUI(event)
         if (!finished) finished = tryPlaceBlock(event.packet, event.player)
         if (finished) {
-            event.player.swingHand(event.packet.hand)
-            event.player.networkHandler.sendPacket(EntityAnimationS2CPacket(event.player, if (event.packet.hand == Hand.MAIN_HAND) 0 else 3))
+            event.player.swingHand(event.packet.hand, true)
+            usedLock.add(event.player)
         }
     }
 
     @Suppress("DuplicatedCode", "unused")
     @EventListener(true)
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
-        val world = event.player.serverWorld
-
-        val itemStack = event.player.getStackInHand(event.packet.hand)
-        val item = itemStack.item as ItemFunctionAccessor
-        val blockHitResult = item.getRayTrace(world, event.player, RayTraceContext.FluidHandling.ANY) as BlockHitResult
-        val entity = BlockUtil.detectBlock(world, blockHitResult.blockPos) ?: return
-        val blockType = BlockUtil.getTypeFromBlock(entity) ?: return
-
-        if (blockType.hasGUI && event.packet.hand == Hand.MAIN_HAND) {
-            event.cancel = true
-            updateBlockAndInventory(event.player, world, blockHitResult.blockPos)
-        }
+        if (usedLock.contains(event.player)) event.cancel = true
     }
 
     @Suppress("UNUSED_PARAMETER", "unused")
@@ -104,7 +88,6 @@ class BlockEvents {
         if (player.isSneaking && player.getStackInHand(hand).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
             BlockUtil.detectBlock(world, position) ?: return false
             BlockUtil.removeBlock(world, position)
-            if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(player)
             return true
         }
         return false
@@ -118,7 +101,6 @@ class BlockEvents {
             val entity = BlockUtil.detectBlock(world, position) ?: return false
             val blockType = BlockUtil.getTypeFromBlock(entity) ?: return false
             if (blockType.hasGUI && hand == Hand.MAIN_HAND) openGUI(blockType, event.player, event)
-            if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(event.player)
             return blockType.hasGUI
         }
         return false
@@ -126,7 +108,6 @@ class BlockEvents {
 
     private fun openGUI(blockType: BlockType, player: ServerPlayerEntity, event: PlayerInteractBlockEvent) {
         event.cancel = true
-        updateBlockAndInventory(player, player.serverWorld, event.packet.hitY.blockPos)
         when (blockType) {
             BlockType.CONTROL_PANEL -> player.sendMessage(LiteralText("Control Panel"))
             BlockType.PLANET_TERMINAL -> player.sendMessage(LiteralText("Planet Terminal"))
@@ -159,8 +140,6 @@ class BlockEvents {
         if (position.y < server.worldHeight - 1 || packet.hitY.side != Direction.UP && position.y < server.worldHeight) {
             // player modifiable world check
             if (world.canPlayerModifyAt(player, placePosition) && player.interactionManager.gameMode != GameMode.SPECTATOR) {
-                if (hand == Hand.MAIN_HAND) mainHandUsedLock.add(player)
-
                 val success = itemBlock.activate(world, placePosition)
 
                 if (success) {

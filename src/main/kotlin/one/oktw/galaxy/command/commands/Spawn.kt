@@ -25,10 +25,12 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
+import net.minecraft.world.GameRules
 import one.oktw.galaxy.command.Command
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 @Suppress("DuplicatedCode")
 class Spawn : Command {
@@ -65,11 +67,13 @@ class Spawn : Command {
                 if (player.isSleeping) {
                     player.wakeUp(true, true)
                 }
+                Random()
+                val spawnRadius = level.gameRules.getInt(GameRules.SPAWN_RADIUS).toDouble()
                 player.teleport(
                     player.serverWorld,
-                    level.spawnX.toDouble(),
+                    level.spawnX.toDouble() + Random.nextDouble(-spawnRadius, spawnRadius),
                     level.spawnY.toDouble(),
-                    level.spawnZ.toDouble(),
+                    level.spawnZ.toDouble() + Random.nextDouble(-spawnRadius, spawnRadius),
                     player.yaw,
                     player.pitch
                 )

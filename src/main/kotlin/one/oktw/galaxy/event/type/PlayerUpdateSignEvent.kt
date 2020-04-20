@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,13 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.network;
+package one.oktw.galaxy.event.type
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.world.RayTraceContext;
-import net.minecraft.world.World;
+import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.network.packet.UpdateSignC2SPacket
 
-public interface ItemFunctionAccessor {
-    HitResult getRayTrace(World world, PlayerEntity playerEntity, RayTraceContext.FluidHandling rayTraceContext$FluidHandling);
-}
+class PlayerUpdateSignEvent(val packet: UpdateSignC2SPacket, val player: ServerPlayerEntity) : CancelableEvent()

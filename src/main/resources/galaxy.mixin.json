@@ -5,13 +5,13 @@
   "mixins": [
     "MixinCustomPayload_CustomPayloadC2SPacket",
     "MixinCustomPayload_NetworkHandler",
-    "MixinItem_Item",
     "MixinPlayerBlockBreak_Block",
     "MixinPlayerChat_MeCommand",
     "MixinPlayerChat_NetworkHandler",
     "MixinPlayerChat_SayCommand",
     "MixinPlayerInteractBlock_NetworkHandler",
     "MixinPlayerInteractItem_NetworkHandler",
+    "MixinPlayerUpdateSign_NetworkHandler",
     "MixinRequestCompletions_NetworkHandler"
   ],
   "client": [],

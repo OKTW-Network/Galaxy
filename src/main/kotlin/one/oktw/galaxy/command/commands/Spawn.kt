@@ -25,14 +25,11 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Box
-import net.minecraft.world.GameRules
 import one.oktw.galaxy.command.Command
+import one.oktw.galaxy.network.ServerPlayerEntityFunctionAccessor
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 
 @Suppress("DuplicatedCode")
 class Spawn : Command {
@@ -56,34 +53,19 @@ class Spawn : Command {
         lock += player.uuid
         GlobalScope.launch {
             val world = player.serverWorld
-            val level = world.levelProperties
             for (i in 0..4) {
                 val component = TranslatableText("Respond.commandCountdown", 5 - i)
                     .styled { style -> style.color = Formatting.GREEN }
                 player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, component))
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
-            val spawnRadius = level.gameRules.getInt(GameRules.SPAWN_RADIUS)
-
-            var spawnPos: BlockPos
-            do {
-                spawnPos = BlockPos(
-                    level.spawnX + Random.nextInt(-spawnRadius, spawnRadius),
-                    level.spawnY,
-                    level.spawnZ + Random.nextInt(-spawnRadius, spawnRadius)
-                )
-            } while (!world.doesNotCollide(Box(spawnPos)))
 
             withContext(player.server.asCoroutineDispatcher()) {
                 player.stopRiding()
                 if (player.isSleeping) {
                     player.wakeUp(true, true)
                 }
-                player.requestTeleport(
-                    spawnPos.x.toDouble(),
-                    spawnPos.y.toDouble(),
-                    spawnPos.z.toDouble()
-                )
+                (player as ServerPlayerEntityFunctionAccessor).moveToWorldSpawn(world)
             }
             lock -= player.uuid
         }

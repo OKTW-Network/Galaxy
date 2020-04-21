@@ -25,6 +25,8 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Box
 import net.minecraft.world.GameRules
 import one.oktw.galaxy.command.Command
 import java.util.*
@@ -61,20 +63,26 @@ class Spawn : Command {
                 player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, component))
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
+            val spawnRadius = level.gameRules.getInt(GameRules.SPAWN_RADIUS)
+
+            var spawnPos: BlockPos
+            do {
+                spawnPos = BlockPos(
+                    level.spawnX + Random.nextInt(-spawnRadius, spawnRadius),
+                    level.spawnY,
+                    level.spawnZ + Random.nextInt(-spawnRadius, spawnRadius)
+                )
+            } while (!world.doesNotCollide(Box(spawnPos)))
 
             withContext(player.server.asCoroutineDispatcher()) {
                 player.stopRiding()
                 if (player.isSleeping) {
                     player.wakeUp(true, true)
                 }
-                val spawnRadius = level.gameRules.getInt(GameRules.SPAWN_RADIUS).toDouble()
-                player.teleport(
-                    player.serverWorld,
-                    level.spawnX.toDouble() + Random.nextDouble(-spawnRadius, spawnRadius),
-                    level.spawnY.toDouble(),
-                    level.spawnZ.toDouble() + Random.nextDouble(-spawnRadius, spawnRadius),
-                    player.yaw,
-                    player.pitch
+                player.requestTeleport(
+                    spawnPos.x.toDouble(),
+                    spawnPos.y.toDouble(),
+                    spawnPos.z.toDouble()
                 )
             }
             lock -= player.uuid

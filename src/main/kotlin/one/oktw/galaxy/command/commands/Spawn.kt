@@ -66,6 +66,9 @@ class Spawn : Command {
                     player.wakeUp(true, true)
                 }
                 (player as ServerPlayerEntityFunctionAccessor).moveToWorldSpawn(world)
+                while (!world.doesNotCollide(player) && player.y < 255) {
+                    player.updatePosition(player.x, player.y + 1, player.z)
+                }
             }
             lock -= player.uuid
         }

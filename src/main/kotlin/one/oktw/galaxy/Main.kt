@@ -31,6 +31,7 @@ import one.oktw.galaxy.command.CommandRegister
 import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.PlayerControl
+import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.resourcepack.ResourcePack
 
 @Suppress("unused")
@@ -65,5 +66,6 @@ class Main : ModInitializer {
         eventManager.register(Exchange())
         eventManager.register(PlayerControl())
         eventManager.register(Harvest())
+        eventManager.register(Sign())
     }
 }

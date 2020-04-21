@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,12 +18,17 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.SignBlockEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.packet.PlayerInteractItemC2SPacket;
+import net.minecraft.server.network.packet.UpdateSignC2SPacket;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import one.oktw.galaxy.Main;
-import one.oktw.galaxy.event.type.PlayerInteractItemEvent;
+import one.oktw.galaxy.event.type.PlayerUpdateSignEvent;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,22 +36,31 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayNetworkHandler.class)
-public class MixinPlayerInteractItem_NetworkHandler {
+public class MixinPlayerUpdateSign_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Inject(method = "onPlayerInteractItem", at = @At(
+    @Shadow
+    @Final
+    private MinecraftServer server;
+
+    @Inject(method = "onSignUpdate", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;interactItem(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;"
+        target = "Lnet/minecraft/server/network/packet/UpdateSignC2SPacket;getText()[Ljava/lang/String;"
     ), cancellable = true)
-    private void onPlayerInteractItem(PlayerInteractItemC2SPacket packet, CallbackInfo info) {
+    private void onSignUpdate(UpdateSignC2SPacket packet, CallbackInfo info) {
         Main main = Main.Companion.getMain();
         if (main == null) return;
-        if (main.getEventManager().emit(new PlayerInteractItemEvent(packet, player)).getCancel()) {
+        if (main.getEventManager().emit(new PlayerUpdateSignEvent(packet, player)).getCancel()) {
             info.cancel();
-            ItemStack item = player.getStackInHand(packet.getHand());
-            player.setStackInHand(packet.getHand(), ItemStack.EMPTY);
-            player.setStackInHand(packet.getHand(), item);
+            World world = player.world;
+            BlockPos blockPos = packet.getPos();
+            SignBlockEntity signBlockEntity = (SignBlockEntity) world.getBlockEntity(blockPos);
+            if (signBlockEntity != null) {
+                BlockState blockState = world.getBlockState(blockPos);
+                signBlockEntity.markDirty();
+                world.updateListeners(blockPos, blockState, blockState, 3);
+            }
         }
     }
 }

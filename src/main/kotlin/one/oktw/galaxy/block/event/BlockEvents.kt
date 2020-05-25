@@ -77,7 +77,7 @@ class BlockEvents {
     @EventListener(true)
     fun onBlockBreak(event: BlockBreakEvent) {
         if (event.state.block != Blocks.BARRIER) return
-        BlockUtil.detectBlock((event.world as ServerWorld), event.pos) ?: return
+        BlockUtil.getCustomBlock((event.world as ServerWorld), event.pos) ?: return
         event.cancel = true
     }
 
@@ -86,7 +86,7 @@ class BlockEvents {
         val position = packet.hitY.blockPos
         if (world.getBlockState(position).block != Blocks.BARRIER) return false
         if (player.isSneaking && player.getStackInHand(hand).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
-            BlockUtil.detectBlock(world, position) ?: return false
+            BlockUtil.getCustomBlock(world, position) ?: return false
             BlockUtil.removeBlock(world, position)
             return true
         }
@@ -98,7 +98,7 @@ class BlockEvents {
         val position = event.packet.hitY.blockPos
         val hand = event.packet.hand
         if (!event.player.isSneaking) {
-            val entity = BlockUtil.detectBlock(world, position) ?: return false
+            val entity = BlockUtil.getCustomBlock(world, position) ?: return false
             val blockType = BlockUtil.getTypeFromBlock(entity) ?: return false
             if (blockType.hasGUI && hand == Hand.MAIN_HAND) openGUI(blockType, event.player, event)
             return blockType.hasGUI

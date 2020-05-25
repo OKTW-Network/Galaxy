@@ -96,14 +96,7 @@ object BlockUtil {
 
     fun getPlacePosition(world: ServerWorld, blockPos: BlockPos, blockHitResult: BlockHitResult): BlockPos {
         return when (world.getBlockState(blockPos).block) {
-            is FernBlock -> blockPos
-            is DeadBushBlock -> blockPos
-            is SeagrassBlock -> blockPos
-            is SnowBlock -> blockPos
-            is VineBlock -> blockPos
-            is TallSeagrassBlock -> blockPos
-            is TallPlantBlock -> blockPos
-            is FluidBlock -> blockPos
+            is FernBlock, is DeadBushBlock, is SeagrassBlock, is SnowBlock, is VineBlock, is TallSeagrassBlock, is TallPlantBlock, is FluidBlock -> blockPos
             else -> blockPos.offset(blockHitResult.side)
         }
     }

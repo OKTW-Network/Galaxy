@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.block.util
 
-import net.minecraft.block.Blocks
+import net.minecraft.block.*
 import net.minecraft.block.Blocks.BARRIER
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
@@ -29,6 +29,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
+import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import one.oktw.galaxy.block.Block
@@ -91,6 +92,20 @@ object BlockUtil {
     fun getTypeFromBlock(entity: Entity): BlockType? {
         val tag = entity.scoreboardTags.firstOrNull { string -> BlockType.values().map { it.name }.contains(string) }
         return if (tag != null) BlockType.valueOf(tag) else null
+    }
+
+    fun getPlacePosition(world: ServerWorld, blockPos: BlockPos, blockHitResult: BlockHitResult): BlockPos {
+        return when (world.getBlockState(blockPos).block) {
+            is FernBlock -> blockPos
+            is DeadBushBlock -> blockPos
+            is SeagrassBlock -> blockPos
+            is SnowBlock -> blockPos
+            is VineBlock -> blockPos
+            is TallSeagrassBlock -> blockPos
+            is TallPlantBlock -> blockPos
+            is FluidBlock -> blockPos
+            else -> blockPos.offset(blockHitResult.side)
+        }
     }
 
     private fun playSound(world: ServerWorld, blockPos: BlockPos) {

@@ -122,7 +122,7 @@ class BlockEvents {
         val world = player.serverWorld
         val server = player.server
         val position = packet.hitY.blockPos
-        val placePosition = position.offset(packet.hitY.side)
+        val placePosition = BlockUtil.getPlacePosition(world, position, packet.hitY)
 
         val hand = packet.hand
 

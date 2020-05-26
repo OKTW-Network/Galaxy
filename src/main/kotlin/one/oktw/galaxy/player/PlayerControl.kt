@@ -20,8 +20,8 @@ package one.oktw.galaxy.player
 
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.netty.buffer.Unpooled.wrappedBuffer
-import net.minecraft.client.network.packet.CommandSuggestionsS2CPacket
-import net.minecraft.client.network.packet.CustomPayloadS2CPacket
+import net.minecraft.network.packet.s2c.play.CommandSuggestionsS2CPacket
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket
 import net.minecraft.util.PacketByteBuf
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.event.annotation.EventListener

@@ -25,6 +25,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
+import net.minecraft.state.property.Properties
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
@@ -86,7 +87,8 @@ object BlockUtil {
 
     fun getPlacePosition(world: ServerWorld, blockPos: BlockPos, blockHitResult: BlockHitResult): BlockPos {
         return when (world.getBlockState(blockPos).block) {
-            is FernBlock, is DeadBushBlock, is SeagrassBlock, is SnowBlock, is VineBlock, is TallSeagrassBlock, is TallPlantBlock, is FluidBlock -> blockPos
+            is FernBlock, is DeadBushBlock, is SeagrassBlock, is VineBlock, is TallSeagrassBlock, is TallPlantBlock, is FluidBlock -> blockPos
+            is SnowBlock -> if (world.getBlockState(blockPos)[Properties.LAYERS] == 1) blockPos else blockPos.offset(blockHitResult.side)
             else -> blockPos.offset(blockHitResult.side)
         }
     }

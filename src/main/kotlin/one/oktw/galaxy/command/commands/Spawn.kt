@@ -20,7 +20,7 @@ package one.oktw.galaxy.command.commands
 
 import com.mojang.brigadier.CommandDispatcher
 import kotlinx.coroutines.*
-import net.minecraft.client.network.packet.TitleS2CPacket
+import net.minecraft.network.packet.s2c.play.TitleS2CPacket
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText

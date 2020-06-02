@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.server.network.packet.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
 import one.oktw.galaxy.network.CustomPayloadC2SPacketAccessor;

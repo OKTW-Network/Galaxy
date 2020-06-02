@@ -19,6 +19,7 @@
 package one.oktw.galaxy.block.util
 
 import net.minecraft.block.*
+import net.minecraft.block.Blocks.AIR
 import net.minecraft.block.Blocks.BARRIER
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
@@ -43,7 +44,7 @@ object BlockUtil {
         if (entities.any { entity -> entity is LivingEntity || entity is BoatEntity || entity is AbstractMinecartEntity || entity is TntEntity }) {
             return false
         }
-
+        if (world.getBlockState(blockPos).block != AIR) return false
         if (world.setBlockState(blockPos, BARRIER.defaultState)) {
             CustomBlockEntityBuilder()
                 .setBlockItem(blockItem)
@@ -73,7 +74,7 @@ object BlockUtil {
     fun removeBlock(world: ServerWorld, blockPos: BlockPos) {
         val entity = getCustomBlock(world, blockPos) ?: return
         val block = Block(getTypeFromBlock(entity) ?: return)
-        world.setBlockState(blockPos, Blocks.AIR.defaultState)
+        world.setBlockState(blockPos, AIR.defaultState)
         entity.kill()
         minecraftBlock.dropStack(world, blockPos, block.item!!.createItemStack())
     }

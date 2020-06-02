@@ -20,8 +20,8 @@ package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.server.ServerTickCallback
 import net.minecraft.block.Blocks
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.server.network.packet.PlayerInteractBlockC2SPacket
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Hand

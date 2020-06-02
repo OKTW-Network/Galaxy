@@ -21,10 +21,6 @@ package one.oktw.galaxy.block.util
 import net.minecraft.block.*
 import net.minecraft.block.Blocks.BARRIER
 import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.TntEntity
-import net.minecraft.entity.vehicle.AbstractMinecartEntity
-import net.minecraft.entity.vehicle.BoatEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
@@ -38,24 +34,18 @@ import net.minecraft.block.Block as minecraftBlock
 
 object BlockUtil {
     fun placeAndRegisterBlock(world: ServerWorld, blockPos: BlockPos, blockItem: ItemStack, blockType: BlockType): Boolean {
-        val entities = world.getEntities(null, Box(blockPos))
-
-        if (
-            entities.any { entity ->
-                return entity is LivingEntity || entity is BoatEntity || entity is AbstractMinecartEntity || entity is TntEntity
-            }
-        ) return false
-
-        world.setBlockState(blockPos, BARRIER.defaultState)
-        CustomBlockEntityBuilder()
-            .setBlockItem(blockItem)
-            .setBlockType(blockType)
-            .setPosition(blockPos)
-            .setWorld(world)
-            .setSmall()
-            .create()
-        playSound(world, blockPos)
-        return true
+        if (world.setBlockState(blockPos, BARRIER.defaultState)) {
+            CustomBlockEntityBuilder()
+                .setBlockItem(blockItem)
+                .setBlockType(blockType)
+                .setPosition(blockPos)
+                .setWorld(world)
+                .setSmall()
+                .create()
+            playSound(world, blockPos)
+            return true
+        }
+        return false
     }
 
     fun registerBlock(world: ServerWorld, blockPos: BlockPos, blockType: BlockType): Boolean {

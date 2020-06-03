@@ -99,7 +99,7 @@ class BlockEvents {
         val hand = event.packet.hand
         if (!event.player.isSneaking) {
             val entity = BlockUtil.getCustomBlockEntity(world, position) ?: return false
-            val blockType = BlockUtil.getTypeFromBlock(entity) ?: return false
+            val blockType = BlockUtil.getTypeFromCustomBlockEntity(entity) ?: return false
             if (blockType.hasGUI && hand == Hand.MAIN_HAND) openGUI(blockType, event.player, event)
             return blockType.hasGUI
         }
@@ -108,7 +108,7 @@ class BlockEvents {
 
     private fun openGUI(blockType: BlockType, player: ServerPlayerEntity, event: PlayerInteractBlockEvent) {
         event.cancel = true
-        when (blockType) {
+        when (blockType) { // TODO activate GUI
             BlockType.CONTROL_PANEL -> player.sendMessage(LiteralText("Control Panel"))
             BlockType.PLANET_TERMINAL -> player.sendMessage(LiteralText("Planet Terminal"))
             BlockType.HT_CRAFTING_TABLE -> player.sendMessage(LiteralText("HTCT"))

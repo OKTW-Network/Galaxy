@@ -73,7 +73,7 @@ object BlockUtil {
 
     fun removeBlock(world: ServerWorld, blockPos: BlockPos) {
         val entity = getCustomBlockEntity(world, blockPos) ?: return
-        val block = Block(getTypeFromBlock(entity) ?: return)
+        val block = Block(getTypeFromCustomBlockEntity(entity) ?: return)
         world.setBlockState(blockPos, AIR.defaultState)
         entity.kill()
         minecraftBlock.dropStack(world, blockPos, block.item!!.createItemStack())
@@ -90,7 +90,7 @@ object BlockUtil {
         return entities.firstOrNull { entity -> entity.scoreboardTags.contains("BLOCK") }
     }
 
-    fun getTypeFromBlock(entity: Entity): BlockType? {
+    fun getTypeFromCustomBlockEntity(entity: Entity): BlockType? {
         val tag = entity.scoreboardTags.firstOrNull { string -> BlockType.values().map { it.name }.contains(string) }
         return if (tag != null) BlockType.valueOf(tag) else null
     }

@@ -44,7 +44,7 @@ object BlockUtil {
         if (entities.any { entity -> entity is LivingEntity || entity is BoatEntity || entity is AbstractMinecartEntity || entity is TntEntity }) {
             return false
         }
-        if (world.getBlockState(blockPos).block != AIR) return false
+        if (!isReplaceable(world, blockPos)) return false
         if (world.setBlockState(blockPos, BARRIER.defaultState)) {
             CustomBlockEntityBuilder()
                 .setBlockItem(blockItem)
@@ -95,12 +95,13 @@ object BlockUtil {
         return if (tag != null) BlockType.valueOf(tag) else null
     }
 
-    fun getPlacePosition(world: ServerWorld, blockPos: BlockPos, blockHitResult: BlockHitResult): BlockPos {
-        return when (world.getBlockState(blockPos).block) {
-            is FernBlock, is DeadBushBlock, is SeagrassBlock, is VineBlock, is TallSeagrassBlock, is TallPlantBlock, is FluidBlock -> blockPos
-            is SnowBlock -> if (world.getBlockState(blockPos)[Properties.LAYERS] == 1) blockPos else blockPos.offset(blockHitResult.side)
-            else -> blockPos.offset(blockHitResult.side)
-        }
+    fun getPlacePosition(world: ServerWorld, blockPos: BlockPos, blockHitResult: BlockHitResult): BlockPos =
+        if (isReplaceable(world, blockPos)) blockPos else blockPos.offset(blockHitResult.side)
+
+    private fun isReplaceable(world: ServerWorld, blockPos: BlockPos) = when (world.getBlockState(blockPos).block) {
+        is AirBlock, is FernBlock, is DeadBushBlock, is SeagrassBlock, is VineBlock, is TallSeagrassBlock, is TallPlantBlock, is FluidBlock -> true
+        is SnowBlock -> world.getBlockState(blockPos)[Properties.LAYERS] == 1
+        else -> false
     }
 
     private fun playSound(world: ServerWorld, blockPos: BlockPos) {

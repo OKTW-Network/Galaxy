@@ -60,7 +60,7 @@ object BlockUtil {
     }
 
     fun registerBlock(world: ServerWorld, blockPos: BlockPos, blockType: BlockType): Boolean {
-        val entity = getCustomBlock(world, blockPos)
+        val entity = getCustomBlockEntity(world, blockPos)
         if (entity != null) return false
         CustomBlockEntityBuilder()
             .setBlockType(blockType)
@@ -72,7 +72,7 @@ object BlockUtil {
     }
 
     fun removeBlock(world: ServerWorld, blockPos: BlockPos) {
-        val entity = getCustomBlock(world, blockPos) ?: return
+        val entity = getCustomBlockEntity(world, blockPos) ?: return
         val block = Block(getTypeFromBlock(entity) ?: return)
         world.setBlockState(blockPos, AIR.defaultState)
         entity.kill()
@@ -80,12 +80,12 @@ object BlockUtil {
     }
 
     fun unregisterBlock(world: ServerWorld, blockPos: BlockPos): Boolean {
-        val entity = getCustomBlock(world, blockPos) ?: return false
+        val entity = getCustomBlockEntity(world, blockPos) ?: return false
         entity.kill()
         return true
     }
 
-    fun getCustomBlock(world: ServerWorld, blockPos: BlockPos): Entity? {
+    fun getCustomBlockEntity(world: ServerWorld, blockPos: BlockPos): Entity? {
         val entities = world.getEntities(null, Box(blockPos))
         return entities.firstOrNull { entity -> entity.scoreboardTags.contains("BLOCK") }
     }

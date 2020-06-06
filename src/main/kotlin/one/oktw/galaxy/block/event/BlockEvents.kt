@@ -64,6 +64,7 @@ class BlockEvents {
         if (finished) {
             event.player.swingHand(event.packet.hand, true)
             usedLock.add(event.player)
+            event.cancel = true
         }
     }
 

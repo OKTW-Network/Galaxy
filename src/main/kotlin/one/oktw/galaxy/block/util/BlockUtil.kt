@@ -99,6 +99,7 @@ object BlockUtil {
         if (isReplaceable(world, blockPos)) blockPos else blockPos.offset(blockHitResult.side)
 
     private fun isReplaceable(world: ServerWorld, blockPos: BlockPos) = when (world.getBlockState(blockPos).block) {
+        is TallFlowerBlock -> false
         is AirBlock, is FernBlock, is DeadBushBlock, is SeagrassBlock, is VineBlock, is TallSeagrassBlock, is TallPlantBlock, is FluidBlock -> true
         is SnowBlock -> world.getBlockState(blockPos)[Properties.LAYERS] == 1
         else -> false

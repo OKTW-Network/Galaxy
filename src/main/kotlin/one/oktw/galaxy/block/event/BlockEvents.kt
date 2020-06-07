@@ -56,23 +56,31 @@ class BlockEvents {
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
         if (event.cancel) return
-        val tryUseBlock = CustomBlockUtil.vanillaTryUseBlock(event.player, event.packet.hand, event.packet.hitY)
+
+        val player = event.player
+        val hand = event.packet.hand
+        val hitResult = event.packet.hitY
+        val blockPos = hitResult.blockPos
+
+        val tryUseBlock = CustomBlockUtil.vanillaTryUseBlock(player, hand, hitResult)
         if (tryUseBlock.isAccepted) {
             event.cancel = true
-            if (tryUseBlock.shouldSwingHand()) event.player.swingHand(event.packet.hand, true)
+            if (tryUseBlock.shouldSwingHand()) player.swingHand(hand, true)
             return
         }
-        if (BlockUtil.isMature(event.player.serverWorld, event.packet.hitY.blockPos, event.player.serverWorld.getBlockState(event.packet.hitY.blockPos))) return
-        if (eventLock.contains(event.packet) || usedLock.contains(event.player)) return
+
+        if (BlockUtil.isMature(player.serverWorld, blockPos, player.serverWorld.getBlockState(blockPos))) return
+
+        if (eventLock.contains(event.packet) || usedLock.contains(player)) return
         eventLock.add(event.packet)
 
         var finished: Boolean
-        finished = tryBreakBlock(event.packet, event.player, event.packet.hand)
+        finished = tryBreakBlock(event.packet, player, hand)
         if (!finished) finished = tryOpenGUI(event)
-        if (!finished) finished = tryPlaceBlock(event.packet, event.player)
+        if (!finished) finished = tryPlaceBlock(event.packet, player)
         if (finished) {
-            event.player.swingHand(event.packet.hand, true)
-            usedLock.add(event.player)
+            player.swingHand(hand, true)
+            usedLock.add(player)
             event.cancel = true
         }
     }
@@ -104,20 +112,20 @@ class BlockEvents {
     }
 
     private fun tryOpenGUI(event: PlayerInteractBlockEvent): Boolean {
-        val world = event.player.serverWorld
+        val player = event.player
+        val world = player.serverWorld
         val position = event.packet.hitY.blockPos
         val hand = event.packet.hand
-        if (!event.player.isSneaking) {
+        if (!player.shouldCancelInteraction()) {
             val entity = CustomBlockUtil.getCustomBlockEntity(world, position) ?: return false
             val blockType = CustomBlockUtil.getTypeFromCustomBlockEntity(entity) ?: return false
-            if (blockType.hasGUI && hand == Hand.MAIN_HAND) openGUI(blockType, event.player, event)
+            if (blockType.hasGUI && hand == Hand.MAIN_HAND) openGUI(blockType, player)
             return blockType.hasGUI
         }
         return false
     }
 
-    private fun openGUI(blockType: BlockType, player: ServerPlayerEntity, event: PlayerInteractBlockEvent) {
-        event.cancel = true
+    private fun openGUI(blockType: BlockType, player: ServerPlayerEntity) {
         when (blockType) { // TODO activate GUI
             BlockType.CONTROL_PANEL -> player.sendMessage(LiteralText("Control Panel"))
             BlockType.PLANET_TERMINAL -> player.sendMessage(LiteralText("Planet Terminal"))

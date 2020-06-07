@@ -47,6 +47,7 @@ import net.minecraft.block.Block as minecraftBlock
 object CustomBlockUtil {
     fun placeAndRegisterBlock(world: ServerWorld, blockPos: BlockPos, blockItem: ItemStack, blockType: BlockType): Boolean {
         val entities = world.getEntities(null, Box(blockPos))
+        // block place entity blacklist
         if (entities.any { entity -> entity is LivingEntity || entity is BoatEntity || entity is AbstractMinecartEntity || entity is TntEntity }) {
             return false
         }

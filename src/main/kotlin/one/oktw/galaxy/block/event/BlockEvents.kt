@@ -54,15 +54,15 @@ class BlockEvents {
     @Suppress("unused")
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
-        if (eventLock.contains(event.packet) || usedLock.contains(event.player)) return
-        eventLock.add(event.packet)
-
         val tryUseBlock = BlockUtil.vanillaTryUseBlock(event.player, event.packet.hand, event.packet.hitY)
         if (tryUseBlock.isAccepted) {
             event.cancel = true
             if (tryUseBlock.shouldSwingHand()) event.player.swingHand(event.packet.hand, true)
             return
         }
+
+        if (eventLock.contains(event.packet) || usedLock.contains(event.player)) return
+        eventLock.add(event.packet)
 
         var finished: Boolean
         finished = tryBreakBlock(event.packet, event.player, event.packet.hand)

@@ -55,12 +55,12 @@ class BlockEvents {
     @Suppress("unused")
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
-        if (event.cancel) return
-
         val player = event.player
         val hand = event.packet.hand
         val hitResult = event.packet.hitY
         val blockPos = hitResult.blockPos
+
+        if (hand == Hand.MAIN_HAND && !player.isSneaking && BlockUtil.isMature(player.serverWorld, blockPos, player.serverWorld.getBlockState(blockPos))) return
 
         val tryUseBlock = CustomBlockUtil.vanillaTryUseBlock(player, hand, hitResult)
         if (tryUseBlock.isAccepted) {
@@ -69,7 +69,6 @@ class BlockEvents {
             return
         }
 
-        if (BlockUtil.isMature(player.serverWorld, blockPos, player.serverWorld.getBlockState(blockPos))) return
 
         if (eventLock.contains(event.packet) || usedLock.contains(player)) return
         eventLock.add(event.packet)

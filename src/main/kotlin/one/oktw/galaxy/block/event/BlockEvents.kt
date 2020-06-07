@@ -55,6 +55,7 @@ class BlockEvents {
     @Suppress("unused")
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
+        if (event.cancel) return
         val tryUseBlock = CustomBlockUtil.vanillaTryUseBlock(event.player, event.packet.hand, event.packet.hitY)
         if (tryUseBlock.isAccepted) {
             event.cancel = true

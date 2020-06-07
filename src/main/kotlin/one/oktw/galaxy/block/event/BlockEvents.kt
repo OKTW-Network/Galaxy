@@ -60,7 +60,7 @@ class BlockEvents {
         val hitResult = event.packet.hitY
         val blockPos = hitResult.blockPos
 
-        if (hand == Hand.MAIN_HAND && !player.isSneaking && BlockUtil.isMature(player.serverWorld, blockPos, player.serverWorld.getBlockState(blockPos))) return
+        if (!player.isSneaking && BlockUtil.isMature(player.serverWorld, blockPos, player.serverWorld.getBlockState(blockPos))) return
 
         val tryUseBlock = CustomBlockUtil.vanillaTryUseBlock(player, hand, hitResult)
         if (tryUseBlock.isAccepted) {

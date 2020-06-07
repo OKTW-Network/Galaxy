@@ -22,13 +22,12 @@ import net.fabricmc.fabric.api.event.server.ServerTickCallback
 import net.minecraft.block.*
 import net.minecraft.block.Blocks.*
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.IntProperty
 import net.minecraft.util.Hand
-import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
+import one.oktw.galaxy.player.util.BlockUtil
 
 class Harvest {
     private val justHarvested = HashSet<ServerPlayerEntity>()
@@ -46,7 +45,7 @@ class Harvest {
         val blockPos = event.packet.hitY.blockPos
         val blockState = world.getBlockState(blockPos)
 
-        if (event.packet.hand == Hand.MAIN_HAND && !player.isSneaking && isMature(world, blockPos, blockState)) {
+        if (event.packet.hand == Hand.MAIN_HAND && !player.isSneaking && BlockUtil.isMature(world, blockPos, blockState)) {
             event.cancel = true
             val ageProperties = when (blockState.block) {
                 WHEAT, CARROTS, POTATOES -> CropBlock.AGE
@@ -69,21 +68,5 @@ class Harvest {
     @EventListener(true)
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
         if (event.player in justHarvested) event.cancel = true
-    }
-
-    private fun isMature(world: ServerWorld, blockPos: BlockPos, blockState: BlockState): Boolean = when (blockState.block) {
-        WHEAT, CARROTS, POTATOES, BEETROOTS -> blockState.let((blockState.block as CropBlock)::isMature)
-        COCOA -> blockState[CocoaBlock.AGE] >= 2
-        NETHER_WART -> blockState[NetherWartBlock.AGE] >= 3
-        MELON -> isNextTo(world, blockPos, ATTACHED_MELON_STEM)
-        PUMPKIN -> isNextTo(world, blockPos, ATTACHED_PUMPKIN_STEM)
-        else -> false
-    }
-
-    private fun isNextTo(world: ServerWorld, blockPos: BlockPos, block: Block): Boolean {
-        return world.getBlockState(blockPos.add(1, 0, 0)).block == block ||
-            world.getBlockState(blockPos.add(0, 0, 1)).block == block ||
-            world.getBlockState(blockPos.add(-1, 0, 0)).block == block ||
-            world.getBlockState(blockPos.add(0, 0, -1)).block == block
     }
 }

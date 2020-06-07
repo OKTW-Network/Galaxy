@@ -24,7 +24,7 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
 import net.minecraft.util.math.BlockPos
-import one.oktw.galaxy.block.util.BlockUtil
+import one.oktw.galaxy.block.util.CustomBlockUtil
 
 class UnregisterBlock {
     companion object {
@@ -41,7 +41,7 @@ class UnregisterBlock {
     }
 
     private fun unregisterBlock(source: ServerCommandSource, blockPos: BlockPos): Int {
-        if (BlockUtil.unregisterBlock(source.player.serverWorld, blockPos)) {
+        if (CustomBlockUtil.unregisterBlock(source.player.serverWorld, blockPos)) {
             source.sendFeedback(LiteralText("Unregistered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z}"), true)
         } else {
             source.sendFeedback(LiteralText("Unregistered Failed"), false)

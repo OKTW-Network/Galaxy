@@ -23,15 +23,15 @@ import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.item.BlockItem
 import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.block.type.BlockType.DUMMY
-import one.oktw.galaxy.block.util.BlockUtil
+import one.oktw.galaxy.block.util.CustomBlockUtil
 
 class Block(val type: BlockType = DUMMY) {
     val item = if (type.customModelData != null) BlockItem(type) else null
 
     fun activate(world: ServerWorld, blockPos: BlockPos) =
         if (type.customModelData != null) {
-            BlockUtil.placeAndRegisterBlock(world, blockPos, this.item!!.createItemStack(), type)
+            CustomBlockUtil.placeAndRegisterBlock(world, blockPos, this.item!!.createItemStack(), type)
         } else {
-            BlockUtil.registerBlock(world, blockPos, type)
+            CustomBlockUtil.registerBlock(world, blockPos, type)
         }
 }

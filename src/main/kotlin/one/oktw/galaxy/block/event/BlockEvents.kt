@@ -29,7 +29,7 @@ import net.minecraft.util.math.Direction
 import net.minecraft.world.GameMode
 import one.oktw.galaxy.block.Block
 import one.oktw.galaxy.block.type.BlockType
-import one.oktw.galaxy.block.util.BlockUtil
+import one.oktw.galaxy.block.util.CustomBlockUtil
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.BlockBreakEvent
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
@@ -37,6 +37,7 @@ import one.oktw.galaxy.event.type.PlayerInteractItemEvent
 import one.oktw.galaxy.item.Tool
 import one.oktw.galaxy.item.type.ItemType
 import one.oktw.galaxy.item.type.ToolType
+import one.oktw.galaxy.player.util.BlockUtil
 
 class BlockEvents {
     private val eventLock = HashSet<PlayerInteractBlockC2SPacket>()
@@ -54,13 +55,13 @@ class BlockEvents {
     @Suppress("unused")
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
-        val tryUseBlock = BlockUtil.vanillaTryUseBlock(event.player, event.packet.hand, event.packet.hitY)
+        val tryUseBlock = CustomBlockUtil.vanillaTryUseBlock(event.player, event.packet.hand, event.packet.hitY)
         if (tryUseBlock.isAccepted) {
             event.cancel = true
             if (tryUseBlock.shouldSwingHand()) event.player.swingHand(event.packet.hand, true)
             return
         }
-
+        if (BlockUtil.isMature(event.player.serverWorld, event.packet.hitY.blockPos, event.player.serverWorld.getBlockState(event.packet.hitY.blockPos))) return
         if (eventLock.contains(event.packet) || usedLock.contains(event.player)) return
         eventLock.add(event.packet)
 
@@ -85,7 +86,7 @@ class BlockEvents {
     @EventListener(true)
     fun onBlockBreak(event: BlockBreakEvent) {
         if (event.state.block != Blocks.BARRIER) return
-        BlockUtil.getCustomBlockEntity((event.world as ServerWorld), event.pos) ?: return
+        CustomBlockUtil.getCustomBlockEntity((event.world as ServerWorld), event.pos) ?: return
         event.cancel = true
     }
 
@@ -94,8 +95,8 @@ class BlockEvents {
         val position = packet.hitY.blockPos
         if (world.getBlockState(position).block != Blocks.BARRIER) return false
         if (player.isSneaking && player.getStackInHand(hand).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
-            BlockUtil.getCustomBlockEntity(world, position) ?: return false
-            BlockUtil.removeBlock(world, position)
+            CustomBlockUtil.getCustomBlockEntity(world, position) ?: return false
+            CustomBlockUtil.removeBlock(world, position)
             return true
         }
         return false
@@ -106,8 +107,8 @@ class BlockEvents {
         val position = event.packet.hitY.blockPos
         val hand = event.packet.hand
         if (!event.player.isSneaking) {
-            val entity = BlockUtil.getCustomBlockEntity(world, position) ?: return false
-            val blockType = BlockUtil.getTypeFromCustomBlockEntity(entity) ?: return false
+            val entity = CustomBlockUtil.getCustomBlockEntity(world, position) ?: return false
+            val blockType = CustomBlockUtil.getTypeFromCustomBlockEntity(entity) ?: return false
             if (blockType.hasGUI && hand == Hand.MAIN_HAND) openGUI(blockType, event.player, event)
             return blockType.hasGUI
         }
@@ -130,7 +131,7 @@ class BlockEvents {
         val world = player.serverWorld
         val server = player.server
         val position = packet.hitY.blockPos
-        val placePosition = BlockUtil.getPlacePosition(world, position, packet.hitY)
+        val placePosition = CustomBlockUtil.getPlacePosition(world, position, packet.hitY)
 
         val hand = packet.hand
 

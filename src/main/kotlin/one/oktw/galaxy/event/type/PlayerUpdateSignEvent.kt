@@ -18,7 +18,8 @@
 
 package one.oktw.galaxy.event.type
 
+import net.minecraft.block.entity.SignBlockEntity
 import net.minecraft.network.packet.c2s.play.UpdateSignC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
 
-class PlayerUpdateSignEvent(val packet: UpdateSignC2SPacket, val player: ServerPlayerEntity) : CancelableEvent()
+class PlayerUpdateSignEvent(val packet: UpdateSignC2SPacket, val player: ServerPlayerEntity, val blockEntity: SignBlockEntity) : CancelableEvent()

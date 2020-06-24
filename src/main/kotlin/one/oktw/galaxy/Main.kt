@@ -23,11 +23,14 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.fabricmc.api.DedicatedServerModInitializer
-import net.fabricmc.loader.api.FabricLoader
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
+import net.fabricmc.fabric.api.event.server.ServerStartCallback
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.chat.Exchange
-import one.oktw.galaxy.command.CommandRegister
+import one.oktw.galaxy.command.commands.Admin
+import one.oktw.galaxy.command.commands.Home
+import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.PlayerControl
@@ -48,24 +51,31 @@ class Main : DedicatedServerModInitializer {
     }
 
     override fun onInitializeServer() {
-        server = FabricLoader.getInstance().gameInstance as MinecraftDedicatedServer
-        eventManager = EventManager(server)
-        CommandRegister()
         main = this
-        val resourcePackUrl: String? = System.getenv("resourcePack")
-        if (!resourcePackUrl.isNullOrBlank()) {
-            GlobalScope.launch {
-                val resourcePack = ResourcePack.new(resourcePackUrl)
-                withContext(server.asCoroutineDispatcher()) {
-                    server.setResourcePack(resourcePack.uri.toString(), resourcePack.hash)
+
+        CommandRegistrationCallback.EVENT.register(CommandRegistrationCallback { dispatcher, _ ->
+            listOf(Join(), Admin(), Home()).forEach { dispatcher.let(it::register) }
+        })
+
+        ServerStartCallback.EVENT.register(ServerStartCallback {
+            server = it as MinecraftDedicatedServer
+            eventManager = EventManager(server)
+
+            val resourcePackUrl: String? = System.getenv("resourcePack")
+            if (!resourcePackUrl.isNullOrBlank()) {
+                GlobalScope.launch {
+                    val resourcePack = ResourcePack.new(resourcePackUrl)
+                    withContext(server.asCoroutineDispatcher()) {
+                        server.setResourcePack(resourcePack.uri.toString(), resourcePack.hash)
+                    }
                 }
             }
-        }
 
-        //Events
-        eventManager.register(Exchange())
-        eventManager.register(PlayerControl())
-        eventManager.register(Harvest())
-        eventManager.register(Sign())
+            //Events
+            eventManager.register(Exchange())
+            eventManager.register(PlayerControl())
+            eventManager.register(Harvest())
+            eventManager.register(Sign())
+        })
     }
 }

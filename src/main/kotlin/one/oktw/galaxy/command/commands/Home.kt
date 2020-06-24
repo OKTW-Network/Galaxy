@@ -23,7 +23,6 @@ import kotlinx.coroutines.*
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Formatting
 import one.oktw.galaxy.command.Command
@@ -47,14 +46,13 @@ class Home : Command {
     private fun execute(source: ServerCommandSource): Int {
         val player = source.player
 
-        if (source !is ServerPlayerEntity || lock.contains(source.player.uuid)) return com.mojang.brigadier.Command.SINGLE_SUCCESS
+        if (lock.contains(player.uuid)) return com.mojang.brigadier.Command.SINGLE_SUCCESS
 
-        lock += source.player.uuid
-
-        val spawnPos = source.player.spawnPointPosition
+        val spawnPos = player.spawnPointPosition
         if (spawnPos == null) {
             player.sendMessage(LiteralText("找不到您的家").styled { it.withColor(Formatting.RED) }, false)
         } else {
+            lock += player.uuid
             GlobalScope.launch {
                 for (i in 0..4) {
                     val component = LiteralText("請等待 ${5 - i} 秒鐘").styled { it.withColor(Formatting.GREEN) }
@@ -64,7 +62,7 @@ class Home : Command {
                 withContext(player.server.asCoroutineDispatcher()) {
                     player.requestTeleport(spawnPos.x.toDouble(), spawnPos.y.toDouble(), spawnPos.z.toDouble())
                 }
-                lock -= source.player.uuid
+                lock -= player.uuid
             }
         }
         return com.mojang.brigadier.Command.SINGLE_SUCCESS

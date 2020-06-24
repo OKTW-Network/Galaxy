@@ -10,7 +10,7 @@ val version = "0.0.1"
 val group = "one.oktw"
 
 val fabricVersion = "0.13.1+build.370-1.16"
-val proxyApiVersion = "0.1.0"
+val proxyApiVersion = "e24e9950"
 val kotlinVersion = "1.3.72"
 val coroutinesVersion = "1.3.7"
 

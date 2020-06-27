@@ -41,12 +41,11 @@ public abstract class EntityMixin_RealTime {
     @Shadow
     public int netherPortalCooldown;
     @Shadow
+    public int timeUntilRegen;
+    @Shadow
     protected int ridingCooldown;
     @Shadow
     protected int netherPortalTime;
-
-    @Shadow
-    public int timeUntilRegen;
 
     @Redirect(method = "baseTick",
         at = @At(

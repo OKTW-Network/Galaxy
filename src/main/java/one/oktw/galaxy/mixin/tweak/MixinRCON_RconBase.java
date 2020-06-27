@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,14 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.command
+package one.oktw.galaxy.mixin.tweak;
 
-import net.fabricmc.fabric.api.registry.CommandRegistry
+import net.minecraft.server.rcon.RconBase;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-object CommandHelper {
-    fun register(command: Command, dedicated: Boolean = false) {
-        CommandRegistry.INSTANCE.register(dedicated) { dispatcher ->
-            command.register(dispatcher)
-        }
+@Mixin(RconBase.class)
+public class MixinRCON_RconBase {
+    boolean isLocal = false;
+
+    @Redirect(method = "start", at = @At(value = "INVOKE", target = "Lorg/apache/logging/log4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V"))
+    private void noLocalLog(Logger logger, String message, Object description) {
+        if (!isLocal) logger.info(message, description);
     }
 }

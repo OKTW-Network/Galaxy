@@ -54,18 +54,14 @@ import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 public abstract class LivingEntityMixin_RealTime extends EntityMixin_RealTime {
     @Shadow
     public int deathTime;
-
-    @Shadow
-    protected int despawnCounter;
-
-    @Shadow
-    protected int itemUseTimeLeft;
-
-    @Shadow
-    protected int lastAttackedTicks;
-
     @Shadow
     public int hurtTime;
+    @Shadow
+    protected int despawnCounter;
+    @Shadow
+    protected int itemUseTimeLeft;
+    @Shadow
+    protected int lastAttackedTicks;
 
     @Redirect(method = "updatePostDeath",
         at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;deathTime:I", opcode = Opcodes.PUTFIELD, ordinal = 0))

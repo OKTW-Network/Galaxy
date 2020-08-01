@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,12 +24,12 @@ import io.netty.buffer.Unpooled.wrappedBuffer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import net.minecraft.command.arguments.GameProfileArgumentType
+import net.minecraft.network.PacketByteBuf
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.LiteralText
-import net.minecraft.util.PacketByteBuf
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
@@ -86,16 +86,16 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                 if (data.uuid != targetPlayer.id) return
 
                 when (data.stage) {
-                    Queue -> sourcePlayer.sendMessage(LiteralText("正在等待星系載入"))
-                    Creating -> sourcePlayer.sendMessage(LiteralText("星系載入中..."))
-                    Starting -> sourcePlayer.sendMessage(LiteralText("星系正在啟動請稍後..."))
+                    Queue -> sourcePlayer.sendMessage(LiteralText("正在等待星系載入"), false)
+                    Creating -> sourcePlayer.sendMessage(LiteralText("星系載入中..."), false)
+                    Starting -> sourcePlayer.sendMessage(LiteralText("星系正在啟動請稍後..."), false)
                     Started -> {
-                        sourcePlayer.sendMessage(LiteralText("星系已載入！"))
+                        sourcePlayer.sendMessage(LiteralText("星系已載入！"), false)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }
                     Failed -> {
-                        sourcePlayer.sendMessage(LiteralText("星系載入失敗，請聯絡開發團隊！"))
+                        sourcePlayer.sendMessage(LiteralText("星系載入失敗，請聯絡開發團隊！"), false)
                         lock[source.player]?.unlock()
                         lock.remove(sourcePlayer)
                     }

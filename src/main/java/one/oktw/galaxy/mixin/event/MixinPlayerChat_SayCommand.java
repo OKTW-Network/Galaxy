@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,30 +19,45 @@
 package one.oktw.galaxy.mixin.event;
 
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.server.PlayerManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.network.MessageType;
 import net.minecraft.server.command.SayCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(SayCommand.class)
 public class MixinPlayerChat_SayCommand {
     @SuppressWarnings("UnresolvedMixinReference")
-    @Redirect(method = "method_13563(Lcom/mojang/brigadier/context/CommandContext;)I", at = @At(value = "INVOKE", target = "net/minecraft/server/PlayerManager.sendToAll(Lnet/minecraft/text/Text;)V"))
-    private static void onCommand(PlayerManager playerManager, Text message, CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        Main main = Main.Companion.getMain();
-        ServerPlayerEntity player = context.getSource().getPlayer();
+    @Inject(
+        method = "method_13563",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V",
+            ordinal = 0
+        ),
+        locals = LocalCapture.CAPTURE_FAILSOFT
+    )
+    private static void onCommand(CommandContext<ServerCommandSource> context, CallbackInfoReturnable<Integer> cir, Text text, TranslatableText translatableText, Entity entity) {
+        if (!(entity instanceof ServerPlayerEntity)) return;
 
-        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, message)).getCancel()) {
-            playerManager.sendToAll(message);
+        Main main = Main.Companion.getMain();
+        ServerPlayerEntity player = (ServerPlayerEntity) entity;
+
+        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, translatableText)).getCancel()) {
+            player.server.getPlayerManager().broadcastChatMessage(translatableText, MessageType.CHAT, entity.getUuid());
         } else {
-            player.server.sendMessage(message.append(" (Canceled)"));
+            cir.setReturnValue(0);
+            cir.cancel();
+            player.server.sendSystemMessage(translatableText.append(" (Canceled)"), entity.getUuid());
         }
     }
 }

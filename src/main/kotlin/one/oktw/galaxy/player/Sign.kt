@@ -20,37 +20,31 @@ package one.oktw.galaxy.player
 
 import net.minecraft.block.entity.SignBlockEntity
 import net.minecraft.text.LiteralText
-import net.minecraft.util.Hand
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerUpdateSignEvent
 
 class Sign {
+    companion object {
+        private val regex = Regex("&(?=[a-f0-9k-or])")
+    }
+
     @EventListener(sync = true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
-        val mainhand = event.player.getStackInHand(Hand.MAIN_HAND).isEmpty
-        val offhand = event.player.getStackInHand(Hand.OFF_HAND).isEmpty
-        if (event.player.isSneaking && mainhand && offhand) {
-            val world = event.player.serverWorld
-            val blockHitResult = event.packet.hitY
-            val entity = world.getBlockEntity(blockHitResult.blockPos)
-            if (entity is SignBlockEntity) {
-                val signBlockEntity = entity as? SignBlockEntity ?: return
-                event.player.openEditSignScreen(signBlockEntity)
-            }
+        val player = event.player
+
+        if (player.isSneaking && player.mainHandStack.isEmpty && player.offHandStack.isEmpty) {
+            val entity = player.serverWorld.getBlockEntity(event.packet.blockHitResult.blockPos) as? SignBlockEntity ?: return
+            player.openEditSignScreen(entity)
         }
     }
 
     @EventListener(sync = true)
     fun onPlayerUpdateSign(event: PlayerUpdateSignEvent) {
-        val world = event.player.serverWorld
-        val entity = world.getBlockEntity(event.packet.pos)
-        val signBlockEntity = entity as? SignBlockEntity ?: return
         for (i in 0..3) {
-            val r = Regex("&(?=[a-f0-9k-or])")
-            val line = r.replace(event.packet.text[i], "§")
-            signBlockEntity.setTextOnRow(i, LiteralText(line))
+            event.blockEntity.setTextOnRow(i, LiteralText(regex.replace(event.packet.text[i], "§")))
         }
+
         event.cancel = true
     }
 }

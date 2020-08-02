@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -57,7 +57,7 @@ class BlockEvents {
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
         val player = event.player
         val hand = event.packet.hand
-        val hitResult = event.packet.hitY
+        val hitResult = event.packet.blockHitResult
         val blockPos = hitResult.blockPos
 
         if (!player.isSneaking && BlockUtil.isMature(player.serverWorld, blockPos, player.serverWorld.getBlockState(blockPos))) return
@@ -100,7 +100,7 @@ class BlockEvents {
 
     private fun tryBreakBlock(packet: PlayerInteractBlockC2SPacket, player: ServerPlayerEntity, hand: Hand): Boolean {
         val world = player.serverWorld
-        val position = packet.hitY.blockPos
+        val position = packet.blockHitResult.blockPos
         if (world.getBlockState(position).block != Blocks.BARRIER) return false
         if (player.isSneaking && player.getStackInHand(hand).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
             CustomBlockUtil.getCustomBlockEntity(world, position) ?: return false
@@ -113,7 +113,7 @@ class BlockEvents {
     private fun tryOpenGUI(event: PlayerInteractBlockEvent): Boolean {
         val player = event.player
         val world = player.serverWorld
-        val position = event.packet.hitY.blockPos
+        val position = event.packet.blockHitResult.blockPos
         val hand = event.packet.hand
         if (!player.shouldCancelInteraction()) {
             val entity = CustomBlockUtil.getCustomBlockEntity(world, position) ?: return false
@@ -126,11 +126,11 @@ class BlockEvents {
 
     private fun openGUI(blockType: BlockType, player: ServerPlayerEntity) {
         when (blockType) { // TODO activate GUI
-            BlockType.CONTROL_PANEL -> player.sendMessage(LiteralText("Control Panel"))
-            BlockType.PLANET_TERMINAL -> player.sendMessage(LiteralText("Planet Terminal"))
-            BlockType.HT_CRAFTING_TABLE -> player.sendMessage(LiteralText("HTCT"))
-            BlockType.TELEPORTER_CORE_BASIC -> player.sendMessage(LiteralText("Basic Teleporter"))
-            BlockType.TELEPORTER_CORE_ADVANCE -> player.sendMessage(LiteralText("Advanced Teleporter"))
+            BlockType.CONTROL_PANEL -> player.sendMessage(LiteralText("Control Panel"), false)
+            BlockType.PLANET_TERMINAL -> player.sendMessage(LiteralText("Planet Terminal"), false)
+            BlockType.HT_CRAFTING_TABLE -> player.sendMessage(LiteralText("HTCT"), false)
+            BlockType.TELEPORTER_CORE_BASIC -> player.sendMessage(LiteralText("Basic Teleporter"), false)
+            BlockType.TELEPORTER_CORE_ADVANCE -> player.sendMessage(LiteralText("Advanced Teleporter"), false)
             else -> Unit
         }
     }
@@ -138,8 +138,8 @@ class BlockEvents {
     private fun tryPlaceBlock(packet: PlayerInteractBlockC2SPacket, player: ServerPlayerEntity): Boolean {
         val world = player.serverWorld
         val server = player.server
-        val position = packet.hitY.blockPos
-        val placePosition = CustomBlockUtil.getPlacePosition(world, position, packet.hitY)
+        val position = packet.blockHitResult.blockPos
+        val placePosition = CustomBlockUtil.getPlacePosition(world, position, packet.blockHitResult)
 
         val hand = packet.hand
 
@@ -154,7 +154,7 @@ class BlockEvents {
         val itemBlock = Block(BlockType.valueOf(tag.getString("customBlockType") ?: return false))
 
         // server world height check
-        if (position.y < server.worldHeight - 1 || packet.hitY.side != Direction.UP && position.y < server.worldHeight) {
+        if (position.y < server.worldHeight - 1 || packet.blockHitResult.side != Direction.UP && position.y < server.worldHeight) {
             // player modifiable world check
             if (world.canPlayerModifyAt(player, placePosition) && player.interactionManager.gameMode != GameMode.SPECTATOR) {
                 val success = itemBlock.activate(world, placePosition)

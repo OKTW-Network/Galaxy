@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -42,10 +42,7 @@ class BlockItem(val type: BlockType = DUMMY) : Item {
             .removeAllModifiers()
 
         if (type.languageKey != "") {
-            TranslatableText(type.languageKey).styled { style ->
-                style.color = Formatting.RESET
-                style.isItalic = false
-            }.let(item::setName)
+            TranslatableText(type.languageKey).styled { it.withColor(Formatting.RESET).withItalic(false) }.let(item::setName)
         }
 
         return item.build()

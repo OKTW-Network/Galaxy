@@ -62,8 +62,8 @@ import java.util.function.Supplier;
 
 @Mixin(ServerWorld.class)
 public abstract class WorldMixin_RealTime extends World implements RealTimeTrackingBridge {
-    protected WorldMixin_RealTime(MutableWorldProperties mutableWorldProperties, RegistryKey<World> registryKey, RegistryKey<DimensionType> registryKey2, DimensionType dimensionType, Supplier<Profiler> profiler, boolean bl, boolean bl2, long l) {
-        super(mutableWorldProperties, registryKey, registryKey2, dimensionType, profiler, bl, bl2, l);
+    protected WorldMixin_RealTime(MutableWorldProperties properties, RegistryKey<World> registryKey, DimensionType dimensionType, Supplier<Profiler> supplier, boolean bl, boolean bl2, long l) {
+        super(properties, registryKey, dimensionType, supplier, bl, bl2, l);
     }
 
     @Shadow
@@ -71,7 +71,7 @@ public abstract class WorldMixin_RealTime extends World implements RealTimeTrack
     public abstract MinecraftServer getServer();
 
     @Shadow
-    public abstract void method_29199(long long_1);
+    public abstract void setTimeOfDay(long timeOfDay);
 
     @Inject(method = "tickTime", at = @At("HEAD"))
     private void realTimeImpl$fixTimeOfDayForRealTime(CallbackInfo ci) {
@@ -80,7 +80,7 @@ public abstract class WorldMixin_RealTime extends World implements RealTimeTrack
             long diff = this.realTimeBridge$getRealTimeTicks() - 1;
             // Don't set if we're not changing it as other mods might be listening for changes
             if (diff > 0) {
-                this.method_29199(this.properties.getTimeOfDay() + diff);
+                this.setTimeOfDay(this.properties.getTimeOfDay() + diff);
             }
         }
     }

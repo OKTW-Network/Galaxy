@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.fabricmc.api.DedicatedServerModInitializer
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
-import net.fabricmc.fabric.api.event.server.ServerStartCallback
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.chat.Exchange
@@ -57,7 +57,7 @@ class Main : DedicatedServerModInitializer {
             listOf(Join(), Admin(), Home()).forEach { dispatcher.let(it::register) }
         })
 
-        ServerStartCallback.EVENT.register(ServerStartCallback {
+        ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer
             eventManager = EventManager(server)
 
@@ -76,6 +76,6 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(PlayerControl())
             eventManager.register(Harvest())
             eventManager.register(Sign())
-        })
+        }
     }
 }

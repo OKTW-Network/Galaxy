@@ -9,10 +9,10 @@ plugins {
 val version = "0.0.1"
 val group = "one.oktw"
 
-val fabricVersion = "0.13.1+build.370-1.16"
+val fabricVersion = "0.16.2+build.385-1.16.1"
 val proxyApiVersion = "0.2.0"
 val kotlinVersion = "1.3.72"
-val coroutinesVersion = "1.3.7"
+val coroutinesVersion = "1.3.8"
 
 repositories {
     mavenCentral()
@@ -43,8 +43,8 @@ minecraft {
 dependencies {
     // Core
     minecraft(group = "com.mojang", name = "minecraft", version = "1.16.1")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.16.1+build.1", classifier = "v2")
-    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.8.8+build.202")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.16.1+build.21", classifier = "v2")
+    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.9.0+build.204")
 
     // fabric api/library
     implementation(kotlin("stdlib"))

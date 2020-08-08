@@ -76,8 +76,8 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(Exchange())
             eventManager.register(PlayerControl())
             eventManager.register(BlockEvents())
-        eventManager.register(Harvest())
-        eventManager.register(Sign())
+            eventManager.register(Harvest())
+            eventManager.register(Sign())
         })
     }
 }

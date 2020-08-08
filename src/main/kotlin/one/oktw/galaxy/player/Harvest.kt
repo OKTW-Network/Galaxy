@@ -34,7 +34,7 @@ class Harvest {
     private val justHarvested = HashSet<ServerPlayerEntity>()
 
     init {
-        ServerTickEvents.EndWorldTick { justHarvested.clear() }
+        ServerTickEvents.END_WORLD_TICK.register(ServerTickEvents.EndWorldTick { justHarvested.clear() })
     }
 
     @EventListener(true)

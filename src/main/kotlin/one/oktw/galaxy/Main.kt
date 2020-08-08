@@ -57,7 +57,7 @@ class Main : DedicatedServerModInitializer {
             listOf(Join(), Admin(), Home()).forEach { dispatcher.let(it::register) }
         })
 
-        ServerLifecycleEvents.ServerStarting {
+        ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer
             eventManager = EventManager(server)
 
@@ -76,6 +76,6 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(PlayerControl())
             eventManager.register(Harvest())
             eventManager.register(Sign())
-        }
+        })
     }
 }

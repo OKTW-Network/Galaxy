@@ -31,9 +31,11 @@ import one.oktw.galaxy.item.util.CustomItemBuilder
 class BlockItem(val type: BlockType = DUMMY) : Item {
     override val itemType = BLOCK
 
+    override val baseItem: net.minecraft.item.Item = COMMAND_BLOCK
+
     override fun createItemStack(): ItemStack {
         val item = CustomItemBuilder()
-            .setBaseItem(COMMAND_BLOCK)
+            .setBaseItem(baseItem)
             .setModel(type.customModelData!!)
             .setItemType(itemType)
             .setBlockType(type)

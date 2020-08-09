@@ -29,9 +29,11 @@ import one.oktw.galaxy.item.util.CustomItemBuilder
 class Gui(val type: GuiType = BLANK) : Item {
     override val itemType = GUI
 
+    override val baseItem: net.minecraft.item.Item = DIAMOND_HOE
+
     override fun createItemStack(): ItemStack {
         val item = CustomItemBuilder()
-            .setBaseItem(DIAMOND_HOE)
+            .setBaseItem(baseItem)
             .setModel(type.customModelData)
             .setItemType(itemType)
             .setUnbreakable()

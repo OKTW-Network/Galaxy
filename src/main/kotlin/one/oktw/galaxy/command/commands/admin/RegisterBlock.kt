@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -62,7 +62,7 @@ class RegisterBlock {
 
     private fun registerBlock(source: ServerCommandSource, block: Block, blockPos: BlockPos): Int {
         GlobalScope.launch {
-            if (block.activate(source.player.serverWorld, blockPos)) {
+            if (block.register(source.player.serverWorld, blockPos)) {
                 source.sendFeedback(LiteralText("Registered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z} to ${block.type.name}"), true)
             } else {
                 source.sendFeedback(LiteralText("Registered Failed"), false)

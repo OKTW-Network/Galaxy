@@ -16,21 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.block
+package one.oktw.galaxy.event.type
 
 import net.minecraft.item.ItemUsageContext
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.BlockPos
-import one.oktw.galaxy.block.item.BlockItem
-import one.oktw.galaxy.block.type.BlockType
-import one.oktw.galaxy.block.type.BlockType.DUMMY
-import one.oktw.galaxy.block.util.CustomBlockUtil
 
-class Block(val type: BlockType = DUMMY) {
-    val item = if (type.customModelData != null) BlockItem(type) else null
-
-    fun register(world: ServerWorld, blockPos: BlockPos) = CustomBlockUtil.registerBlock(world, blockPos, type)
-
-    fun place(context: ItemUsageContext) =
-        CustomBlockUtil.placeAndRegisterBlock(context, this.item!!.createItemStack(), type)
-}
+class PlayerUseItemOnBlock(val context: ItemUsageContext) : Event

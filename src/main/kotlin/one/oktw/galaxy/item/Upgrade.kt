@@ -29,9 +29,11 @@ import one.oktw.galaxy.item.util.CustomItemBuilder
 class Upgrade(val type: UpgradeType = DUMMY) : Item {
     override val itemType = UPGRADE
 
+    override val baseItem: net.minecraft.item.Item = DIAMOND_SWORD
+
     override fun createItemStack(): ItemStack {
         val item = CustomItemBuilder()
-            .setBaseItem(DIAMOND_SWORD)
+            .setBaseItem(baseItem)
             .setModel(type.customModelData)
             .setItemType(itemType)
             .setUnbreakable()

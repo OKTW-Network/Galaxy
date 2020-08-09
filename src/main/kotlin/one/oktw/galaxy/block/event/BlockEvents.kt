@@ -58,7 +58,10 @@ class BlockEvents {
         val packet = event.packet
         val hand = packet.hand
         val player = event.player
-        if (eventLock.contains(packet) || usedLock.contains(player)) return
+        if (eventLock.contains(packet) || usedLock.contains(player)) {
+            event.cancel = true
+            return
+        }
         eventLock.add(packet)
         if (tryOpenGUI(event)) {
             player.swingHand(hand, true)
@@ -75,13 +78,13 @@ class BlockEvents {
         if (item.item == BlockItem().baseItem) {
             if (player.isCreativeLevelTwoOp) return
             if (tryPlaceBlock(event.context)) {
-                player.swingHand(event.context.hand)
+                player.swingHand(event.context.hand, true)
                 usedLock.add(player)
             }
         }
         if (item.item == Tool().baseItem) {
             if (tryBreakBlock(event.context)) {
-                player.swingHand(event.context.hand)
+                player.swingHand(event.context.hand, true)
                 usedLock.add(player)
             }
         }

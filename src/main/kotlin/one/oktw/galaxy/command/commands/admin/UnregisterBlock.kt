@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,7 +24,7 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
 import net.minecraft.util.math.BlockPos
-import one.oktw.galaxy.block.util.CustomBlockUtil
+import one.oktw.galaxy.block.util.BlockUtil
 
 class UnregisterBlock {
     companion object {
@@ -41,7 +41,7 @@ class UnregisterBlock {
     }
 
     private fun unregisterBlock(source: ServerCommandSource, blockPos: BlockPos): Int {
-        if (CustomBlockUtil.unregisterBlock(source.player.serverWorld, blockPos)) {
+        if (BlockUtil.unregisterBlock(source.player.serverWorld, blockPos)) {
             source.sendFeedback(LiteralText("Unregistered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z}"), true)
         } else {
             source.sendFeedback(LiteralText("Unregistered Failed"), false)

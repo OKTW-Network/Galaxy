@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,15 +23,15 @@ import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.item.BlockItem
 import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.block.type.BlockType.DUMMY
-import one.oktw.galaxy.block.util.CustomBlockUtil
+import one.oktw.galaxy.block.util.BlockUtil
 
 class Block(val type: BlockType = DUMMY) {
     val item = if (type.customModelData != null) BlockItem(type) else null
 
     fun activate(world: ServerWorld, blockPos: BlockPos) =
         if (type.customModelData != null) {
-            CustomBlockUtil.placeAndRegisterBlock(world, blockPos, this.item!!.createItemStack(), type)
+            BlockUtil.placeAndRegisterBlock(world, blockPos, this.item!!.createItemStack(), type)
         } else {
-            CustomBlockUtil.registerBlock(world, blockPos, type)
+            BlockUtil.registerBlock(world, blockPos, type)
         }
 }

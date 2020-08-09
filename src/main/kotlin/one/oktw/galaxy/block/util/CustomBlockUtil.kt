@@ -41,7 +41,7 @@ object CustomBlockUtil {
         val placementContext = ItemPlacementContext(context)
         val blockPos = placementContext.blockPos
         val placeResult = (BARRIER as BlockItem).place(placementContext)
-        if (placeResult == ActionResult.SUCCESS) {
+        if (placeResult == ActionResult.SUCCESS || placeResult == ActionResult.CONSUME) {
             CustomBlockEntityBuilder()
                 .setBlockItem(blockItem)
                 .setBlockType(blockType)

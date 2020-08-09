@@ -44,7 +44,7 @@ class BlockItem(val type: BlockType = DUMMY) : Item {
             .removeAllModifiers()
 
         if (type.languageKey != "") {
-            TranslatableText(type.languageKey).styled { it.withColor(Formatting.RESET).withItalic(false) }.let(item::setName)
+            TranslatableText(type.languageKey).styled { it.withColor(Formatting.WHITE).withItalic(false) }.let(item::setName)
         }
 
         return item.build()

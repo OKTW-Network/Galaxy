@@ -29,7 +29,7 @@ import net.minecraft.util.math.Direction
 import net.minecraft.world.GameMode
 import one.oktw.galaxy.block.Block
 import one.oktw.galaxy.block.type.BlockType
-import one.oktw.galaxy.block.util.BlockUtil
+import one.oktw.galaxy.block.util.CustomBlockUtil
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.BlockBreakEvent
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
@@ -54,16 +54,19 @@ class BlockEvents {
     @Suppress("unused")
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
-        if (eventLock.contains(event.packet) || usedLock.contains(event.player)) return
-        eventLock.add(event.packet)
+        val packet = event.packet
+        val hand = packet.hand
+        val player = event.player
+        if (eventLock.contains(packet) || usedLock.contains(player)) return
+        eventLock.add(packet)
 
         var finished: Boolean
-        finished = tryBreakBlock(event.packet, event.player, event.packet.hand)
+        finished = tryBreakBlock(packet, player, hand)
         if (!finished) finished = tryOpenGUI(event)
-        if (!finished) finished = tryPlaceBlock(event.packet, event.player)
+        if (!finished) finished = tryPlaceBlock(packet, player)
         if (finished) {
-            event.player.swingHand(event.packet.hand, true)
-            usedLock.add(event.player)
+            player.swingHand(hand, true)
+            usedLock.add(player)
             event.cancel = true
         }
     }
@@ -78,7 +81,7 @@ class BlockEvents {
     @EventListener(true)
     fun onBlockBreak(event: BlockBreakEvent) {
         if (event.state.block != Blocks.BARRIER) return
-        BlockUtil.getCustomBlockEntity((event.world as ServerWorld), event.pos) ?: return
+        CustomBlockUtil.getCustomBlockEntity((event.world as ServerWorld), event.pos) ?: return
         event.cancel = true
     }
 
@@ -87,28 +90,29 @@ class BlockEvents {
         val position = packet.blockHitResult.blockPos
         if (world.getBlockState(position).block != Blocks.BARRIER) return false
         if (player.isSneaking && player.getStackInHand(hand).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
-            BlockUtil.getCustomBlockEntity(world, position) ?: return false
-            BlockUtil.removeBlock(world, position)
+            CustomBlockUtil.getCustomBlockEntity(world, position) ?: return false
+            CustomBlockUtil.removeBlock(world, position)
             return true
         }
         return false
     }
 
     private fun tryOpenGUI(event: PlayerInteractBlockEvent): Boolean {
-        val world = event.player.serverWorld
-        val position = event.packet.blockHitResult.blockPos
-        val hand = event.packet.hand
-        if (!event.player.isSneaking) {
-            val entity = BlockUtil.getCustomBlockEntity(world, position) ?: return false
-            val blockType = BlockUtil.getTypeFromCustomBlockEntity(entity) ?: return false
-            if (blockType.hasGUI && hand == Hand.MAIN_HAND) openGUI(blockType, event.player, event)
+        val packet = event.packet
+        val position = packet.blockHitResult.blockPos
+        val hand = packet.hand
+        val player = event.player
+        val world = player.serverWorld
+        if (!player.shouldCancelInteraction()) {
+            val entity = CustomBlockUtil.getCustomBlockEntity(world, position) ?: return false
+            val blockType = CustomBlockUtil.getTypeFromCustomBlockEntity(entity) ?: return false
+            if (blockType.hasGUI && hand == Hand.MAIN_HAND) openGUI(blockType, player)
             return blockType.hasGUI
         }
         return false
     }
 
-    private fun openGUI(blockType: BlockType, player: ServerPlayerEntity, event: PlayerInteractBlockEvent) {
-        event.cancel = true
+    private fun openGUI(blockType: BlockType, player: ServerPlayerEntity) {
         when (blockType) { // TODO activate GUI
             BlockType.CONTROL_PANEL -> player.sendMessage(LiteralText("Control Panel"), false)
             BlockType.PLANET_TERMINAL -> player.sendMessage(LiteralText("Planet Terminal"), false)
@@ -123,7 +127,7 @@ class BlockEvents {
         val world = player.serverWorld
         val server = player.server
         val position = packet.blockHitResult.blockPos
-        val placePosition = BlockUtil.getPlacePosition(world, position, packet.blockHitResult)
+        val placePosition = CustomBlockUtil.getPlacePosition(world, position, packet.blockHitResult)
 
         val hand = packet.hand
 

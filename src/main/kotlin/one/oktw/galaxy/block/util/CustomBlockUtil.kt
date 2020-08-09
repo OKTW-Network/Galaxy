@@ -38,7 +38,7 @@ import one.oktw.galaxy.block.Block
 import one.oktw.galaxy.block.type.BlockType
 import net.minecraft.block.Block as minecraftBlock
 
-object BlockUtil {
+object CustomBlockUtil {
     fun placeAndRegisterBlock(world: ServerWorld, blockPos: BlockPos, blockItem: ItemStack, blockType: BlockType): Boolean {
         val entities = world.getEntities(null, Box(blockPos))
         if (entities.any { entity -> entity is LivingEntity || entity is BoatEntity || entity is AbstractMinecartEntity || entity is TntEntity }) {

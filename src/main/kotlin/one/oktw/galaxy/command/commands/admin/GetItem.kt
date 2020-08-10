@@ -156,6 +156,7 @@ class GetItem {
 
         val success = source.player.inventory.insertStack(itemStack)
         if (success) {
+            itemStack.count = 1
             val itemEntity = source.player.dropItem(itemStack, false)
             itemEntity?.setDespawnImmediately()
 

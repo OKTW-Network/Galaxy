@@ -18,19 +18,46 @@
 
 package one.oktw.galaxy.block.event
 
-import net.minecraft.text.LiteralText
+import net.minecraft.client.options.ParticlesOption
+import net.minecraft.client.particle.Particle
+import net.minecraft.particle.ParticleEffect
+import net.minecraft.particle.ParticleTypes
+import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvents
+import net.minecraft.util.math.BlockPos
+import one.oktw.galaxy.block.type.BlockType
+import one.oktw.galaxy.block.util.CustomBlockUtil
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerJumpEvent
 import one.oktw.galaxy.event.type.PlayerSneakEvent
 
 class Elevator {
-    @EventListener
-    fun onPlayerJump(event: PlayerJumpEvent) {
-        event.player.sendMessage(LiteralText("You jumped"), false)
+    @EventListener(sync = true)
+    fun onJump(event: PlayerJumpEvent) {
+        val position = event.player.pos
+        if(CustomBlockUtil.positionIsBlock(event.player.serverWorld, BlockPos(position.subtract(0.0, 1.0, 0.0)), BlockType.ELEVATOR)) {
+            for (i in 3..16) {
+                if (CustomBlockUtil.positionIsBlock(event.player.serverWorld, BlockPos(position.add(0.0, i.toDouble(), 0.0)), BlockType.ELEVATOR)) {
+                    event.player.requestTeleport(position.x, position.y+i+1, position.z)
+                    event.player.world.playSound(null, BlockPos(position.add(0.0, i.toDouble(), 0.0)), SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT, SoundCategory.BLOCKS, 1.0f, 1.0f)
+                    break
+                }
+            }
+        }
     }
 
-    @EventListener
-    fun onPlayerSneak(event: PlayerSneakEvent) {
-        event.player.sendMessage(LiteralText("You sneaked"), false)
+    @EventListener(sync = true)
+    fun onSneak(event: PlayerSneakEvent) {
+        val position = event.player.pos
+        if(CustomBlockUtil.positionIsBlock(event.player.serverWorld, BlockPos(position.subtract(0.0, 1.0, 0.0)), BlockType.ELEVATOR)) {
+            for (i in 3..16) {
+                if (CustomBlockUtil.positionIsBlock(event.player.serverWorld, BlockPos(position.subtract(0.0, i.toDouble(), 0.0)), BlockType.ELEVATOR)) {
+                    event.player.requestTeleport(position.x, position.y-i+1, position.z)
+                    event.player.world.playSound(null, BlockPos(position.subtract(0.0, i.toDouble(), 0.0)), SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT, SoundCategory.BLOCKS, 1.0f, 1.0f)
+                    break
+                }
+            }
+        }
+
     }
 }

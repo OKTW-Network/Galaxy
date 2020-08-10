@@ -41,6 +41,9 @@ public class MixinPlayerSneak_NetworkHandler {
             Main main = Main.Companion.getMain();
             if (main == null) return;
             main.getEventManager().emit(new PlayerSneakEvent(player));
+
         }
+
+        player.setSneaking(sneaking);
     }
 }

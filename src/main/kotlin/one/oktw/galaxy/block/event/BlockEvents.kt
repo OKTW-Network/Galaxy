@@ -53,7 +53,6 @@ class BlockEvents {
         )
     }
 
-    @Suppress("unused")
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
         val packet = event.packet
@@ -71,7 +70,6 @@ class BlockEvents {
         }
     }
 
-    @Suppress("unused")
     @EventListener(true)
     fun onUseItem(event: PlayerUseItemOnBlock) {
         val item = event.context.stack
@@ -95,13 +93,11 @@ class BlockEvents {
         }
     }
 
-    @Suppress("DuplicatedCode", "unused")
     @EventListener(true)
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
         if (usedLock.contains(event.player)) event.cancel = true
     }
 
-    @Suppress("UNUSED_PARAMETER", "unused")
     @EventListener(true)
     fun onBlockBreak(event: BlockBreakEvent) {
         if (event.state.block != Blocks.BARRIER) return

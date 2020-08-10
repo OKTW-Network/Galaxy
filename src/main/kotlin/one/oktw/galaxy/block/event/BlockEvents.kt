@@ -100,7 +100,6 @@ class BlockEvents {
 
     @EventListener(true)
     fun onBlockBreak(event: BlockBreakEvent) {
-        if (event.state.block != Blocks.BARRIER) return
         CustomBlockUtil.getCustomBlockEntity((event.world as ServerWorld), event.pos) ?: return
         event.cancel = true
     }

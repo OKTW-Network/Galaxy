@@ -148,9 +148,9 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
 
                         // TODO move item to canUse slot
                         if (slot in playerInventoryRange) {
-                            if (!insertItem(slotItemStack, playerHotBarRange.first, playerHotBarRange.last, false)) return ItemStack.EMPTY
+                            if (!insertItem(slotItemStack, playerHotBarRange.first, playerHotBarRange.last, false)) return null
                         } else if (slot in playerHotBarRange) {
-                            if (!insertItem(slotItemStack, playerInventoryRange.first, playerInventoryRange.last, false)) return ItemStack.EMPTY
+                            if (!insertItem(slotItemStack, playerInventoryRange.first, playerInventoryRange.last, false)) return null
                         }
 
                         // clean up empty slot

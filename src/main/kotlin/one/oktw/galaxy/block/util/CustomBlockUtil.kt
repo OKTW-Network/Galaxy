@@ -23,7 +23,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.item.ItemStack
-import net.minecraft.item.ItemUsageContext
 import net.minecraft.item.Items.BARRIER
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
@@ -36,11 +35,10 @@ import one.oktw.galaxy.block.type.BlockType
 import net.minecraft.block.Block as minecraftBlock
 
 object CustomBlockUtil {
-    fun placeAndRegisterBlock(context: ItemUsageContext, blockItem: ItemStack, blockType: BlockType): Boolean {
+    fun placeAndRegisterBlock(context: ItemPlacementContext, blockItem: ItemStack, blockType: BlockType): Boolean {
         val world = context.world as ServerWorld
-        val placementContext = ItemPlacementContext(context)
-        val blockPos = placementContext.blockPos
-        val placeResult = (BARRIER as BlockItem).place(placementContext)
+        val blockPos = context.blockPos
+        val placeResult = (BARRIER as BlockItem).place(context)
         if (placeResult == ActionResult.SUCCESS || placeResult == ActionResult.CONSUME) {
             CustomBlockEntityBuilder()
                 .setBlockItem(blockItem)

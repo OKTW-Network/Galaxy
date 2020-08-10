@@ -20,6 +20,7 @@ package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.server.ServerTickCallback
 import net.minecraft.block.Blocks
+import net.minecraft.item.ItemPlacementContext
 import net.minecraft.item.ItemUsageContext
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
@@ -157,6 +158,6 @@ class BlockEvents {
 
         val itemBlock = Block(BlockType.valueOf(tag.getString("customBlockType") ?: return false))
 
-        return itemBlock.place(context)
+        return itemBlock.place(ItemPlacementContext(context))
     }
 }

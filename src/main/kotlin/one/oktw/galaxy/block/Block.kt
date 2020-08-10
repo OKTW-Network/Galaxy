@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.block
 
-import net.minecraft.item.ItemUsageContext
+import net.minecraft.item.ItemPlacementContext
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.item.BlockItem
@@ -31,6 +31,6 @@ class Block(val type: BlockType = DUMMY) {
 
     fun register(world: ServerWorld, blockPos: BlockPos) = CustomBlockUtil.registerBlock(world, blockPos, type)
 
-    fun place(context: ItemUsageContext) =
+    fun place(context: ItemPlacementContext) =
         CustomBlockUtil.placeAndRegisterBlock(context, this.item!!.createItemStack(), type)
 }

@@ -84,7 +84,11 @@ class BlockEvents {
         }
         if (item.item == Tool().baseItem) {
             if (tryBreakBlock(event.context)) {
-                player.swingHand(event.context.hand, true)
+                if (player.getStackInHand(Hand.MAIN_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
+                    player.swingHand(Hand.MAIN_HAND, true)
+                } else {
+                    player.swingHand(event.context.hand, true)
+                }
                 usedLock.add(player)
             }
         }

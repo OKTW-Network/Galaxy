@@ -27,7 +27,7 @@ import one.oktw.galaxy.block.type.BlockType.DUMMY
 import one.oktw.galaxy.block.util.CustomBlockUtil
 
 class Block(val type: BlockType = DUMMY) {
-    val item = if (type.customModelData != null) BlockItem(type) else null
+    val item = if (type.customModelData != 0 || type.name == "DUMMY") BlockItem(type) else null
 
     fun register(world: ServerWorld, blockPos: BlockPos) = CustomBlockUtil.registerBlock(world, blockPos, type)
 

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,10 +18,10 @@
 
 package one.oktw.galaxy.block.type
 
-enum class BlockType(val customModelData: Int?, val languageKey: String, val hasGUI: Boolean = false) {
+enum class BlockType(val customModelData: Int, val languageKey: String, val hasGUI: Boolean = false) {
     DUMMY(0, ""),
-    CONTROL_PANEL(null, "", true),
-    PLANET_TERMINAL(null, "", true),
+    CONTROL_PANEL(0, "", true),
+    PLANET_TERMINAL(0, "", true),
     HT_CRAFTING_TABLE(1010100, "block.HT_CRAFTING_TABLE", true),
     ELEVATOR(1010200, "block.ELEVATOR"),
     TELEPORTER_CORE_BASIC(1010300, "block.TELEPORTER", true),

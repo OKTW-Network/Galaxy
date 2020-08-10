@@ -140,7 +140,7 @@ class GetItem {
                     .suggests { _, builder ->
                         val blocks: MutableList<String> = mutableListOf()
                         BlockType.values().forEach { block ->
-                            if (block.customModelData != null) {
+                            if (block.customModelData != 0 || block.name != "DUMMY") {
                                 blocks.add(block.name)
                             }
                         }

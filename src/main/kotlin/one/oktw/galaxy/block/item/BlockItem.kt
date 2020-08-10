@@ -36,7 +36,7 @@ class BlockItem(val type: BlockType = DUMMY) : Item {
     override fun createItemStack(): ItemStack {
         val item = CustomItemBuilder()
             .setBaseItem(baseItem)
-            .setModel(type.customModelData!!)
+            .setModel(type.customModelData)
             .setItemType(itemType)
             .setBlockType(type)
             .hideAllFlags()

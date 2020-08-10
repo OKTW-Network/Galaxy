@@ -31,6 +31,7 @@ import one.oktw.galaxy.chat.Exchange
 import one.oktw.galaxy.command.commands.Admin
 import one.oktw.galaxy.command.commands.Home
 import one.oktw.galaxy.command.commands.Join
+import one.oktw.galaxy.command.commands.Spawn
 import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.PlayerControl
@@ -54,7 +55,7 @@ class Main : DedicatedServerModInitializer {
         main = this
 
         CommandRegistrationCallback.EVENT.register(CommandRegistrationCallback { dispatcher, _ ->
-            listOf(Join(), Admin(), Home()).forEach { dispatcher.let(it::register) }
+            listOf(Join(), Admin(), Home(), Spawn()).forEach { dispatcher.let(it::register) }
         })
 
         ServerStartCallback.EVENT.register(ServerStartCallback {

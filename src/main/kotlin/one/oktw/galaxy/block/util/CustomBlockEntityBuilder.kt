@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,7 +30,7 @@ import one.oktw.galaxy.block.type.BlockType
 class CustomBlockEntityBuilder {
     private val tags: CompoundTag = CompoundTag()
     private var blockItem: ItemStack? = null
-    private var world: ServerWorld? = null
+    private lateinit var world: ServerWorld
     private var blockPos: BlockPos = BlockPos(0, 0, 0)
     private var blockType: BlockType = BlockType.DUMMY
 
@@ -60,7 +60,6 @@ class CustomBlockEntityBuilder {
     }
 
     fun create(): Entity {
-        if (this.world == null) throw RuntimeException("World is null!")
         this.tags.putString("id", "minecraft:armor_stand")
         this.tags.putBoolean("Invisible", true)
         this.tags.putBoolean("Invulnerable", true)
@@ -73,7 +72,7 @@ class CustomBlockEntityBuilder {
         }
         entity.addScoreboardTag("BLOCK")
         entity.addScoreboardTag(this.blockType.name)
-        this.world!!.tryLoadEntity(entity)
+        this.world.tryLoadEntity(entity)
         return entity
     }
 }

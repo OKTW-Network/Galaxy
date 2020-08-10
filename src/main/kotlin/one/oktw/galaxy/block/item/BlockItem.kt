@@ -39,7 +39,6 @@ class BlockItem(val type: BlockType = DUMMY) : Item {
             .setModel(type.customModelData!!)
             .setItemType(itemType)
             .setBlockType(type)
-            .setUnbreakable()
             .hideAllFlags()
             .removeAllModifiers()
 

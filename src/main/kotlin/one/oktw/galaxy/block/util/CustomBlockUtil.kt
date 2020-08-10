@@ -46,6 +46,7 @@ object CustomBlockUtil {
                 .setPosition(blockPos)
                 .setWorld(world)
                 .setSmall()
+                .setSlotsDisabled()
                 .create()
             playSound(world, blockPos)
             return true
@@ -61,6 +62,7 @@ object CustomBlockUtil {
             .setPosition(blockPos)
             .setWorld(world)
             .setSmall()
+            .setSlotsDisabled()
             .create()
         return true
     }

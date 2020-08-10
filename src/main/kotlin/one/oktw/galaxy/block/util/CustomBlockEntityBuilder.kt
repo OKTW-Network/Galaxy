@@ -59,6 +59,11 @@ class CustomBlockEntityBuilder {
         return this
     }
 
+    fun setSlotsDisabled(): CustomBlockEntityBuilder {
+        this.tags.putInt("DisabledSlots", 4144959)
+        return this
+    }
+
     fun create(): Entity {
         this.tags.putString("id", "minecraft:armor_stand")
         this.tags.putBoolean("Invisible", true)

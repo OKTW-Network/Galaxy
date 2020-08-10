@@ -11,6 +11,8 @@
     "MixinPlayerChat_SayCommand",
     "MixinPlayerInteractBlock_NetworkHandler",
     "MixinPlayerInteractItem_NetworkHandler",
+    "MixinPlayerJump_NetworkHandler",
+    "MixinPlayerSneak_NetworkHandler",
     "MixinPlayerUpdateSign_NetworkHandler",
     "MixinPlayerUseItemOnBlock_ItemStack",
     "MixinRequestCompletions_NetworkHandler"

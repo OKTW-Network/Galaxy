@@ -32,10 +32,7 @@ import one.oktw.galaxy.block.item.BlockItem
 import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.block.util.CustomBlockUtil
 import one.oktw.galaxy.event.annotation.EventListener
-import one.oktw.galaxy.event.type.BlockBreakEvent
-import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
-import one.oktw.galaxy.event.type.PlayerInteractItemEvent
-import one.oktw.galaxy.event.type.PlayerUseItemOnBlock
+import one.oktw.galaxy.event.type.*
 import one.oktw.galaxy.item.Tool
 import one.oktw.galaxy.item.type.ItemType
 import one.oktw.galaxy.item.type.ToolType
@@ -96,6 +93,20 @@ class BlockEvents {
     @EventListener(true)
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
         if (usedLock.contains(event.player)) event.cancel = true
+    }
+
+    @EventListener(true)
+    fun onInteractEntity(event: PlayerInteractEntityEvent) {
+        if (usedLock.contains(event.player)) return
+        val entity = event.packet.getEntity(event.player.serverWorld) ?: return
+        if (!event.player.shouldCancelInteraction()) {
+            val blockType = CustomBlockUtil.getTypeFromCustomBlockEntity(entity) ?: return
+            if (blockType.hasGUI && event.packet.hand == Hand.MAIN_HAND) {
+                openGUI(blockType, event.player)
+                event.player.swingHand(Hand.MAIN_HAND, true)
+                usedLock.add(event.player)
+            }
+        }
     }
 
     @EventListener(true)

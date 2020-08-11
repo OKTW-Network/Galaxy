@@ -10,6 +10,7 @@
     "MixinPlayerChat_NetworkHandler",
     "MixinPlayerChat_SayCommand",
     "MixinPlayerInteractBlock_NetworkHandler",
+    "MixinPlayerInteractEntity_NetworkHandler",
     "MixinPlayerInteractItem_NetworkHandler",
     "MixinPlayerUpdateSign_NetworkHandler",
     "MixinPlayerUseItemOnBlock_ItemStack",

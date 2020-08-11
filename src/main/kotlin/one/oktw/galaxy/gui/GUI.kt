@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,6 +18,8 @@
 
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.runBlocking
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.PlayerInventory
 import net.minecraft.inventory.SimpleInventory
@@ -29,6 +31,7 @@ import net.minecraft.screen.ScreenHandlerType.*
 import net.minecraft.screen.slot.SlotActionType
 import net.minecraft.screen.slot.SlotActionType.*
 import net.minecraft.text.Text
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.gui.utils.InventoryEditor
 import one.oktw.galaxy.gui.utils.InventoryUtils
 import one.oktw.galaxy.gui.utils.InventoryUtils.Companion.genericScreenHandlerType
@@ -109,8 +112,16 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
     }
 
     fun editInventory(block: InventoryEditor.() -> Unit) {
-        block.invoke(InventoryEditor(type, inventory))
-        inventory.markDirty()
+        val server = main?.server
+        if (server != null && !server.isOnThread) {
+            runBlocking(server.asCoroutineDispatcher()) {
+                block.invoke(InventoryEditor(type, inventory))
+                inventory.markDirty()
+            }
+        } else {
+            block.invoke(InventoryEditor(type, inventory))
+            inventory.markDirty()
+        }
     }
 
     private fun checkRange(x: Int, y: Int) = inventoryUtils.xyToIndex(x, y) in 0 until inventory.size()

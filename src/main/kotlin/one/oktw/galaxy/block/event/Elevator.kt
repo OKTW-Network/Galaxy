@@ -41,7 +41,6 @@ class Elevator {
             }
         }
     }
-
     @EventListener(sync = true)
     fun onSneak(event: PlayerSneakEvent) {
         val position = event.player.pos

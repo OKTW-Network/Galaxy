@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy.mixin.event;
 
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import one.oktw.galaxy.Main;
@@ -25,25 +26,22 @@ import one.oktw.galaxy.event.type.PlayerSneakEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class MixinPlayerSneak_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Redirect(method = "onClientCommand", at = @At(
+    @Inject(method = "onClientCommand", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/server/network/ServerPlayerEntity;setSneaking(Z)V"
+        target = "Lnet/minecraft/server/network/ServerPlayerEntity;setSneaking(Z)V",
+        ordinal = 0
     ))
-    private void playerInput(ServerPlayerEntity serverPlayerEntity, boolean sneaking) {
-        if (sneaking) {
-            Main main = Main.Companion.getMain();
-            if (main == null) return;
-            main.getEventManager().emit(new PlayerSneakEvent(player));
-
-        }
-
-        player.setSneaking(sneaking);
+    private void playerInput(ClientCommandC2SPacket packet, CallbackInfo ci) {
+        Main main = Main.Companion.getMain();
+        if (main == null) return;
+        main.getEventManager().emit(new PlayerSneakEvent(player));
     }
 }

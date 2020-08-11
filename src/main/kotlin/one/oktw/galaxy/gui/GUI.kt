@@ -54,7 +54,7 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
     private val bindings = ConcurrentHashMap<Int, GUIClickEvent.() -> Any>()
     private val rangeBindings = ConcurrentHashMap<Pair<IntRange, IntRange>, GUIClickEvent.() -> Any>()
     private val inventoryUtils = InventoryUtils(type)
-    private var allowUseSlot = HashSet<Int>()
+    private var allowUseSlot = ConcurrentHashMap.newKeySet<Int>()
 
     override fun getDisplayName() = title
 
@@ -174,17 +174,19 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
 
                     return itemStack
                 }
-                PICKUP_ALL -> { // Rewrite PICKUP_ALL only take from player inventory. TODO move item from canUse slot
+                PICKUP_ALL -> { // Rewrite PICKUP_ALL only take from allow use slot & player inventory.
                     if (slot < 0) return null
 
                     val cursorItemStack = player.inventory.cursorStack
                     val clickSlot = slots[slot]
                     if (!cursorItemStack.isEmpty && (!clickSlot.hasStack() || !clickSlot.canTakeItems(player))) {
-                        val step = if (button == 0) 1 else -1
+                        var takeFullStack = false
 
-                        for (tryTime in 0..1) {
-                            var index = inventory.size()
-                            while (index >= inventory.size() && index < slots.size && cursorItemStack.count < cursorItemStack.maxCount) {
+                        loop@ while (!takeFullStack) { // First time only take not full stack items
+                            takeFullStack = true
+                            for (index in allowUseSlot + (inventory.size() until slots.size)) {
+                                if (cursorItemStack.count >= cursorItemStack.maxCount) break@loop
+
                                 val scanSlot = slots[index]
                                 if (scanSlot.hasStack()
                                     && canInsertItemIntoSlot(scanSlot, cursorItemStack, true)
@@ -192,7 +194,7 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
                                     && canInsertIntoSlot(cursorItemStack, scanSlot)
                                 ) {
                                     val selectItemStack = scanSlot.stack
-                                    if (tryTime != 0 || selectItemStack.count != selectItemStack.maxCount) {
+                                    if (takeFullStack || selectItemStack.count != selectItemStack.maxCount) {
                                         val takeCount = (cursorItemStack.maxCount - cursorItemStack.count).coerceAtMost(selectItemStack.count)
                                         val selectItemStack2 = scanSlot.takeStack(takeCount)
                                         cursorItemStack.increment(takeCount)
@@ -203,7 +205,6 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
                                         scanSlot.onTakeItem(player, selectItemStack2)
                                     }
                                 }
-                                index += step
                             }
                         }
                     }
@@ -263,17 +264,19 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
 
                     return itemStack
                 }
-                PICKUP_ALL -> { // Rewrite PICKUP_ALL only take from player inventory. TODO move item from canUse slot
+                PICKUP_ALL -> { // Rewrite PICKUP_ALL only take from allow use slot & player inventory.
                     if (slot < 0) return null
 
                     val cursorItemStack = player.inventory.cursorStack
                     val clickSlot = slots[slot]
                     if (!cursorItemStack.isEmpty && (!clickSlot.hasStack() || !clickSlot.canTakeItems(player))) {
-                        val step = if (button == 0) 1 else -1
+                        var takeFullStack = false
 
-                        for (tryTime in 0..1) {
-                            var index = inventory.size()
-                            while (index >= inventory.size() && index < slots.size && cursorItemStack.count < cursorItemStack.maxCount) {
+                        loop@ while (!takeFullStack) { // First time only take not full stack items
+                            takeFullStack = true
+                            for (index in allowUseSlot + (inventory.size() until slots.size)) {
+                                if (cursorItemStack.count >= cursorItemStack.maxCount) break@loop
+
                                 val scanSlot = slots[index]
                                 if (scanSlot.hasStack()
                                     && canInsertItemIntoSlot(scanSlot, cursorItemStack, true)
@@ -281,7 +284,7 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
                                     && canInsertIntoSlot(cursorItemStack, scanSlot)
                                 ) {
                                     val selectItemStack = scanSlot.stack
-                                    if (tryTime != 0 || selectItemStack.count != selectItemStack.maxCount) {
+                                    if (takeFullStack || selectItemStack.count != selectItemStack.maxCount) {
                                         val takeCount = (cursorItemStack.maxCount - cursorItemStack.count).coerceAtMost(selectItemStack.count)
                                         val selectItemStack2 = scanSlot.takeStack(takeCount)
                                         cursorItemStack.increment(takeCount)
@@ -292,7 +295,6 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
                                         scanSlot.onTakeItem(player, selectItemStack2)
                                     }
                                 }
-                                index += step
                             }
                         }
                     }
@@ -352,17 +354,19 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
 
                     return itemStack
                 }
-                PICKUP_ALL -> { // Rewrite PICKUP_ALL only take from player inventory. TODO move item from canUse slot
+                PICKUP_ALL -> { // Rewrite PICKUP_ALL only take from allow use slot & player inventory.
                     if (slot < 0) return null
 
                     val cursorItemStack = player.inventory.cursorStack
                     val clickSlot = slots[slot]
                     if (!cursorItemStack.isEmpty && (!clickSlot.hasStack() || !clickSlot.canTakeItems(player))) {
-                        val step = if (button == 0) 1 else -1
+                        var takeFullStack = false
 
-                        for (tryTime in 0..1) {
-                            var index = inventory.size()
-                            while (index >= inventory.size() && index < slots.size && cursorItemStack.count < cursorItemStack.maxCount) {
+                        loop@ while (!takeFullStack) { // First time only take not full stack items
+                            takeFullStack = true
+                            for (index in allowUseSlot + (inventory.size() until slots.size)) {
+                                if (cursorItemStack.count >= cursorItemStack.maxCount) break@loop
+
                                 val scanSlot = slots[index]
                                 if (scanSlot.hasStack()
                                     && canInsertItemIntoSlot(scanSlot, cursorItemStack, true)
@@ -370,7 +374,7 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
                                     && canInsertIntoSlot(cursorItemStack, scanSlot)
                                 ) {
                                     val selectItemStack = scanSlot.stack
-                                    if (tryTime != 0 || selectItemStack.count != selectItemStack.maxCount) {
+                                    if (takeFullStack || selectItemStack.count != selectItemStack.maxCount) {
                                         val takeCount = (cursorItemStack.maxCount - cursorItemStack.count).coerceAtMost(selectItemStack.count)
                                         val selectItemStack2 = scanSlot.takeStack(takeCount)
                                         cursorItemStack.increment(takeCount)
@@ -381,7 +385,6 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
                                         scanSlot.onTakeItem(player, selectItemStack2)
                                     }
                                 }
-                                index += step
                             }
                         }
                     }

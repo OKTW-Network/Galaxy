@@ -75,9 +75,9 @@ class Home : Command {
             GlobalScope.launch {
                 // Add back charge in countdown stage
                 if (world != null) {
-                    val blockState = world.getBlockState(spawnPointPosition)
-                    if (blockState.block is RespawnAnchorBlock) {
-                        withContext(player.server.asCoroutineDispatcher()) {
+                    withContext(player.server.asCoroutineDispatcher()) {
+                        val blockState = world.getBlockState(spawnPointPosition)
+                        if (blockState.block is RespawnAnchorBlock) {
                             world.setBlockState(
                                 spawnPointPosition, blockState.with(RespawnAnchorBlock.CHARGES, blockState[RespawnAnchorBlock.CHARGES] + 1)
                             )
@@ -92,23 +92,22 @@ class Home : Command {
                 }
                 player.sendMessage(TranslatableText("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
 
-                // Check Again
-                val checkAgain = PlayerEntity.findRespawnPosition(
-                    world,
-                    spawnPointPosition,
-                    player.isSpawnPointSet,
-                    player.notInAnyWorld
-                )
-                if (!checkAgain.isPresent) {
-                    player.sendMessage(TranslatableText("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
-                    lock -= player.uuid
-                    return@launch
-                }
-
-                val world2 = if (world != null && checkAgain.isPresent) world else source.minecraftServer.overworld
-                val position = checkAgain.get()
-
                 withContext(player.server.asCoroutineDispatcher()) {
+                    // Check Again
+                    val checkAgain = PlayerEntity.findRespawnPosition(
+                        world,
+                        spawnPointPosition,
+                        player.isSpawnPointSet,
+                        player.notInAnyWorld
+                    )
+                    if (!checkAgain.isPresent) {
+                        player.sendMessage(TranslatableText("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
+                        lock -= player.uuid
+                        return@withContext
+                    }
+
+                    val world2 = if (world != null && checkAgain.isPresent) world else source.minecraftServer.overworld
+                    val position = checkAgain.get()
                     player.teleport(
                         world2,
                         position.x,

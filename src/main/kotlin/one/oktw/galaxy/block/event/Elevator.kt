@@ -18,10 +18,6 @@
 
 package one.oktw.galaxy.block.event
 
-import net.minecraft.client.options.ParticlesOption
-import net.minecraft.client.particle.Particle
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleTypes
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
@@ -45,7 +41,6 @@ class Elevator {
             }
         }
     }
-
     @EventListener(sync = true)
     fun onSneak(event: PlayerSneakEvent) {
         val position = event.player.pos
@@ -58,6 +53,5 @@ class Elevator {
                 }
             }
         }
-
     }
 }

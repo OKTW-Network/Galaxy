@@ -33,7 +33,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinPlayerSneak_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
-
     @Inject(method = "onClientCommand", at = @At(
         value = "INVOKE",
         target = "Lnet/minecraft/server/network/ServerPlayerEntity;setSneaking(Z)V",

@@ -32,11 +32,12 @@ class Wrench {
     @EventListener(true)
     fun onUseItemOnBlock(event: PlayerUseItemOnBlock) {
         val player = event.context.player
+        val hand = event.context.hand
 
         if (player != null) {
-            if (player.getStackInHand(Hand.MAIN_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
+            if (player.getStackInHand(Hand.MAIN_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && hand == Hand.MAIN_HAND) {
                 wrenchSpin(event)
-            } else if (player.getStackInHand(Hand.OFF_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && player.mainHandStack.isEmpty) {
+            } else if (player.getStackInHand(Hand.OFF_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && player.mainHandStack.isEmpty && hand == Hand.OFF_HAND) {
                 wrenchSpin(event)
             }
         }

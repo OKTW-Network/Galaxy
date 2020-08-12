@@ -18,31 +18,43 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import com.google.common.collect.Sets;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.enums.BreakType;
 import one.oktw.galaxy.event.type.BlockBreakEvent;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 @Mixin(Explosion.class)
 public class MixinBlockBreak_Explosion {
-    @Redirect(method = "affectWorld", at = @At(
+    @Final
+    @Shadow
+    private World world;
+
+    @Redirect(method = "collectBlocksAndDamageEntities", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Z"
+        target = "Ljava/util/List;addAll(Ljava/util/Collection;)Z",
+        ordinal = 0
     ))
-    private boolean onDestroyByExplosion(World world, BlockPos pos, BlockState state) {
+    private boolean onDestroyByExplosion(List<BlockPos> list, Collection<? extends BlockPos> affectedPos) {
         Main main = Main.Companion.getMain();
-        if (main == null) return world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
-        if (!main.getEventManager().emit(new BlockBreakEvent(world, pos, world.getBlockState(pos), BreakType.EXPLOSION, null)).getCancel()) {
-            System.out.println("done");
-            return world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
-        }
-        return false;
+        if (main == null) return list.addAll(affectedPos);
+        Set<BlockPos> set = Sets.newHashSet();
+        affectedPos.forEach(blockPos -> {
+            if (!main.getEventManager().emit(new BlockBreakEvent(world, blockPos, world.getBlockState(blockPos), BreakType.EXPLOSION, null)).getCancel()) {
+                set.add(blockPos);
+            }
+        });
+        return list.addAll(set);
     }
 }

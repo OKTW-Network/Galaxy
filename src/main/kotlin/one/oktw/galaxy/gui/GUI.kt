@@ -55,6 +55,8 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
     private val bindings = ConcurrentHashMap<Int, GUIClickEvent.() -> Any>()
     private val rangeBindings = ConcurrentHashMap<Pair<IntRange, IntRange>, GUIClickEvent.() -> Any>()
     private val inventoryUtils = InventoryUtils(type)
+    private val openListener = ConcurrentHashMap.newKeySet<(PlayerEntity) -> Any>()
+    private val closeListener = ConcurrentHashMap.newKeySet<(PlayerEntity) -> Any>()
     private var allowUseSlot = ConcurrentHashMap.newKeySet<Int>()
 
     override fun getDisplayName() = title
@@ -125,11 +127,28 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
         }
     }
 
+    fun onOpen(block: (PlayerEntity) -> Any) {
+        openListener += block
+    }
+
+    fun onClose(block: (PlayerEntity) -> Any) {
+        closeListener += block
+    }
+
     private fun checkRange(x: Int, y: Int) = inventoryUtils.xyToIndex(x, y) in 0 until inventory.size()
 
     // Vanilla container hack
     private inner class GenericContainer(syncId: Int, playerInventory: PlayerInventory) :
         net.minecraft.screen.GenericContainerScreenHandler(type, syncId, playerInventory, inventory, inventory.size() / 9) {
+        init {
+            openListener.forEach { it.invoke(playerInventory.player) }
+        }
+
+        override fun close(player: PlayerEntity) {
+            super.close(player)
+            closeListener.forEach { it.invoke(player) }
+        }
+
         override fun onSlotClick(slot: Int, button: Int, action: SlotActionType, player: PlayerEntity): ItemStack? {
             // Trigger binding TODO allow binding cancel player change
             if (slot in 0 until inventory.size()) {
@@ -220,6 +239,15 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
 
     private inner class Generic3x3Container(syncId: Int, playerInventory: PlayerInventory) :
         net.minecraft.screen.Generic3x3ContainerScreenHandler(syncId, playerInventory, inventory) {
+        init {
+            openListener.forEach { it.invoke(playerInventory.player) }
+        }
+
+        override fun close(player: PlayerEntity) {
+            super.close(player)
+            closeListener.forEach { it.invoke(player) }
+        }
+
         override fun onSlotClick(slot: Int, button: Int, action: SlotActionType, player: PlayerEntity): ItemStack? {
             // Trigger binding TODO allow binding cancel player change
             if (slot in 0 until inventory.size()) {
@@ -310,6 +338,15 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
 
     private inner class HopperContainer(syncId: Int, playerInventory: PlayerInventory) :
         net.minecraft.screen.HopperScreenHandler(syncId, playerInventory, inventory) {
+        init {
+            openListener.forEach { it.invoke(playerInventory.player) }
+        }
+
+        override fun close(player: PlayerEntity) {
+            super.close(player)
+            closeListener.forEach { it.invoke(player) }
+        }
+
         override fun onSlotClick(slot: Int, button: Int, action: SlotActionType, player: PlayerEntity): ItemStack? {
             // Trigger binding TODO allow binding cancel player change
             if (slot in 0 until inventory.size()) {

@@ -16,12 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.event.type
+package one.oktw.galaxy.event.enums
 
-import net.minecraft.block.BlockState
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
-import one.oktw.galaxy.event.enums.BreakType
-
-class BlockBreakEvent(val world: World, val pos: BlockPos, val state: BlockState, val type: BreakType, val player: PlayerEntity?) : CancelableEvent()
+enum class BreakType {
+    PLAYER,
+    EXPLOSION,
+    WITHER,
+    DRAGON
+}

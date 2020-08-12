@@ -23,6 +23,7 @@ import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import one.oktw.galaxy.Main;
+import one.oktw.galaxy.event.enums.BreakType;
 import one.oktw.galaxy.event.type.BlockBreakEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -45,7 +46,7 @@ public class MixinPlayerBlockBreak_Block {
     private void onBlockBreak(BlockPos blockPos, CallbackInfoReturnable<Boolean> cir) {
         Main main = Main.Companion.getMain();
         if (main == null) return;
-        if (main.getEventManager().emit(new BlockBreakEvent(world, blockPos, world.getBlockState(blockPos), player)).getCancel()) {
+        if (main.getEventManager().emit(new BlockBreakEvent(world, blockPos, world.getBlockState(blockPos), BreakType.PLAYER, player)).getCancel()) {
             cir.setReturnValue(false);
             cir.cancel();
         }

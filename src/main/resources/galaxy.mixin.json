@@ -3,6 +3,9 @@
   "package": "one.oktw.galaxy.mixin.event",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "MixinBlockBreak_EnderDragonEntity",
+    "MixinBlockBreak_Explosion",
+    "MixinBlockerBreak_WitherEntity",
     "MixinCustomPayload_CustomPayloadC2SPacket",
     "MixinCustomPayload_NetworkHandler",
     "MixinPlayerBlockBreak_Block",

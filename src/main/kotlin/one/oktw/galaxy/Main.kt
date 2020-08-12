@@ -50,7 +50,7 @@ class Main : DedicatedServerModInitializer {
         val PROXY_IDENTIFIER = Identifier("galaxy", "proxy")
         var main: Main? = null
             private set
-        val selfUID by lazy {
+        val selfUUID by lazy {
             try {
                 System.getenv("GALAXY_ID")?.let { UUID.fromString(it) }
             } catch (err: Throwable) {
@@ -88,6 +88,6 @@ class Main : DedicatedServerModInitializer {
         })
 
         // server.log("current server id is $selfUID
-        println("current server id is $selfUID")
+        println("current server id is $selfUUID")
     }
 }

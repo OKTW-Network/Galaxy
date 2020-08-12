@@ -43,6 +43,7 @@ public class MixinPlayerChat_MeCommand {
             target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V",
             ordinal = 0
         ),
+        remap = false,
         locals = LocalCapture.CAPTURE_FAILSOFT
     )
     private static void onCommand(CommandContext<ServerCommandSource> context, CallbackInfoReturnable<Integer> cir, TranslatableText translatableText, Entity entity) {

@@ -34,33 +34,37 @@ class Wrench {
         val player = event.context.player
 
         if (player != null) {
-            if (player.getStackInHand(Hand.MAIN_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) || player.getStackInHand(Hand.OFF_HAND)
-                    .isItemEqual(Tool(ToolType.WRENCH).createItemStack())
-            ) {
-                val blockPos = event.context.blockPos
-                val blockState = event.context.world.getBlockState(blockPos)
-                var facing: BlockState
-
-                facing = when {
-                    blockState.contains(CHEST_TYPE) -> if (blockState.get(CHEST_TYPE) == ChestType.SINGLE) blockState.cycle(HORIZONTAL_FACING) else blockState
-                    blockState.contains(FACING) -> blockState.cycle(FACING)
-                    blockState.contains(HOPPER_FACING) -> blockState.cycle(HOPPER_FACING)
-                    blockState.contains(HORIZONTAL_FACING) -> blockState.cycle(HORIZONTAL_FACING)
-                    blockState.contains(AXIS) -> blockState.cycle(AXIS)
-                    else -> blockState
-                }
-
-                if (blockState.contains(SLAB_TYPE)) {
-                    val direction = blockState.get(SLAB_TYPE)
-                    if (direction == SlabType.TOP) {
-                        facing = blockState.with(SLAB_TYPE, SlabType.BOTTOM)
-                    } else if (direction == SlabType.BOTTOM) {
-                        facing = blockState.with(SLAB_TYPE, SlabType.TOP)
-                    }
-                }
-
-                event.context.world.setBlockState(blockPos, facing)
+            if (player.getStackInHand(Hand.MAIN_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
+                wrenchSpin(event)
+            } else if (player.getStackInHand(Hand.OFF_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && player.mainHandStack.isEmpty) {
+                wrenchSpin(event)
             }
         }
+    }
+
+    private fun wrenchSpin(event: PlayerUseItemOnBlock) {
+        val blockPos = event.context.blockPos
+        val blockState = event.context.world.getBlockState(blockPos)
+        var facing: BlockState
+
+        facing = when {
+            blockState.contains(CHEST_TYPE) -> if (blockState.get(CHEST_TYPE) == ChestType.SINGLE) blockState.cycle(HORIZONTAL_FACING) else blockState
+            blockState.contains(FACING) -> blockState.cycle(FACING)
+            blockState.contains(HOPPER_FACING) -> blockState.cycle(HOPPER_FACING)
+            blockState.contains(HORIZONTAL_FACING) -> blockState.cycle(HORIZONTAL_FACING)
+            blockState.contains(AXIS) -> blockState.cycle(AXIS)
+            else -> blockState
+        }
+
+        if (blockState.contains(SLAB_TYPE)) {
+            val direction = blockState.get(SLAB_TYPE)
+            if (direction == SlabType.TOP) {
+                facing = blockState.with(SLAB_TYPE, SlabType.BOTTOM)
+            } else if (direction == SlabType.BOTTOM) {
+                facing = blockState.with(SLAB_TYPE, SlabType.TOP)
+            }
+        }
+
+        event.context.world.setBlockState(blockPos, facing)
     }
 }

@@ -31,7 +31,7 @@ class Wrench {
         val player = event.context.player
 
         if (player != null) {
-            if (player.getStackInHand(Hand.MAIN_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && player.getStackInHand(Hand.OFF_HAND)
+            if (player.getStackInHand(Hand.MAIN_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) || player.getStackInHand(Hand.OFF_HAND)
                     .isItemEqual(Tool(ToolType.WRENCH).createItemStack())
             ) {
                 val blockPos = event.context.blockPos

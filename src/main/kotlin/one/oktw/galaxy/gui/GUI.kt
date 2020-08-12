@@ -37,6 +37,7 @@ import one.oktw.galaxy.gui.utils.InventoryUtils
 import one.oktw.galaxy.gui.utils.InventoryUtils.Companion.genericScreenHandlerType
 import java.util.concurrent.ConcurrentHashMap
 
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val title: Text) : NamedScreenHandlerFactory {
     private val inventory = when (type) {
         GENERIC_9X1 -> SimpleInventory(9)
@@ -249,9 +250,9 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
 
                         // TODO move item to canUse slot
                         if (slot in playerInventoryRange) {
-                            if (!insertItem(slotItemStack, playerHotBarRange.first, playerHotBarRange.last, false)) return ItemStack.EMPTY
+                            if (!insertItem(slotItemStack, playerHotBarRange.first, playerHotBarRange.last, false)) return null
                         } else if (slot in playerHotBarRange) {
-                            if (!insertItem(slotItemStack, playerInventoryRange.first, playerInventoryRange.last, false)) return ItemStack.EMPTY
+                            if (!insertItem(slotItemStack, playerInventoryRange.first, playerInventoryRange.last, false)) return null
                         }
 
                         // clean up empty slot
@@ -339,9 +340,9 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
 
                         // TODO move item to canUse slot
                         if (slot in playerInventoryRange) {
-                            if (!insertItem(slotItemStack, playerHotBarRange.first, playerHotBarRange.last, false)) return ItemStack.EMPTY
+                            if (!insertItem(slotItemStack, playerHotBarRange.first, playerHotBarRange.last, false)) return null
                         } else if (slot in playerHotBarRange) {
-                            if (!insertItem(slotItemStack, playerInventoryRange.first, playerInventoryRange.last, false)) return ItemStack.EMPTY
+                            if (!insertItem(slotItemStack, playerInventoryRange.first, playerInventoryRange.last, false)) return null
                         }
 
                         // clean up empty slot

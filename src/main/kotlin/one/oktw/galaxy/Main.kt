@@ -33,6 +33,7 @@ import one.oktw.galaxy.command.commands.Admin
 import one.oktw.galaxy.command.commands.Home
 import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.event.EventManager
+import one.oktw.galaxy.item.event.Wrench
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.PlayerControl
 import one.oktw.galaxy.player.Sign
@@ -78,6 +79,7 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(Harvest())
             eventManager.register(BlockEvents())
             eventManager.register(Sign())
+            eventManager.register(Wrench())
         })
     }
 }

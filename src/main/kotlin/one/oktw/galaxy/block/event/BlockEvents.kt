@@ -68,7 +68,7 @@ class BlockEvents {
     }
 
     @EventListener(true)
-    fun onUseItem(event: PlayerUseItemOnBlock) {
+    fun onUseItemOnBlock(event: PlayerUseItemOnBlock) {
         val item = event.context.stack
         val player = event.context.player as ServerPlayerEntity
         if (item.item == BlockItem().baseItem) {

@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy.item.event
 
+import net.minecraft.block.enums.SlabType
 import net.minecraft.state.property.Properties.*
 import net.minecraft.util.Hand
 import one.oktw.galaxy.event.annotation.EventListener
@@ -37,12 +38,21 @@ class Wrench {
                 val blockPos = event.context.blockPos
                 val blockState = event.context.world.getBlockState(blockPos)
 
-                val facing = when {
+                var facing = when {
                     blockState.contains(FACING) -> blockState.cycle(FACING)
                     blockState.contains(HOPPER_FACING) -> blockState.cycle(HOPPER_FACING)
                     blockState.contains(HORIZONTAL_FACING) -> blockState.cycle(HORIZONTAL_FACING)
                     blockState.contains(AXIS) -> blockState.cycle(AXIS)
                     else -> blockState
+                }
+
+                if (blockState.contains(SLAB_TYPE)) {
+                    val direction = blockState.get(SLAB_TYPE)
+                    if (direction == SlabType.TOP) {
+                        facing = blockState.with(SLAB_TYPE, SlabType.BOTTOM)
+                    } else if (direction == SlabType.BOTTOM) {
+                        facing = blockState.with(SLAB_TYPE, SlabType.TOP)
+                    }
                 }
 
                 event.context.world.setBlockState(blockPos, facing)

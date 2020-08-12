@@ -34,7 +34,10 @@ public class MixinPlayerInteractEntity_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Inject(method = "onPlayerInteractEntity", at = @At("HEAD"))
+    @Inject(method = "onPlayerInteractEntity", at = @At(
+        value = "INVOKE",
+        target = "Lnet/minecraft/server/network/ServerPlayerEntity;interact(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;"
+    ))
     private void onPlayerInteractEntity(PlayerInteractEntityC2SPacket packet, CallbackInfo ci) {
         Main main = Main.Companion.getMain();
         if (main == null) return;

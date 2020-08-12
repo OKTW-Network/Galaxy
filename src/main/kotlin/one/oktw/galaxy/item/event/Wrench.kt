@@ -19,7 +19,6 @@
 package one.oktw.galaxy.item.event
 
 import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
 import net.minecraft.block.enums.ChestType
 import net.minecraft.block.enums.SlabType
 import net.minecraft.state.property.Properties.*
@@ -41,10 +40,6 @@ class Wrench {
                 val blockPos = event.context.blockPos
                 val blockState = event.context.world.getBlockState(blockPos)
                 var facing: BlockState
-
-                if (blockState.block == Blocks.ATTACHED_PUMPKIN_STEM || blockState.block == Blocks.ATTACHED_MELON_STEM) {
-                    return
-                }
 
                 facing = when {
                     blockState.contains(CHEST_TYPE) -> if (blockState.get(CHEST_TYPE) == ChestType.SINGLE) blockState.cycle(HORIZONTAL_FACING) else blockState

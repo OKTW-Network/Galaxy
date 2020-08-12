@@ -5,7 +5,7 @@
   "mixins": [
     "MixinBlockBreak_EnderDragonEntity",
     "MixinBlockBreak_Explosion",
-    "MixinBlockerBreak_WitherEntity",
+    "MixinBlockBreak_WitherEntity",
     "MixinCustomPayload_CustomPayloadC2SPacket",
     "MixinCustomPayload_NetworkHandler",
     "MixinPlayerBlockBreak_Block",

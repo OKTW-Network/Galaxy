@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(WitherEntity.class)
-public class MixinBlockerBreak_WitherEntity {
+public class MixinBlockBreak_WitherEntity {
     @Redirect(method = "mobTick", at = @At(
         value = "INVOKE",
         target = "Lnet/minecraft/world/World;breakBlock(Lnet/minecraft/util/math/BlockPos;ZLnet/minecraft/entity/Entity;)Z"

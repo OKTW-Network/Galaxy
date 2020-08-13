@@ -37,6 +37,8 @@ import one.oktw.galaxy.player.PlayerControl
 import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.proxy.api.ProxyAPI
 import one.oktw.galaxy.resourcepack.ResourcePack
+import one.oktw.galaxy.worldData.ChunkDataProviderRegistry
+import one.oktw.galaxy.worldData.TestChunkDataProvider
 import java.util.*
 
 @Suppress("unused")
@@ -61,6 +63,8 @@ class Main : DedicatedServerModInitializer {
 
     override fun onInitializeServer() {
         main = this
+
+        ChunkDataProviderRegistry.instance.register("Test", TestChunkDataProvider())
 
         CommandRegistrationCallback.EVENT.register(CommandRegistrationCallback { dispatcher, _ ->
             listOf(Join(), Admin(), Home()).forEach { dispatcher.let(it::register) }

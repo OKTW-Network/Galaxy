@@ -36,6 +36,11 @@ class GUISBackStackManager(private val player: ServerPlayerEntity) : CoroutineSc
         fun openGUI(player: ServerPlayerEntity, gui: GUI) {
             managers.getOrPut(player) { GUISBackStackManager(player) }.open(gui)
         }
+
+        fun closeAll(player: ServerPlayerEntity) {
+            managers[player]?.stack?.clear()
+            player.closeHandledScreen()
+        }
     }
 
     fun open(gui: GUI) {

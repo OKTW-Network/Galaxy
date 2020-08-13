@@ -103,7 +103,7 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
     fun addBinding(x: Int, y: Int, function: GUIClickEvent.() -> Any) {
         if (!checkRange(x, y)) throw IndexOutOfBoundsException("Binding index out of inventory range")
 
-        bindings[x * y] = function
+        bindings[inventoryUtils.xyToIndex(x, y)] = function
     }
 
     fun addBinding(xRange: IntRange, yRange: IntRange, function: GUIClickEvent.() -> Any) {

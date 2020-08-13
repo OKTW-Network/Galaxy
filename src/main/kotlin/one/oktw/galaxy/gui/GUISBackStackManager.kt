@@ -37,7 +37,7 @@ class GUISBackStackManager(private val player: ServerPlayerEntity) {
     }
 
     fun open(gui: GUI) {
-        gui.onClose(this::closeCallback)
+        gui.onClose { this.closeCallback(gui, it) }
         stack.offerLast(gui)
         if (player.server.isOnThread) {
             player.openHandledScreen(gui)
@@ -46,8 +46,8 @@ class GUISBackStackManager(private val player: ServerPlayerEntity) {
         }
     }
 
-    private fun closeCallback(player: PlayerEntity) {
-        if (player == this.player) {
+    private fun closeCallback(gui: GUI, player: PlayerEntity) {
+        if (player == this.player && gui == stack.lastOrNull()) {
             stack.pollLast()?.let(player::openHandledScreen)
         }
     }

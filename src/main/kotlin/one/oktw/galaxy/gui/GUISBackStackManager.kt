@@ -19,13 +19,15 @@
 package one.oktw.galaxy.gui
 
 import com.google.common.collect.MapMaker
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
 import java.util.concurrent.ConcurrentLinkedDeque
 
-class GUISBackStackManager(private val player: ServerPlayerEntity) {
+class GUISBackStackManager(private val player: ServerPlayerEntity) : CoroutineScope by CoroutineScope(player.server.asCoroutineDispatcher()) {
     private val stack = ConcurrentLinkedDeque<GUI>()
 
     companion object {
@@ -40,7 +42,8 @@ class GUISBackStackManager(private val player: ServerPlayerEntity) {
         gui.onClose { this.closeCallback(gui, it) }
         stack.offerLast(gui)
         if (player.server.isOnThread) {
-            player.openHandledScreen(gui)
+            // Delay 1 tick to workaround open GUI on close callback
+            launch { player.openHandledScreen(gui) }
         } else runBlocking(player.server.asCoroutineDispatcher()) {
             player.openHandledScreen(gui)
         }
@@ -49,7 +52,9 @@ class GUISBackStackManager(private val player: ServerPlayerEntity) {
     private fun closeCallback(gui: GUI, player: PlayerEntity) {
         if (player == this.player && gui == stack.lastOrNull()) {
             stack.pollLast() // Remove closed
-            stack.pollLast()?.let(player::openHandledScreen) // Open previous
+
+            // Delay 1 tick to workaround open GUI on close callback
+            launch { stack.lastOrNull()?.let(player::openHandledScreen) } // Open previous
         }
     }
 }

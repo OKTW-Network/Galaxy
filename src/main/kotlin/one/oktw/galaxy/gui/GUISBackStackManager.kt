@@ -48,7 +48,8 @@ class GUISBackStackManager(private val player: ServerPlayerEntity) {
 
     private fun closeCallback(gui: GUI, player: PlayerEntity) {
         if (player == this.player && gui == stack.lastOrNull()) {
-            stack.pollLast()?.let(player::openHandledScreen)
+            stack.pollLast() // Remove closed
+            stack.pollLast()?.let(player::openHandledScreen) // Open previous
         }
     }
 }

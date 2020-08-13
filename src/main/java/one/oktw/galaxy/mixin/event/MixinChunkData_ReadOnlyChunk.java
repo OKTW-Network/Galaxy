@@ -21,14 +21,12 @@ package one.oktw.galaxy.mixin.event;
 import net.minecraft.world.chunk.ReadOnlyChunk;
 import net.minecraft.world.chunk.WorldChunk;
 import one.oktw.galaxy.worldData.ChunkDataProvider;
-import one.oktw.galaxy.worldData.ChunkDataProviderRegistry;
 import one.oktw.galaxy.worldData.ExtendedChunk;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 
-import java.util.HashMap;
-import java.util.Map;
-
+// the ReadOnlyChunk redirects all read operation to the WorldChunk,
+// so we also do this.
 @Mixin(ReadOnlyChunk.class)
 public class MixinChunkData_ReadOnlyChunk implements ExtendedChunk {
     public <T> T getData(@NotNull ChunkDataProvider<T> provider) {
@@ -37,8 +35,5 @@ public class MixinChunkData_ReadOnlyChunk implements ExtendedChunk {
         return casted.getData(provider);
     }
     public <T> void setData(@NotNull ChunkDataProvider<T> provider, T data) {
-        @SuppressWarnings("ConstantConditions") WorldChunk original = ((ReadOnlyChunk) ((Object) this)).getWrappedChunk();
-        ExtendedChunk casted = ((ExtendedChunk) original);
-        casted.setData(provider, data);
     }
 }

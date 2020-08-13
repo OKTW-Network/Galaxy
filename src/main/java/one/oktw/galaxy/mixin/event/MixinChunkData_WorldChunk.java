@@ -42,6 +42,8 @@ public class MixinChunkData_WorldChunk implements ExtendedChunk {
         at = @At("RETURN")
     )
     public void init(World world, ProtoChunk protoChunk, CallbackInfo ci){
+        // When the WorldChunk upgraded from the protoChunk,
+        // the custom data on the protoChunk need to be moved to the WorldChunk
         for (ChunkDataProvider<Object> provider: ChunkDataProviderRegistry.Companion.getInstance().getProviders()) {
             setData(provider, ((ExtendedChunk)protoChunk).getData(provider));
         }

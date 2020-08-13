@@ -23,6 +23,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.ChunkPos
 import net.minecraft.world.chunk.Chunk
 import net.minecraft.world.chunk.ProtoChunk
+import net.minecraft.world.chunk.ReadOnlyChunk
 import java.util.concurrent.ConcurrentHashMap
 
 class ChunkDataProviderRegistry private constructor() {
@@ -60,20 +61,26 @@ class ChunkDataProviderRegistry private constructor() {
     }
 
     fun parseData(world: ServerWorld, pos: ChunkPos, tag: CompoundTag, chunk: ProtoChunk) {
+        val normalizedChunk = if (chunk is ReadOnlyChunk) {
+            chunk.wrappedChunk
+        } else {
+            chunk
+        }
+
         if (tag.contains(DATA_ROOT_NAME)) {
             val root = tag.getCompound(DATA_ROOT_NAME)
             nameProviderMap.elements().toList().forEach {
                 val name = providerNameMap[it]
 
                 if (root.contains(name)) {
-                    (chunk as ExtendedChunk).setData(it, it.parseData(world, tag, root.getCompound(name)))
+                    (normalizedChunk as ExtendedChunk).setData(it, it.parseData(world, tag, root.getCompound(name)))
                 } else {
-                    (chunk as ExtendedChunk).setData(it, it.createData(pos))
+                    (normalizedChunk as ExtendedChunk).setData(it, it.createData(pos))
                 }
             }
         } else {
             nameProviderMap.elements().toList().forEach {
-                (chunk as ExtendedChunk).setData(it, it.createData(pos))
+                (normalizedChunk as ExtendedChunk).setData(it, it.createData(pos))
             }
         }
     }

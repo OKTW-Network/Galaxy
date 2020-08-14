@@ -31,6 +31,7 @@ import one.oktw.galaxy.chat.Exchange
 import one.oktw.galaxy.command.commands.Admin
 import one.oktw.galaxy.command.commands.Home
 import one.oktw.galaxy.command.commands.Join
+import one.oktw.galaxy.command.commands.TestChunkData
 import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.PlayerControl
@@ -64,10 +65,10 @@ class Main : DedicatedServerModInitializer {
     override fun onInitializeServer() {
         main = this
 
-        ChunkDataProviderRegistry.instance.register("Test", TestChunkDataProvider())
+        ChunkDataProviderRegistry.instance.register("Test", TestChunkDataProvider.instance)
 
         CommandRegistrationCallback.EVENT.register(CommandRegistrationCallback { dispatcher, _ ->
-            listOf(Join(), Admin(), Home()).forEach { dispatcher.let(it::register) }
+            listOf(Join(), Admin(), Home(), TestChunkData()).forEach { dispatcher.let(it::register) }
         })
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {

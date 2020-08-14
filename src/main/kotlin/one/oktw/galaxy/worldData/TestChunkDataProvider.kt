@@ -19,30 +19,48 @@
 package one.oktw.galaxy.worldData
 
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.particle.ParticleTypes
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.ChunkPos
 import net.minecraft.world.World
 import net.minecraft.world.chunk.Chunk
 import net.minecraft.world.chunk.WorldChunk
 
-data class A(val test: Long)
-
-class TestChunkDataProvider: ChunkDataProvider<A> {
-    override fun createData(pos: ChunkPos): A {
-        return A(1)
+class TestChunkDataProvider private constructor(): ChunkDataProvider<TestData> {
+    companion object {
+        val instance = TestChunkDataProvider()
     }
 
-    override fun parseData(world: World, chunkTag: CompoundTag, nbt: CompoundTag): A {
-        println("parse ${nbt.getLong("a")}")
-        return A(nbt.getLong("a") + 1)
+    private var counter = 0
+
+    override fun createData(pos: ChunkPos): TestData {
+        return TestData()
     }
 
-    override fun writeData(world: World, chunk: Chunk, data: A, nbt: CompoundTag) {
-        println("write ${data.test}")
-        nbt.putLong("a", data.test)
+    override fun parseData(world: World, chunkTag: CompoundTag, nbt: CompoundTag): TestData {
+        return TestData(nbt)
     }
 
-    override fun tick(world: World, chunk: WorldChunk, randomTickSpeed: Int, data: A) {
-        (chunk as ExtendedChunk).setData(this, A(data.test + 1))
-        chunk.markDirty()
+    override fun writeData(world: World, chunk: Chunk, data: TestData, nbt: CompoundTag) {
+        data.writeNbt(nbt)
+    }
+
+    override fun tick(world: World, chunk: WorldChunk, randomTickSpeed: Int, data: TestData) {
+        counter++
+        if (counter % 5 == 0) {
+            data.positions.forEach {
+                (world as ServerWorld).spawnParticles(
+                    ParticleTypes.EXPLOSION,
+                    it.first.toDouble() + 0.5,
+                    it.second.toDouble() + 0.5,
+                    it.third.toDouble() + 0.5,
+                    10,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                )
+            }
+        }
     }
 }

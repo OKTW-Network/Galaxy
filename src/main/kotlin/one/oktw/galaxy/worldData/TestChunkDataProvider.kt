@@ -22,6 +22,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.math.ChunkPos
 import net.minecraft.world.World
 import net.minecraft.world.chunk.Chunk
+import net.minecraft.world.chunk.WorldChunk
 
 data class A(val test: Long)
 
@@ -31,7 +32,7 @@ class TestChunkDataProvider: ChunkDataProvider<A> {
     }
 
     override fun parseData(world: World, chunkTag: CompoundTag, nbt: CompoundTag): A {
-        println("load ${nbt.getLong("a")}")
+        println("parse ${nbt.getLong("a")}")
         return A(nbt.getLong("a") + 1)
     }
 
@@ -40,11 +41,14 @@ class TestChunkDataProvider: ChunkDataProvider<A> {
         nbt.putLong("a", data.test)
     }
 
-    override fun beforeUnload(world: World, chunk: Chunk, data: A) {
-        TODO("Not yet implemented")
+    override fun beforeUnload(world: World, chunk: WorldChunk, data: A) {
     }
 
-    override fun tick(world: World, chunk: Chunk, data: A) {
-        TODO("Not yet implemented")
+    override fun afterLoad(world: World, chunk: WorldChunk, data: A) {
+    }
+
+    override fun tick(world: World, chunk: WorldChunk, randomTickSpeed: Int, data: A) {
+        (chunk as ExtendedChunk).setData(this, A(data.test + 1))
+        chunk.markDirty()
     }
 }

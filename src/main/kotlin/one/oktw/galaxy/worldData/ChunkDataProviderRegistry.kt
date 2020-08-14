@@ -21,9 +21,11 @@ package one.oktw.galaxy.worldData
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.ChunkPos
+import net.minecraft.world.World
 import net.minecraft.world.chunk.Chunk
 import net.minecraft.world.chunk.ProtoChunk
 import net.minecraft.world.chunk.ReadOnlyChunk
+import net.minecraft.world.chunk.WorldChunk
 import java.util.concurrent.ConcurrentHashMap
 
 class ChunkDataProviderRegistry private constructor() {
@@ -94,6 +96,27 @@ class ChunkDataProviderRegistry private constructor() {
             val sub = CompoundTag()
             root.put(name, sub)
             it.writeData(world, chunk, (chunk as ExtendedChunk).getData(it), sub)
+        }
+    }
+
+    fun loadChunk(world: World, chunk: WorldChunk) {
+        nameProviderMap.elements().toList().forEach {
+            val data = (chunk as ExtendedChunk).getData(it)
+            it.afterLoad(world, chunk, data)
+        }
+    }
+
+    fun unloadChunk(world: World, chunk: WorldChunk) {
+        nameProviderMap.elements().toList().forEach {
+            val data = (chunk as ExtendedChunk).getData(it)
+            it.beforeUnload(world, chunk, data)
+        }
+    }
+
+    fun tickChunk(world: World, chunk: WorldChunk, randomTickSpeed: Int) {
+        nameProviderMap.elements().toList().forEach {
+            val data = (chunk as ExtendedChunk).getData(it)
+            it.tick(world, chunk, randomTickSpeed, data)
         }
     }
 }

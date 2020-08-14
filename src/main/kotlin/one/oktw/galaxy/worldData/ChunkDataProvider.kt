@@ -22,11 +22,13 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.math.ChunkPos
 import net.minecraft.world.World
 import net.minecraft.world.chunk.Chunk
+import net.minecraft.world.chunk.WorldChunk
 
 interface ChunkDataProvider<Data> {
     fun createData(pos: ChunkPos): Data
     fun parseData(world: World, chunkTag: CompoundTag, nbt: CompoundTag): Data
     fun writeData(world: World, chunk: Chunk, data: Data, nbt: CompoundTag)
-    fun beforeUnload(world: World, chunk: Chunk, data: Data)
-    fun tick(world: World, chunk: Chunk, data: Data)
+    fun afterLoad(world: World, chunk: WorldChunk, data: Data)
+    fun beforeUnload(world: World, chunk: WorldChunk, data: Data)
+    fun tick(world: World, chunk: WorldChunk, randomTickSpeed: Int, data: Data)
 }

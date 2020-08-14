@@ -20,6 +20,7 @@ package one.oktw.galaxy.mixin.event;
 
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ProtoChunk;
+import net.minecraft.world.chunk.ReadOnlyChunk;
 import net.minecraft.world.chunk.WorldChunk;
 import one.oktw.galaxy.worldData.ChunkDataProvider;
 import one.oktw.galaxy.worldData.ChunkDataProviderRegistry;
@@ -54,8 +55,23 @@ public class MixinChunkData_WorldChunk implements ExtendedChunk {
         //noinspection unchecked
         return (T) galaxyDataMap.get(name);
     }
+
     public <T> void setData(@NotNull ChunkDataProvider<T> provider, T data) {
         String name = ChunkDataProviderRegistry.Companion.getInstance().getRegisteredName((ChunkDataProvider<Object>) provider);
         galaxyDataMap.put(name, data);
+    }
+
+    @Inject(
+        method = "setLoadedToWorld(Z)V",
+        at = @At("HEAD")
+    )
+    public void setLoaded(boolean loaded, CallbackInfo ci) {
+        //noinspection ConstantConditions
+        WorldChunk original = ((WorldChunk) ((Object) this));
+        if (loaded) {
+            ChunkDataProviderRegistry.Companion.getInstance().loadChunk(original.getWorld(), original);
+        } else {
+            ChunkDataProviderRegistry.Companion.getInstance().unloadChunk(original.getWorld(), original);
+        }
     }
 }

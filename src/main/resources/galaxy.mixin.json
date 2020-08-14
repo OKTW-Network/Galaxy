@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "one.oktw.galaxy.mixin.event",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_14",
   "mixins": [
     "MixinCustomPayload_CustomPayloadC2SPacket",
     "MixinCustomPayload_NetworkHandler",

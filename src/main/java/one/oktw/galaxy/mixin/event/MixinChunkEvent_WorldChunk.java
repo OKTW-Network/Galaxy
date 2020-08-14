@@ -21,6 +21,9 @@ package one.oktw.galaxy.mixin.event;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.WorldChunk;
+import one.oktw.galaxy.Main;
+import one.oktw.galaxy.event.type.ChunkLoadEvent;
+import one.oktw.galaxy.event.type.ChunkUnloadEvent;
 import one.oktw.galaxy.worldData.ChunkDataProvider;
 import one.oktw.galaxy.worldData.ChunkDataProviderRegistry;
 import one.oktw.galaxy.worldData.ExtendedChunk;
@@ -34,18 +37,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Mixin(WorldChunk.class)
-public class MixinChunkData_WorldChunk implements ExtendedChunk {
+public class MixinChunkEvent_WorldChunk implements ExtendedChunk {
     Map<String, Object> galaxyDataMap = new HashMap<>();
 
     @Inject(
         method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/world/chunk/ProtoChunk;)V",
         at = @At("RETURN")
     )
-    public void init(World world, ProtoChunk protoChunk, CallbackInfo ci){
+    public void init(World world, ProtoChunk protoChunk, CallbackInfo ci) {
         // When the WorldChunk upgraded from the protoChunk,
         // the custom data on the protoChunk need to be moved to the WorldChunk
-        for (ChunkDataProvider<Object> provider: ChunkDataProviderRegistry.Companion.getInstance().getProviders()) {
-            setData(provider, ((ExtendedChunk)protoChunk).getData(provider));
+        for (ChunkDataProvider<Object> provider : ChunkDataProviderRegistry.Companion.getInstance().getProviders()) {
+            setData(provider, ((ExtendedChunk) protoChunk).getData(provider));
         }
     }
 
@@ -58,5 +61,21 @@ public class MixinChunkData_WorldChunk implements ExtendedChunk {
     public <T> void setData(@NotNull ChunkDataProvider<T> provider, T data) {
         String name = ChunkDataProviderRegistry.Companion.getInstance().getRegisteredName((ChunkDataProvider<Object>) provider);
         galaxyDataMap.put(name, data);
+    }
+
+    @Inject(
+        method = "setLoadedToWorld(Z)V",
+        at = @At("HEAD")
+    )
+    public void setLoaded(boolean loaded, CallbackInfo ci) {
+        //noinspection ConstantConditions
+        WorldChunk original = ((WorldChunk) ((Object) this));
+        if (loaded) {
+            //noinspection ConstantConditions
+            Main.Companion.getMain().getEventManager().emit(new ChunkLoadEvent(original.getWorld(), original));
+        } else {
+            //noinspection ConstantConditions
+            Main.Companion.getMain().getEventManager().emit(new ChunkUnloadEvent(original.getWorld(), original));
+        }
     }
 }

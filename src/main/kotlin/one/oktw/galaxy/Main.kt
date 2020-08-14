@@ -85,6 +85,7 @@ class Main : DedicatedServerModInitializer {
             }
 
             //Events
+            eventManager.register(ChunkDataProviderRegistry.instance)
             eventManager.register(Exchange())
             eventManager.register(PlayerControl())
             eventManager.register(Harvest())

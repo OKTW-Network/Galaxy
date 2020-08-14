@@ -16,7 +16,8 @@
     "MixinChunkData_ProtoChunk",
     "MixinChunkData_ReadOnlyChunk",
     "MixinChunkData_WorldChunk",
-    "MixinChunkData_ServerWorld"
+    "MixinChunkEvent_ServerWorld",
+    "MixinChunkEvent_WorldChunk"
   ],
   "client": [],
   "injectors": {

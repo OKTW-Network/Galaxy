@@ -20,20 +20,23 @@ package one.oktw.galaxy.mixin.event;
 
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.chunk.WorldChunk;
-import one.oktw.galaxy.worldData.ChunkDataProviderRegistry;
+import one.oktw.galaxy.Main;
+import one.oktw.galaxy.event.type.ChunkTickEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerWorld.class)
-public class MixinChunkData_ServerWorld {
+public class MixinChunkEvent_ServerWorld {
     @Inject(
         method = "tickChunk(Lnet/minecraft/world/chunk/WorldChunk;I)V",
         at = @At("RETURN")
     )
     public void onTickChunks(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci){
         //noinspection ConstantConditions
-        ChunkDataProviderRegistry.Companion.getInstance().tickChunk((ServerWorld)((Object)this), chunk, randomTickSpeed);
+        ServerWorld world = (ServerWorld)((Object)this);
+        //noinspection ConstantConditions
+        Main.Companion.getMain().getEventManager().emit(new ChunkTickEvent(world, chunk, randomTickSpeed));
     }
 }

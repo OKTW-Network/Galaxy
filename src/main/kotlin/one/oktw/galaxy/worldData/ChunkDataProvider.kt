@@ -28,7 +28,8 @@ interface ChunkDataProvider<Data> {
     fun createData(pos: ChunkPos): Data
     fun parseData(world: World, chunkTag: CompoundTag, nbt: CompoundTag): Data
     fun writeData(world: World, chunk: Chunk, data: Data, nbt: CompoundTag)
-    fun afterLoad(world: World, chunk: WorldChunk, data: Data)
-    fun beforeUnload(world: World, chunk: WorldChunk, data: Data)
-    fun tick(world: World, chunk: WorldChunk, randomTickSpeed: Int, data: Data)
+
+    fun afterLoad(world: World, chunk: WorldChunk, data: Data) {}
+    fun beforeUnload(world: World, chunk: WorldChunk, data: Data) {}
+    fun tick(world: World, chunk: WorldChunk, randomTickSpeed: Int, data: Data) {}
 }

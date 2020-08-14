@@ -41,12 +41,6 @@ class TestChunkDataProvider: ChunkDataProvider<A> {
         nbt.putLong("a", data.test)
     }
 
-    override fun beforeUnload(world: World, chunk: WorldChunk, data: A) {
-    }
-
-    override fun afterLoad(world: World, chunk: WorldChunk, data: A) {
-    }
-
     override fun tick(world: World, chunk: WorldChunk, randomTickSpeed: Int, data: A) {
         (chunk as ExtendedChunk).setData(this, A(data.test + 1))
         chunk.markDirty()

@@ -18,13 +18,11 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import com.google.common.collect.Sets;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import one.oktw.galaxy.Main;
-import one.oktw.galaxy.event.enums.BreakType;
-import one.oktw.galaxy.event.type.BlockBreakEvent;
+import one.oktw.galaxy.event.type.BlockExplodeEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -46,15 +44,9 @@ public class MixinBlockBreak_Explosion {
         target = "Ljava/util/List;addAll(Ljava/util/Collection;)Z",
         ordinal = 0
     ))
-    private boolean onDestroyByExplosion(List<BlockPos> list, Collection<? extends BlockPos> affectedPos) {
+    private boolean onDestroyByExplosion(List<BlockPos> list, Collection<BlockPos> affectedPos) {
         Main main = Main.Companion.getMain();
         if (main == null) return list.addAll(affectedPos);
-        Set<BlockPos> set = Sets.newHashSet();
-        affectedPos.forEach(blockPos -> {
-            if (!main.getEventManager().emit(new BlockBreakEvent(world, blockPos, world.getBlockState(blockPos), BreakType.EXPLOSION, null)).getCancel()) {
-                set.add(blockPos);
-            }
-        });
-        return list.addAll(set);
+        return list.addAll(main.getEventManager().emit(new BlockExplodeEvent(world, (Set<BlockPos>) affectedPos)).getAffectedPos());
     }
 }

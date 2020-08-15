@@ -115,6 +115,11 @@ class BlockEvents {
         event.cancel = true
     }
 
+    @EventListener(true)
+    fun onBlockExplode(event: BlockExplodeEvent) {
+        event.affectedPos.removeIf { CustomBlockUtil.positionIsAnyCustomBlock((event.world as ServerWorld), it) }
+    }
+
     private fun tryBreakBlock(context: ItemUsageContext): Boolean {
         val world = context.world as ServerWorld
         val position = context.blockPos

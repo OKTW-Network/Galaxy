@@ -16,10 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.event.enums
+package one.oktw.galaxy.event.type
 
-enum class BreakType {
-    PLAYER,
-    WITHER,
-    DRAGON
-}
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.World
+
+class BlockExplodeEvent(val world: World, var affectedPos: MutableSet<BlockPos>) : Event

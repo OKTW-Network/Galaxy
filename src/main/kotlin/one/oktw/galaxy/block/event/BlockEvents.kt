@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.block.event
 
-import net.fabricmc.fabric.api.event.server.ServerTickCallback
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.block.Blocks
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.item.ItemUsageContext
@@ -42,8 +42,8 @@ class BlockEvents {
     private val usedLock = HashSet<ServerPlayerEntity>()
 
     init {
-        ServerTickCallback.EVENT.register(
-            ServerTickCallback {
+        ServerTickEvents.END_WORLD_TICK.register(
+            ServerTickEvents.EndWorldTick {
                 eventLock.clear()
                 usedLock.clear()
             }

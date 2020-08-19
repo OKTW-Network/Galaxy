@@ -92,7 +92,7 @@ object CustomBlockUtil {
     }
 
     fun getCustomBlockEntity(world: ServerWorld, blockPos: BlockPos): Entity? {
-        val entities = world.getEntities(null, Box(blockPos))
+        val entities = world.getOtherEntities(null, Box(blockPos))
         return entities.firstOrNull { entity -> entity.scoreboardTags.contains("BLOCK") }
     }
 

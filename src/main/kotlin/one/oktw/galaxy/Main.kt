@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.fabricmc.api.DedicatedServerModInitializer
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
-import net.fabricmc.fabric.api.event.server.ServerStartCallback
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.block.event.BlockEvents
@@ -36,7 +36,9 @@ import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.PlayerControl
 import one.oktw.galaxy.player.Sign
+import one.oktw.galaxy.proxy.api.ProxyAPI
 import one.oktw.galaxy.resourcepack.ResourcePack
+import java.util.*
 
 @Suppress("unused")
 class Main : DedicatedServerModInitializer {
@@ -49,6 +51,13 @@ class Main : DedicatedServerModInitializer {
         val PROXY_IDENTIFIER = Identifier("galaxy", "proxy")
         var main: Main? = null
             private set
+        val selfUUID by lazy {
+            try {
+                System.getenv("GALAXY_ID")?.let { UUID.fromString(it) }
+            } catch (err: Throwable) {
+                null
+            } ?: ProxyAPI.dummyUUID
+        }
     }
 
     override fun onInitializeServer() {
@@ -58,7 +67,7 @@ class Main : DedicatedServerModInitializer {
             listOf(Join(), Admin(), Home()).forEach { dispatcher.let(it::register) }
         })
 
-        ServerStartCallback.EVENT.register(ServerStartCallback {
+        ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer
             eventManager = EventManager(server)
 
@@ -79,5 +88,8 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(BlockEvents())
             eventManager.register(Sign())
         })
+
+        // server.log("current server id is $selfUID
+        println("current server id is $selfUUID")
     }
 }

@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.player
 
-import net.fabricmc.fabric.api.event.server.ServerTickCallback
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.block.*
 import net.minecraft.block.Blocks.*
 import net.minecraft.server.network.ServerPlayerEntity
@@ -34,7 +34,7 @@ class Harvest {
     private val justHarvested = HashSet<ServerPlayerEntity>()
 
     init {
-        ServerTickCallback.EVENT.register(ServerTickCallback { justHarvested.clear() })
+        ServerTickEvents.END_WORLD_TICK.register(ServerTickEvents.EndWorldTick { justHarvested.clear() })
     }
 
     @EventListener(true)

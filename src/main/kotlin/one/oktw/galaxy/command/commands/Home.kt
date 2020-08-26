@@ -65,6 +65,7 @@ class Home : Command {
         val spawnPoint = PlayerEntity.findRespawnPosition(
             world,
             spawnPointPosition,
+            player.spawnAngle,
             player.isSpawnPointSet,
             player.notInAnyWorld
         )
@@ -97,6 +98,7 @@ class Home : Command {
                     val checkAgain = PlayerEntity.findRespawnPosition(
                         world,
                         spawnPointPosition,
+                        player.spawnAngle,
                         player.isSpawnPointSet,
                         player.notInAnyWorld
                     )

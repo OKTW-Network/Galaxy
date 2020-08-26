@@ -23,7 +23,7 @@ import com.mojang.brigadier.CommandDispatcher
 import io.netty.buffer.Unpooled.wrappedBuffer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
-import net.minecraft.command.arguments.GameProfileArgumentType
+import net.minecraft.command.argument.GameProfileArgumentType
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket
 import net.minecraft.server.command.CommandManager

@@ -26,7 +26,7 @@ import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
-import one.oktw.galaxy.network.ServerPlayerEntityFunctionAccessor
+import one.oktw.galaxy.mixin.accessor.ServerPlayerEntityFunctionAccessor
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit

@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "one.oktw.galaxy.mixin.accessor",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "ServerPlayerEntityFunctionAccessor"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

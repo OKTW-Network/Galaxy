@@ -16,22 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.event;
+package one.oktw.galaxy.mixin.accessor;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import one.oktw.galaxy.network.ServerPlayerEntityFunctionAccessor;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(ServerPlayerEntity.class)
-public class MixinServerPlayerEntity_ServerPlayerEntity implements ServerPlayerEntityFunctionAccessor {
-    @Shadow
-    private void moveToSpawn(ServerWorld world) {
-    }
-
-    @Override
-    public void moveToWorldSpawn(ServerWorld world) {
-        moveToSpawn(world);
-    }
+public interface ServerPlayerEntityFunctionAccessor {
+    @Invoker(value = "moveToSpawn")
+    void moveToWorldSpawn(ServerWorld world);
 }

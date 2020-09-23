@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.block.event
 
-import net.fabricmc.fabric.api.event.server.ServerTickCallback
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.block.Blocks
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.item.ItemUsageContext
@@ -32,10 +32,7 @@ import one.oktw.galaxy.block.item.BlockItem
 import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.block.util.CustomBlockUtil
 import one.oktw.galaxy.event.annotation.EventListener
-import one.oktw.galaxy.event.type.BlockBreakEvent
-import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
-import one.oktw.galaxy.event.type.PlayerInteractItemEvent
-import one.oktw.galaxy.event.type.PlayerUseItemOnBlock
+import one.oktw.galaxy.event.type.*
 import one.oktw.galaxy.item.Tool
 import one.oktw.galaxy.item.type.ItemType
 import one.oktw.galaxy.item.type.ToolType
@@ -45,8 +42,8 @@ class BlockEvents {
     private val usedLock = HashSet<ServerPlayerEntity>()
 
     init {
-        ServerTickCallback.EVENT.register(
-            ServerTickCallback {
+        ServerTickEvents.END_WORLD_TICK.register(
+            ServerTickEvents.EndWorldTick {
                 eventLock.clear()
                 usedLock.clear()
             }
@@ -71,7 +68,7 @@ class BlockEvents {
     }
 
     @EventListener(true)
-    fun onUseItem(event: PlayerUseItemOnBlock) {
+    fun onUseItemOnBlock(event: PlayerUseItemOnBlock) {
         val item = event.context.stack
         val player = event.context.player as ServerPlayerEntity
         if (item.item == BlockItem().baseItem) {
@@ -99,10 +96,28 @@ class BlockEvents {
     }
 
     @EventListener(true)
+    fun onInteractEntity(event: PlayerInteractEntityEvent) {
+        if (usedLock.contains(event.player)) return
+        val entity = event.packet.getEntity(event.player.serverWorld) ?: return
+        if (!event.player.shouldCancelInteraction()) {
+            val blockType = CustomBlockUtil.getTypeFromCustomBlockEntity(entity) ?: return
+            if (blockType.hasGUI && event.packet.hand == Hand.MAIN_HAND) {
+                openGUI(blockType, event.player)
+                event.player.swingHand(Hand.MAIN_HAND, true)
+                usedLock.add(event.player)
+            }
+        }
+    }
+
+    @EventListener(true)
     fun onBlockBreak(event: BlockBreakEvent) {
-        if (event.state.block != Blocks.BARRIER) return
         CustomBlockUtil.getCustomBlockEntity((event.world as ServerWorld), event.pos) ?: return
         event.cancel = true
+    }
+
+    @EventListener(true)
+    fun onBlockExplode(event: BlockExplodeEvent) {
+        event.affectedPos.removeIf { CustomBlockUtil.positionIsAnyCustomBlock((event.world as ServerWorld), it) }
     }
 
     private fun tryBreakBlock(context: ItemUsageContext): Boolean {

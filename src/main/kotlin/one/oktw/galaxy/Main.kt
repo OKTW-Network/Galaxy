@@ -27,6 +27,7 @@ import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
+import one.oktw.galaxy.block.event.BlockEvents
 import one.oktw.galaxy.chat.Exchange
 import one.oktw.galaxy.command.commands.Admin
 import one.oktw.galaxy.command.commands.Home
@@ -84,6 +85,7 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(Exchange())
             eventManager.register(PlayerControl())
             eventManager.register(Harvest())
+            eventManager.register(BlockEvents())
             eventManager.register(Sign())
         })
 

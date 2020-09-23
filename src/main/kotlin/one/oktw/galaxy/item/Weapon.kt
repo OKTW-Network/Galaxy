@@ -30,9 +30,11 @@ import one.oktw.galaxy.item.util.CustomItemBuilder
 class Weapon(val type: WeaponType = DUMMY) : Item {
     override val itemType = WEAPON
 
+    override val baseItem: net.minecraft.item.Item = DIAMOND_SWORD
+
     override fun createItemStack(): ItemStack {
         val item = CustomItemBuilder()
-            .setBaseItem(DIAMOND_SWORD)
+            .setBaseItem(baseItem)
             .setModel(type.customModelData)
             .setItemType(itemType)
             .setUnbreakable()

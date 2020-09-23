@@ -29,9 +29,11 @@ import one.oktw.galaxy.item.util.CustomItemBuilder
 class Material(val type: MaterialType = DUMMY) : Item {
     override val itemType = MATERIAL
 
+    override val baseItem: net.minecraft.item.Item = STONE_SWORD
+
     override fun createItemStack(): ItemStack {
         val item = CustomItemBuilder()
-            .setBaseItem(STONE_SWORD)
+            .setBaseItem(baseItem)
             .setModel(type.customModelData)
             .setItemType(itemType)
             .setUnbreakable()

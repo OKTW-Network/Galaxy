@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,7 +23,11 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.CommandSource
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvents
 import net.minecraft.text.TranslatableText
+import one.oktw.galaxy.block.Block
+import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.item.*
 import one.oktw.galaxy.item.type.*
 
@@ -36,6 +40,7 @@ class GetItem {
             .then(GetItem().tool)
             .then(GetItem().upgrade)
             .then(GetItem().weapon)
+            .then(GetItem().block)
     }
 
     private val button =
@@ -128,11 +133,45 @@ class GetItem {
                     }
             )
 
+    private val block =
+        CommandManager.literal("block")
+            .then(
+                CommandManager.argument("block", StringArgumentType.string())
+                    .suggests { _, builder ->
+                        val blocks: MutableList<String> = mutableListOf()
+                        BlockType.values().forEach { block ->
+                            if (block.customModelData != 0 || block.name != "DUMMY") {
+                                blocks.add(block.name)
+                            }
+                        }
+                        return@suggests CommandSource.suggestMatching(blocks, builder)
+                    }
+                    .executes { context ->
+                        getItem(context.source, Block(BlockType.valueOf(StringArgumentType.getString(context, "block"))).item!!)
+                    }
+            )
+
     private fun getItem(source: ServerCommandSource, item: Item): Int {
         val itemStack = item.createItemStack()
 
         val success = source.player.inventory.insertStack(itemStack)
-        if (!success) {
+        if (success) {
+            itemStack.count = 1
+            val itemEntity = source.player.dropItem(itemStack, false)
+            itemEntity?.setDespawnImmediately()
+
+            source.player.world.playSound(
+                null,
+                source.player.x,
+                source.player.y,
+                source.player.z,
+                SoundEvents.ENTITY_ITEM_PICKUP,
+                SoundCategory.PLAYERS,
+                0.2F,
+                ((source.player.random.nextFloat() - source.player.random.nextFloat()) * 0.7F + 1.0F) * 2.0F
+            )
+            source.player.playerScreenHandler.sendContentUpdates()
+        } else {
             val itemEntity = source.player.dropItem(itemStack, false)
             if (itemEntity != null) {
                 itemEntity.resetPickupDelay()

@@ -16,31 +16,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item
+package one.oktw.galaxy.block.item
 
 import net.minecraft.item.ItemStack
-import net.minecraft.item.Items.DIAMOND_HOE
-import net.minecraft.text.LiteralText
-import one.oktw.galaxy.item.type.GuiType
-import one.oktw.galaxy.item.type.GuiType.BLANK
-import one.oktw.galaxy.item.type.ItemType.GUI
+import net.minecraft.item.Items.COMMAND_BLOCK
+import net.minecraft.text.TranslatableText
+import net.minecraft.util.Formatting
+import one.oktw.galaxy.block.type.BlockType
+import one.oktw.galaxy.block.type.BlockType.DUMMY
+import one.oktw.galaxy.item.Item
+import one.oktw.galaxy.item.type.ItemType.BLOCK
 import one.oktw.galaxy.item.util.CustomItemBuilder
 
-class Gui(val type: GuiType = BLANK) : Item {
-    override val itemType = GUI
+class BlockItem(val type: BlockType = DUMMY) : Item {
+    override val itemType = BLOCK
 
-    override val baseItem: net.minecraft.item.Item = DIAMOND_HOE
+    override val baseItem: net.minecraft.item.Item = COMMAND_BLOCK
 
     override fun createItemStack(): ItemStack {
         val item = CustomItemBuilder()
             .setBaseItem(baseItem)
             .setModel(type.customModelData)
             .setItemType(itemType)
-            .setUnbreakable()
+            .setBlockType(type)
             .hideAllFlags()
             .removeAllModifiers()
 
-        LiteralText("").styled { it.withItalic(false) }.let(item::setName)
+        if (type.languageKey != "") {
+            TranslatableText(type.languageKey).styled { it.withColor(Formatting.WHITE).withItalic(false) }.let(item::setName)
+        }
 
         return item.build()
     }

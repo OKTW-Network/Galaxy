@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,11 +18,14 @@
 
 package one.oktw.galaxy.item
 
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import one.oktw.galaxy.item.type.ItemType
 
 interface Item {
     val itemType: ItemType
+
+    val baseItem: Item
 
     fun createItemStack(): ItemStack
 }

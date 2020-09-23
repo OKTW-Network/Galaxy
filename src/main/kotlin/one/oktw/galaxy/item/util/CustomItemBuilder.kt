@@ -24,6 +24,7 @@ import net.minecraft.item.Items.AIR
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.text.Text
+import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.item.type.ItemType
 
 class CustomItemBuilder {
@@ -76,6 +77,11 @@ class CustomItemBuilder {
 
     fun setItemType(itemType: ItemType): CustomItemBuilder {
         this.tags.putString("customItemType", itemType.name)
+        return this
+    }
+
+    fun setBlockType(blockType: BlockType): CustomItemBuilder {
+        this.tags.putString("customBlockType", blockType.name)
         return this
     }
 

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,18 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.type
+package one.oktw.galaxy.event.type
 
-enum class ItemType {
-    // System
-    DUMMY,
-    BUTTON,
-    GUI,
-    BLOCK,
+import net.minecraft.block.BlockState
+import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.World
+import one.oktw.galaxy.event.enums.BreakType
 
-    // Weapons & Tools
-    MATERIAL,
-    WEAPON,
-    TOOL,
-    UPGRADE
-}
+class BlockBreakEvent(val world: World, val pos: BlockPos, val state: BlockState, val type: BreakType, val player: PlayerEntity?) : CancelableEvent()

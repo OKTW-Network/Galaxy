@@ -16,20 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.tweak;
+package one.oktw.galaxy.event.enums
 
-import net.minecraft.server.rcon.RconBase;
-import org.apache.logging.log4j.Logger;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
-
-@Mixin(RconBase.class)
-public class MixinRCON_RconBase {
-    boolean isLocal = false;
-
-    @Redirect(method = "start", at = @At(value = "INVOKE", target = "Lorg/apache/logging/log4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
-    private void noLocalLog(Logger logger, String message, Object description) {
-        if (!isLocal) logger.info(message, description);
-    }
+enum class BreakType {
+    PLAYER,
+    WITHER,
+    DRAGON
 }

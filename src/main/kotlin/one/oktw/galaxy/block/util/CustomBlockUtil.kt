@@ -81,14 +81,18 @@ object CustomBlockUtil {
         return true
     }
 
-    fun positionIsBlock(world: ServerWorld, blockPos: BlockPos, type: BlockType): Boolean {
+    fun positionMatchesCustomBlock(world: ServerWorld, blockPos: BlockPos, type: BlockType): Boolean {
         val entity = getCustomBlockEntity(world, blockPos) ?: return false
         val blockType = getTypeFromCustomBlockEntity(entity) ?: return false
         return blockType == type
     }
 
+    fun positionIsAnyCustomBlock(world: ServerWorld, blockPos: BlockPos): Boolean {
+        return getCustomBlockEntity(world, blockPos) != null
+    }
+
     fun getCustomBlockEntity(world: ServerWorld, blockPos: BlockPos): Entity? {
-        val entities = world.getEntities(null, Box(blockPos))
+        val entities = world.getOtherEntities(null, Box(blockPos))
         return entities.firstOrNull { entity -> entity.scoreboardTags.contains("BLOCK") }
     }
 

@@ -1,4 +1,22 @@
 /*
+ * OKTW Galaxy Project
+ * Copyright (C) 2018-2020
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/*
  * This file is part of Sponge, licensed under the MIT License (MIT).
  *
  * Copyright (c) SpongePowered <https://www.spongepowered.org>
@@ -39,8 +57,6 @@ public abstract class EntityMixin_RealTime {
     @Shadow
     public World world;
     @Shadow
-    public int netherPortalCooldown;
-    @Shadow
     public int timeUntilRegen;
     @Shadow
     protected int ridingCooldown;
@@ -78,7 +94,7 @@ public abstract class EntityMixin_RealTime {
         ),
         slice = @Slice(
             from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getMaxNetherPortalTime()I"),
-            to = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getDefaultNetherPortalCooldown()I")
+            to = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;method_30229()V")
         )
     )
     private void realTimeImpl$adjustForRealTimePortalCounter(final Entity self, final int modifier) {

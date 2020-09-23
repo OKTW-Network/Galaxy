@@ -19,7 +19,7 @@
 package one.oktw.galaxy.command.commands.admin
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import net.minecraft.command.arguments.BlockPosArgumentType
+import net.minecraft.command.argument.BlockPosArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText

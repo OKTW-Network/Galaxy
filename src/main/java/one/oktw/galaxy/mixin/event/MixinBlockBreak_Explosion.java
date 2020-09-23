@@ -18,29 +18,35 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 import one.oktw.galaxy.Main;
-import one.oktw.galaxy.event.type.PlayerInteractEntityEvent;
+import one.oktw.galaxy.event.type.BlockExplodeEvent;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(ServerPlayNetworkHandler.class)
-public class MixinPlayerInteractEntity_NetworkHandler {
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+@Mixin(Explosion.class)
+public class MixinBlockBreak_Explosion {
+    @Final
     @Shadow
-    public ServerPlayerEntity player;
+    private World world;
 
-    @Inject(method = "onPlayerInteractEntity", at = @At(
+    @Redirect(method = "collectBlocksAndDamageEntities", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/entity/Entity;interactAt(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;"
+        target = "Ljava/util/List;addAll(Ljava/util/Collection;)Z",
+        ordinal = 0
     ))
-    private void onPlayerInteractEntity(PlayerInteractEntityC2SPacket packet, CallbackInfo ci) {
+    private boolean onDestroyByExplosion(List<BlockPos> list, Collection<BlockPos> affectedPos) {
         Main main = Main.Companion.getMain();
-        if (main == null) return;
-        main.getEventManager().emit(new PlayerInteractEntityEvent(packet, player));
+        if (main == null) return list.addAll(affectedPos);
+        return list.addAll(main.getEventManager().emit(new BlockExplodeEvent(world, (Set<BlockPos>) affectedPos)).getAffectedPos());
     }
 }

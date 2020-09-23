@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.block.event
 
-import net.fabricmc.fabric.api.event.server.ServerTickCallback
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.block.Blocks
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.item.ItemUsageContext
@@ -42,8 +42,8 @@ class BlockEvents {
     private val usedLock = HashSet<ServerPlayerEntity>()
 
     init {
-        ServerTickCallback.EVENT.register(
-            ServerTickCallback {
+        ServerTickEvents.END_WORLD_TICK.register(
+            ServerTickEvents.EndWorldTick {
                 eventLock.clear()
                 usedLock.clear()
             }
@@ -68,7 +68,7 @@ class BlockEvents {
     }
 
     @EventListener(true)
-    fun onUseItem(event: PlayerUseItemOnBlock) {
+    fun onUseItemOnBlock(event: PlayerUseItemOnBlock) {
         val item = event.context.stack
         val player = event.context.player as ServerPlayerEntity
         if (item.item == BlockItem().baseItem) {
@@ -113,6 +113,11 @@ class BlockEvents {
     fun onBlockBreak(event: BlockBreakEvent) {
         CustomBlockUtil.getCustomBlockEntity((event.world as ServerWorld), event.pos) ?: return
         event.cancel = true
+    }
+
+    @EventListener(true)
+    fun onBlockExplode(event: BlockExplodeEvent) {
+        event.affectedPos.removeIf { CustomBlockUtil.positionIsAnyCustomBlock((event.world as ServerWorld), it) }
     }
 
     private fun tryBreakBlock(context: ItemUsageContext): Boolean {

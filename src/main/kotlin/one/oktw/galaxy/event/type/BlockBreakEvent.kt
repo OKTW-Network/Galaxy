@@ -22,5 +22,6 @@ import net.minecraft.block.BlockState
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
+import one.oktw.galaxy.event.enums.BreakType
 
-class BlockBreakEvent(val world: World, val pos: BlockPos, val state: BlockState, val player: PlayerEntity) : CancelableEvent()
+class BlockBreakEvent(val world: World, val pos: BlockPos, val state: BlockState, val type: BreakType, val player: PlayerEntity?) : CancelableEvent()

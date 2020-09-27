@@ -65,7 +65,7 @@ class Wrench {
                     val clickDirection = event.context.side
 
                     if (clickDirection == Direction.UP || clickDirection == Direction.DOWN) {
-                        event.context.world.setBlockState(blockPos, blockState.cycle(HORIZONTAL_FACING))
+                        event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, blockState.get(HORIZONTAL_FACING).rotateYClockwise()))
                     } else {
                         event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, clickDirection))
                     }

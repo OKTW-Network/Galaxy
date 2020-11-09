@@ -22,9 +22,9 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import net.minecraft.command.CommandSource
 import net.minecraft.command.argument.BlockPosArgumentType
 import net.minecraft.server.command.CommandManager
-import net.minecraft.server.command.CommandSource
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
 import net.minecraft.util.math.BlockPos

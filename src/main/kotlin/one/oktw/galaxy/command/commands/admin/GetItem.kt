@@ -20,8 +20,8 @@ package one.oktw.galaxy.command.commands.admin
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import net.minecraft.command.CommandSource
 import net.minecraft.server.command.CommandManager
-import net.minecraft.server.command.CommandSource
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents

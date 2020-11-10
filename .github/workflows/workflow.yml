@@ -11,10 +11,10 @@ jobs:
       - name: Validation
         uses: gradle/wrapper-validation-action@v1
 
-      - name: JDK 14
+      - name: JDK
         uses: actions/setup-java@v1
         with:
-          java-version: '14'
+          java-version: '15'
 
       - name: cache
         uses: actions/cache@v2

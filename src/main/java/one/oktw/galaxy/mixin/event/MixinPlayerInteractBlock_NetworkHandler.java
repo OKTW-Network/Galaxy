@@ -51,7 +51,7 @@ public class MixinPlayerInteractBlock_NetworkHandler {
             BlockPos blockPos = packet.getBlockHitResult().getBlockPos();
             player.networkHandler.sendPacket(new BlockUpdateS2CPacket(world, blockPos));
             player.networkHandler.sendPacket(new BlockUpdateS2CPacket(world, blockPos.offset(packet.getBlockHitResult().getSide())));
-            player.openHandledScreen(player.currentScreenHandler);
+            player.refreshScreenHandler(player.currentScreenHandler);
         }
     }
 }

@@ -33,7 +33,8 @@ import java.util.UUID;
 
 @Mixin(MeCommand.class)
 public class MixinPlayerChat_MeCommand {
-    @Redirect(method = "register", at = @At(
+    @SuppressWarnings("UnresolvedMixinReference")
+    @Redirect(method = "method_13238", at = @At(
         value = "INVOKE",
         target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V",
         ordinal = 0

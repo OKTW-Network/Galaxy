@@ -44,7 +44,7 @@ public class MixinPlayerChat_NetworkHandler {
     @Final
     private MinecraftServer server;
 
-    @Redirect(method = "onGameMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"))
+    @Redirect(method = "method_31286", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"))
     private void onChat(PlayerManager playerManager, Text message, MessageType messageType, UUID uUID) {
         Main main = Main.Companion.getMain();
 

@@ -9,7 +9,7 @@ plugins {
 val version = "0.0.1"
 val group = "one.oktw"
 
-val galaxyLibVersion = "6116cf5e"
+val galaxyLibVersion = "9f1f46b7"
 
 repositories {
     mavenCentral()
@@ -48,10 +48,10 @@ dependencies {
     modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.25.1+build.416-1.16")
 
     // galaxy api
-    modImplementation(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion, classifier = "all")
+    implementation(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion)
 
     // Jar in Jar
-    include(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion)
+    include(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion, classifier = "all")
 }
 
 tasks.getByName<ProcessResources>("processResources") {

@@ -66,7 +66,7 @@ class Spawn : Command {
                     player.wakeUp(true, true)
                 }
                 (player as ServerPlayerEntityFunctionAccessor).moveToWorldSpawn(world)
-                while (!world.doesNotCollide(player) && player.y < 255) {
+                while (!world.isSpaceEmpty(player) && player.y < 255) {
                     player.updatePosition(player.x, player.y + 1, player.z)
                 }
                 player.networkHandler.requestTeleport(player.x, player.y, player.z, player.yaw, player.pitch)

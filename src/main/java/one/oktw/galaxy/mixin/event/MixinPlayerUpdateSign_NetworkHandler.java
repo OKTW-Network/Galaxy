@@ -35,19 +35,21 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.util.List;
+
 @Mixin(ServerPlayNetworkHandler.class)
 public class MixinPlayerUpdateSign_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Inject(method = "onSignUpdate", at = @At(
-        value = "INVOKE",
-        target = "Lnet/minecraft/block/entity/SignBlockEntity;isEditable()Z"
-    ), cancellable = true, locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void onSignUpdate(UpdateSignC2SPacket packet, CallbackInfo ci, ServerWorld serverWorld, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity, SignBlockEntity signBlockEntity) {
+    @Inject(method = "method_31282",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/SignBlockEntity;isEditable()Z"),
+        cancellable = true,
+        locals = LocalCapture.CAPTURE_FAILSOFT)
+    private void onSignUpdate(UpdateSignC2SPacket updateSignC2SPacket, List<String> list, CallbackInfo ci, ServerWorld serverWorld, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity, SignBlockEntity signBlockEntity) {
         Main main = Main.Companion.getMain();
         if (main == null) return;
-        if (main.getEventManager().emit(new PlayerUpdateSignEvent(packet, player, signBlockEntity)).getCancel()) {
+        if (main.getEventManager().emit(new PlayerUpdateSignEvent(updateSignC2SPacket, player, signBlockEntity)).getCancel()) {
             ci.cancel();
 
             signBlockEntity.markDirty();

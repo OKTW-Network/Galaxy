@@ -2,17 +2,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     //    "maven-publish"
-    kotlin("jvm") version "1.3.72"
+    kotlin("jvm") version "1.4.10"
     id("fabric-loom") version "0.4-SNAPSHOT"
 }
 
 val version = "0.0.1"
 val group = "one.oktw"
 
-val fabricVersion = "0.17.2+build.396-1.16"
-val proxyApiVersion = "0.2.0"
-val kotlinVersion = "1.3.72"
-val coroutinesVersion = "1.3.8"
+val galaxyLibVersion = "9f1f46b7"
 
 repositories {
     mavenCentral()
@@ -31,9 +28,10 @@ java {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        apiVersion = "1.3"
-        languageVersion = "1.3"
-        jvmTarget = "13"
+        apiVersion = "1.4"
+        languageVersion = "1.4"
+        jvmTarget = "14"
+        useIR = true
     }
 }
 
@@ -42,27 +40,18 @@ minecraft {
 
 dependencies {
     // Core
-    minecraft(group = "com.mojang", name = "minecraft", version = "1.16.2")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.16.2+build.1", classifier = "v2")
-    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.9.1+build.205")
+    minecraft(group = "com.mojang", name = "minecraft", version = "1.16.4")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.16.4+build.6", classifier = "v2")
+    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.10.6+build.214")
 
-    // fabric api/library
-    implementation(kotlin("stdlib"))
-    implementation(kotlin("reflect"))
-    implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = coroutinesVersion)
-//    modImplementation(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.71+build.1")
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = fabricVersion)
+    // fabric api
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.25.1+build.416-1.16")
 
     // galaxy api
-    modImplementation(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
+    implementation(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion)
 
     // Jar in Jar
-    include(kotlin("stdlib", kotlinVersion))
-    include(kotlin("stdlib-jdk7"))
-    include(kotlin("stdlib-jdk8"))
-    include(kotlin("reflect"))
-    include(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = coroutinesVersion)
-    include(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion, classifier = "all")
+    include(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion, classifier = "all")
 }
 
 tasks.getByName<ProcessResources>("processResources") {

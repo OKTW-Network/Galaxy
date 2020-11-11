@@ -18,45 +18,33 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.entity.Entity;
 import net.minecraft.network.MessageType;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.MeCommand;
-import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.UUID;
 
 @Mixin(MeCommand.class)
 public class MixinPlayerChat_MeCommand {
     @SuppressWarnings("UnresolvedMixinReference")
-    @Inject(
-        method = "method_13238",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V",
-            ordinal = 0
-        ),
-        locals = LocalCapture.CAPTURE_FAILSOFT
-    )
-    private static void onCommand(CommandContext<ServerCommandSource> context, CallbackInfoReturnable<Integer> cir, TranslatableText translatableText, Entity entity) {
-        if (!(entity instanceof ServerPlayerEntity)) return;
-
+    @Redirect(method = "method_13238", at = @At(
+        value = "INVOKE",
+        target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V",
+        ordinal = 0
+    ))
+    private static void onCommand(PlayerManager playerManager, Text message, MessageType type, UUID senderUuid) {
         Main main = Main.Companion.getMain();
-        ServerPlayerEntity player = (ServerPlayerEntity) entity;
+        ServerPlayerEntity player = playerManager.getPlayer(senderUuid);
 
-        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, translatableText)).getCancel()) {
-            player.server.getPlayerManager().broadcastChatMessage(translatableText, MessageType.CHAT, entity.getUuid());
-        } else {
-            cir.setReturnValue(0);
-            cir.cancel();
-            player.server.sendSystemMessage(translatableText.append(" (Canceled)"), entity.getUuid());
+        if (main == null || player == null || !main.getEventManager().emit(new PlayerChatEvent(player, message)).getCancel()) {
+            playerManager.broadcastChatMessage(message, type, senderUuid);
         }
     }
 }

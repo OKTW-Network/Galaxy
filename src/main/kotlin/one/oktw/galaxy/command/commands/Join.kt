@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,17 +21,15 @@ package one.oktw.galaxy.command.commands
 import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.CommandDispatcher
 import io.netty.buffer.Unpooled.wrappedBuffer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.time.delay
-import net.minecraft.client.network.packet.CustomPayloadS2CPacket
-import net.minecraft.client.network.packet.TitleS2CPacket
-import net.minecraft.command.arguments.GameProfileArgumentType
+import net.minecraft.command.argument.GameProfileArgumentType
 import net.minecraft.entity.boss.BossBar
 import net.minecraft.entity.boss.CommandBossBar
+import net.minecraft.network.PacketByteBuf
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket
+import net.minecraft.network.packet.s2c.play.TitleS2CPacket
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
@@ -39,7 +37,6 @@ import net.minecraft.text.LiteralText
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
-import net.minecraft.util.PacketByteBuf
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
@@ -112,7 +109,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             } else {
                 "請稍後..."
             }
-            source.sendFeedback(LiteralText(message).styled { style -> style.color = Formatting.AQUA }, false)
+            source.sendFeedback(LiteralText(message).styled { style -> style.withColor(Formatting.AQUA) }, false)
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
 
@@ -129,9 +126,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             if (sourcePlayer.gameProfile == targetPlayer) "已將目的地設為您的星系" else "已將目的地設為 ${targetPlayer.name} 的星系"
         }
         startingTarget.remove(sourcePlayer.uuid)
-        val text = LiteralText(message).styled { style ->
-            style.color = Formatting.AQUA
-        }
+        val text = LiteralText(message).styled { style -> style.withColor(Formatting.AQUA) }
         source.sendFeedback(text, false)
         sourcePlayer.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.TITLE, text))
 
@@ -145,27 +140,21 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
 
                 when (data.stage) {
                     Queue -> {
-                        val subText = LiteralText("飛船正在準備起飛...").styled { style -> style.color = Formatting.AQUA }
+                        val subText = LiteralText("飛船正在準備起飛...").styled { style -> style.withColor(Formatting.AQUA) }
                         updateVisualStatus(source, text, subText, 0)
-                        val tipText = LiteralText(queueList[randomInt(0, queueList.size)]).styled { style ->
-                            style.color = Formatting.YELLOW
-                        }
-                        source.sendFeedback(tipText, false)
+                        val tipText = LiteralText(queueList[randomInt(0, queueList.size)]).styled { style -> style.withColor(Formatting.YELLOW) }
+                        sourcePlayer.sendMessage(tipText, false)
                     }
                     Creating -> {
-                        val subText = LiteralText("星系載入中...").styled { style -> style.color = Formatting.AQUA }
+                        val subText = LiteralText("星系載入中...").styled { style -> style.withColor(Formatting.AQUA) }
                         updateVisualStatus(source, text, subText, 10)
-                        val tipText = LiteralText(creatingList[randomInt(0, creatingList.size)]).styled { style ->
-                            style.color = Formatting.YELLOW
-                        }
+                        val tipText = LiteralText(creatingList[randomInt(0, creatingList.size)]).styled { style -> style.withColor(Formatting.YELLOW) }
                         source.sendFeedback(tipText, false)
                     }
                     Starting -> {
-                        val subText = LiteralText("飛船正在飛向星系請稍後...").styled { style -> style.color = Formatting.AQUA }
+                        val subText = LiteralText("飛船正在飛向星系請稍後...").styled { style -> style.withColor(Formatting.AQUA) }
                         updateVisualStatus(source, text, subText, 20)
-                        val tipFirstText = LiteralText("飛船正在飛向星系，請耐心等候").styled { style ->
-                            style.color = Formatting.YELLOW
-                        }
+                        val tipFirstText = LiteralText("飛船正在飛向星系，請耐心等候").styled { style -> style.withColor(Formatting.YELLOW) }
                         source.sendFeedback(tipFirstText, false)
                         startingTarget[sourcePlayer.uuid] = targetPlayer
                         launch {
@@ -189,10 +178,9 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                                 seconds += tickTime / 1000
                                 if ((seconds.toInt() % 20) == 0) {
                                     if (!sentTip) {
-                                        val tipText = LiteralText(startingList[randomInt(0, startingList.size)]).styled { style ->
-                                            style.color = Formatting.YELLOW
-                                        }
-                                        source.sendFeedback(tipText, false)
+                                        val tipText =
+                                            LiteralText(startingList[randomInt(0, startingList.size)]).styled { style -> style.withColor(Formatting.YELLOW) }
+                                        sourcePlayer.sendMessage(tipText, false)
                                         sentTip = true
                                         bossBar.value += randomInt(1, 3)
                                     }
@@ -203,12 +191,12 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                         }
                     }
                     Started -> {
-                        val subText = LiteralText("成功抵達目的地！").styled { style -> style.color = Formatting.GREEN }
-                        sourcePlayer.sendMessage(subText)
+                        val subText = LiteralText("成功抵達目的地！").styled { style -> style.withColor(Formatting.GREEN) }
+                        sourcePlayer.sendMessage(subText, false)
                         val bossBar = getOrCreateProcessBossBar(source)
                         updateVisualStatus(source, text, subText, bossBar.maxValue)
                         startingTarget.remove(sourcePlayer.uuid)
-                        lock[sourcePlayer]?.unlock()
+                        lock[source.player]?.unlock()
                         lock.remove(sourcePlayer)
                         launch {
                             delay(Duration.ofSeconds(2))
@@ -216,8 +204,8 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                         }
                     }
                     Failed -> {
-                        val subText = LiteralText("您的飛船在飛行途中炸毀了，請聯絡開發團隊！").styled { style -> style.color = Formatting.RED }
-                        sourcePlayer.sendMessage(subText)
+                        val subText = LiteralText("您的飛船在飛行途中炸毀了，請聯絡開發團隊！").styled { style -> style.withColor(Formatting.RED) }
+                        sourcePlayer.sendMessage(subText, false)
                         updateVisualStatus(source, text, subText, 0)
                         startingTarget.remove(sourcePlayer.uuid)
                         lock[sourcePlayer]?.unlock()
@@ -231,7 +219,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             }
 
             main!!.eventManager.register(PacketReceiveEvent::class, listener)
-            delay(Duration.ofMinutes(5))
+            delay(Duration.ofMinutes(5).toMillis()) // TODO change to kotlin Duration
             main!!.eventManager.unregister(PacketReceiveEvent::class, listener)
             lock[sourcePlayer]?.unlock()
             lock.remove(sourcePlayer)

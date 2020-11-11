@@ -18,8 +18,8 @@
 
 package one.oktw.galaxy.event.type
 
+import net.minecraft.network.PacketByteBuf
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.Identifier
-import net.minecraft.util.PacketByteBuf
 
 class PacketReceiveEvent(val channel: Identifier, val packet: PacketByteBuf, val player: ServerPlayerEntity) : Event

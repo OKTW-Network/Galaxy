@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,9 +30,11 @@ import one.oktw.galaxy.item.util.CustomItemBuilder
 class Weapon(val type: WeaponType = DUMMY) : Item {
     override val itemType = WEAPON
 
+    override val baseItem: net.minecraft.item.Item = DIAMOND_SWORD
+
     override fun createItemStack(): ItemStack {
         val item = CustomItemBuilder()
-            .setBaseItem(DIAMOND_SWORD)
+            .setBaseItem(baseItem)
             .setModel(type.customModelData)
             .setItemType(itemType)
             .setUnbreakable()
@@ -40,9 +42,9 @@ class Weapon(val type: WeaponType = DUMMY) : Item {
             .removeAllModifiers()
 
         if (type.languageKey != "") {
-            TranslatableText(type.languageKey).styled { style ->
-                style.color = Formatting.GREEN //TODO Advanced weapon
-                style.isItalic = false
+            TranslatableText(type.languageKey).styled {
+                it.withColor(Formatting.GREEN) //TODO Advanced weapon
+                it.withItalic(false)
             }.let(item::setName)
         }
 

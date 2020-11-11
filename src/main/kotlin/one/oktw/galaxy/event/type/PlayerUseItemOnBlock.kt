@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,13 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.network;
+package one.oktw.galaxy.event.type
 
-import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.item.ItemUsageContext
 
-public interface CustomPayloadC2SPacketAccessor {
-    Identifier getChannel();
-
-    PacketByteBuf getData();
-}
+class PlayerUseItemOnBlock(val context: ItemUsageContext) : Event

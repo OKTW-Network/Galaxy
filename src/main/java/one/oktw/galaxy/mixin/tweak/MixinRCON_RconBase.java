@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,29 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.event;
+package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.server.network.packet.CustomPayloadC2SPacket;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
-import one.oktw.galaxy.network.CustomPayloadC2SPacketAccessor;
+import net.minecraft.server.rcon.RconBase;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(CustomPayloadC2SPacket.class)
-public class MixinCustomPayload_CustomPayloadC2SPacket implements CustomPayloadC2SPacketAccessor {
-    @Shadow
-    private Identifier channel;
-    @Shadow
-    private PacketByteBuf data;
+@Mixin(RconBase.class)
+public class MixinRCON_RconBase {
+    boolean isLocal = false;
 
-    @Override
-    public Identifier getChannel() {
-        return channel;
-    }
-
-    @Override
-    public PacketByteBuf getData() {
-        return new PacketByteBuf(this.data.copy());
+    @Redirect(method = "start", at = @At(value = "INVOKE", target = "Lorg/apache/logging/log4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
+    private void noLocalLog(Logger logger, String message, Object description) {
+        if (!isLocal) logger.info(message, description);
     }
 }

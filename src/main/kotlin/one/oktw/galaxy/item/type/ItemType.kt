@@ -23,6 +23,7 @@ enum class ItemType {
     DUMMY,
     BUTTON,
     GUI,
+    BLOCK,
 
     // Weapons & Tools
     MATERIAL,

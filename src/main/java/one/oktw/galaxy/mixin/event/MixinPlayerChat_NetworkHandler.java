@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,10 +18,12 @@
 
 package one.oktw.galaxy.mixin.event;
 
+import net.minecraft.network.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.BaseText;
 import net.minecraft.text.Text;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
@@ -30,6 +32,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.UUID;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class MixinPlayerChat_NetworkHandler {
@@ -40,14 +44,14 @@ public class MixinPlayerChat_NetworkHandler {
     @Final
     private MinecraftServer server;
 
-    @Redirect(method = "onChatMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Z)V"))
-    private void onChat(PlayerManager playerManager, Text message, boolean isSystem) {
+    @Redirect(method = "method_31286", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"))
+    private void onChat(PlayerManager playerManager, Text message, MessageType type, UUID senderUuid) {
         Main main = Main.Companion.getMain();
 
         if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, message)).getCancel()) {
-            playerManager.broadcastChatMessage(message, isSystem);
+            playerManager.broadcastChatMessage(message, type, senderUuid);
         } else {
-            server.sendMessage(message.append(" (Canceled)"));
+            server.sendSystemMessage(((BaseText) message).append(" (Canceled)"), senderUuid);
         }
     }
 }

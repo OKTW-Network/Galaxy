@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,11 +18,9 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.network.MessageType;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.MeCommand;
-import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import one.oktw.galaxy.Main;
@@ -31,18 +29,22 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import java.util.UUID;
+
 @Mixin(MeCommand.class)
 public class MixinPlayerChat_MeCommand {
     @SuppressWarnings("UnresolvedMixinReference")
-    @Redirect(method = "method_13238(Lcom/mojang/brigadier/context/CommandContext;)I", at = @At(value = "INVOKE", target = "net/minecraft/server/PlayerManager.sendToAll(Lnet/minecraft/text/Text;)V"))
-    private static void onCommand(PlayerManager playerManager, Text message, CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    @Redirect(method = "method_13238", at = @At(
+        value = "INVOKE",
+        target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V",
+        ordinal = 0
+    ))
+    private static void onCommand(PlayerManager playerManager, Text message, MessageType type, UUID senderUuid) {
         Main main = Main.Companion.getMain();
-        ServerPlayerEntity player = context.getSource().getPlayer();
+        ServerPlayerEntity player = playerManager.getPlayer(senderUuid);
 
-        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, message)).getCancel()) {
-            playerManager.sendToAll(message);
-        } else {
-            player.server.sendMessage(message.append(" (Canceled)"));
+        if (main == null || player == null || !main.getEventManager().emit(new PlayerChatEvent(player, message)).getCancel()) {
+            playerManager.broadcastChatMessage(message, type, senderUuid);
         }
     }
 }

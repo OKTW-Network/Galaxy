@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,9 +18,12 @@
 
 package one.oktw.galaxy.mixin.event;
 
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.packet.PlayerInteractBlockC2SPacket;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,12 +37,21 @@ public class MixinPlayerInteractBlock_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Inject(method = "onPlayerInteractBlock", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "onPlayerInteractBlock", at = @At(
+        value = "INVOKE",
+        target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;interactBlock(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;"
+    ), cancellable = true)
     private void onPlayerInteractBlock(PlayerInteractBlockC2SPacket packet, CallbackInfo info) {
         Main main = Main.Companion.getMain();
         if (main == null) return;
         if (main.getEventManager().emit(new PlayerInteractBlockEvent(packet, player)).getCancel()) {
             info.cancel();
+            // Re-sync block & inventory
+            ServerWorld world = player.getServerWorld();
+            BlockPos blockPos = packet.getBlockHitResult().getBlockPos();
+            player.networkHandler.sendPacket(new BlockUpdateS2CPacket(world, blockPos));
+            player.networkHandler.sendPacket(new BlockUpdateS2CPacket(world, blockPos.offset(packet.getBlockHitResult().getSide())));
+            player.refreshScreenHandler(player.currentScreenHandler);
         }
     }
 }

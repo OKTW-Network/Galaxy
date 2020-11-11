@@ -2,26 +2,19 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     //    "maven-publish"
-    kotlin("jvm") version "1.3.61"
-    id("fabric-loom") version "0.2.6-SNAPSHOT"
+    kotlin("jvm") version "1.4.10"
+    id("fabric-loom") version "0.4-SNAPSHOT"
 }
 
 val version = "0.0.1"
 val group = "one.oktw"
 
-val fabricVersion = "0.1.2+b7f9825de8"
-val proxyApiVersion = "0.1.0"
+val galaxyLibVersion = "9f1f46b7"
 
 repositories {
     mavenCentral()
     jcenter()
     maven(url = "https://jitpack.io")
-    maven(url = "https://maven.fabricmc.net/") {
-        name = "Fabric"
-    }
-    maven(url = "https://kotlin.bintray.com/kotlinx") {
-        name = "Kotlinx"
-    }
 }
 
 base {
@@ -29,15 +22,16 @@ base {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_14
+    targetCompatibility = JavaVersion.VERSION_14
 }
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        apiVersion = "1.3"
-        languageVersion = "1.3"
-        jvmTarget = "1.8"
+        apiVersion = "1.4"
+        languageVersion = "1.4"
+        jvmTarget = "14"
+        useIR = true
     }
 }
 
@@ -46,25 +40,18 @@ minecraft {
 
 dependencies {
     // Core
-    minecraft(group = "com.mojang", name = "minecraft", version = "1.15.2")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.15.2+build.1", classifier = "v2")
-    modCompile(group = "net.fabricmc", name = "fabric-loader", version = "0.7.5+build.178")
+    minecraft(group = "com.mojang", name = "minecraft", version = "1.16.4")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.16.4+build.6", classifier = "v2")
+    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.10.6+build.214")
 
-    // fabric api/library
-    modImplementation(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.3.61+build.2")
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api-base", version = fabricVersion)
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = fabricVersion)
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-events-lifecycle-v0", version = fabricVersion)
+    // fabric api
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.25.1+build.416-1.16")
 
     // galaxy api
-    modImplementation(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
+    implementation(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion)
 
     // Jar in Jar
-    include(group = "net.fabricmc.fabric-api", name = "fabric-api-base", version = fabricVersion)
-    include(group = "net.fabricmc.fabric-api", name = "fabric-commands-v0", version = fabricVersion)
-    include(group = "net.fabricmc.fabric-api", name = "fabric-events-lifecycle-v0", version = fabricVersion)
-    include(group = "one.oktw", name = "galaxy-proxy", version = proxyApiVersion)
-    include(group = "org.mongodb", name = "bson", version = "3.12.0")
+    include(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion, classifier = "all")
 }
 
 tasks.getByName<ProcessResources>("processResources") {

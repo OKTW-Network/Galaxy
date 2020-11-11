@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,26 +19,25 @@
 package one.oktw.galaxy.mixin.tweak;
 
 import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.server.rcon.RconBase;
 import net.minecraft.server.rcon.RconClient;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.net.Socket;
 
 @Mixin(RconClient.class)
-public abstract class MixinRCON_RconClient extends RconBase {
-    @Shadow
-    private Socket socket;
-
-    protected MixinRCON_RconClient(DedicatedServer dedicatedServer_1, String string_1) {
-        super(dedicatedServer_1, string_1);
+public class MixinRCON_RconClient extends MixinRCON_RconBase {
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void checkLocal(DedicatedServer server, String password, Socket socket, CallbackInfo ci) {
+        if (socket.getInetAddress().isLoopbackAddress()) isLocal = true;
     }
 
-    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/rcon/RconClient;info(Ljava/lang/String;)V"))
-    private void onLogging(RconClient rconClient, String string_1) {
-        if (!socket.getInetAddress().isLoopbackAddress()) info(string_1);
+    @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lorg/apache/logging/log4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
+    private void noLocalLog(Logger logger, String message, Object description) {
+        if (!isLocal) logger.info(message, description);
     }
 }

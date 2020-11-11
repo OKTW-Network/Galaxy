@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.event.type
 
+import net.minecraft.network.packet.c2s.play.RequestCommandCompletionsC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.server.network.packet.RequestCommandCompletionsC2SPacket
 
 class RequestCommandCompletionsEvent(val packet: RequestCommandCompletionsC2SPacket, val player: ServerPlayerEntity) : CancelableEvent()

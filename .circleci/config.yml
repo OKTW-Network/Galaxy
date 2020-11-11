@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: openjdk:14-jdk-slim
+      - image: openjdk:15-jdk-slim
 
     working_directory: ~/repo
 
@@ -22,10 +22,10 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - dependencies-v6-{{ .Branch }}-{{ .Revision }}
-            - dependencies-v6-{{ .Branch }}-
-            - dependencies-v6-master-
-            - dependencies-v6-
+            - dependencies-v7-{{ .Branch }}-{{ .Revision }}
+            - dependencies-v7-{{ .Branch }}-
+            - dependencies-v7-master-
+            - dependencies-v7-
 
       # run build
       - run: ./gradlew build
@@ -34,7 +34,7 @@ jobs:
           paths:
             - ~/.gradle
             - .gradle/loom-cache
-          key: dependencies-v6-{{ .Branch }}-{{ .Revision }}
+          key: dependencies-v7-{{ .Branch }}-{{ .Revision }}
 
       - store_artifacts:
           path: build/libs

@@ -44,14 +44,14 @@ public class MixinPlayerChat_NetworkHandler {
     @Final
     private MinecraftServer server;
 
-    @Redirect(method = "onGameMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"))
-    private void onChat(PlayerManager playerManager, Text message, MessageType messageType, UUID uUID) {
+    @Redirect(method = "method_31286", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"))
+    private void onChat(PlayerManager playerManager, Text message, MessageType type, UUID senderUuid) {
         Main main = Main.Companion.getMain();
 
         if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, message)).getCancel()) {
-            playerManager.broadcastChatMessage(message, messageType, uUID);
+            playerManager.broadcastChatMessage(message, type, senderUuid);
         } else {
-            server.sendSystemMessage(((BaseText) message).append(" (Canceled)"), uUID);
+            server.sendSystemMessage(((BaseText) message).append(" (Canceled)"), senderUuid);
         }
     }
 }

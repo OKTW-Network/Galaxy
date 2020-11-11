@@ -94,7 +94,7 @@ public abstract class EntityMixin_RealTime {
         ),
         slice = @Slice(
             from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getMaxNetherPortalTime()I"),
-            to = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;method_30229()V")
+            to = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;resetNetherPortalCooldown()V")
         )
     )
     private void realTimeImpl$adjustForRealTimePortalCounter(final Entity self, final int modifier) {

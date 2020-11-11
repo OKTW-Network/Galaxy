@@ -31,9 +31,9 @@ class Elevator {
     @EventListener(sync = true)
     fun onJump(event: PlayerJumpEvent) {
         val position = event.player.pos
-        if(CustomBlockUtil.positionIsBlock(event.player.serverWorld, BlockPos(position.subtract(0.0, 1.0, 0.0)), BlockType.ELEVATOR)) {
+        if(CustomBlockUtil.positionMatchesCustomBlock(event.player.serverWorld, BlockPos(position.subtract(0.0, 1.0, 0.0)), BlockType.ELEVATOR)) {
             for (i in 3..16) {
-                if (CustomBlockUtil.positionIsBlock(event.player.serverWorld, BlockPos(position.add(0.0, i.toDouble(), 0.0)), BlockType.ELEVATOR)) {
+                if (CustomBlockUtil.positionMatchesCustomBlock(event.player.serverWorld, BlockPos(position.add(0.0, i.toDouble(), 0.0)), BlockType.ELEVATOR)) {
                     event.player.requestTeleport(position.x, position.y+i+1, position.z)
                     event.player.world.playSound(null, BlockPos(position.add(0.0, i.toDouble(), 0.0)), SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT, SoundCategory.BLOCKS, 1.0f, 1.0f)
                     break
@@ -44,9 +44,9 @@ class Elevator {
     @EventListener(sync = true)
     fun onSneak(event: PlayerSneakEvent) {
         val position = event.player.pos
-        if(CustomBlockUtil.positionIsBlock(event.player.serverWorld, BlockPos(position.subtract(0.0, 1.0, 0.0)), BlockType.ELEVATOR)) {
+        if(CustomBlockUtil.positionMatchesCustomBlock(event.player.serverWorld, BlockPos(position.subtract(0.0, 1.0, 0.0)), BlockType.ELEVATOR)) {
             for (i in 3..16) {
-                if (CustomBlockUtil.positionIsBlock(event.player.serverWorld, BlockPos(position.subtract(0.0, i.toDouble(), 0.0)), BlockType.ELEVATOR)) {
+                if (CustomBlockUtil.positionMatchesCustomBlock(event.player.serverWorld, BlockPos(position.subtract(0.0, i.toDouble(), 0.0)), BlockType.ELEVATOR)) {
                     event.player.requestTeleport(position.x, position.y-i+1, position.z)
                     event.player.world.playSound(null, BlockPos(position.subtract(0.0, i.toDouble(), 0.0)), SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT, SoundCategory.BLOCKS, 1.0f, 1.0f)
                     break

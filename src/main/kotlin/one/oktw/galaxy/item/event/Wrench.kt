@@ -22,7 +22,9 @@ import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks.*
 import net.minecraft.block.ChestBlock
 import net.minecraft.block.TrappedChestBlock
+import net.minecraft.block.WallMountedBlock.FACE
 import net.minecraft.block.enums.ChestType
+import net.minecraft.block.enums.RailShape
 import net.minecraft.block.enums.SlabType
 import net.minecraft.state.property.Properties.*
 import net.minecraft.util.Hand
@@ -124,6 +126,41 @@ class Wrench {
             return
         }
 
+        if (blockState.contains(BLOCK_HALF)) {
+            val newDirection = blockState.get(HORIZONTAL_FACING).rotateYClockwise()
+            var newState = blockState.with(HORIZONTAL_FACING, newDirection)
+            if (newDirection == Direction.NORTH) {
+                newState = newState.cycle(BLOCK_HALF)
+            }
+            event.context.world.setBlockState(blockPos, newState)
+            return
+        }
+
+        if (blockState.contains(RAIL_SHAPE)) {
+            event.context.world.setBlockState(blockPos, blockState.with(RAIL_SHAPE, spinRail(blockState.get(RAIL_SHAPE))))
+            return
+        }
+
+        if (blockState.block == GRINDSTONE) {
+            val newDirection = blockState.get(HORIZONTAL_FACING).rotateYClockwise()
+            var newState = blockState.with(HORIZONTAL_FACING, newDirection)
+            if (newDirection == Direction.NORTH) {
+                newState = newState.cycle(FACE)
+            }
+            event.context.world.setBlockState(blockPos, newState)
+            return
+        }
+
+        if (blockState.block == BELL) {
+            val newDirection = blockState.get(HORIZONTAL_FACING).rotateYClockwise()
+            var newState = blockState.with(HORIZONTAL_FACING, newDirection)
+            if (newDirection == Direction.NORTH) {
+                newState = newState.cycle(ATTACHMENT)
+            }
+            event.context.world.setBlockState(blockPos, newState)
+            return
+        }
+
         var facing: BlockState
 
         facing = when {
@@ -180,5 +217,18 @@ class Wrench {
         Direction.EAST -> Direction.WEST
         Direction.DOWN -> Direction.DOWN
         Direction.UP -> Direction.UP
+    }
+
+    private fun spinRail(shape: RailShape) = when (shape) {
+        RailShape.NORTH_SOUTH -> RailShape.EAST_WEST
+        RailShape.EAST_WEST -> RailShape.NORTH_SOUTH
+        RailShape.ASCENDING_EAST -> RailShape.ASCENDING_EAST
+        RailShape.ASCENDING_WEST -> RailShape.ASCENDING_WEST
+        RailShape.ASCENDING_NORTH -> RailShape.ASCENDING_NORTH
+        RailShape.ASCENDING_SOUTH -> RailShape.ASCENDING_NORTH
+        RailShape.SOUTH_WEST -> RailShape.NORTH_WEST
+        RailShape.NORTH_WEST -> RailShape.NORTH_EAST
+        RailShape.NORTH_EAST -> RailShape.SOUTH_EAST
+        RailShape.SOUTH_EAST -> RailShape.SOUTH_WEST
     }
 }

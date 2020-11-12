@@ -21,6 +21,7 @@ package one.oktw.galaxy.item.event
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks.*
 import net.minecraft.block.ChestBlock
+import net.minecraft.block.TrappedChestBlock
 import net.minecraft.block.enums.ChestType
 import net.minecraft.block.enums.SlabType
 import net.minecraft.state.property.Properties.*
@@ -58,16 +59,21 @@ class Wrench {
 
         event.context.player?.swingHand(Hand.MAIN_HAND, true)
 
-        if (blockState.block == CHEST) {
+        if (blockState.block == CHEST || blockState.block == TRAPPED_CHEST) {
+            val chestFacing: Direction = if (blockState.block == CHEST) {
+                ChestBlock.getFacing(blockState)
+            } else {
+                TrappedChestBlock.getFacing(blockState)
+            }
+
             when (blockState.get(CHEST_TYPE)) {
                 ChestType.LEFT, ChestType.RIGHT -> {
-                    val anotherPos = blockPos.offset(ChestBlock.getFacing(blockState))
+                    val anotherPos = blockPos.offset(chestFacing)
                     val anotherState = event.context.world.getBlockState(anotherPos)
                     event.context.world.setBlockState(blockPos, blockState.with(CHEST_TYPE, ChestType.SINGLE))
                     event.context.world.setBlockState(anotherPos, anotherState.with(CHEST_TYPE, ChestType.SINGLE))
                 }
                 ChestType.SINGLE -> {
-                    val chestDirection = ChestBlock.getFacing(blockState)
                     val clickDirection = event.context.side
 
                     if (clickDirection == Direction.UP || clickDirection == Direction.DOWN) {
@@ -76,25 +82,25 @@ class Wrench {
                         event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, clickDirection))
                     }
 
-                    if (chestDirection == clickDirection) {
+                    if (chestFacing == clickDirection) {
                         val facing = blockState.get(HORIZONTAL_FACING)
-                        val anotherPos = blockPos.offset(ChestBlock.getFacing(blockState))
+                        val anotherPos = blockPos.offset(chestFacing)
                         val anotherState = event.context.world.getBlockState(anotherPos)
 
-                        if (anotherState.block == CHEST && anotherState.get(CHEST_TYPE) == ChestType.SINGLE) {
+                        if ((anotherState.block == CHEST || anotherState.block == TRAPPED_CHEST) && anotherState.get(CHEST_TYPE) == ChestType.SINGLE) {
                             val anotherFacing = anotherState.get(HORIZONTAL_FACING)
 
-                            if (anotherState.block == CHEST && facing == anotherFacing) {
+                            if ((anotherState.block == CHEST || anotherState.block == TRAPPED_CHEST) && facing == anotherFacing) {
                                 event.context.world.setBlockState(blockPos, blockState.with(CHEST_TYPE, ChestType.RIGHT))
                                 event.context.world.setBlockState(anotherPos, anotherState.with(CHEST_TYPE, ChestType.LEFT))
                             }
                         }
-                    } else if (chestDirection.opposite == clickDirection) {
+                    } else if (chestFacing.opposite == clickDirection) {
                         val facing = blockState.get(HORIZONTAL_FACING)
-                        val anotherPos = blockPos.offset(chestDirection.opposite)
+                        val anotherPos = blockPos.offset(chestFacing.opposite)
                         val anotherState = event.context.world.getBlockState(anotherPos)
 
-                        if (anotherState.block == CHEST && anotherState.get(CHEST_TYPE) == ChestType.SINGLE) {
+                        if ((anotherState.block == CHEST || anotherState.block == TRAPPED_CHEST) && anotherState.get(CHEST_TYPE) == ChestType.SINGLE) {
                             val anotherFacing = anotherState.get(HORIZONTAL_FACING)
 
                             if (facing == anotherFacing) {

@@ -133,7 +133,18 @@ class Wrench {
             if (clickDirection == Direction.UP || clickDirection == Direction.DOWN) {
                 event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, blockState.get(HORIZONTAL_FACING).rotateYClockwise()))
             } else {
-                event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, clickDirection))
+                if (blockState.get(HORIZONTAL_FACING) == clickDirection){
+                    val facing = when (clickDirection) {
+                        Direction.NORTH -> Direction.SOUTH
+                        Direction.SOUTH -> Direction.NORTH
+                        Direction.WEST -> Direction.EAST
+                        Direction.EAST -> Direction.WEST
+                        else -> return
+                    }
+                    event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, facing))
+                } else {
+                    event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, clickDirection))
+                }
             }
             return
         }

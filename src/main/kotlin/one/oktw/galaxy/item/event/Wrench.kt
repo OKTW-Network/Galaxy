@@ -143,7 +143,6 @@ class Wrench {
     }
 
     private fun chestRotate(event: PlayerUseItemOnBlock, clickDirection: Direction, blockPos: BlockPos, blockState: BlockState) {
-
         if (clickDirection == Direction.UP || clickDirection == Direction.DOWN) {
             event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, blockState.get(HORIZONTAL_FACING).rotateYClockwise()))
         } else {

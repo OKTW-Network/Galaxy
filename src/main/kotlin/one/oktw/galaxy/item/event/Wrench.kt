@@ -56,6 +56,7 @@ class Wrench {
         // Check destructible
         if (blockState.getHardness(event.context.world, blockPos) < 0.0) return
         if (((blockState.block == PISTON || blockState.block == STICKY_PISTON) && blockState.get(EXTENDED)) || blockState.block == PISTON_HEAD) return
+        if (blockState.contains(BED_PART)) return
 
         event.context.player?.swingHand(Hand.MAIN_HAND, true)
 

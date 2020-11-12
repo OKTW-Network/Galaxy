@@ -38,10 +38,10 @@ class Wrench {
         val hand = event.context.hand
 
         if (player != null) {
-            if (player.getStackInHand(Hand.MAIN_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && hand == Hand.MAIN_HAND) {
+            if (player.getStackInHand(Hand.MAIN_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && hand == Hand.MAIN_HAND && player.isSneaking) {
                 wrenchSpin(event)
             } else if (player.getStackInHand(Hand.OFF_HAND)
-                    .isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && player.mainHandStack.isEmpty && hand == Hand.OFF_HAND
+                    .isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && player.mainHandStack.isEmpty && hand == Hand.OFF_HAND && player.isSneaking
             ) {
                 wrenchSpin(event)
             }

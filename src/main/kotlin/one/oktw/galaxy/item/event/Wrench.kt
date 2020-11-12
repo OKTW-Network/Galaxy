@@ -122,6 +122,7 @@ class Wrench {
             blockState.contains(HOPPER_FACING) -> blockState.cycle(HOPPER_FACING)
             blockState.contains(HORIZONTAL_FACING) -> blockState.cycle(HORIZONTAL_FACING)
             blockState.contains(AXIS) -> blockState.cycle(AXIS)
+            blockState.contains(ROTATION) -> blockState.cycle(ROTATION)
             else -> blockState
         }
 

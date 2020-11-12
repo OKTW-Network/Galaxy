@@ -51,6 +51,10 @@ class Wrench {
     private fun wrenchSpin(event: PlayerUseItemOnBlock) {
         val blockPos = event.context.blockPos
         val blockState = event.context.world.getBlockState(blockPos)
+
+        // Check destructible
+        if (blockState.getHardness(event.context.world, blockPos) < 0.0) return;
+
         event.context.player?.swingHand(Hand.MAIN_HAND, true)
 
         if (blockState.block == CHEST) {

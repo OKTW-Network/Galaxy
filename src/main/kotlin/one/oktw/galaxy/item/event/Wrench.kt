@@ -119,11 +119,42 @@ class Wrench {
             return
         }
 
+        if (blockState.block == HOPPER) {
+            val clickDirection = event.context.side
+
+            if (clickDirection == Direction.UP) {
+                if (blockState.get(HOPPER_FACING) == Direction.DOWN) {
+                    event.context.world.setBlockState(blockPos, blockState.with(HOPPER_FACING, Direction.NORTH))
+                } else {
+                    if (blockState.get(HOPPER_FACING) == Direction.WEST) {
+                        event.context.world.setBlockState(blockPos, blockState.with(HOPPER_FACING, Direction.DOWN))
+                    } else {
+                        event.context.world.setBlockState(blockPos, blockState.with(HOPPER_FACING, blockState.get(HOPPER_FACING).rotateYClockwise()))
+                    }
+                }
+            } else if (clickDirection == Direction.DOWN){
+                event.context.world.setBlockState(blockPos, blockState.with(HOPPER_FACING, Direction.DOWN))
+            } else {
+                if (blockState.get(HOPPER_FACING) == clickDirection){
+                    val facing = when (clickDirection) {
+                        Direction.NORTH -> Direction.SOUTH
+                        Direction.SOUTH -> Direction.NORTH
+                        Direction.WEST -> Direction.EAST
+                        Direction.EAST -> Direction.WEST
+                        else -> return
+                    }
+                    event.context.world.setBlockState(blockPos, blockState.with(HOPPER_FACING, facing))
+                } else {
+                    event.context.world.setBlockState(blockPos, blockState.with(HOPPER_FACING, clickDirection))
+                }
+            }
+            return
+        }
+
         var facing: BlockState
 
         facing = when {
             blockState.contains(FACING) -> blockState.cycle(FACING)
-            blockState.contains(HOPPER_FACING) -> blockState.cycle(HOPPER_FACING)
             blockState.contains(HORIZONTAL_FACING) -> blockState.cycle(HORIZONTAL_FACING)
             blockState.contains(AXIS) -> blockState.cycle(AXIS)
             blockState.contains(ROTATION) -> blockState.cycle(ROTATION)

@@ -40,10 +40,12 @@ class Wrench {
         val hand = event.context.hand
 
         if (player != null) {
-            if (player.getStackInHand(Hand.MAIN_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && hand == Hand.MAIN_HAND && player.isSneaking) {
+            if (player.getStackInHand(Hand.MAIN_HAND)
+                    .isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && hand == Hand.MAIN_HAND && player.shouldCancelInteraction()
+            ) {
                 wrenchSpin(event)
             } else if (player.getStackInHand(Hand.OFF_HAND)
-                    .isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && player.mainHandStack.isEmpty && hand == Hand.OFF_HAND && player.isSneaking
+                    .isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && player.mainHandStack.isEmpty && hand == Hand.OFF_HAND && player.shouldCancelInteraction()
             ) {
                 wrenchSpin(event)
             }
@@ -81,31 +83,9 @@ class Wrench {
                     chestRotate(event, clickDirection, blockPos, blockState)
 
                     if (chestFacing == clickDirection) {
-                        val facing = blockState.get(HORIZONTAL_FACING)
-                        val anotherPos = blockPos.offset(chestFacing)
-                        val anotherState = event.context.world.getBlockState(anotherPos)
-
-                        if ((anotherState.block == CHEST || anotherState.block == TRAPPED_CHEST) && anotherState.get(CHEST_TYPE) == ChestType.SINGLE) {
-                            val anotherFacing = anotherState.get(HORIZONTAL_FACING)
-
-                            if ((anotherState.block == CHEST || anotherState.block == TRAPPED_CHEST) && facing == anotherFacing) {
-                                event.context.world.setBlockState(blockPos, blockState.with(CHEST_TYPE, ChestType.RIGHT))
-                                event.context.world.setBlockState(anotherPos, anotherState.with(CHEST_TYPE, ChestType.LEFT))
-                            }
-                        }
+                        connectChest(event, chestFacing, blockPos, blockState, false)
                     } else if (chestFacing.opposite == clickDirection) {
-                        val facing = blockState.get(HORIZONTAL_FACING)
-                        val anotherPos = blockPos.offset(chestFacing.opposite)
-                        val anotherState = event.context.world.getBlockState(anotherPos)
-
-                        if ((anotherState.block == CHEST || anotherState.block == TRAPPED_CHEST) && anotherState.get(CHEST_TYPE) == ChestType.SINGLE) {
-                            val anotherFacing = anotherState.get(HORIZONTAL_FACING)
-
-                            if (facing == anotherFacing) {
-                                event.context.world.setBlockState(blockPos, blockState.with(CHEST_TYPE, ChestType.LEFT))
-                                event.context.world.setBlockState(anotherPos, anotherState.with(CHEST_TYPE, ChestType.RIGHT))
-                            }
-                        }
+                        connectChest(event, chestFacing, blockPos, blockState, true)
                     }
                 }
                 else -> Unit
@@ -132,18 +112,11 @@ class Wrench {
                         event.context.world.setBlockState(blockPos, blockState.with(HOPPER_FACING, blockState.get(HOPPER_FACING).rotateYClockwise()))
                     }
                 }
-            } else if (clickDirection == Direction.DOWN){
+            } else if (clickDirection == Direction.DOWN) {
                 event.context.world.setBlockState(blockPos, blockState.with(HOPPER_FACING, Direction.DOWN))
             } else {
-                if (blockState.get(HOPPER_FACING) == clickDirection){
-                    val facing = when (clickDirection) {
-                        Direction.NORTH -> Direction.SOUTH
-                        Direction.SOUTH -> Direction.NORTH
-                        Direction.WEST -> Direction.EAST
-                        Direction.EAST -> Direction.WEST
-                        else -> return
-                    }
-                    event.context.world.setBlockState(blockPos, blockState.with(HOPPER_FACING, facing))
+                if (blockState.get(HOPPER_FACING) == clickDirection) {
+                    event.context.world.setBlockState(blockPos, blockState.with(HOPPER_FACING, spinToOpposite(clickDirection)))
                 } else {
                     event.context.world.setBlockState(blockPos, blockState.with(HOPPER_FACING, clickDirection))
                 }
@@ -177,18 +150,35 @@ class Wrench {
         if (clickDirection == Direction.UP || clickDirection == Direction.DOWN) {
             event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, blockState.get(HORIZONTAL_FACING).rotateYClockwise()))
         } else {
-            if (blockState.get(HORIZONTAL_FACING) == clickDirection){
-                val facing = when (clickDirection) {
-                    Direction.NORTH -> Direction.SOUTH
-                    Direction.SOUTH -> Direction.NORTH
-                    Direction.WEST -> Direction.EAST
-                    Direction.EAST -> Direction.WEST
-                    else -> return
-                }
-                event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, facing))
+            if (blockState.get(HORIZONTAL_FACING) == clickDirection) {
+                event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, spinToOpposite(clickDirection)))
             } else {
                 event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, clickDirection))
             }
         }
+    }
+
+    private fun connectChest(event: PlayerUseItemOnBlock, chestFacing: Direction, blockPos: BlockPos, blockState: BlockState, opposite: Boolean) {
+        val facing = blockState.get(HORIZONTAL_FACING)
+        val anotherPos = blockPos.offset(if (opposite) chestFacing.opposite else chestFacing)
+        val anotherState = event.context.world.getBlockState(anotherPos)
+
+        if ((anotherState.block == CHEST || anotherState.block == TRAPPED_CHEST) && anotherState.get(CHEST_TYPE) == ChestType.SINGLE) {
+            val anotherFacing = anotherState.get(HORIZONTAL_FACING)
+
+            if (facing == anotherFacing) {
+                event.context.world.setBlockState(blockPos, blockState.with(CHEST_TYPE, if (opposite) ChestType.LEFT else ChestType.RIGHT))
+                event.context.world.setBlockState(anotherPos, anotherState.with(CHEST_TYPE, if (opposite) ChestType.RIGHT else ChestType.LEFT))
+            }
+        }
+    }
+
+    private fun spinToOpposite(clickDirection: Direction) = when (clickDirection) {
+        Direction.NORTH -> Direction.SOUTH
+        Direction.SOUTH -> Direction.NORTH
+        Direction.WEST -> Direction.EAST
+        Direction.EAST -> Direction.WEST
+        Direction.DOWN -> Direction.DOWN
+        Direction.UP -> Direction.UP
     }
 }

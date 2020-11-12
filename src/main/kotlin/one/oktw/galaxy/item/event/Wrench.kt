@@ -26,6 +26,7 @@ import net.minecraft.block.enums.ChestType
 import net.minecraft.block.enums.SlabType
 import net.minecraft.state.property.Properties.*
 import net.minecraft.util.Hand
+import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerUseItemOnBlock
@@ -77,22 +78,7 @@ class Wrench {
                 ChestType.SINGLE -> {
                     val clickDirection = event.context.side
 
-                    if (clickDirection == Direction.UP || clickDirection == Direction.DOWN) {
-                        event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, blockState.get(HORIZONTAL_FACING).rotateYClockwise()))
-                    } else {
-                        if (blockState.get(HORIZONTAL_FACING) == clickDirection){
-                            val facing = when (clickDirection) {
-                                Direction.NORTH -> Direction.SOUTH
-                                Direction.SOUTH -> Direction.NORTH
-                                Direction.WEST -> Direction.EAST
-                                Direction.EAST -> Direction.WEST
-                                else -> return
-                            }
-                            event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, facing))
-                        } else {
-                            event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, clickDirection))
-                        }
-                    }
+                    chestRotate(event, clickDirection, blockPos, blockState)
 
                     if (chestFacing == clickDirection) {
                         val facing = blockState.get(HORIZONTAL_FACING)
@@ -129,23 +115,7 @@ class Wrench {
 
         if (blockState.block == ENDER_CHEST) {
             val clickDirection = event.context.side
-
-            if (clickDirection == Direction.UP || clickDirection == Direction.DOWN) {
-                event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, blockState.get(HORIZONTAL_FACING).rotateYClockwise()))
-            } else {
-                if (blockState.get(HORIZONTAL_FACING) == clickDirection){
-                    val facing = when (clickDirection) {
-                        Direction.NORTH -> Direction.SOUTH
-                        Direction.SOUTH -> Direction.NORTH
-                        Direction.WEST -> Direction.EAST
-                        Direction.EAST -> Direction.WEST
-                        else -> return
-                    }
-                    event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, facing))
-                } else {
-                    event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, clickDirection))
-                }
-            }
+            chestRotate(event, clickDirection, blockPos, blockState)
             return
         }
 
@@ -170,5 +140,25 @@ class Wrench {
         }
 
         event.context.world.setBlockState(blockPos, facing)
+    }
+
+    private fun chestRotate(event: PlayerUseItemOnBlock, clickDirection: Direction, blockPos: BlockPos, blockState: BlockState) {
+
+        if (clickDirection == Direction.UP || clickDirection == Direction.DOWN) {
+            event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, blockState.get(HORIZONTAL_FACING).rotateYClockwise()))
+        } else {
+            if (blockState.get(HORIZONTAL_FACING) == clickDirection){
+                val facing = when (clickDirection) {
+                    Direction.NORTH -> Direction.SOUTH
+                    Direction.SOUTH -> Direction.NORTH
+                    Direction.WEST -> Direction.EAST
+                    Direction.EAST -> Direction.WEST
+                    else -> return
+                }
+                event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, facing))
+            } else {
+                event.context.world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, clickDirection))
+            }
+        }
     }
 }

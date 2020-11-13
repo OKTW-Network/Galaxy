@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy.block.event
 
+import net.minecraft.block.Blocks
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
@@ -30,25 +31,64 @@ import one.oktw.galaxy.event.type.PlayerSneakEvent
 class Elevator {
     @EventListener(sync = true)
     fun onJump(event: PlayerJumpEvent) {
-        val position = event.player.pos
-        if(CustomBlockUtil.positionMatchesCustomBlock(event.player.serverWorld, BlockPos(position.subtract(0.0, 1.0, 0.0)), BlockType.ELEVATOR)) {
-            for (i in 3..16) {
-                if (CustomBlockUtil.positionMatchesCustomBlock(event.player.serverWorld, BlockPos(position.add(0.0, i.toDouble(), 0.0)), BlockType.ELEVATOR)) {
-                    event.player.requestTeleport(position.x, position.y+i+1, position.z)
-                    event.player.world.playSound(null, BlockPos(position.add(0.0, i.toDouble(), 0.0)), SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT, SoundCategory.BLOCKS, 1.0f, 1.0f)
+        val position = event.player.pos.subtract(0.0, 1.0, 0.0)
+        if (CustomBlockUtil.positionMatchesCustomBlock(event.player.serverWorld, BlockPos(position), BlockType.ELEVATOR)
+            && (
+                event.player.serverWorld.getBlockState(BlockPos(position.add(0.0, 1.0, 0.0))).block == Blocks.WATER ||
+                    event.player.serverWorld.getBlockState(BlockPos(position.add(0.0, 1.0, 0.0))).block == Blocks.AIR
+                )
+        ) {
+            for (i in 2..8) {
+                if (CustomBlockUtil.positionMatchesCustomBlock(event.player.serverWorld, BlockPos(position.add(0.0, i.toDouble(), 0.0)), BlockType.ELEVATOR)
+                    && (
+                        event.player.serverWorld.getBlockState(BlockPos(position.add(0.0, i.toDouble() + 1.0, 0.0))).block == Blocks.WATER ||
+                            event.player.serverWorld.getBlockState(BlockPos(position.add(0.0, i.toDouble() + 1.0, 0.0))).block == Blocks.AIR
+                        )
+                ) {
+                    event.player.requestTeleport(position.x, position.y + i + 1, position.z)
+                    event.player.world.playSound(
+                        null,
+                        BlockPos(position.add(0.0, i.toDouble(), 0.0)),
+                        SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
+                        SoundCategory.BLOCKS,
+                        1.0f,
+                        1.0f
+                    )
                     break
                 }
             }
         }
     }
+
     @EventListener(sync = true)
     fun onSneak(event: PlayerSneakEvent) {
-        val position = event.player.pos
-        if(CustomBlockUtil.positionMatchesCustomBlock(event.player.serverWorld, BlockPos(position.subtract(0.0, 1.0, 0.0)), BlockType.ELEVATOR)) {
-            for (i in 3..16) {
-                if (CustomBlockUtil.positionMatchesCustomBlock(event.player.serverWorld, BlockPos(position.subtract(0.0, i.toDouble(), 0.0)), BlockType.ELEVATOR)) {
-                    event.player.requestTeleport(position.x, position.y-i+1, position.z)
-                    event.player.world.playSound(null, BlockPos(position.subtract(0.0, i.toDouble(), 0.0)), SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT, SoundCategory.BLOCKS, 1.0f, 1.0f)
+        val position = event.player.pos.subtract(0.0, 1.0, 0.0)
+        if (CustomBlockUtil.positionMatchesCustomBlock(event.player.serverWorld, BlockPos(position), BlockType.ELEVATOR)
+            && (
+                event.player.serverWorld.getBlockState(BlockPos(position.add(0.0, 1.0, 0.0))).block == Blocks.WATER ||
+                    event.player.serverWorld.getBlockState(BlockPos(position.add(0.0, 1.0, 0.0))).block == Blocks.AIR
+                )
+        ) {
+            for (i in 2..8) {
+                if (CustomBlockUtil.positionMatchesCustomBlock(
+                        event.player.serverWorld,
+                        BlockPos(position.subtract(0.0, i.toDouble(), 0.0)),
+                        BlockType.ELEVATOR
+                    )
+                    && (
+                        event.player.serverWorld.getBlockState(BlockPos(position.subtract(0.0, i.toDouble() - 1.0, 0.0))).block == Blocks.WATER ||
+                            event.player.serverWorld.getBlockState(BlockPos(position.subtract(0.0, i.toDouble() - 1.0, 0.0))).block == Blocks.AIR
+                        )
+                ) {
+                    event.player.requestTeleport(position.x, position.y - i + 1, position.z)
+                    event.player.world.playSound(
+                        null,
+                        BlockPos(position.subtract(0.0, i.toDouble(), 0.0)),
+                        SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
+                        SoundCategory.BLOCKS,
+                        1.0f,
+                        1.0f
+                    )
                     break
                 }
             }

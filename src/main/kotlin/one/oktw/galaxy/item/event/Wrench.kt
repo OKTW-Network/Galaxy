@@ -171,6 +171,10 @@ class Wrench {
             }
             blockState.contains(HORIZONTAL_FACING) -> {
                 event.context.world.setBlockState(blockPos, blockState.cycle(HORIZONTAL_FACING))
+                if (blockState.block == REPEATER || blockState.block == COMPARATOR) {
+                    event.context.world.updateNeighborsAlways(blockPos, blockState.block)
+                    event.context.world.updateNeighborsAlways(blockPos.offset(blockState.cycle(HORIZONTAL_FACING).get(HORIZONTAL_FACING)), blockState.block)
+                }
                 return true
             }
             blockState.contains(AXIS) -> {

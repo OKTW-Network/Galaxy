@@ -42,14 +42,16 @@ class Wrench {
         val hand = event.context.hand
 
         if (player != null) {
-            if (player.getStackInHand(Hand.MAIN_HAND)
-                    .isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && hand == Hand.MAIN_HAND && player.shouldCancelInteraction()
+            if (
+                player.getStackInHand(Hand.MAIN_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) &&
+                hand == Hand.MAIN_HAND && player.shouldCancelInteraction()
             ) {
-                if (wrenchSpin(event)) event.context.player?.swingHand(Hand.MAIN_HAND, true)
-            } else if (player.getStackInHand(Hand.OFF_HAND)
-                    .isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && player.mainHandStack.isEmpty && hand == Hand.OFF_HAND && player.shouldCancelInteraction()
+                if (wrenchSpin(event)) player.swingHand(Hand.MAIN_HAND, true)
+            } else if (
+                player.getStackInHand(Hand.OFF_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) &&
+                player.mainHandStack.isEmpty && hand == Hand.OFF_HAND && player.shouldCancelInteraction()
             ) {
-                if (wrenchSpin(event)) event.context.player?.swingHand(Hand.MAIN_HAND, true)
+                if (wrenchSpin(event)) player.swingHand(Hand.MAIN_HAND, true)
             }
         }
     }
@@ -228,20 +230,16 @@ class Wrench {
         Direction.SOUTH -> Direction.NORTH
         Direction.WEST -> Direction.EAST
         Direction.EAST -> Direction.WEST
-        Direction.DOWN -> Direction.DOWN
-        Direction.UP -> Direction.UP
+        else -> clickDirection
     }
 
     private fun spinRail(shape: RailShape) = when (shape) {
         RailShape.NORTH_SOUTH -> RailShape.EAST_WEST
         RailShape.EAST_WEST -> RailShape.NORTH_SOUTH
-        RailShape.ASCENDING_EAST -> RailShape.ASCENDING_EAST
-        RailShape.ASCENDING_WEST -> RailShape.ASCENDING_WEST
-        RailShape.ASCENDING_NORTH -> RailShape.ASCENDING_NORTH
-        RailShape.ASCENDING_SOUTH -> RailShape.ASCENDING_NORTH
         RailShape.SOUTH_WEST -> RailShape.NORTH_WEST
         RailShape.NORTH_WEST -> RailShape.NORTH_EAST
         RailShape.NORTH_EAST -> RailShape.SOUTH_EAST
         RailShape.SOUTH_EAST -> RailShape.SOUTH_WEST
+        else -> shape
     }
 }

@@ -203,6 +203,8 @@ class Wrench {
         val anotherPos = blockPos.offset(if (opposite) chestFacing.opposite else chestFacing)
         val anotherState = event.context.world.getBlockState(anotherPos)
 
+        if (anotherState.block != blockState.block) return
+
         if ((anotherState.block == CHEST || anotherState.block == TRAPPED_CHEST) && anotherState.get(CHEST_TYPE) == ChestType.SINGLE) {
             val anotherFacing = anotherState.get(HORIZONTAL_FACING)
 

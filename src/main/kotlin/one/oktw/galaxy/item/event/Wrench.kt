@@ -45,25 +45,23 @@ class Wrench {
             if (player.getStackInHand(Hand.MAIN_HAND)
                     .isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && hand == Hand.MAIN_HAND && player.shouldCancelInteraction()
             ) {
-                wrenchSpin(event)
+                if (wrenchSpin(event)) event.context.player?.swingHand(Hand.MAIN_HAND, true)
             } else if (player.getStackInHand(Hand.OFF_HAND)
                     .isItemEqual(Tool(ToolType.WRENCH).createItemStack()) && player.mainHandStack.isEmpty && hand == Hand.OFF_HAND && player.shouldCancelInteraction()
             ) {
-                wrenchSpin(event)
+                if (wrenchSpin(event)) event.context.player?.swingHand(Hand.MAIN_HAND, true)
             }
         }
     }
 
-    private fun wrenchSpin(event: PlayerUseItemOnBlock) {
+    private fun wrenchSpin(event: PlayerUseItemOnBlock): Boolean {
         val blockPos = event.context.blockPos
         val blockState = event.context.world.getBlockState(blockPos)
 
         // Check destructible
-        if (blockState.getHardness(event.context.world, blockPos) < 0.0) return
-        if (((blockState.block == PISTON || blockState.block == STICKY_PISTON) && blockState.get(EXTENDED)) || blockState.block == PISTON_HEAD) return
-        if (blockState.contains(BED_PART)) return
-
-        event.context.player?.swingHand(Hand.MAIN_HAND, true)
+        if (blockState.getHardness(event.context.world, blockPos) < 0.0) return false
+        if (((blockState.block == PISTON || blockState.block == STICKY_PISTON) && blockState.get(EXTENDED)) || blockState.block == PISTON_HEAD) return false
+        if (blockState.contains(BED_PART)) return false
 
         if (blockState.block == CHEST || blockState.block == TRAPPED_CHEST) {
             val chestFacing: Direction = if (blockState.block == CHEST) {
@@ -92,13 +90,13 @@ class Wrench {
                 }
                 else -> Unit
             }
-            return
+            return true
         }
 
         if (blockState.block == ENDER_CHEST) {
             val clickDirection = event.context.side
             chestRotate(event, clickDirection, blockPos, blockState)
-            return
+            return true
         }
 
         if (blockState.block == HOPPER) {
@@ -123,7 +121,7 @@ class Wrench {
                     event.context.world.setBlockState(blockPos, blockState.with(HOPPER_FACING, clickDirection))
                 }
             }
-            return
+            return true
         }
 
         if (blockState.contains(BLOCK_HALF)) {
@@ -133,15 +131,15 @@ class Wrench {
                 newState = newState.cycle(BLOCK_HALF)
             }
             event.context.world.setBlockState(blockPos, newState)
-            return
+            return true
         }
 
         if (blockState.contains(RAIL_SHAPE)) {
             event.context.world.setBlockState(blockPos, blockState.with(RAIL_SHAPE, spinRail(blockState.get(RAIL_SHAPE))))
-            return
+            return true
         } else if (blockState.contains(STRAIGHT_RAIL_SHAPE)) {
             event.context.world.setBlockState(blockPos, blockState.with(STRAIGHT_RAIL_SHAPE, spinRail(blockState.get(STRAIGHT_RAIL_SHAPE))))
-            return
+            return true
         }
 
         if (blockState.block == GRINDSTONE) {
@@ -151,7 +149,7 @@ class Wrench {
                 newState = newState.cycle(FACE)
             }
             event.context.world.setBlockState(blockPos, newState)
-            return
+            return true
         }
 
         if (blockState.block == BELL) {
@@ -161,29 +159,39 @@ class Wrench {
                 newState = newState.cycle(ATTACHMENT)
             }
             event.context.world.setBlockState(blockPos, newState)
-            return
+            return true
         }
 
-        var facing: BlockState
-
-        facing = when {
-            blockState.contains(FACING) -> blockState.cycle(FACING)
-            blockState.contains(HORIZONTAL_FACING) -> blockState.cycle(HORIZONTAL_FACING)
-            blockState.contains(AXIS) -> blockState.cycle(AXIS)
-            blockState.contains(ROTATION) -> blockState.cycle(ROTATION)
-            else -> blockState
+        when {
+            blockState.contains(FACING) -> {
+                event.context.world.setBlockState(blockPos, blockState.cycle(FACING))
+                return true
+            }
+            blockState.contains(HORIZONTAL_FACING) -> {
+                event.context.world.setBlockState(blockPos, blockState.cycle(HORIZONTAL_FACING))
+                return true
+            }
+            blockState.contains(AXIS) -> {
+                event.context.world.setBlockState(blockPos, blockState.cycle(AXIS))
+                return true
+            }
+            blockState.contains(ROTATION) -> {
+                event.context.world.setBlockState(blockPos, blockState.cycle(ROTATION))
+                return true
+            }
         }
 
         if (blockState.contains(SLAB_TYPE)) {
             val direction = blockState.get(SLAB_TYPE)
             if (direction == SlabType.TOP) {
-                facing = blockState.with(SLAB_TYPE, SlabType.BOTTOM)
+                event.context.world.setBlockState(blockPos, blockState.with(SLAB_TYPE, SlabType.BOTTOM))
             } else if (direction == SlabType.BOTTOM) {
-                facing = blockState.with(SLAB_TYPE, SlabType.TOP)
+                event.context.world.setBlockState(blockPos, blockState.with(SLAB_TYPE, SlabType.TOP))
             }
+            return true
         }
 
-        event.context.world.setBlockState(blockPos, facing)
+        return false
     }
 
     private fun chestRotate(event: PlayerUseItemOnBlock, clickDirection: Direction, blockPos: BlockPos, blockState: BlockState) {

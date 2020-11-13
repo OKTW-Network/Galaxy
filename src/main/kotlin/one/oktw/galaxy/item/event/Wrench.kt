@@ -139,6 +139,9 @@ class Wrench {
         if (blockState.contains(RAIL_SHAPE)) {
             event.context.world.setBlockState(blockPos, blockState.with(RAIL_SHAPE, spinRail(blockState.get(RAIL_SHAPE))))
             return
+        } else if (blockState.contains(STRAIGHT_RAIL_SHAPE)) {
+            event.context.world.setBlockState(blockPos, blockState.with(STRAIGHT_RAIL_SHAPE, spinRail(blockState.get(STRAIGHT_RAIL_SHAPE))))
+            return
         }
 
         if (blockState.block == GRINDSTONE) {

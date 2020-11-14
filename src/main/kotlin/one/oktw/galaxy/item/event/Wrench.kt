@@ -51,7 +51,7 @@ class Wrench {
                 player.getStackInHand(Hand.OFF_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) &&
                 player.mainHandStack.isEmpty && hand == Hand.OFF_HAND && player.shouldCancelInteraction()
             ) {
-                if (wrenchSpin(event)) player.swingHand(Hand.MAIN_HAND, true)
+                if (wrenchSpin(event)) player.swingHand(Hand.OFF_HAND, true)
             }
         }
     }

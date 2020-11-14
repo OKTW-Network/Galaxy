@@ -20,10 +20,13 @@ package one.oktw.galaxy.command.commands
 
 import com.mojang.brigadier.CommandDispatcher
 import kotlinx.coroutines.*
-import net.minecraft.network.packet.s2c.play.TitleS2CPacket
+import net.minecraft.block.RespawnAnchorBlock
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.text.LiteralText
+import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvents
+import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import one.oktw.galaxy.command.Command
 import java.util.*
@@ -46,21 +49,82 @@ class Home : Command {
     private fun execute(source: ServerCommandSource): Int {
         val player = source.player
 
-        if (lock.contains(player.uuid)) return com.mojang.brigadier.Command.SINGLE_SUCCESS
+        if (player == null || lock.contains(player.uuid)) return com.mojang.brigadier.Command.SINGLE_SUCCESS
 
-        val spawnPos = player.spawnPointPosition
-        if (spawnPos == null) {
-            player.sendMessage(LiteralText("找不到您的家").styled { it.withColor(Formatting.RED) }, false)
+        lock += player.uuid
+
+        val spawnPointPosition = player.spawnPointPosition
+        if (spawnPointPosition == null) {
+            player.sendMessage(TranslatableText("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
+            lock -= player.uuid
+            return com.mojang.brigadier.Command.SINGLE_SUCCESS
+        }
+
+        val world = source.minecraftServer.getWorld(player.spawnPointDimension)
+
+        val spawnPoint = PlayerEntity.findRespawnPosition(
+            world,
+            spawnPointPosition,
+            player.spawnAngle,
+            player.isSpawnPointSet,
+            player.notInAnyWorld
+        )
+        if (!spawnPoint.isPresent) {
+            player.sendMessage(TranslatableText("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
+            lock -= player.uuid
         } else {
-            lock += player.uuid
             GlobalScope.launch {
+                // Add back charge in countdown stage
+                if (world != null) {
+                    withContext(player.server.asCoroutineDispatcher()) {
+                        val blockState = world.getBlockState(spawnPointPosition)
+                        if (blockState.block is RespawnAnchorBlock) {
+                            world.setBlockState(
+                                spawnPointPosition, blockState.with(RespawnAnchorBlock.CHARGES, blockState[RespawnAnchorBlock.CHARGES] + 1)
+                            )
+                            world.updateNeighbors(spawnPointPosition, blockState.block)
+                        }
+                    }
+                }
+
                 for (i in 0..4) {
-                    val component = LiteralText("請等待 ${5 - i} 秒鐘").styled { it.withColor(Formatting.GREEN) }
-                    player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, component))
+                    player.sendMessage(TranslatableText("Respond.commandCountdown", 5 - i).styled { it.withColor(Formatting.GREEN) }, true)
                     delay(TimeUnit.SECONDS.toMillis(1))
                 }
+                player.sendMessage(TranslatableText("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
+
                 withContext(player.server.asCoroutineDispatcher()) {
-                    player.requestTeleport(spawnPos.x.toDouble(), spawnPos.y.toDouble(), spawnPos.z.toDouble())
+                    // Check Again
+                    val checkAgain = PlayerEntity.findRespawnPosition(
+                        world,
+                        spawnPointPosition,
+                        player.spawnAngle,
+                        player.isSpawnPointSet,
+                        player.notInAnyWorld
+                    )
+                    if (!checkAgain.isPresent) {
+                        player.sendMessage(TranslatableText("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
+                        lock -= player.uuid
+                        return@withContext
+                    }
+
+                    val world2 = if (world != null && checkAgain.isPresent) world else source.minecraftServer.overworld
+                    val position = checkAgain.get()
+                    player.teleport(
+                        world2,
+                        position.x,
+                        position.y,
+                        position.z,
+                        player.yaw,
+                        player.pitch
+                    )
+
+                    val blockState = world2.getBlockState(spawnPointPosition)
+                    if (!player.notInAnyWorld && blockState.block is RespawnAnchorBlock) {
+                        world2.playSound(
+                            null, spawnPointPosition, SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.BLOCKS, 1.0F, 1.0F
+                        )
+                    }
                 }
                 lock -= player.uuid
             }

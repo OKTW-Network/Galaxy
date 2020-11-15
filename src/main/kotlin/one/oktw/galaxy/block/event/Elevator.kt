@@ -18,10 +18,14 @@
 
 package one.oktw.galaxy.block.event
 
+import net.minecraft.block.Block
 import net.minecraft.block.Blocks
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Position
+import net.minecraft.util.math.Vec3d
 import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.block.util.CustomBlockUtil
 import one.oktw.galaxy.event.annotation.EventListener
@@ -29,28 +33,29 @@ import one.oktw.galaxy.event.type.PlayerJumpEvent
 import one.oktw.galaxy.event.type.PlayerSneakEvent
 
 class Elevator {
+    private fun canWeTeleport(player: ServerPlayerEntity, position: Position): Boolean {
+        return listOf<Block>(Blocks.AIR, Blocks.WATER).contains(player.serverWorld.getBlockState(BlockPos(position)).block)
+    }
+
+    private fun isElevator(player: ServerPlayerEntity, position: Position): Boolean {
+        return CustomBlockUtil.positionMatchesCustomBlock(player.serverWorld, BlockPos(position), BlockType.ELEVATOR)
+    }
+
     @EventListener(sync = true)
     fun onJump(event: PlayerJumpEvent) {
-        val position = event.player.pos.subtract(0.0, 1.0, 0.0)
-        val currentElevatorPosition = event.player.serverWorld.getBlockState(BlockPos(position.add(0.0, 1.0, 0.0))).block
-        if (CustomBlockUtil.positionMatchesCustomBlock(event.player.serverWorld, BlockPos(position), BlockType.ELEVATOR)
-            && (
-                currentElevatorPosition == Blocks.WATER ||
-                    currentElevatorPosition == Blocks.AIR
-                )
-        ) {
+        val player = event.player
+        val playerPosition = player.pos
+        val currentElevatorPosition: Vec3d = playerPosition.subtract(0.0, 1.0, 0.0)
+        var nextElevatorPosition: Vec3d
+
+        if (canWeTeleport(player, playerPosition) && isElevator(player, currentElevatorPosition)) {
             for (i in 2..8) {
-                val nextElevatorPosition = event.player.serverWorld.getBlockState(BlockPos(position.add(0.0, i.toDouble() + 1.0, 0.0))).block
-                if (CustomBlockUtil.positionMatchesCustomBlock(event.player.serverWorld, BlockPos(position.add(0.0, i.toDouble(), 0.0)), BlockType.ELEVATOR)
-                    && (
-                        nextElevatorPosition == Blocks.WATER ||
-                            nextElevatorPosition == Blocks.AIR
-                        )
-                ) {
-                    event.player.requestTeleport(position.x, position.y + i + 1, position.z)
+                nextElevatorPosition = currentElevatorPosition.add(0.0, i.toDouble(), 0.0)
+                if (isElevator(player, nextElevatorPosition) && canWeTeleport(player, nextElevatorPosition.add(0.0, 1.0, 0.0))) {
+                    event.player.requestTeleport(nextElevatorPosition.x, nextElevatorPosition.y + 1, nextElevatorPosition.z)
                     event.player.world.playSound(
                         null,
-                        BlockPos(position.add(0.0, i.toDouble(), 0.0)),
+                        BlockPos(nextElevatorPosition.add(0.0, i.toDouble(), 0.0)),
                         SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
                         SoundCategory.BLOCKS,
                         1.0f,
@@ -64,30 +69,19 @@ class Elevator {
 
     @EventListener(sync = true)
     fun onSneak(event: PlayerSneakEvent) {
-        val position = event.player.pos.subtract(0.0, 1.0, 0.0)
-        val currentElevatorPosition = event.player.serverWorld.getBlockState(BlockPos(position.add(0.0, 1.0, 0.0))).block
-        if (CustomBlockUtil.positionMatchesCustomBlock(event.player.serverWorld, BlockPos(position), BlockType.ELEVATOR)
-            && (
-                currentElevatorPosition == Blocks.WATER ||
-                    currentElevatorPosition == Blocks.AIR
-                )
-        ) {
+        val player = event.player
+        val playerPosition = player.pos
+        val currentElevatorPosition: Vec3d = playerPosition.subtract(0.0, 1.0, 0.0)
+        var nextElevatorPosition: Vec3d
+
+        if (canWeTeleport(player, playerPosition) && isElevator(player, currentElevatorPosition)) {
             for (i in 2..8) {
-                val nextElevatorPosition = event.player.serverWorld.getBlockState(BlockPos(position.subtract(0.0, i.toDouble() - 1.0, 0.0))).block
-                if (CustomBlockUtil.positionMatchesCustomBlock(
-                        event.player.serverWorld,
-                        BlockPos(position.subtract(0.0, i.toDouble(), 0.0)),
-                        BlockType.ELEVATOR
-                    )
-                    && (
-                        nextElevatorPosition == Blocks.WATER ||
-                            nextElevatorPosition == Blocks.AIR
-                        )
-                ) {
-                    event.player.requestTeleport(position.x, position.y - i + 1, position.z)
+                nextElevatorPosition = currentElevatorPosition.subtract(0.0, i.toDouble(), 0.0)
+                if (isElevator(player, nextElevatorPosition) && canWeTeleport(player, nextElevatorPosition.add(0.0, 1.0, 0.0))) {
+                    event.player.requestTeleport(nextElevatorPosition.x, nextElevatorPosition.y + 1, nextElevatorPosition.z)
                     event.player.world.playSound(
                         null,
-                        BlockPos(position.subtract(0.0, i.toDouble(), 0.0)),
+                        BlockPos(nextElevatorPosition.add(0.0, i.toDouble(), 0.0)),
                         SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
                         SoundCategory.BLOCKS,
                         1.0f,
@@ -98,4 +92,5 @@ class Elevator {
             }
         }
     }
+
 }

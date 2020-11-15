@@ -3,7 +3,8 @@
   "package": "one.oktw.galaxy.mixin.accessor",
   "compatibilityLevel": "JAVA_14",
   "mixins": [
-    "ServerPlayerEntityFunctionAccessor"
+    "ServerPlayerEntityFunctionAccessor",
+    "ShulkerBoxBlockEntityAccessor"
   ],
   "client": [],
   "injectors": {

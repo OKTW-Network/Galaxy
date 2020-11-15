@@ -48,14 +48,14 @@ class Elevator {
         val currentElevatorPosition: Vec3d = playerPosition.subtract(0.0, 1.0, 0.0)
         var nextElevatorPosition: Vec3d
 
-        if (canWeTeleport(player, playerPosition) && isElevator(player, currentElevatorPosition)) {
+        if (isElevator(player, currentElevatorPosition) && canWeTeleport(player, playerPosition)) {
             for (i in 2..8) {
                 nextElevatorPosition = currentElevatorPosition.add(0.0, i.toDouble(), 0.0)
                 if (isElevator(player, nextElevatorPosition) && canWeTeleport(player, nextElevatorPosition.add(0.0, 1.0, 0.0))) {
                     event.player.requestTeleport(nextElevatorPosition.x, nextElevatorPosition.y + 1, nextElevatorPosition.z)
                     event.player.world.playSound(
                         null,
-                        BlockPos(nextElevatorPosition.add(0.0, i.toDouble(), 0.0)),
+                        BlockPos(nextElevatorPosition),
                         SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
                         SoundCategory.BLOCKS,
                         1.0f,
@@ -74,14 +74,14 @@ class Elevator {
         val currentElevatorPosition: Vec3d = playerPosition.subtract(0.0, 1.0, 0.0)
         var nextElevatorPosition: Vec3d
 
-        if (canWeTeleport(player, playerPosition) && isElevator(player, currentElevatorPosition)) {
+        if (isElevator(player, currentElevatorPosition) && canWeTeleport(player, playerPosition)) {
             for (i in 2..8) {
                 nextElevatorPosition = currentElevatorPosition.subtract(0.0, i.toDouble(), 0.0)
                 if (isElevator(player, nextElevatorPosition) && canWeTeleport(player, nextElevatorPosition.add(0.0, 1.0, 0.0))) {
                     event.player.requestTeleport(nextElevatorPosition.x, nextElevatorPosition.y + 1, nextElevatorPosition.z)
                     event.player.world.playSound(
                         null,
-                        BlockPos(nextElevatorPosition.add(0.0, i.toDouble(), 0.0)),
+                        BlockPos(nextElevatorPosition),
                         SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
                         SoundCategory.BLOCKS,
                         1.0f,

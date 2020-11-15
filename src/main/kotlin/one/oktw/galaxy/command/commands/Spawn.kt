@@ -20,16 +20,20 @@ package one.oktw.galaxy.command.commands
 
 import com.mojang.brigadier.CommandDispatcher
 import kotlinx.coroutines.*
-import net.minecraft.network.packet.s2c.play.TitleS2CPacket
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.text.LiteralText
+import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
+import one.oktw.galaxy.mixin.accessor.ServerPlayerEntityFunctionAccessor
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 class Spawn : Command {
+    private val lock = ConcurrentHashMap.newKeySet<UUID>()
+
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
             CommandManager.literal("spawn")
@@ -42,16 +46,32 @@ class Spawn : Command {
 
     private fun execute(source: ServerCommandSource): Int {
         val player = source.player
+
+        if (player == null || lock.contains(player.uuid)) return com.mojang.brigadier.Command.SINGLE_SUCCESS
+
+        lock += player.uuid
+
         GlobalScope.launch {
+            val world = player.serverWorld
+
             for (i in 0..4) {
-                val component = LiteralText("請等待 ${5 - i} 秒鐘").styled { it.withColor(Formatting.GREEN) }
-                player.networkHandler.sendPacket(TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, component))
+                player.sendMessage(TranslatableText("Respond.commandCountdown", 5 - i).styled { it.withColor(Formatting.GREEN) }, true)
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
+            player.sendMessage(TranslatableText("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
+
             withContext(main!!.server.asCoroutineDispatcher()) {
-                // TODO (Broken spawnPos)
-                player.refreshPositionAndAngles(source.world.spawnPos, 0.0F, 0.0F)
+                player.stopRiding()
+                if (player.isSleeping) {
+                    player.wakeUp(true, true)
+                }
+                (player as ServerPlayerEntityFunctionAccessor).moveToWorldSpawn(world)
+                while (!world.isSpaceEmpty(player) && player.y < 255) {
+                    player.updatePosition(player.x, player.y + 1, player.z)
+                }
+                player.networkHandler.requestTeleport(player.x, player.y, player.z, player.yaw, player.pitch)
             }
+            lock -= player.uuid
         }
 
         return com.mojang.brigadier.Command.SINGLE_SUCCESS

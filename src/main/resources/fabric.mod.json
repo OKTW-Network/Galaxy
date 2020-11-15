@@ -21,7 +21,8 @@
   "mixins": [
     "galaxy.mixin.json",
     "tweak.mixin.json",
-    "sponge.realtime.mixin.json"
+    "sponge.realtime.mixin.json",
+    "accessor.mixin.json"
   ],
   "depends": {
     "minecraft": "1.16.x",

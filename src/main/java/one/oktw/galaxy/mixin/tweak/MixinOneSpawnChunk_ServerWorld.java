@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,16 +18,15 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerChunkManager;
+import net.minecraft.server.world.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
-@Mixin(MinecraftServer.class)
-public class MixinPreGenSpawn_MinecraftServer {
-    @Redirect(method = "prepareStartRegion", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerChunkManager;getTotalChunksLoadedCount()I"))
-    private <T> int skipLoadSpawn(ServerChunkManager serverChunkManager) {
-        return 441;
+@Mixin(ServerWorld.class)
+public class MixinOneSpawnChunk_ServerWorld {
+    @ModifyConstant(method = "setSpawnPos", constant = @Constant(intValue = 11))
+    private int onlyForceLoadOneChunk(int radius) {
+        return 1;
     }
 }

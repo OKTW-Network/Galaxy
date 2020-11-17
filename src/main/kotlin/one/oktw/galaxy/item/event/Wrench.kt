@@ -18,7 +18,6 @@
 
 package one.oktw.galaxy.item.event
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks.*
 import net.minecraft.block.ChestBlock
@@ -29,11 +28,13 @@ import net.minecraft.block.entity.ShulkerBoxBlockEntity
 import net.minecraft.block.enums.ChestType
 import net.minecraft.block.enums.RailShape
 import net.minecraft.block.enums.SlabType
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.state.property.Properties.*
 import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import one.oktw.galaxy.event.annotation.EventListener
+import one.oktw.galaxy.event.type.PlayerSneakReleaseEvent
 import one.oktw.galaxy.event.type.PlayerUseItemOnBlock
 import one.oktw.galaxy.item.Tool
 import one.oktw.galaxy.item.type.ToolType
@@ -41,19 +42,7 @@ import one.oktw.galaxy.mixin.accessor.ShulkerBoxBlockEntityAccessor
 import java.util.concurrent.ConcurrentHashMap
 
 class Wrench {
-    private val pointToFaceCoolDown = ConcurrentHashMap<BlockPos, Int>()
-
-    init {
-        ServerTickEvents.END_WORLD_TICK.register(ServerTickEvents.EndWorldTick {
-            pointToFaceCoolDown.forEach { (blockPos, tick) ->
-                if (tick == 0) {
-                    pointToFaceCoolDown.remove(blockPos)
-                } else {
-                    pointToFaceCoolDown[blockPos] = tick - 1
-                }
-            }
-        })
-    }
+    private val faceLock = ConcurrentHashMap<ServerPlayerEntity, BlockPos>()
 
     @EventListener(true)
     fun onUseItemOnBlock(event: PlayerUseItemOnBlock) {
@@ -75,8 +64,14 @@ class Wrench {
         }
     }
 
+    @EventListener(true)
+    fun onSneakRelease(event: PlayerSneakReleaseEvent) {
+        faceLock.remove(event.player)
+    }
+
     private fun wrenchSpin(event: PlayerUseItemOnBlock): Boolean {
         val world = event.context.world
+        val player = event.context.player as ServerPlayerEntity
         val blockPos = event.context.blockPos
         val blockState = world.getBlockState(blockPos)
         val clickDirection = event.context.side
@@ -92,37 +87,37 @@ class Wrench {
                 world.setBlockState(
                     blockPos, WALL_TORCH.defaultState.with(
                         HORIZONTAL_FACING,
-                        if (!pointToFaceCoolDown.containsKey(blockPos) && clickDirection != Direction.UP && clickDirection != Direction.DOWN)
+                        if (!faceLock.containsValue(blockPos) && clickDirection != Direction.UP && clickDirection != Direction.DOWN)
                             clickDirection else Direction.NORTH
                     )
                 )
 
-                pointToFaceCoolDown[blockPos] = 20
+                faceLock[player] = blockPos
                 return true
             }
             blockState.block == SOUL_TORCH -> {
                 world.setBlockState(
                     blockPos, SOUL_WALL_TORCH.defaultState.with(
                         HORIZONTAL_FACING,
-                        if (!pointToFaceCoolDown.containsKey(blockPos) && clickDirection != Direction.UP && clickDirection != Direction.DOWN)
+                        if (!faceLock.containsValue(blockPos) && clickDirection != Direction.UP && clickDirection != Direction.DOWN)
                             clickDirection else Direction.NORTH
                     )
                 )
 
-                pointToFaceCoolDown[blockPos] = 20
+                faceLock[player] = blockPos
                 return true
             }
             blockState.block == REDSTONE_TORCH -> {
                 val newState = REDSTONE_WALL_TORCH.defaultState.with(
                     HORIZONTAL_FACING,
-                    if (pointToFaceCoolDown.containsKey(blockPos) && clickDirection != Direction.UP && clickDirection != Direction.DOWN)
+                    if (faceLock.containsValue(blockPos) && clickDirection != Direction.UP && clickDirection != Direction.DOWN)
                         Direction.NORTH else clickDirection
                 )
                 world.setBlockState(blockPos, newState)
                 world.updateNeighborsAlways(blockPos, newState.block)
                 world.updateNeighborsAlways(blockPos.offset(newState.get(HORIZONTAL_FACING)), blockState.block)
 
-                pointToFaceCoolDown[blockPos] = 20
+                faceLock[player] = blockPos
                 return true
             }
             blockState.contains(FACING) -> {
@@ -135,13 +130,13 @@ class Wrench {
                     }
                 }
 
-                if (currentFacing != clickDirection && !pointToFaceCoolDown.containsKey(blockPos)) {
+                if (currentFacing != clickDirection && !faceLock.containsValue(blockPos)) {
                     world.setBlockState(blockPos, blockState.with(FACING, clickDirection))
                 } else {
                     world.setBlockState(blockPos, blockState.with(FACING, rotateYClockwiseWithUpDown(currentFacing)))
                 }
 
-                pointToFaceCoolDown[blockPos] = 20
+                faceLock[player] = blockPos
                 return true
             }
             blockState.contains(HORIZONTAL_FACING) -> {
@@ -177,10 +172,10 @@ class Wrench {
 
                 if (
                     currentFacing != clickDirection && clickDirection != Direction.UP &&
-                    clickDirection != Direction.DOWN && !pointToFaceCoolDown.containsKey(blockPos)
+                    clickDirection != Direction.DOWN && !faceLock.containsValue(blockPos)
                 ) {
                     world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, clickDirection))
-                    pointToFaceCoolDown[blockPos] = 20
+                    faceLock[player] = blockPos
                     return true
                 } else {
                     newDirection = blockState.get(HORIZONTAL_FACING).rotateYClockwise()
@@ -233,19 +228,19 @@ class Wrench {
                 if (newState.contains(HORIZONTAL_FACING)) {
                     world.updateNeighborsAlways(blockPos.offset(newState.get(HORIZONTAL_FACING)), newState.block)
                 }
-                pointToFaceCoolDown[blockPos] = 20
+                faceLock[player] = blockPos
                 return true
             }
             blockState.contains(HOPPER_FACING) -> {
                 val currentFacing = blockState.get(HOPPER_FACING)
 
-                if (currentFacing != clickDirection && clickDirection != Direction.UP && !pointToFaceCoolDown.containsKey(blockPos)) {
+                if (currentFacing != clickDirection && clickDirection != Direction.UP && !faceLock.containsValue(blockPos)) {
                     world.setBlockState(blockPos, blockState.with(HOPPER_FACING, clickDirection))
                 } else {
                     world.setBlockState(blockPos, blockState.with(HOPPER_FACING, rotateHopper(currentFacing)))
                 }
 
-                pointToFaceCoolDown[blockPos] = 20
+                faceLock[player] = blockPos
                 return true
             }
             blockState.contains(RAIL_SHAPE) -> {

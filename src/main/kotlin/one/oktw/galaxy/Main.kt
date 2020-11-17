@@ -25,9 +25,11 @@ import kotlinx.coroutines.withContext
 import net.fabricmc.api.DedicatedServerModInitializer
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
+import net.minecraft.recipe.RecipeType
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.block.event.BlockEvents
+import one.oktw.galaxy.block.event.Elevator
 import one.oktw.galaxy.chat.Exchange
 import one.oktw.galaxy.command.commands.Admin
 import one.oktw.galaxy.command.commands.Home
@@ -35,10 +37,12 @@ import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.command.commands.Spawn
 import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.item.event.Wrench
+import one.oktw.galaxy.mixin.interfaces.CustomRecipeManager
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.PlayerControl
 import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.proxy.api.ProxyAPI
+import one.oktw.galaxy.recipe.tools.Wrench
 import one.oktw.galaxy.resourcepack.ResourcePack
 import java.util.*
 
@@ -69,6 +73,9 @@ class Main : DedicatedServerModInitializer {
             listOf(Join(), Admin(), Home(), Spawn()).forEach { dispatcher.let(it::register) }
         })
 
+        // Recipe
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Wrench())
+
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer
             eventManager = EventManager(server)
@@ -90,6 +97,7 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(BlockEvents())
             eventManager.register(Sign())
             eventManager.register(Wrench())
+            eventManager.register(Elevator())
         })
 
         // server.log("current server id is $selfUID

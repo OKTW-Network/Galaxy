@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "one.oktw.galaxy.mixin.recipe",
+  "compatibilityLevel": "JAVA_14",
+  "mixins": [
+    "MixinCustomRecipe_CraftingResultSlot",
+    "MixinCustomRecipe_PlayerManager",
+    "MixinCustomRecipe_RecipeManager"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

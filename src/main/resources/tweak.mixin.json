@@ -3,7 +3,8 @@
   "package": "one.oktw.galaxy.mixin.tweak",
   "compatibilityLevel": "JAVA_14",
   "mixins": [
-    "MixinPreGenSpawn_MinecraftServer",
+    "MixinOneSpawnChunk_MinecraftServer",
+    "MixinOneSpawnChunk_ServerWorld",
     "MixinRCON_RconBase",
     "MixinRCON_RconClient"
   ],

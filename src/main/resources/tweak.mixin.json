@@ -3,6 +3,8 @@
   "package": "one.oktw.galaxy.mixin.tweak",
   "compatibilityLevel": "JAVA_14",
   "mixins": [
+    "MixinAsyncChunk_StorageIoWorker",
+    "MixinAsyncChunk_ThreadedAnvilChunkStorage",
     "MixinOneSpawnChunk_MinecraftServer",
     "MixinOneSpawnChunk_ServerWorld",
     "MixinRCON_RconBase",

@@ -12,6 +12,7 @@
     "sources": "https://github.com/OKTW-Network/Galaxy"
   },
   "license": "AGPL-3.0-or-later",
+  "accessWidener": "galaxy-tweak.accesswidener",
   "environment": "server",
   "entrypoints": {
     "server": [

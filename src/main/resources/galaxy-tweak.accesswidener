@@ -1,0 +1,5 @@
+accessWidener   v1  named
+
+# Async chunk load
+accessible  class   net/minecraft/world/storage/StorageIoWorker$Result
+accessible  field   net/minecraft/world/storage/StorageIoWorker$Result  nbt Lnet/minecraft/nbt/CompoundTag;

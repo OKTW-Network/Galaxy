@@ -173,7 +173,9 @@ class Wrench {
                                     Direction.DOWN
                                 }
                             } else {
-                                if (originalFace[blockPos] == Direction.DOWN) {
+                                if (!originalFace.containsKey(blockPos) && clickDirection == Direction.DOWN) {
+                                    Direction.UP
+                                } else if (originalFace[blockPos] == Direction.DOWN) {
                                     Direction.UP
                                 } else {
                                     if (originalFace[blockPos] != Direction.UP && originalFace[blockPos] != Direction.DOWN) {

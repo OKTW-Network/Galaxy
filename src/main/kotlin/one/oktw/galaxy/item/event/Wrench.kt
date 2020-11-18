@@ -332,9 +332,9 @@ class Wrench {
     }
 
     private fun rotateHopper(hopperDirection: Direction, blockPos: BlockPos): Direction = if (hopperDirection == Direction.DOWN) {
-        originalFace[blockPos] ?: Direction.NORTH
+        (if (originalFace[blockPos] != Direction.DOWN) originalFace[blockPos] else Direction.NORTH) ?: Direction.NORTH
     } else {
-        if (hopperDirection.rotateYClockwise() == originalFace[blockPos] ?: Direction.NORTH) {
+        if (hopperDirection.rotateYClockwise() == (if (originalFace[blockPos] != Direction.DOWN) originalFace[blockPos] else Direction.NORTH) ?: Direction.NORTH) {
             Direction.DOWN
         } else {
             hopperDirection.rotateYClockwise()

@@ -36,11 +36,13 @@ import one.oktw.galaxy.command.commands.Home
 import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.command.commands.Spawn
 import one.oktw.galaxy.event.EventManager
+import one.oktw.galaxy.item.event.WrenchEvents
 import one.oktw.galaxy.mixin.interfaces.CustomRecipeManager
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.PlayerControl
 import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.proxy.api.ProxyAPI
+import one.oktw.galaxy.recipe.tools.Wrench
 import one.oktw.galaxy.resourcepack.ResourcePack
 import java.util.*
 
@@ -72,7 +74,7 @@ class Main : DedicatedServerModInitializer {
         })
 
         // Recipe
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, one.oktw.galaxy.recipe.tools.Wrench())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Wrench())
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer
@@ -94,7 +96,7 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(Harvest())
             eventManager.register(BlockEvents())
             eventManager.register(Sign())
-            eventManager.register(one.oktw.galaxy.item.event.Wrench())
+            eventManager.register(WrenchEvents())
             eventManager.register(Elevator())
         })
 

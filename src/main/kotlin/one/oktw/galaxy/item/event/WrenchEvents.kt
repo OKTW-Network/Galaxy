@@ -41,7 +41,7 @@ import one.oktw.galaxy.item.type.ToolType
 import one.oktw.galaxy.mixin.accessor.ShulkerBoxBlockEntityAccessor
 import java.util.concurrent.ConcurrentHashMap
 
-class Wrench {
+class WrenchEvents {
     private val faceLock = ConcurrentHashMap<ServerPlayerEntity, BlockPos>()
     private val originalFace = ConcurrentHashMap<BlockPos, Direction>()
 

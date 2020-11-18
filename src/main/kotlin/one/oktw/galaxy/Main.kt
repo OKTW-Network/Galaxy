@@ -29,7 +29,7 @@ import net.minecraft.recipe.RecipeType
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.block.event.BlockEvents
-import one.oktw.galaxy.block.event.Elevator
+import one.oktw.galaxy.block.event.ElevatorEvents
 import one.oktw.galaxy.chat.Exchange
 import one.oktw.galaxy.command.commands.Admin
 import one.oktw.galaxy.command.commands.Home
@@ -41,6 +41,7 @@ import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.PlayerControl
 import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.proxy.api.ProxyAPI
+import one.oktw.galaxy.recipe.blocks.Elevator
 import one.oktw.galaxy.recipe.tools.Wrench
 import one.oktw.galaxy.resourcepack.ResourcePack
 import java.util.*
@@ -74,6 +75,7 @@ class Main : DedicatedServerModInitializer {
 
         // Recipe
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Wrench())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Elevator())
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer
@@ -95,7 +97,7 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(Harvest())
             eventManager.register(BlockEvents())
             eventManager.register(Sign())
-            eventManager.register(Elevator())
+            eventManager.register(ElevatorEvents())
         })
 
         // server.log("current server id is $selfUID

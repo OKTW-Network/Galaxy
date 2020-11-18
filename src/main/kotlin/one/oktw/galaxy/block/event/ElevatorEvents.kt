@@ -32,7 +32,7 @@ import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerJumpEvent
 import one.oktw.galaxy.event.type.PlayerSneakEvent
 
-class Elevator {
+class ElevatorEvents {
     private fun canWeTeleport(player: ServerPlayerEntity, position: Position): Boolean {
         return listOf<Block>(Blocks.AIR, Blocks.WATER).contains(player.serverWorld.getBlockState(BlockPos(position)).block)
     }

@@ -42,6 +42,7 @@ import one.oktw.galaxy.player.PlayerControl
 import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.proxy.api.ProxyAPI
 import one.oktw.galaxy.recipe.blocks.Elevator
+import one.oktw.galaxy.recipe.blocks.HTCraftingTable
 import one.oktw.galaxy.recipe.materials.CeramicPlate
 import one.oktw.galaxy.recipe.tools.Wrench
 import one.oktw.galaxy.resourcepack.ResourcePack
@@ -77,6 +78,7 @@ class Main : DedicatedServerModInitializer {
         // Recipe
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Wrench())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Elevator())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, HTCraftingTable())
         CustomRecipeManager.addRecipe(RecipeType.SMELTING, CeramicPlate())
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {

@@ -19,8 +19,9 @@
 package one.oktw.galaxy.item
 
 import net.minecraft.item.ItemStack
-import net.minecraft.item.Items.STONE_SWORD
+import net.minecraft.item.Items.COMMAND_BLOCK
 import net.minecraft.text.TranslatableText
+import net.minecraft.util.Formatting
 import one.oktw.galaxy.item.type.ItemType.MATERIAL
 import one.oktw.galaxy.item.type.MaterialType
 import one.oktw.galaxy.item.type.MaterialType.DUMMY
@@ -29,7 +30,7 @@ import one.oktw.galaxy.item.util.CustomItemBuilder
 class Material(val type: MaterialType = DUMMY) : Item {
     override val itemType = MATERIAL
 
-    override val baseItem: net.minecraft.item.Item = STONE_SWORD
+    override val baseItem: net.minecraft.item.Item = COMMAND_BLOCK
 
     override fun createItemStack(): ItemStack {
         val item = CustomItemBuilder()
@@ -41,7 +42,7 @@ class Material(val type: MaterialType = DUMMY) : Item {
             .removeAllModifiers()
 
         if (type.languageKey != "") {
-            TranslatableText(type.languageKey).styled { it.withItalic(false) }.let(item::setName)
+            TranslatableText(type.languageKey).styled { it.withColor(Formatting.WHITE).withItalic(false) }.let(item::setName)
         }
 
         return item.build()

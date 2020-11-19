@@ -29,27 +29,13 @@ import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import one.oktw.galaxy.block.item.BlockItem
 import one.oktw.galaxy.block.type.BlockType
+import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class Elevator : CraftingRecipe {
     private val item = BlockItem(BlockType.ELEVATOR).createItemStack()
     private val list = listOf(ENDER_PEARL, IRON_BLOCK)
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean {
-        list.forEach { item ->
-            var match = false
-            for (i in 0 until inv.size()) {
-                val invItem = inv.getStack(i)
-                if (invItem.isEmpty) continue
-                if (invItem.item == item) {
-                    match = true
-                } else if (!list.contains(invItem.item)) {
-                    return false
-                }
-            }
-            if (!match) return false
-        }
-        return true
-    }
+    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapelessMatches(inv, list)
 
     override fun craft(inv: CraftingInventory) = item.copy()
 

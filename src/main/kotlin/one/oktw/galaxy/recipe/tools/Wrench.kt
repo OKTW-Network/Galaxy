@@ -28,6 +28,7 @@ import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import one.oktw.galaxy.item.Tool
 import one.oktw.galaxy.item.type.ToolType
+import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class Wrench : CraftingRecipe {
     private val item = Tool(ToolType.WRENCH).createItemStack()
@@ -37,16 +38,7 @@ class Wrench : CraftingRecipe {
         AIR, IRON_INGOT, AIR
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean {
-        for (x in 0 until inv.width) {
-            for (y in 0 until inv.height) {
-                val index = x + y * inv.width
-                if (inv.getStack(index).item != list[index]) return false
-            }
-        }
-
-        return true
-    }
+    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemFull3x3ShapedMatches(inv, list)
 
     override fun craft(inv: CraftingInventory) = item.copy()
 

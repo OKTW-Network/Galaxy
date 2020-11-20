@@ -43,6 +43,7 @@ import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.proxy.api.ProxyAPI
 import one.oktw.galaxy.recipe.blocks.Elevator
 import one.oktw.galaxy.recipe.blocks.HTCraftingTable
+import one.oktw.galaxy.recipe.easyRecipe.*
 import one.oktw.galaxy.recipe.materials.CeramicPlate
 import one.oktw.galaxy.recipe.tools.Wrench
 import one.oktw.galaxy.resourcepack.ResourcePack
@@ -80,6 +81,14 @@ class Main : DedicatedServerModInitializer {
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Elevator())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, HTCraftingTable())
         CustomRecipeManager.addRecipe(RecipeType.SMELTING, CeramicPlate())
+        // Easy Recipe
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, RedstoneLamp())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Dispenser())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Dispenser_Right())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Dispenser_Left())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, RedstoneRepeater())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStick_Right())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStick_Left())
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer

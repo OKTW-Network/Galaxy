@@ -28,17 +28,18 @@ import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import one.oktw.galaxy.block.item.BlockItem
 import one.oktw.galaxy.block.type.BlockType
+import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class HTCraftingTable : CraftingRecipe {
     private val item = BlockItem(BlockType.HT_CRAFTING_TABLE).createItemStack()
     private val list = listOf(
-        REDSTONE, DIAMOND, LAPIS_LAZULI,
-        IRON_INGOT, CRAFTING_TABLE, IRON_INGOT,
-        LAPIS_LAZULI, OBSIDIAN, REDSTONE
+        Ingredient(item = REDSTONE), Ingredient(item = DIAMOND), Ingredient(item = LAPIS_LAZULI),
+        Ingredient(item = IRON_INGOT), Ingredient(item = CRAFTING_TABLE), Ingredient(item = IRON_INGOT),
+        Ingredient(item = LAPIS_LAZULI), Ingredient(item = OBSIDIAN), Ingredient(item = REDSTONE)
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemFull3x3ShapedMatches(inv, list)
+    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
 
     override fun craft(inv: CraftingInventory) = item.copy()
 

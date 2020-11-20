@@ -19,34 +19,60 @@
 package one.oktw.galaxy.recipe.utils
 
 import net.minecraft.inventory.CraftingInventory
-import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 
 object RecipeUtils {
-    fun isItemFull3x3ShapedMatches(inv: CraftingInventory, list: List<Item>): Boolean {
-        for (x in 0 until inv.width) {
-            for (y in 0 until inv.height) {
-                val index = x + y * inv.width
-                if (inv.getStack(index).item != list[index]) return false
+    fun isItemShapedMatches(inv: CraftingInventory, width: Int, height: Int, list: List<Ingredient>): Boolean {
+        for (x in 0..(inv.width - width)) {
+            for (y in 0..(inv.height - height)) {
+                if (shapeMatchesSmall(inv, width, height, x, y, true, list)) return true
+                if (shapeMatchesSmall(inv, width, height, x, y, false, list)) return true
             }
         }
 
+        return false
+    }
+
+    private fun shapeMatchesSmall(
+        inv: CraftingInventory,
+        width: Int,
+        height: Int,
+        offsetX: Int,
+        offsetY: Int,
+        aBoolean: Boolean,
+        list: List<Ingredient>
+    ): Boolean {
+        for (x in 0 until inv.width) {
+            for (y in 0 until inv.height) {
+                val i = x - offsetX
+                val j = y - offsetY
+                if (i >= 0 && j >= 0 && i < width && j < height) {
+                    val index = if (aBoolean) {
+                        width - i - 1 + j * inv.width
+                    } else {
+                        i + j * inv.width
+                    }
+                    if (!list[index].matches(inv.getStack(x + y * inv.width))) return false
+                }
+            }
+        }
         return true
     }
 
-    fun isItemShapelessMatches(inv: CraftingInventory, list: List<Item>): Boolean {
-        list.forEach { item ->
-            var match = false
-            for (i in 0 until inv.size()) {
-                val invItem = inv.getStack(i)
-                if (invItem.isEmpty) continue
-                if (invItem.item == item) {
-                    match = true
-                } else if (!list.contains(invItem.item)) {
-                    return false
-                }
+    fun isItemShapelessMatches(inv: CraftingInventory, list: List<Ingredient>): Boolean {
+        val inputItems = mutableListOf<ItemStack>()
+
+        for (i in 0 until inv.size()) {
+            val invItem = inv.getStack(i)
+            if (!invItem.isEmpty) {
+                inputItems += invItem
             }
-            if (!match) return false
         }
-        return true
+
+        if (inputItems.count() != list.count()) return false
+        list.forEach { ingredient ->
+            inputItems.removeIf { ingredient.matches(it) }
+        }
+        return inputItems.count() == 0
     }
 }

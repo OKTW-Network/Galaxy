@@ -28,17 +28,18 @@ import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
+import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class RedstoneLamp: CraftingRecipe {
+class RedstoneLamp : CraftingRecipe {
     private val item = ItemStack(Blocks.REDSTONE_LAMP)
     private val list = listOf(
-        REDSTONE, GLOWSTONE_DUST, REDSTONE,
-        GLOWSTONE_DUST, AIR, GLOWSTONE_DUST,
-        REDSTONE, GLOWSTONE_DUST, REDSTONE
+        Ingredient(item = REDSTONE), Ingredient(item = GLOWSTONE_DUST), Ingredient(item = REDSTONE),
+        Ingredient(item = GLOWSTONE_DUST), Ingredient(item = AIR), Ingredient(item = GLOWSTONE_DUST),
+        Ingredient(item = REDSTONE), Ingredient(item = GLOWSTONE_DUST), Ingredient(item = REDSTONE)
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemFull3x3ShapedMatches(inv, list)
+    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
 
     override fun craft(inv: CraftingInventory) = item.copy()
 

@@ -28,17 +28,18 @@ import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import one.oktw.galaxy.item.Tool
 import one.oktw.galaxy.item.type.ToolType
+import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class Wrench : CraftingRecipe {
     private val item = Tool(ToolType.WRENCH).createItemStack()
     private val list = listOf(
-        IRON_INGOT, AIR, IRON_INGOT,
-        AIR, STICK, AIR,
-        AIR, IRON_INGOT, AIR
+        Ingredient(item = IRON_INGOT), Ingredient(item = AIR), Ingredient(item = IRON_INGOT),
+        Ingredient(item = AIR), Ingredient(item = STICK), Ingredient(item = AIR),
+        Ingredient(item = AIR), Ingredient(item = IRON_INGOT), Ingredient(item = AIR)
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemFull3x3ShapedMatches(inv, list)
+    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list = list)
 
     override fun craft(inv: CraftingInventory) = item.copy()
 

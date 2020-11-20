@@ -27,17 +27,18 @@ import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
+import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class Dispenser_Right: CraftingRecipe {
+class DispenserLeft : CraftingRecipe {
     private val item = ItemStack(DISPENSER)
     private val list = listOf(
-        STRING, STICK, AIR,
-        STRING, DROPPER, STICK,
-        STRING, STICK, AIR
+        Ingredient(item = AIR), Ingredient(item = STICK), Ingredient(item = STRING),
+        Ingredient(item = STICK), Ingredient(item = DROPPER), Ingredient(item = STRING),
+        Ingredient(item = AIR), Ingredient(item = STICK), Ingredient(item = STRING)
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemFull3x3ShapedMatches(inv, list)
+    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
 
     override fun craft(inv: CraftingInventory) = item.copy()
 
@@ -48,7 +49,7 @@ class Dispenser_Right: CraftingRecipe {
 
     override fun getOutput() = item
 
-    override fun getId() = Identifier("galaxy", "easy_recipe/dispenser_right")
+    override fun getId() = Identifier("galaxy", "easy_recipe/dispenser_left")
 
     override fun getSerializer(): RecipeSerializer<*> {
         TODO("Not yet implemented, support client mod.")

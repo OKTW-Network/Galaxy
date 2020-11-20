@@ -29,11 +29,12 @@ import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import one.oktw.galaxy.block.item.BlockItem
 import one.oktw.galaxy.block.type.BlockType
+import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class Elevator : CraftingRecipe {
     private val item = BlockItem(BlockType.ELEVATOR).createItemStack()
-    private val list = listOf(ENDER_PEARL, IRON_BLOCK)
+    private val list = listOf(Ingredient(item = ENDER_PEARL), Ingredient(item = IRON_BLOCK))
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapelessMatches(inv, list)
 

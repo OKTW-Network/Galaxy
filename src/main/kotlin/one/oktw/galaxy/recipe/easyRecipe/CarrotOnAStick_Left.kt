@@ -27,17 +27,18 @@ import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
+import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class CarrotOnAStick_Left: CraftingRecipe {
+class CarrotOnAStick_Left : CraftingRecipe {
     private val item = ItemStack(CARROT_ON_A_STICK)
     private val list = listOf(
-        STICK, AIR, AIR,
-        STRING,STICK,AIR,
-        STRING, CARROT, STICK
+        Ingredient(item = STICK), Ingredient(item = AIR), Ingredient(item = AIR),
+        Ingredient(item = STRING), Ingredient(item = STICK), Ingredient(item = AIR),
+        Ingredient(item = STRING), Ingredient(item = CARROT), Ingredient(item = STICK)
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemFull3x3ShapedMatches(inv, list)
+    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
 
     override fun craft(inv: CraftingInventory) = item.copy()
 

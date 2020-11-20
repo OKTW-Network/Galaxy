@@ -27,11 +27,12 @@ import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
+import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class Dispenser: CraftingRecipe {
+class Dispenser : CraftingRecipe {
     private val item = ItemStack(DISPENSER)
-    private val list = listOf(BOW, DROPPER)
+    private val list = listOf(Ingredient(item = BOW), Ingredient(item = DROPPER))
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapelessMatches(inv, list)
 

@@ -28,17 +28,18 @@ import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
+import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class RedstoneRepeater: CraftingRecipe {
+class RedstoneRepeater : CraftingRecipe {
     private val item = ItemStack(Blocks.REPEATER)
     private val list = listOf(
-        REDSTONE, AIR, REDSTONE,
-        STICK, REDSTONE, STICK,
-        STONE, STONE, STONE
+        Ingredient(item = REDSTONE), Ingredient(item = AIR), Ingredient(item = REDSTONE),
+        Ingredient(item = STICK), Ingredient(item = REDSTONE), Ingredient(item = STICK),
+        Ingredient(item = STONE), Ingredient(item = STONE), Ingredient(item = STONE)
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemFull3x3ShapedMatches(inv, list)
+    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
 
     override fun craft(inv: CraftingInventory) = item.copy()
 

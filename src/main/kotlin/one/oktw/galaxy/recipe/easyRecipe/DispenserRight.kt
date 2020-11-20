@@ -27,17 +27,18 @@ import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
+import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class CarrotOnAStick_Right: CraftingRecipe {
-    private val item = ItemStack(CARROT_ON_A_STICK)
+class DispenserRight : CraftingRecipe {
+    private val item = ItemStack(DISPENSER)
     private val list = listOf(
-        AIR, AIR, STICK,
-        AIR, STICK, STRING,
-        STICK, CARROT, STRING
+        Ingredient(item = STRING), Ingredient(item = STICK), Ingredient(item = AIR),
+        Ingredient(item = STRING), Ingredient(item = DROPPER), Ingredient(item = STICK),
+        Ingredient(item = STRING), Ingredient(item = STICK), Ingredient(item = AIR)
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemFull3x3ShapedMatches(inv, list)
+    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
 
     override fun craft(inv: CraftingInventory) = item.copy()
 
@@ -48,7 +49,7 @@ class CarrotOnAStick_Right: CraftingRecipe {
 
     override fun getOutput() = item
 
-    override fun getId() = Identifier("galaxy", "easy_recipe/carrot_on_a_stick_right")
+    override fun getId() = Identifier("galaxy", "easy_recipe/dispenser_right")
 
     override fun getSerializer(): RecipeSerializer<*> {
         TODO("Not yet implemented, support client mod.")

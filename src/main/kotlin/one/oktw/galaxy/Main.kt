@@ -84,10 +84,10 @@ class Main : DedicatedServerModInitializer {
         // Easy Recipe
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, RedstoneLamp())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Dispenser())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Dispenser_Right())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Dispenser_Left())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, DispenserRight())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, DispenserLeft())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, RedstoneRepeater())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStick_Right())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStickRight())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStick_Left())
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {

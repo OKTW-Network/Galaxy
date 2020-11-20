@@ -89,6 +89,7 @@ class Main : DedicatedServerModInitializer {
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, RedstoneRepeater())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStickRight())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStick_Left())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Ladder())
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer

@@ -20,10 +20,8 @@ package one.oktw.galaxy.recipe.easyRecipe
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.block.Blocks
 import net.minecraft.inventory.CraftingInventory
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items.*
+import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
@@ -32,11 +30,11 @@ import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class RedstoneLamp : CraftingRecipe {
-    private val item = ItemStack(Blocks.REDSTONE_LAMP)
+    private val item = Items.REDSTONE_LAMP.defaultStack
     private val list = listOf(
-        Ingredient(item = REDSTONE), Ingredient(item = GLOWSTONE_DUST), Ingredient(item = REDSTONE),
-        Ingredient(item = GLOWSTONE_DUST), Ingredient(item = AIR), Ingredient(item = GLOWSTONE_DUST),
-        Ingredient(item = REDSTONE), Ingredient(item = GLOWSTONE_DUST), Ingredient(item = REDSTONE)
+        Ingredient(item = Items.REDSTONE), Ingredient(item = Items.GLOWSTONE_DUST), Ingredient(item = Items.REDSTONE),
+        Ingredient(item = Items.GLOWSTONE_DUST), Ingredient(item = Items.AIR), Ingredient(item = Items.GLOWSTONE_DUST),
+        Ingredient(item = Items.REDSTONE), Ingredient(item = Items.GLOWSTONE_DUST), Ingredient(item = Items.REDSTONE)
     )
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)

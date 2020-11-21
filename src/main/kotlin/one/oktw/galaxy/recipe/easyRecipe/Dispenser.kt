@@ -21,8 +21,7 @@ package one.oktw.galaxy.recipe.easyRecipe
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.inventory.CraftingInventory
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items.*
+import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
@@ -31,8 +30,8 @@ import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class Dispenser : CraftingRecipe {
-    private val item = ItemStack(DISPENSER)
-    private val list = listOf(Ingredient(item = BOW), Ingredient(item = DROPPER))
+    private val item = Items.DISPENSER.defaultStack
+    private val list = listOf(Ingredient(item = Items.BOW), Ingredient(item = Items.DROPPER))
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapelessMatches(inv, list)
 

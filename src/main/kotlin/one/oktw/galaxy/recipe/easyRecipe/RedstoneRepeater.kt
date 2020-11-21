@@ -22,8 +22,7 @@ import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.block.Blocks
 import net.minecraft.inventory.CraftingInventory
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items.*
+import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
@@ -32,11 +31,11 @@ import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class RedstoneRepeater : CraftingRecipe {
-    private val item = ItemStack(Blocks.REPEATER)
+    private val item = Items.REPEATER.defaultStack
     private val list = listOf(
-        Ingredient(item = REDSTONE), Ingredient(item = AIR), Ingredient(item = REDSTONE),
-        Ingredient(item = STICK), Ingredient(item = REDSTONE), Ingredient(item = STICK),
-        Ingredient(item = STONE), Ingredient(item = STONE), Ingredient(item = STONE)
+        Ingredient(item = Items.REDSTONE), Ingredient(item = Items.AIR), Ingredient(item = Items.REDSTONE),
+        Ingredient(item = Items.STICK), Ingredient(item = Items.REDSTONE), Ingredient(item = Items.STICK),
+        Ingredient(item = Items.STONE), Ingredient(item = Items.STONE), Ingredient(item = Items.STONE)
     )
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)

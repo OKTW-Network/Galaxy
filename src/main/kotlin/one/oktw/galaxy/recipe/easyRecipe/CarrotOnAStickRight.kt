@@ -21,8 +21,7 @@ package one.oktw.galaxy.recipe.easyRecipe
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.inventory.CraftingInventory
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items.*
+import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
@@ -31,11 +30,11 @@ import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class CarrotOnAStickRight : CraftingRecipe {
-    private val item = ItemStack(CARROT_ON_A_STICK)
+    private val item = Items.CARROT_ON_A_STICK.defaultStack
     private val list = listOf(
-        Ingredient(item = AIR), Ingredient(item = AIR), Ingredient(item = STICK),
-        Ingredient(item = AIR), Ingredient(item = STICK), Ingredient(item = STRING),
-        Ingredient(item = STICK), Ingredient(item = CARROT), Ingredient(item = STRING)
+        Ingredient(item = Items.AIR), Ingredient(item = Items.AIR), Ingredient(item = Items.STICK),
+        Ingredient(item = Items.AIR), Ingredient(item = Items.STICK), Ingredient(item = Items.STRING),
+        Ingredient(item = Items.STICK), Ingredient(item = Items.CARROT), Ingredient(item = Items.STRING)
     )
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)

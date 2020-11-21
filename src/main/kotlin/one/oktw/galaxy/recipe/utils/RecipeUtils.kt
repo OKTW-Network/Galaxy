@@ -20,6 +20,7 @@ package one.oktw.galaxy.recipe.utils
 
 import net.minecraft.inventory.CraftingInventory
 import net.minecraft.item.ItemStack
+import net.minecraft.item.Items
 
 object RecipeUtils {
     fun isItemShapedMatches(inv: CraftingInventory, width: Int, height: Int, list: List<Ingredient>): Boolean {
@@ -46,14 +47,15 @@ object RecipeUtils {
             for (y in 0 until inv.height) {
                 val i = x - offsetX
                 val j = y - offsetY
+                var input = Ingredient(item = Items.AIR)
                 if (i >= 0 && j >= 0 && i < width && j < height) {
-                    val index = if (aBoolean) {
-                        width - i - 1 + j * inv.width
+                    input = if (aBoolean) {
+                        list[width - i - 1 + j * width]
                     } else {
-                        i + j * inv.width
+                        list[i + j * width]
                     }
-                    if (!list[index].matches(inv.getStack(x + y * inv.width))) return false
                 }
+                if (!input.matches(inv.getStack(x + y * inv.width))) return false
             }
         }
         return true

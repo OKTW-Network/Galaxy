@@ -82,14 +82,20 @@ class Main : DedicatedServerModInitializer {
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, HTCraftingTable())
         CustomRecipeManager.addRecipe(RecipeType.SMELTING, CeramicPlate())
         // Easy Recipe
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Chest())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Hopper())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, RedstoneLamp())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Dispenser())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, DispenserRight())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, DispenserLeft())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, RedstoneRepeater())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, TrappedChest())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStickRight())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStick_Left())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Ladder())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, ChestMinecraft())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, FurnaceMinecraft())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, HopperMinecraft())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, TNTMinecraft())
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer

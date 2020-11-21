@@ -93,10 +93,10 @@ class Main : DedicatedServerModInitializer {
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, TrappedChest())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStickRight())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStickLeft())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, ChestMinecraft())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, FurnaceMinecraft())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, HopperMinecraft())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, TNTMinecraft())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, ChestMinecart())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, FurnaceMinecart())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, HopperMinecart())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, TNTMinecart())
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer

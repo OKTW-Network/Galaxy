@@ -29,10 +29,10 @@ import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class HopperMinecraft: CraftingRecipe {
-    private val item = Items.HOPPER_MINECART.defaultStack
+class TNTMinecart: CraftingRecipe {
+    private val item = Items.TNT_MINECART.defaultStack
     private val list = listOf(
-        Ingredient(item = Items.IRON_INGOT), Ingredient(item = Items.HOPPER), Ingredient(item = Items.IRON_INGOT),
+        Ingredient(item = Items.IRON_INGOT), Ingredient(item = Items.TNT), Ingredient(item = Items.IRON_INGOT),
         Ingredient(item = Items.IRON_INGOT), Ingredient(item = Items.IRON_INGOT), Ingredient(item = Items.IRON_INGOT)
     )
 
@@ -47,7 +47,7 @@ class HopperMinecraft: CraftingRecipe {
 
     override fun getOutput() = item
 
-    override fun getId() = Identifier("galaxy", "easy_recipe/hopper_minecraft")
+    override fun getId() = Identifier("galaxy", "easy_recipe/tnt_minecart")
 
     override fun getSerializer(): RecipeSerializer<*> {
         TODO("Not yet implemented, support client mod.")

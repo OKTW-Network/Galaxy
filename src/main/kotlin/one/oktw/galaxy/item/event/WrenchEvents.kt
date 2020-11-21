@@ -239,37 +239,37 @@ class WrenchEvents {
                 var newState = blockState.with(HORIZONTAL_FACING, newDirection)
 
                 if (blockState.contains(BLOCK_HALF)) {
-                    if (newDirection == originalFace[blockPos] ?: Direction.NORTH) {
+                    if (originalFace.containsKey(blockPos) && (newDirection == originalFace[blockPos] ?: Direction.NORTH)) {
                         newState = newState.cycle(BLOCK_HALF)
                     }
                 }
 
                 if (blockState.block == WALL_TORCH) {
-                    if (newDirection == originalFace[blockPos] ?: Direction.NORTH) {
+                    if (originalFace.containsKey(blockPos) && (newDirection == originalFace[blockPos] ?: Direction.NORTH)) {
                         newState = TORCH.defaultState
                     }
                 }
 
                 if (blockState.block == SOUL_WALL_TORCH) {
-                    if (newDirection == originalFace[blockPos] ?: Direction.NORTH) {
+                    if (originalFace.containsKey(blockPos) && (newDirection == originalFace[blockPos] ?: Direction.NORTH)) {
                         newState = SOUL_TORCH.defaultState
                     }
                 }
 
                 if (blockState.block == REDSTONE_WALL_TORCH) {
-                    if (newDirection == originalFace[blockPos] ?: Direction.NORTH) {
+                    if (originalFace.containsKey(blockPos) && (newDirection == originalFace[blockPos] ?: Direction.NORTH)) {
                         newState = REDSTONE_TORCH.defaultState
                     }
                 }
 
                 if (blockState.contains(FACE)) {
-                    if (newDirection == originalFace[blockPos] ?: Direction.NORTH) {
+                    if (originalFace.containsKey(blockPos) && (newDirection == originalFace[blockPos] ?: Direction.NORTH)) {
                         newState = newState.cycle(FACE)
                     }
                 }
 
                 if (blockState.contains(ATTACHMENT)) {
-                    if (newDirection == originalFace[blockPos] ?: Direction.NORTH) {
+                    if (originalFace.containsKey(blockPos) && (newDirection == originalFace[blockPos] ?: Direction.NORTH)) {
                         newState = newState.cycle(ATTACHMENT)
                     }
                 }
@@ -336,7 +336,10 @@ class WrenchEvents {
     private fun rotateHopper(hopperDirection: Direction, blockPos: BlockPos): Direction = if (hopperDirection == Direction.DOWN) {
         (if (originalFace[blockPos] != Direction.DOWN) originalFace[blockPos] else Direction.NORTH) ?: Direction.NORTH
     } else {
-        if (hopperDirection.rotateYClockwise() == (if (originalFace[blockPos] != Direction.DOWN) originalFace[blockPos] else Direction.NORTH) ?: Direction.NORTH) {
+        if (
+            originalFace.containsKey(blockPos) &&
+            (hopperDirection.rotateYClockwise() == (if (originalFace[blockPos] != Direction.DOWN) originalFace[blockPos] else Direction.NORTH) ?: Direction.NORTH)
+        ) {
             Direction.DOWN
         } else {
             hopperDirection.rotateYClockwise()

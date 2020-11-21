@@ -29,7 +29,7 @@ import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class ChestMinecart: CraftingRecipe {
+class ChestMinecart : CraftingRecipe {
     private val item = Items.CHEST_MINECART.defaultStack
     private val list = listOf(
         Ingredient(item = Items.IRON_INGOT), Ingredient(item = Items.CHEST), Ingredient(item = Items.IRON_INGOT),

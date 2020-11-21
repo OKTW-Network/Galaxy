@@ -31,7 +31,7 @@ import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class TrappedChest: CraftingRecipe {
+class TrappedChest : CraftingRecipe {
     private val item = Items.TRAPPED_CHEST.defaultStack
     private val list = listOf(
         Ingredient(tag = ItemTags.PLANKS), Ingredient(tag = ItemTags.PLANKS), Ingredient(tag = ItemTags.PLANKS),

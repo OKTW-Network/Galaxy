@@ -30,7 +30,7 @@ import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class Chest: CraftingRecipe {
+class Chest : CraftingRecipe {
     private val item = Items.CHEST.defaultStack.apply { this.count = 4 }
     private val list = listOf(
         Ingredient(tag = ItemTags.LOGS), Ingredient(tag = ItemTags.LOGS), Ingredient(tag = ItemTags.LOGS),

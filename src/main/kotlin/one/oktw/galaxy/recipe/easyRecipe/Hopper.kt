@@ -31,7 +31,7 @@ import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class Hopper: CraftingRecipe {
+class Hopper : CraftingRecipe {
     private val item = Items.HOPPER.defaultStack
     private val list = listOf(
         Ingredient(item = Items.IRON_INGOT), Ingredient(tag = ItemTags.LOGS), Ingredient(item = Items.IRON_INGOT),

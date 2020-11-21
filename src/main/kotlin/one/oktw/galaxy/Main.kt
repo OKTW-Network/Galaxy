@@ -98,6 +98,7 @@ class Main : DedicatedServerModInitializer {
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, FurnaceMinecart())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, HopperMinecart())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, TNTMinecart())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Stick())
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer

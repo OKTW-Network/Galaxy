@@ -52,6 +52,7 @@ object RecipeRegistry {
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, HopperMinecart())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, TNTMinecart())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Stick())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Glass())
         // Slabs
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, OakSlab())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, SpruceSlab())

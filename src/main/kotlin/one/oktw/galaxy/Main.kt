@@ -41,9 +41,11 @@ import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.PlayerControl
 import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.proxy.api.ProxyAPI
+import one.oktw.galaxy.recipe.RecipeRegistry
 import one.oktw.galaxy.recipe.blocks.Elevator
 import one.oktw.galaxy.recipe.blocks.HTCraftingTable
 import one.oktw.galaxy.recipe.easyRecipe.*
+import one.oktw.galaxy.recipe.easyRecipe.slabs.OakSlab
 import one.oktw.galaxy.recipe.materials.CeramicPlate
 import one.oktw.galaxy.recipe.tools.Wrench
 import one.oktw.galaxy.resourcepack.ResourcePack
@@ -76,29 +78,7 @@ class Main : DedicatedServerModInitializer {
             listOf(Join(), Admin(), Home(), Spawn()).forEach { dispatcher.let(it::register) }
         })
 
-        // Recipe
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Wrench())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Elevator())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, HTCraftingTable())
-        CustomRecipeManager.addRecipe(RecipeType.SMELTING, CeramicPlate())
-        // Easy Recipe
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Ladder())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Chest())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Hopper())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, RedstoneLamp())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Dispenser())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, DispenserRight())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, DispenserLeft())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, RedstoneRepeater())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, TrappedChest())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStickRight())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStickLeft())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, BookAndQuill())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, ChestMinecart())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, FurnaceMinecart())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, HopperMinecart())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, TNTMinecart())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Stick())
+        RecipeRegistry.register()
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer

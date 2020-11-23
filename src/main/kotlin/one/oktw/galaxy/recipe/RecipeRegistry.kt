@@ -23,7 +23,6 @@ import one.oktw.galaxy.mixin.interfaces.CustomRecipeManager
 import one.oktw.galaxy.recipe.blocks.Elevator
 import one.oktw.galaxy.recipe.blocks.HTCraftingTable
 import one.oktw.galaxy.recipe.easyRecipe.*
-import one.oktw.galaxy.recipe.easyRecipe.slabs.*
 import one.oktw.galaxy.recipe.materials.CeramicPlate
 import one.oktw.galaxy.recipe.tools.Wrench
 
@@ -53,14 +52,6 @@ object RecipeRegistry {
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, TNTMinecart())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Stick())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Glass())
-        // Slabs
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, OakSlab())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, SpruceSlab())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, BirchSlab())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, JungleSlab())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, AcaciaSlab())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, DarkOakSlab())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CrimsonSlab())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, WarpedSlab())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, WoodenSlab())
     }
 }

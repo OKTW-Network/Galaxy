@@ -25,7 +25,6 @@ import kotlinx.coroutines.withContext
 import net.fabricmc.api.DedicatedServerModInitializer
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
-import net.minecraft.recipe.RecipeType
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.block.event.BlockEvents
@@ -36,18 +35,11 @@ import one.oktw.galaxy.command.commands.Home
 import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.command.commands.Spawn
 import one.oktw.galaxy.event.EventManager
-import one.oktw.galaxy.mixin.interfaces.CustomRecipeManager
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.PlayerControl
 import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.proxy.api.ProxyAPI
 import one.oktw.galaxy.recipe.RecipeRegistry
-import one.oktw.galaxy.recipe.blocks.Elevator
-import one.oktw.galaxy.recipe.blocks.HTCraftingTable
-import one.oktw.galaxy.recipe.easyRecipe.*
-import one.oktw.galaxy.recipe.easyRecipe.slabs.OakSlab
-import one.oktw.galaxy.recipe.materials.CeramicPlate
-import one.oktw.galaxy.recipe.tools.Wrench
 import one.oktw.galaxy.resourcepack.ResourcePack
 import java.util.*
 

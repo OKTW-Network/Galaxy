@@ -51,6 +51,7 @@ object RecipeRegistry {
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Stick())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Glass())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, GlassPane())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, GlassPaneRestore())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, WoodenSlab())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, SlabRestore())
     }

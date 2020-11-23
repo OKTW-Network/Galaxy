@@ -79,7 +79,7 @@ class SlabRestore : CraftingRecipe {
         var match = false
         slabs.forEach { (items, _) ->
             val list = listOf(
-                Ingredient(item = items), Ingredient(item = items), Ingredient(item = items)
+                Ingredient(item = items), Ingredient(item = items)
             )
             if (RecipeUtils.isItemShapedMatches(inv, 2, 1, list)) {
                 match = true
@@ -93,7 +93,7 @@ class SlabRestore : CraftingRecipe {
         var item = ItemStack.EMPTY
         slabs.forEach { (items, result) ->
             val list = listOf(
-                Ingredient(item = items), Ingredient(item = items), Ingredient(item = items)
+                Ingredient(item = items), Ingredient(item = items)
             )
             if (RecipeUtils.isItemShapedMatches(inv, 2, 1, list)) {
                 item = result.defaultStack

@@ -27,7 +27,7 @@ import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
-import one.oktw.galaxy.recipe.tags.StainedGlassPane
+import one.oktw.galaxy.recipe.tags.CustomTags
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
@@ -56,9 +56,9 @@ class GlassPane : CraftingRecipe {
         var match = false
         slabs.forEach { (items, _) ->
             val list = listOf(
-                Ingredient(customTag = StainedGlassPane()), Ingredient(customTag = StainedGlassPane()), Ingredient(customTag = StainedGlassPane()),
-                Ingredient(customTag = StainedGlassPane()), Ingredient(item = items), Ingredient(customTag = StainedGlassPane()),
-                Ingredient(customTag = StainedGlassPane()), Ingredient(customTag = StainedGlassPane()), Ingredient(customTag = StainedGlassPane()),
+                Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(customTag = CustomTags.StainedGlassPane),
+                Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(item = items), Ingredient(customTag = CustomTags.StainedGlassPane),
+                Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(customTag = CustomTags.StainedGlassPane),
             )
             if (RecipeUtils.isItemShapedMatches(inv, 3, 3, list)) {
                 match = true
@@ -72,9 +72,9 @@ class GlassPane : CraftingRecipe {
         var item = ItemStack.EMPTY
         slabs.forEach { (items, result) ->
             val list = listOf(
-                Ingredient(customTag = StainedGlassPane()), Ingredient(customTag = StainedGlassPane()), Ingredient(customTag = StainedGlassPane()),
-                Ingredient(customTag = StainedGlassPane()), Ingredient(item = items), Ingredient(customTag = StainedGlassPane()),
-                Ingredient(customTag = StainedGlassPane()), Ingredient(customTag = StainedGlassPane()), Ingredient(customTag = StainedGlassPane()),
+                Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(customTag = CustomTags.StainedGlassPane),
+                Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(item = items), Ingredient(customTag = CustomTags.StainedGlassPane),
+                Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(customTag = CustomTags.StainedGlassPane),
             )
             if (RecipeUtils.isItemShapedMatches(inv, 3, 3, list)) {
                 item = result.defaultStack.apply { this.count = 8 }

@@ -29,15 +29,21 @@ import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class DispenserRight : CraftingRecipe {
+class DispenserWithBow : CraftingRecipe {
     private val item = Items.DISPENSER.defaultStack
-    private val list = listOf(
+    private val listLeft = listOf(
+        Ingredient(item = Items.AIR), Ingredient(item = Items.STICK), Ingredient(item = Items.STRING),
+        Ingredient(item = Items.STICK), Ingredient(item = Items.DROPPER), Ingredient(item = Items.STRING),
+        Ingredient(item = Items.AIR), Ingredient(item = Items.STICK), Ingredient(item = Items.STRING)
+    )
+    private val listRight = listOf(
         Ingredient(item = Items.STRING), Ingredient(item = Items.STICK), Ingredient(item = Items.AIR),
         Ingredient(item = Items.STRING), Ingredient(item = Items.DROPPER), Ingredient(item = Items.STICK),
         Ingredient(item = Items.STRING), Ingredient(item = Items.STICK), Ingredient(item = Items.AIR)
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
+    override fun matches(inv: CraftingInventory, world: World): Boolean =
+        (RecipeUtils.isItemShapedMatches(inv, 3, 3, listLeft) || RecipeUtils.isItemShapedMatches(inv, 3, 3, listLeft))
 
     override fun craft(inv: CraftingInventory) = item.copy()
 
@@ -48,7 +54,7 @@ class DispenserRight : CraftingRecipe {
 
     override fun getOutput() = item
 
-    override fun getId() = Identifier("galaxy", "easy_recipe/dispenser_right")
+    override fun getId() = Identifier("galaxy", "easy_recipe/dispenser_with_bow")
 
     override fun getSerializer(): RecipeSerializer<*> {
         TODO("Not yet implemented, support client mod.")

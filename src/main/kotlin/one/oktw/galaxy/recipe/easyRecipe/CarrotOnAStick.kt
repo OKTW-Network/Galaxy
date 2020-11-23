@@ -29,15 +29,21 @@ import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class CarrotOnAStickRight : CraftingRecipe {
+class CarrotOnAStick : CraftingRecipe {
     private val item = Items.CARROT_ON_A_STICK.defaultStack
-    private val list = listOf(
+    private val listLeft = listOf(
+        Ingredient(item = Items.STICK), Ingredient(item = Items.AIR), Ingredient(item = Items.AIR),
+        Ingredient(item = Items.STRING), Ingredient(item = Items.STICK), Ingredient(item = Items.AIR),
+        Ingredient(item = Items.STRING), Ingredient(item = Items.CARROT), Ingredient(item = Items.STICK)
+    )
+    private val listRight = listOf(
         Ingredient(item = Items.AIR), Ingredient(item = Items.AIR), Ingredient(item = Items.STICK),
         Ingredient(item = Items.AIR), Ingredient(item = Items.STICK), Ingredient(item = Items.STRING),
         Ingredient(item = Items.STICK), Ingredient(item = Items.CARROT), Ingredient(item = Items.STRING)
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
+    override fun matches(inv: CraftingInventory, world: World): Boolean =
+        (RecipeUtils.isItemShapedMatches(inv, 3, 3, listLeft) || RecipeUtils.isItemShapedMatches(inv, 3, 3, listRight))
 
     override fun craft(inv: CraftingInventory) = item.copy()
 
@@ -48,7 +54,7 @@ class CarrotOnAStickRight : CraftingRecipe {
 
     override fun getOutput() = item
 
-    override fun getId() = Identifier("galaxy", "easy_recipe/carrot_on_a_stick_right")
+    override fun getId() = Identifier("galaxy", "easy_recipe/carrot_on_a_stick")
 
     override fun getSerializer(): RecipeSerializer<*> {
         TODO("Not yet implemented, support client mod.")

@@ -91,7 +91,7 @@ class Glass : CraftingRecipe {
         throw NotImplementedError()
     }
 
-    override fun getOutput() = Items.OAK_SLAB.defaultStack.apply { this.count = 24 }
+    override fun getOutput() = Items.GLASS.defaultStack.apply { this.count = 8 }
 
     override fun getId() = Identifier("galaxy", "easy_recipe/glass")
 

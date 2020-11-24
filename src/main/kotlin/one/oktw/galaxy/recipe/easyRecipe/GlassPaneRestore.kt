@@ -31,7 +31,7 @@ import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class GlassPaneRestore : CraftingRecipe {
-    private val slabs = hashMapOf(
+    private val glassPane = hashMapOf(
         Items.GLASS_PANE to Items.GLASS,
         Items.RED_STAINED_GLASS_PANE to Items.RED_STAINED_GLASS,
         Items.GREEN_STAINED_GLASS_PANE to Items.GREEN_STAINED_GLASS,
@@ -53,7 +53,7 @@ class GlassPaneRestore : CraftingRecipe {
 
     override fun matches(inv: CraftingInventory, world: World): Boolean {
         var match = false
-        slabs.forEach { (items, _) ->
+        glassPane.forEach { (items, _) ->
             val list = listOf(
                 Ingredient(item = items), Ingredient(item = items),
                 Ingredient(item = items), Ingredient(item = items), Ingredient(item = items),
@@ -69,7 +69,7 @@ class GlassPaneRestore : CraftingRecipe {
 
     override fun craft(inv: CraftingInventory): ItemStack {
         var item = ItemStack.EMPTY
-        slabs.forEach { (items, result) ->
+        glassPane.forEach { (items, result) ->
             val list = listOf(
                 Ingredient(item = items), Ingredient(item = items),
                 Ingredient(item = items), Ingredient(item = items), Ingredient(item = items),

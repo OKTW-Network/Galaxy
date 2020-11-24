@@ -32,7 +32,7 @@ import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class GlassPane : CraftingRecipe {
-    private val slabs = hashMapOf(
+    private val glassPane = hashMapOf(
         Items.WATER_BUCKET to Items.GLASS_PANE,
         Items.RED_DYE to Items.RED_STAINED_GLASS_PANE,
         Items.GREEN_DYE to Items.GREEN_STAINED_GLASS_PANE,
@@ -54,7 +54,7 @@ class GlassPane : CraftingRecipe {
 
     override fun matches(inv: CraftingInventory, world: World): Boolean {
         var match = false
-        slabs.forEach { (items, _) ->
+        glassPane.forEach { (items, _) ->
             val list = listOf(
                 Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(customTag = CustomTags.StainedGlassPane),
                 Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(item = items), Ingredient(customTag = CustomTags.StainedGlassPane),
@@ -70,7 +70,7 @@ class GlassPane : CraftingRecipe {
 
     override fun craft(inv: CraftingInventory): ItemStack {
         var item = ItemStack.EMPTY
-        slabs.forEach { (items, result) ->
+        glassPane.forEach { (items, result) ->
             val list = listOf(
                 Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(customTag = CustomTags.StainedGlassPane),
                 Ingredient(customTag = CustomTags.StainedGlassPane), Ingredient(item = items), Ingredient(customTag = CustomTags.StainedGlassPane),

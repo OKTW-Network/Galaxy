@@ -43,8 +43,8 @@ public abstract class MixinThrownCountdown_Entity implements IThrownCountdown_En
             if (intoWater > 10) {
                 remove();
             }
-            intoWater++;
         }
+        intoWater++;
     }
 
     @Override

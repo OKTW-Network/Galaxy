@@ -36,7 +36,7 @@ public class MixinThrownCountdown_ThrownEntity {
     private HitResult addWaterHit(Entity entity, Predicate<Entity> predicate) {
         var hit = ProjectileUtil.getCollision(entity, predicate);
 
-        if (hit.getType() == HitResult.Type.BLOCK && ((IThrownCountdown_Entity) this).getIntoWater() > 10) {
+        if (hit.getType() == HitResult.Type.MISS && ((IThrownCountdown_Entity) this).getIntoWater() > 10) {
             var pos = entity.getPos();
             var velocity = pos.add(entity.getVelocity());
             var newHit = entity.world.raycast(new RaycastContext(pos, velocity, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.ANY, entity));

@@ -40,7 +40,7 @@ object RecipeUtils {
         height: Int,
         offsetX: Int,
         offsetY: Int,
-        aBoolean: Boolean,
+        widthFromLast: Boolean,
         list: List<Ingredient>
     ): Boolean {
         for (x in 0 until inv.width) {
@@ -49,7 +49,7 @@ object RecipeUtils {
                 val j = y - offsetY
                 var input = Ingredient(items = listOf(Items.AIR))
                 if (i >= 0 && j >= 0 && i < width && j < height) {
-                    input = if (aBoolean) {
+                    input = if (widthFromLast) {
                         list[width - i - 1 + j * width]
                     } else {
                         list[i + j * width]

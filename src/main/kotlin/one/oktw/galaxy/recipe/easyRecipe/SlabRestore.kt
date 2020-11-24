@@ -25,7 +25,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
-import net.minecraft.tag.ItemTags
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
@@ -77,9 +76,9 @@ class SlabRestore : CraftingRecipe {
 
     override fun matches(inv: CraftingInventory, world: World): Boolean {
         var match = false
-        slabs.forEach { (items, _) ->
+        slabs.forEach { (recipeItem, _) ->
             val list = listOf(
-                Ingredient(item = items), Ingredient(item = items)
+                Ingredient(items = listOf(recipeItem)), Ingredient(items = listOf(recipeItem))
             )
             if (RecipeUtils.isItemShapedMatches(inv, 2, 1, list)) {
                 match = true
@@ -91,9 +90,9 @@ class SlabRestore : CraftingRecipe {
 
     override fun craft(inv: CraftingInventory): ItemStack {
         var item = ItemStack.EMPTY
-        slabs.forEach { (items, result) ->
+        slabs.forEach { (recipeItem, result) ->
             val list = listOf(
-                Ingredient(item = items), Ingredient(item = items)
+                Ingredient(items = listOf(recipeItem)), Ingredient(items = listOf(recipeItem))
             )
             if (RecipeUtils.isItemShapedMatches(inv, 2, 1, list)) {
                 item = result.defaultStack

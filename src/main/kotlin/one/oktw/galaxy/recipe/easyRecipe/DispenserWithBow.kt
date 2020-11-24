@@ -31,19 +31,24 @@ import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class DispenserWithBow : CraftingRecipe {
     private val item = Items.DISPENSER.defaultStack
+
+    private val air = Ingredient(items = listOf(Items.AIR))
+    private val stick = Ingredient(items = listOf(Items.STICK))
+    private val strings = Ingredient(items = listOf(Items.STRING))
+    private val dropper = Ingredient(items = listOf(Items.DROPPER))
     private val listLeft = listOf(
-        Ingredient(item = Items.AIR), Ingredient(item = Items.STICK), Ingredient(item = Items.STRING),
-        Ingredient(item = Items.STICK), Ingredient(item = Items.DROPPER), Ingredient(item = Items.STRING),
-        Ingredient(item = Items.AIR), Ingredient(item = Items.STICK), Ingredient(item = Items.STRING)
+        air, stick, strings,
+        stick, dropper, strings,
+        air, stick, strings
     )
     private val listRight = listOf(
-        Ingredient(item = Items.STRING), Ingredient(item = Items.STICK), Ingredient(item = Items.AIR),
-        Ingredient(item = Items.STRING), Ingredient(item = Items.DROPPER), Ingredient(item = Items.STICK),
-        Ingredient(item = Items.STRING), Ingredient(item = Items.STICK), Ingredient(item = Items.AIR)
+        strings, stick, air,
+        strings, dropper, stick,
+        strings, stick, air
     )
 
     override fun matches(inv: CraftingInventory, world: World): Boolean =
-        (RecipeUtils.isItemShapedMatches(inv, 3, 3, listLeft) || RecipeUtils.isItemShapedMatches(inv, 3, 3, listLeft))
+        (RecipeUtils.isItemShapedMatches(inv, 3, 3, listLeft) || RecipeUtils.isItemShapedMatches(inv, 3, 3, listRight))
 
     override fun craft(inv: CraftingInventory) = item.copy()
 

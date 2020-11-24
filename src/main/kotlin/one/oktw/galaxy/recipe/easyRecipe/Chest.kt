@@ -32,10 +32,13 @@ import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class Chest : CraftingRecipe {
     private val item = Items.CHEST.defaultStack.apply { this.count = 4 }
+
+    private val logs = Ingredient(tag = ItemTags.LOGS)
+    private val air = Ingredient(items = listOf(Items.AIR))
     private val list = listOf(
-        Ingredient(tag = ItemTags.LOGS), Ingredient(tag = ItemTags.LOGS), Ingredient(tag = ItemTags.LOGS),
-        Ingredient(tag = ItemTags.LOGS), Ingredient(item = Items.AIR), Ingredient(tag = ItemTags.LOGS),
-        Ingredient(tag = ItemTags.LOGS), Ingredient(tag = ItemTags.LOGS), Ingredient(tag = ItemTags.LOGS)
+        logs, logs, logs,
+        logs, air, logs,
+        logs, logs, logs
     )
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)

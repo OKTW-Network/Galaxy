@@ -53,11 +53,12 @@ class GlassPaneRestore : CraftingRecipe {
 
     override fun matches(inv: CraftingInventory, world: World): Boolean {
         var match = false
-        glassPane.forEach { (items, _) ->
+        glassPane.forEach { (recipeItem, _) ->
+            val glassPane = Ingredient(items = listOf(recipeItem))
             val list = listOf(
-                Ingredient(item = items), Ingredient(item = items),
-                Ingredient(item = items), Ingredient(item = items), Ingredient(item = items),
-                Ingredient(item = items), Ingredient(item = items), Ingredient(item = items),
+                glassPane, glassPane,
+                glassPane, glassPane, glassPane,
+                glassPane, glassPane, glassPane,
             )
             if (RecipeUtils.isItemShapelessMatches(inv, list)) {
                 match = true
@@ -69,11 +70,12 @@ class GlassPaneRestore : CraftingRecipe {
 
     override fun craft(inv: CraftingInventory): ItemStack {
         var item = ItemStack.EMPTY
-        glassPane.forEach { (items, result) ->
+        glassPane.forEach { (recipeItem, result) ->
+            val glassPane = Ingredient(items = listOf(recipeItem))
             val list = listOf(
-                Ingredient(item = items), Ingredient(item = items),
-                Ingredient(item = items), Ingredient(item = items), Ingredient(item = items),
-                Ingredient(item = items), Ingredient(item = items), Ingredient(item = items),
+                glassPane, glassPane,
+                glassPane, glassPane, glassPane,
+                glassPane, glassPane, glassPane,
             )
             if (RecipeUtils.isItemShapelessMatches(inv, list)) {
                 item = result.defaultStack.apply { this.count = 3 }

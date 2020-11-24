@@ -31,10 +31,12 @@ import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class BookAndQuill : CraftingRecipe {
     private val item = Items.WRITABLE_BOOK.defaultStack
-    private val list = listOf(
-        Ingredient(item = Items.PAPER), Ingredient(item = Items.PAPER), Ingredient(item = Items.PAPER),
-        Ingredient(item = Items.LEATHER), Ingredient(item = Items.FEATHER), Ingredient(item = Items.INK_SAC)
-    )
+
+    private val paper = Ingredient(items = listOf(Items.PAPER))
+    private val leather = Ingredient(items = listOf(Items.LEATHER))
+    private val feather = Ingredient(items = listOf(Items.FEATHER))
+    private val inkSac = Ingredient(items = listOf(Items.INK_SAC))
+    private val list = listOf(paper, paper, paper, leather, feather, inkSac)
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapelessMatches(inv, list)
 

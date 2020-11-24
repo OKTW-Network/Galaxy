@@ -31,10 +31,14 @@ import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class RedstoneLamp : CraftingRecipe {
     private val item = Items.REDSTONE_LAMP.defaultStack
+
+    private val air = Ingredient(items = listOf(Items.AIR))
+    private val redStone = Ingredient(items = listOf(Items.REDSTONE))
+    private val glowStoneDust = Ingredient(items = listOf(Items.GLOWSTONE_DUST))
     private val list = listOf(
-        Ingredient(item = Items.REDSTONE), Ingredient(item = Items.GLOWSTONE_DUST), Ingredient(item = Items.REDSTONE),
-        Ingredient(item = Items.GLOWSTONE_DUST), Ingredient(item = Items.AIR), Ingredient(item = Items.GLOWSTONE_DUST),
-        Ingredient(item = Items.REDSTONE), Ingredient(item = Items.GLOWSTONE_DUST), Ingredient(item = Items.REDSTONE)
+        redStone, glowStoneDust, redStone,
+        glowStoneDust, air, glowStoneDust,
+        redStone, glowStoneDust, redStone
     )
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)

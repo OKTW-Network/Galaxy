@@ -22,7 +22,6 @@ import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.inventory.CraftingInventory
 import net.minecraft.item.Items
-import net.minecraft.item.Items.AIR
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.tag.ItemTags
@@ -33,10 +32,13 @@ import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class Ladder : CraftingRecipe {
     private val item = Items.LADDER.defaultStack.apply { this.count = 24 }
+
+    private val air = Ingredient(items = listOf(Items.AIR))
+    private val logs = Ingredient(tag = ItemTags.LOGS)
     private val list = listOf(
-        Ingredient(tag = ItemTags.LOGS), Ingredient(item = AIR), Ingredient(tag = ItemTags.LOGS),
-        Ingredient(tag = ItemTags.LOGS), Ingredient(tag = ItemTags.LOGS), Ingredient(tag = ItemTags.LOGS),
-        Ingredient(tag = ItemTags.LOGS), Ingredient(item = AIR), Ingredient(tag = ItemTags.LOGS)
+        logs, air, logs,
+        logs, logs, logs,
+        logs, air, logs
     )
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)

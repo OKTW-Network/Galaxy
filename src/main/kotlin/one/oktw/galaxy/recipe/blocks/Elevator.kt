@@ -21,8 +21,7 @@ package one.oktw.galaxy.recipe.blocks
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.inventory.CraftingInventory
-import net.minecraft.item.Items.ENDER_PEARL
-import net.minecraft.item.Items.IRON_BLOCK
+import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
@@ -34,7 +33,8 @@ import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class Elevator : CraftingRecipe {
     private val item = BlockItem(BlockType.ELEVATOR).createItemStack()
-    private val list = listOf(Ingredient(item = ENDER_PEARL), Ingredient(item = IRON_BLOCK))
+    private val list =
+        listOf(Ingredient(items = listOf(Items.ENDER_PEARL)), Ingredient(items = listOf(Items.IRON_BLOCK)))
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapelessMatches(inv, list)
 

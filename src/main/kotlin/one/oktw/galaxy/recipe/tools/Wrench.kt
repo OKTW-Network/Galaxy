@@ -21,7 +21,7 @@ package one.oktw.galaxy.recipe.tools
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.inventory.CraftingInventory
-import net.minecraft.item.Items.*
+import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
@@ -33,10 +33,14 @@ import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class Wrench : CraftingRecipe {
     private val item = Tool(ToolType.WRENCH).createItemStack()
+
+    private val air = Ingredient(items = listOf(Items.AIR))
+    private val ironIngot = Ingredient(items = listOf(Items.IRON_INGOT))
+    private val stick = Ingredient(items = listOf(Items.STICK))
     private val list = listOf(
-        Ingredient(item = IRON_INGOT), Ingredient(item = AIR), Ingredient(item = IRON_INGOT),
-        Ingredient(item = AIR), Ingredient(item = STICK), Ingredient(item = AIR),
-        Ingredient(item = AIR), Ingredient(item = IRON_INGOT), Ingredient(item = AIR)
+        ironIngot, air, ironIngot,
+        air, stick, air,
+        air, ironIngot, air
     )
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list = list)

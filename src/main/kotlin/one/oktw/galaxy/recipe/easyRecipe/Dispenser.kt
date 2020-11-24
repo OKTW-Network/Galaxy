@@ -31,7 +31,8 @@ import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class Dispenser : CraftingRecipe {
     private val item = Items.DISPENSER.defaultStack
-    private val list = listOf(Ingredient(item = Items.BOW), Ingredient(item = Items.DROPPER))
+    private val list =
+        listOf(Ingredient(items = listOf(Items.BOW)), Ingredient(items = listOf(Items.DROPPER)))
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapelessMatches(inv, list)
 

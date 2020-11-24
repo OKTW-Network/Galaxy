@@ -21,7 +21,6 @@ package one.oktw.galaxy.recipe.easyRecipe
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.inventory.CraftingInventory
-import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
@@ -33,10 +32,14 @@ import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class Hopper : CraftingRecipe {
     private val item = Items.HOPPER.defaultStack
+
+    private val air = Ingredient(items = listOf(Items.AIR))
+    private val logs = Ingredient(tag = ItemTags.LOGS)
+    private val ironIngot = Ingredient(items = listOf(Items.IRON_INGOT))
     private val list = listOf(
-        Ingredient(item = Items.IRON_INGOT), Ingredient(tag = ItemTags.LOGS), Ingredient(item = Items.IRON_INGOT),
-        Ingredient(item = Items.IRON_INGOT), Ingredient(tag = ItemTags.LOGS), Ingredient(item = Items.IRON_INGOT),
-        Ingredient(item = Items.AIR), Ingredient(item = Items.IRON_INGOT), Ingredient(item = Items.AIR)
+        ironIngot, logs, ironIngot,
+        ironIngot, logs, ironIngot,
+        air, ironIngot, air
     )
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)

@@ -31,15 +31,20 @@ import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class CarrotOnAStick : CraftingRecipe {
     private val item = Items.CARROT_ON_A_STICK.defaultStack
+
+    private val air = Ingredient(items = listOf(Items.AIR))
+    private val stick = Ingredient(items = listOf(Items.STICK))
+    private val strings = Ingredient(items = listOf(Items.STRING))
+    private val carrot = Ingredient(items = listOf(Items.CARROT))
     private val listLeft = listOf(
-        Ingredient(item = Items.STICK), Ingredient(item = Items.AIR), Ingredient(item = Items.AIR),
-        Ingredient(item = Items.STRING), Ingredient(item = Items.STICK), Ingredient(item = Items.AIR),
-        Ingredient(item = Items.STRING), Ingredient(item = Items.CARROT), Ingredient(item = Items.STICK)
+        stick, air, air,
+        strings, stick, air,
+        strings, carrot, stick
     )
     private val listRight = listOf(
-        Ingredient(item = Items.AIR), Ingredient(item = Items.AIR), Ingredient(item = Items.STICK),
-        Ingredient(item = Items.AIR), Ingredient(item = Items.STICK), Ingredient(item = Items.STRING),
-        Ingredient(item = Items.STICK), Ingredient(item = Items.CARROT), Ingredient(item = Items.STRING)
+        air, air, stick,
+        air, stick, strings,
+        stick, carrot, strings
     )
 
     override fun matches(inv: CraftingInventory, world: World): Boolean =

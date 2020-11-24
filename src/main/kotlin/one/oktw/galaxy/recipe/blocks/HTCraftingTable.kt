@@ -21,7 +21,7 @@ package one.oktw.galaxy.recipe.blocks
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.inventory.CraftingInventory
-import net.minecraft.item.Items.*
+import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
@@ -33,10 +33,17 @@ import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class HTCraftingTable : CraftingRecipe {
     private val item = BlockItem(BlockType.HT_CRAFTING_TABLE).createItemStack()
+
+    private val redStone = Ingredient(items = listOf(Items.REDSTONE))
+    private val diamond = Ingredient(items = listOf(Items.DIAMOND))
+    private val lapisLazuli = Ingredient(items = listOf(Items.LAPIS_LAZULI))
+    private val ironIngot = Ingredient(items = listOf(Items.IRON_INGOT))
+    private val obsidian = Ingredient(items = listOf(Items.OBSIDIAN))
+    private val craftingTable = Ingredient(items = listOf(Items.CRAFTING_TABLE))
     private val list = listOf(
-        Ingredient(item = REDSTONE), Ingredient(item = DIAMOND), Ingredient(item = LAPIS_LAZULI),
-        Ingredient(item = IRON_INGOT), Ingredient(item = CRAFTING_TABLE), Ingredient(item = IRON_INGOT),
-        Ingredient(item = LAPIS_LAZULI), Ingredient(item = OBSIDIAN), Ingredient(item = REDSTONE)
+        redStone, diamond, lapisLazuli,
+        ironIngot, craftingTable, ironIngot,
+        lapisLazuli, obsidian, redStone
     )
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)

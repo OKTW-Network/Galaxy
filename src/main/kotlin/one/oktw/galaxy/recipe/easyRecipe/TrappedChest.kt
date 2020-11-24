@@ -21,7 +21,6 @@ package one.oktw.galaxy.recipe.easyRecipe
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.inventory.CraftingInventory
-import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
@@ -33,10 +32,13 @@ import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class TrappedChest : CraftingRecipe {
     private val item = Items.TRAPPED_CHEST.defaultStack
+
+    private val planks = Ingredient(tag = ItemTags.PLANKS)
+    private val tripWireHook = Ingredient(items = listOf(Items.TRIPWIRE_HOOK))
     private val list = listOf(
-        Ingredient(tag = ItemTags.PLANKS), Ingredient(tag = ItemTags.PLANKS), Ingredient(tag = ItemTags.PLANKS),
-        Ingredient(tag = ItemTags.PLANKS), Ingredient(item = Items.TRIPWIRE_HOOK), Ingredient(tag = ItemTags.PLANKS),
-        Ingredient(tag = ItemTags.PLANKS), Ingredient(tag = ItemTags.PLANKS), Ingredient(tag = ItemTags.PLANKS)
+        planks, planks, planks,
+        planks, tripWireHook, planks,
+        planks, planks, planks
     )
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)

@@ -47,7 +47,7 @@ object RecipeUtils {
             for (y in 0 until inv.height) {
                 val i = x - offsetX
                 val j = y - offsetY
-                var input = Ingredient(item = Items.AIR)
+                var input = Ingredient(items = listOf(Items.AIR))
                 if (i >= 0 && j >= 0 && i < width && j < height) {
                     input = if (aBoolean) {
                         list[width - i - 1 + j * width]

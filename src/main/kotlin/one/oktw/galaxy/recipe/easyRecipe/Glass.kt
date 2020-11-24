@@ -27,12 +27,11 @@ import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
-import one.oktw.galaxy.recipe.tags.CustomTags
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class Glass : CraftingRecipe {
-    private val glass = hashMapOf(
+    private val dyes = hashMapOf(
         Items.WATER_BUCKET to Items.GLASS,
         Items.RED_DYE to Items.RED_STAINED_GLASS,
         Items.GREEN_DYE to Items.GREEN_STAINED_GLASS,
@@ -52,13 +51,34 @@ class Glass : CraftingRecipe {
         Items.WHITE_DYE to Items.WHITE_STAINED_GLASS
     )
 
+    private val stainedGlass = listOf(
+        Items.WHITE_STAINED_GLASS,
+        Items.ORANGE_STAINED_GLASS,
+        Items.MAGENTA_STAINED_GLASS,
+        Items.LIGHT_BLUE_STAINED_GLASS,
+        Items.YELLOW_STAINED_GLASS,
+        Items.LIME_STAINED_GLASS,
+        Items.PINK_STAINED_GLASS,
+        Items.GRAY_STAINED_GLASS,
+        Items.LIGHT_GRAY_STAINED_GLASS,
+        Items.CYAN_STAINED_GLASS,
+        Items.PURPLE_STAINED_GLASS,
+        Items.BLUE_STAINED_GLASS,
+        Items.BROWN_STAINED_GLASS,
+        Items.GREEN_STAINED_GLASS,
+        Items.RED_STAINED_GLASS,
+        Items.BLACK_STAINED_GLASS
+    )
+
     override fun matches(inv: CraftingInventory, world: World): Boolean {
         var match = false
-        glass.forEach { (items, _) ->
+        dyes.forEach { (recipeItem, _) ->
+            val stainedGlass = Ingredient(items = stainedGlass)
+            val dye = Ingredient(items = listOf(recipeItem))
             val list = listOf(
-                Ingredient(customTag = CustomTags.StainedGlass), Ingredient(customTag = CustomTags.StainedGlass), Ingredient(customTag = CustomTags.StainedGlass),
-                Ingredient(customTag = CustomTags.StainedGlass), Ingredient(item = items), Ingredient(customTag = CustomTags.StainedGlass),
-                Ingredient(customTag = CustomTags.StainedGlass), Ingredient(customTag = CustomTags.StainedGlass), Ingredient(customTag = CustomTags.StainedGlass),
+                stainedGlass, stainedGlass, stainedGlass,
+                stainedGlass, dye, stainedGlass,
+                stainedGlass, stainedGlass, stainedGlass,
             )
             if (RecipeUtils.isItemShapedMatches(inv, 3, 3, list)) {
                 match = true
@@ -70,11 +90,13 @@ class Glass : CraftingRecipe {
 
     override fun craft(inv: CraftingInventory): ItemStack {
         var item = ItemStack.EMPTY
-        glass.forEach { (items, result) ->
+        dyes.forEach { (recipeItem, result) ->
+            val stainedGlass = Ingredient(items = stainedGlass)
+            val dye = Ingredient(items = listOf(recipeItem))
             val list = listOf(
-                Ingredient(customTag = CustomTags.StainedGlass), Ingredient(customTag = CustomTags.StainedGlass), Ingredient(customTag = CustomTags.StainedGlass),
-                Ingredient(customTag = CustomTags.StainedGlass), Ingredient(item = items), Ingredient(customTag = CustomTags.StainedGlass),
-                Ingredient(customTag = CustomTags.StainedGlass), Ingredient(customTag = CustomTags.StainedGlass), Ingredient(customTag = CustomTags.StainedGlass),
+                stainedGlass, stainedGlass, stainedGlass,
+                stainedGlass, dye, stainedGlass,
+                stainedGlass, stainedGlass, stainedGlass,
             )
             if (RecipeUtils.isItemShapedMatches(inv, 3, 3, list)) {
                 item = result.defaultStack.apply { this.count = 8 }

@@ -37,7 +37,7 @@ public abstract class MixinThrownCountdown_ProjectileEntity extends Entity {
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void maxAge(CallbackInfo ci) {
-        if (maxAge > 12000) remove();
+        if (maxAge > 6000) remove();
         maxAge++;
     }
 }

@@ -10,7 +10,8 @@
     "MixinRCON_RconBase",
     "MixinRCON_RconClient",
     "MixinThrownCountdown_Entity",
-    "MixinThrownCountdown_ProjectileEntity"
+    "MixinThrownCountdown_ProjectileEntity",
+    "MixinThrownCountdown_ThrownEntity"
   ],
   "client": [],
   "injectors": {

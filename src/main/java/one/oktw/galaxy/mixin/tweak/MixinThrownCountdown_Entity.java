@@ -21,7 +21,7 @@ package one.oktw.galaxy.mixin.tweak;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.SpectralArrowEntity;
-import net.minecraft.entity.projectile.thrown.ThrownEntity;
+import one.oktw.galaxy.mixin.interfaces.IThrownCountdown_Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Entity.class)
-public abstract class MixinThrownCountdown_Entity {
+public abstract class MixinThrownCountdown_Entity implements IThrownCountdown_Entity {
     private int intoWater = 0;
 
     @Shadow
@@ -39,11 +39,16 @@ public abstract class MixinThrownCountdown_Entity {
         at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;onSwimmingStart()V"))
     private void countIntoWater(CallbackInfo ci) {
         //noinspection ConstantConditions
-        if (((Object) this) instanceof ThrownEntity || ((Object) this) instanceof ArrowEntity || ((Object) this) instanceof SpectralArrowEntity) {
+        if (((Object) this) instanceof ArrowEntity || ((Object) this) instanceof SpectralArrowEntity) {
             if (intoWater > 10) {
                 remove();
             }
             intoWater++;
         }
+    }
+
+    @Override
+    public int getIntoWater() {
+        return intoWater;
     }
 }

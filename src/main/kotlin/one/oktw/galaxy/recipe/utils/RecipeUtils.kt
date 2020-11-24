@@ -75,6 +75,6 @@ object RecipeUtils {
         list.forEach { ingredient ->
             inputItems.removeIf { ingredient.matches(it) }
         }
-        return inputItems.count() == 0
+        return inputItems.isEmpty()
     }
 }

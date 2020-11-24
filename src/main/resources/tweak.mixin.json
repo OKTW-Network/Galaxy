@@ -8,7 +8,10 @@
     "MixinOneSpawnChunk_MinecraftServer",
     "MixinOneSpawnChunk_ServerWorld",
     "MixinRCON_RconBase",
-    "MixinRCON_RconClient"
+    "MixinRCON_RconClient",
+    "MixinThrownCountdown_Entity",
+    "MixinThrownCountdown_ProjectileEntity",
+    "MixinThrownCountdown_ThrownEntity"
   ],
   "client": [],
   "injectors": {

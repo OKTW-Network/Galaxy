@@ -23,6 +23,7 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.PlayerSneakEvent;
+import one.oktw.galaxy.event.type.PlayerSneakReleaseEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,14 +34,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinPlayerSneak_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
+
     @Inject(method = "onClientCommand", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/server/network/ServerPlayerEntity;setSneaking(Z)V",
-        ordinal = 0
+        target = "Lnet/minecraft/server/network/ServerPlayerEntity;setSneaking(Z)V"
     ))
     private void playerInput(ClientCommandC2SPacket packet, CallbackInfo ci) {
         Main main = Main.Companion.getMain();
         if (main == null) return;
-        main.getEventManager().emit(new PlayerSneakEvent(player));
+        switch (packet.getMode()) {
+            case PRESS_SHIFT_KEY -> main.getEventManager().emit(new PlayerSneakEvent(player));
+            case RELEASE_SHIFT_KEY -> main.getEventManager().emit(new PlayerSneakReleaseEvent(player));
+        }
     }
 }

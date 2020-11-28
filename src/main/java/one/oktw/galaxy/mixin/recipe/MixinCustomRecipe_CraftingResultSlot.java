@@ -20,6 +20,7 @@ package one.oktw.galaxy.mixin.recipe;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,6 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinCustomRecipe_CraftingResultSlot {
     @Inject(method = "onTakeItem", at = @At("RETURN"))
     private void consumeInput(PlayerEntity player, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
-        ((ServerPlayerEntity) player).refreshScreenHandler(player.currentScreenHandler);
+        var handler = player.currentScreenHandler;
+        ((ServerPlayerEntity) player).networkHandler.sendPacket(new InventoryS2CPacket(handler.syncId, handler.getStacks()));
     }
 }

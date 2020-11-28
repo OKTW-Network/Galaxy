@@ -16,13 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.interfaces;
+package org.spongepowered.common.mixin.realtime.accessor;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.block.entity.BrewingStandBlockEntity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-import java.util.concurrent.CompletableFuture;
+@Mixin(BrewingStandBlockEntity.class)
+public interface BrewingStandBlockEntityAccessor {
+    @Accessor
+    int getBrewTime();
 
-public interface AsyncChunk_StorageIoWorker {
-    CompletableFuture<CompoundTag> getNbt(ChunkPos pos);
+    @Accessor
+    void setBrewTime(int i);
 }

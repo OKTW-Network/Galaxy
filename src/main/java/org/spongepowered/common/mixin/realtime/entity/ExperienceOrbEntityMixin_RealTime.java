@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -48,47 +48,14 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
 @Mixin(ExperienceOrbEntity.class)
 public abstract class ExperienceOrbEntityMixin_RealTime extends EntityMixin_RealTime {
     @Shadow
-    public int pickupDelay;
-    @Shadow
-    public int orbAge;
+    private int orbAge;
 
-    @Redirect(
-        method = "tick",
-        at = @At(
-            value = "FIELD",
-            target = "Lnet/minecraft/entity/ExperienceOrbEntity;pickupDelay:I",
-            opcode = Opcodes.PUTFIELD
-        )
-    )
-    private void realTimeImpl$adjustForRealTimePickupDelay(final ExperienceOrbEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) this.world).realTimeBridge$getRealTimeTicks();
-        this.pickupDelay = Math.max(0, this.pickupDelay - ticks);
-    }
-
-    @Redirect(
-        method = "tick",
-        at = @At(value = "FIELD",
-            target = "Lnet/minecraft/entity/ExperienceOrbEntity;orbAge:I",
-            opcode = Opcodes.PUTFIELD
-        ),
-        slice = @Slice(
-            from = @At(
-                value = "FIELD",
-                target = "Lnet/minecraft/entity/ExperienceOrbEntity;renderTicks:I",
-                opcode = Opcodes.PUTFIELD
-            ),
-            to = @At(
-                value = "CONSTANT",
-                args = "intValue=6000"
-            )
-        )
-    )
+    @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/ExperienceOrbEntity;orbAge:I", opcode = Opcodes.PUTFIELD))
     private void realTimeImpl$adjustForRealTimeAge(final ExperienceOrbEntity self, final int modifier) {
         final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         this.orbAge += ticks;

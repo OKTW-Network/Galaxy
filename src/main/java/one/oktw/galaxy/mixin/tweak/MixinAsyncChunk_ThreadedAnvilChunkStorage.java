@@ -37,7 +37,7 @@ import net.minecraft.world.chunk.UpgradeData;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.storage.VersionedChunkStorage;
 import one.oktw.galaxy.mixin.accessor.AsyncChunk_VersionedChunkStorage;
-import one.oktw.galaxy.mixin.interfaces.AsyncChunk_StorageIoWorker;
+import one.oktw.galaxy.mixin.accessor.StorageIoWorkerAccessor;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -87,10 +87,9 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
      */
     @Overwrite
     private CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> loadChunk(ChunkPos pos) {
+        this.world.getProfiler().visit("chunkLoad");
         return getUpdatedChunkTagAsync(pos).handleAsync((compoundTag, t) -> {
             try {
-                this.world.getProfiler().visit("chunkLoad");
-
                 if (t != null) {
                     throw (Exception) t;
                 }
@@ -99,7 +98,6 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
                     boolean bl = compoundTag.contains("Level", 10) && compoundTag.getCompound("Level").contains("Status", 8);
                     if (bl) {
                         Chunk chunk = ChunkSerializer.deserialize(this.world, this.structureManager, this.pointOfInterestStorage, pos, compoundTag);
-                        chunk.setLastSaveTime(this.world.getTime());
                         this.method_27053(pos, chunk.getStatus().getChunkType());
                         return Either.left(chunk);
                     }
@@ -119,12 +117,12 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
             }
 
             this.method_27054(pos);
-            return Either.left(new ProtoChunk(pos, UpgradeData.NO_UPGRADE_DATA));
+            return Either.left(new ProtoChunk(pos, UpgradeData.NO_UPGRADE_DATA, this.world));
         }, this.mainThreadExecutor);
     }
 
     private CompletableFuture<CompoundTag> getUpdatedChunkTagAsync(ChunkPos pos) {
-        return ((AsyncChunk_StorageIoWorker) ((AsyncChunk_VersionedChunkStorage) this).getWorker()).getNbt(pos)
+        return ((StorageIoWorkerAccessor) ((AsyncChunk_VersionedChunkStorage) this).getWorker()).callMethod_31738(pos)
             .thenApplyAsync(compoundTag -> compoundTag == null ? null : this.updateChunkTag(world.getRegistryKey(), this.persistentStateManagerFactory, compoundTag), mainThreadExecutor);
     }
 }

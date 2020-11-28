@@ -5,7 +5,8 @@
   "mixins": [
     "AsyncChunk_VersionedChunkStorage",
     "PlayerAbilitiesAccessor",
-    "ServerPlayerEntityFunctionAccessor"
+    "ServerPlayerEntityFunctionAccessor",
+    "StorageIoWorkerAccessor"
   ],
   "client": [],
   "injectors": {

@@ -47,18 +47,18 @@ public class MixinPlayerChat_SayCommand {
         cancellable = true,
         locals = LocalCapture.CAPTURE_FAILSOFT
     )
-    private static void onCommand(CommandContext<ServerCommandSource> context, CallbackInfoReturnable<Integer> cir, Text text, TranslatableText translatableText, Entity entity) {
+    private static void onCommand(CommandContext<ServerCommandSource> context, CallbackInfoReturnable<Integer> cir, Text text, Text text1, Entity entity) {
         if (!(entity instanceof ServerPlayerEntity)) return;
 
         Main main = Main.Companion.getMain();
         ServerPlayerEntity player = (ServerPlayerEntity) entity;
 
-        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, translatableText)).getCancel()) {
-            player.server.getPlayerManager().broadcastChatMessage(translatableText, MessageType.CHAT, entity.getUuid());
+        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, text1)).getCancel()) {
+            player.server.getPlayerManager().broadcastChatMessage(text1, MessageType.CHAT, entity.getUuid());
         } else {
             cir.setReturnValue(0);
             cir.cancel();
-            player.server.sendSystemMessage(translatableText.append(" (Canceled)"), entity.getUuid());
+            player.server.sendSystemMessage(((TranslatableText) text1).append(" (Canceled)"), entity.getUuid());
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,15 +18,8 @@
 
 package one.oktw.galaxy.item.type
 
-enum class WeaponType(val customModelData: Int, val languageKey: String) {
+enum class SwordType(val customModelData: Int, val languageKey: String) {
     DUMMY(0, ""),
-    PISTOL(1010100, "item.Gun.PISTOL"),
-    PISTOL_LASOR(1010200, "item.Gun.PISTOL"),
-    PISTOL_LASOR_AIMING(1010201, "item.Gun.PISTOL"),
-    SNIPER(1010300, "item.Gun.SNIPER"),
-    SNIPER_AIMING(1010301, "item.Gun.SNIPER"),
-    RAILGUN(1010400, "item.Gun.RAILGUN"),
-    RAILGUN_AIMING(1010401, "item.Gun.RAILGUN"),
     SWORD_KATANA_OFF(1020100, "item.Weapon.KATANA"),
     SWORD_KATANA_ON(1020101, "item.Weapon.KATANA"),
     SWORD_KATANA_SCABBARD(1020102, "item.Weapon.KATANA.SCABARD"),

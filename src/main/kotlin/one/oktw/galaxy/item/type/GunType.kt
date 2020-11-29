@@ -18,17 +18,13 @@
 
 package one.oktw.galaxy.item.type
 
-enum class ItemType {
-    // System
-    DUMMY,
-    BUTTON,
-    GUI,
-    BLOCK,
-
-    // Weapons & Tools
-    MATERIAL,
-    GUN,
-    SWORD,
-    TOOL,
-    UPGRADE
+enum class GunType(val customModelData: Int, val languageKey: String) {
+    DUMMY(0, ""),
+    PISTOL(1010100, "item.Gun.PISTOL"),
+    PISTOL_LASOR(1010200, "item.Gun.PISTOL"),
+    PISTOL_LASOR_AIMING(1010201, "item.Gun.PISTOL"),
+    SNIPER(1010300, "item.Gun.SNIPER"),
+    SNIPER_AIMING(1010301, "item.Gun.SNIPER"),
+    RAILGUN(1010400, "item.Gun.RAILGUN"),
+    RAILGUN_AIMING(1010401, "item.Gun.RAILGUN")
 }

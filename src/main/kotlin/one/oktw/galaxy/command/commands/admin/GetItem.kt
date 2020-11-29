@@ -39,7 +39,8 @@ class GetItem {
             .then(GetItem().material)
             .then(GetItem().tool)
             .then(GetItem().upgrade)
-            .then(GetItem().weapon)
+            .then(GetItem().gun)
+            .then(GetItem().sword)
             .then(GetItem().block)
     }
 
@@ -118,18 +119,33 @@ class GetItem {
                     }
             )
 
-    private val weapon =
-        CommandManager.literal("weapon")
+    private val gun =
+        CommandManager.literal("gun")
             .then(
                 CommandManager.argument("item", StringArgumentType.string())
                     .suggests { _, builder ->
                         return@suggests CommandSource.suggestMatching(
-                            WeaponType.values().map { weapon -> weapon.name },
+                            GunType.values().map { gun -> gun.name },
                             builder
                         )
                     }
                     .executes { context ->
-                        getItem(context.source, Weapon(WeaponType.valueOf(StringArgumentType.getString(context, "item"))))
+                        getItem(context.source, Gun(GunType.valueOf(StringArgumentType.getString(context, "item"))))
+                    }
+            )
+
+    private val sword =
+        CommandManager.literal("sword")
+            .then(
+                CommandManager.argument("item", StringArgumentType.string())
+                    .suggests { _, builder ->
+                        return@suggests CommandSource.suggestMatching(
+                            SwordType.values().map { sword -> sword.name },
+                            builder
+                        )
+                    }
+                    .executes { context ->
+                        getItem(context.source, Sword(SwordType.valueOf(StringArgumentType.getString(context, "item"))))
                     }
             )
 

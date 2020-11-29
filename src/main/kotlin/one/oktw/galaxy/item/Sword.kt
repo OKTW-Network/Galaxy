@@ -22,13 +22,12 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.DIAMOND_SWORD
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
-import one.oktw.galaxy.item.type.ItemType.WEAPON
-import one.oktw.galaxy.item.type.WeaponType
-import one.oktw.galaxy.item.type.WeaponType.DUMMY
+import one.oktw.galaxy.item.type.ItemType.SWORD
+import one.oktw.galaxy.item.type.SwordType
 import one.oktw.galaxy.item.util.CustomItemBuilder
 
-class Weapon(val type: WeaponType = DUMMY) : Item {
-    override val itemType = WEAPON
+class Sword(val type: SwordType = SwordType.DUMMY) : Item {
+    override val itemType = SWORD
 
     override val baseItem: net.minecraft.item.Item = DIAMOND_SWORD
 

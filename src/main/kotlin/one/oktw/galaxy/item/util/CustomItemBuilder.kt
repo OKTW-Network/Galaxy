@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -82,6 +82,21 @@ class CustomItemBuilder {
 
     fun setBlockType(blockType: BlockType): CustomItemBuilder {
         this.tags.putString("customBlockType", blockType.name)
+        return this
+    }
+
+    fun setCustomString(name: String, value: String): CustomItemBuilder {
+        this.tags.putString(name, value)
+        return this
+    }
+
+    fun setCustomInt(name: String, value: Int): CustomItemBuilder {
+        this.tags.putInt(name, value)
+        return this
+    }
+
+    fun setCustomDouble(name: String, value: Double): CustomItemBuilder {
+        this.tags.putDouble(name, value)
         return this
     }
 

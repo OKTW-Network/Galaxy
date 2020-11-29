@@ -26,7 +26,15 @@ import one.oktw.galaxy.item.type.GunType
 import one.oktw.galaxy.item.type.ItemType.GUN
 import one.oktw.galaxy.item.util.CustomItemBuilder
 
-class Gun(val type: GunType = GunType.DUMMY) : Item {
+class Gun(
+    val type: GunType = GunType.DUMMY,
+    val heat: Int = 0,
+    val maxTemp: Int = 0,
+    val cooling: Int = 0,
+    val damage: Double = 0.0,
+    val range: Double = 0.0,
+    val through: Int = 1
+) : Item {
     override val itemType = GUN
 
     override val baseItem: net.minecraft.item.Item = DIAMOND_SWORD
@@ -36,6 +44,13 @@ class Gun(val type: GunType = GunType.DUMMY) : Item {
             .setBaseItem(baseItem)
             .setModel(type.customModelData)
             .setItemType(itemType)
+            .setCustomString("gunType", type.name)
+            .setCustomInt("heat", heat)
+            .setCustomInt("maxTemp", maxTemp)
+            .setCustomInt("cooling", cooling)
+            .setCustomDouble("damage", damage)
+            .setCustomDouble("range", range)
+            .setCustomInt("through", through)
             .setUnbreakable()
             .hideAllFlags()
             .removeAllModifiers()

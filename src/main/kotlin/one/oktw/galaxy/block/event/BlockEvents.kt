@@ -126,7 +126,11 @@ class BlockEvents {
         val player = context.player as ServerPlayerEntity
         if (world.getBlockState(position).block != Blocks.BARRIER) return false
         if (player.shouldCancelInteraction() && context.stack.isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
-            CustomBlockUtil.getCustomBlockEntity(world, position) ?: return false
+            CustomBlockUtil.getCustomBlockEntity(world, position)
+                .let {
+                    it ?: return false
+                    if (CustomBlockUtil.getTypeFromCustomBlockEntity(it) == BlockType.ANGEL_BLOCK) return false
+                }
             CustomBlockUtil.removeBlock(world, position)
             return true
         }

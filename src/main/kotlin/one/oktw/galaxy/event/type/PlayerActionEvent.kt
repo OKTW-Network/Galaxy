@@ -16,16 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.block.type
+package one.oktw.galaxy.event.type
 
-enum class BlockType(val customModelData: Int, val languageKey: String, val hasGUI: Boolean = false) {
-    DUMMY(0, ""),
-    CONTROL_PANEL(0, "", true),
-    PLANET_TERMINAL(0, "", true),
-    HT_CRAFTING_TABLE(1010100, "block.HT_CRAFTING_TABLE", true),
-    ELEVATOR(1010200, "block.ELEVATOR"),
-    ANGEL_BLOCK(87, "block.ANGEL_BLOCK"),
-    TELEPORTER_CORE_BASIC(1010300, "block.TELEPORTER", true),
-    TELEPORTER_CORE_ADVANCE(1010301, "block.TELEPORTER_ADVANCED", true),
-    TELEPORTER_FRAME(1010302, "block.TELEPORTER_FRAME")
-}
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
+import net.minecraft.server.network.ServerPlayerEntity
+
+class PlayerActionEvent(val packet: PlayerActionC2SPacket, val player: ServerPlayerEntity) : CancelableEvent()

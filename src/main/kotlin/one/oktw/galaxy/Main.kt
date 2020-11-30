@@ -30,6 +30,7 @@ import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.block.event.BlockEvents
 import one.oktw.galaxy.block.event.Elevator
+import one.oktw.galaxy.block.vanilla.DispenserPlant
 import one.oktw.galaxy.chat.Exchange
 import one.oktw.galaxy.command.commands.Admin
 import one.oktw.galaxy.command.commands.Home
@@ -96,6 +97,9 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(Sign())
             eventManager.register(one.oktw.galaxy.item.event.Wrench())
             eventManager.register(Elevator())
+
+            //DispenserPlant
+            DispenserPlant.register()
         })
 
         // server.log("current server id is $selfUID

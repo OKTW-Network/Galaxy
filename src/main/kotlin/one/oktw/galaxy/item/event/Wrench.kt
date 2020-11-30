@@ -28,9 +28,11 @@ import net.minecraft.block.entity.ShulkerBoxBlockEntity
 import net.minecraft.block.enums.ChestType
 import net.minecraft.block.enums.RailShape
 import net.minecraft.block.enums.SlabType
+import net.minecraft.item.ItemStack
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.state.property.Properties.*
-import net.minecraft.util.Hand
+import net.minecraft.util.Hand.MAIN_HAND
+import net.minecraft.util.Hand.OFF_HAND
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import one.oktw.galaxy.event.annotation.EventListener
@@ -42,25 +44,22 @@ import one.oktw.galaxy.mixin.accessor.ShulkerBoxBlockEntityAccessor
 import java.util.concurrent.ConcurrentHashMap
 
 class Wrench {
+    private val wrenchItemStack = Tool(ToolType.WRENCH).createItemStack()
     private val faceLock = ConcurrentHashMap<ServerPlayerEntity, BlockPos>()
     private val originalFace = ConcurrentHashMap<BlockPos, Direction>()
 
     @EventListener(true)
     fun onUseItemOnBlock(event: PlayerUseItemOnBlock) {
-        val player = event.context.player
-        val hand = event.context.hand
+        val player = event.context.player ?: return
 
-        if (player != null) {
-            if (
-                player.getStackInHand(Hand.MAIN_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) &&
-                hand == Hand.MAIN_HAND && player.shouldCancelInteraction()
-            ) {
-                if (wrenchSpin(event)) player.swingHand(Hand.MAIN_HAND, true)
-            } else if (
-                player.getStackInHand(Hand.OFF_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) &&
-                player.mainHandStack.isEmpty && hand == Hand.OFF_HAND && player.shouldCancelInteraction()
-            ) {
-                if (wrenchSpin(event)) player.swingHand(Hand.OFF_HAND, true)
+        if (!player.shouldCancelInteraction()) return
+
+        when (event.context.hand ?: return) {
+            MAIN_HAND -> if (ItemStack.areEqual(player.mainHandStack, wrenchItemStack)) {
+                if (wrenchSpin(event)) player.swingHand(MAIN_HAND, true)
+            }
+            OFF_HAND -> if (player.mainHandStack.isEmpty && ItemStack.areEqual(player.offHandStack, wrenchItemStack)) {
+                if (wrenchSpin(event)) player.swingHand(OFF_HAND, true)
             }
         }
     }

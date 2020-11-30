@@ -40,6 +40,22 @@ object DispenserPlant {
         val plantBlockPos = if (dispenserFacing == Direction.UP) currentBlockPos.up(1) else currentBlockPos.down(1)
         val plantBlockState = world.getBlockState(plantBlockPos)
 
+        if (block == Blocks.RED_MUSHROOM || block == Blocks.BROWN_MUSHROOM) {
+            if (dispenserFacing == Direction.UP) {
+                if (plantBlockState.block == Blocks.AIR) {
+                    world.setBlockState(plantBlockPos, block.defaultState)
+                    itemStack.decrement(1)
+                    return itemStack
+                }
+            } else {
+                if (currentBlockState.block == Blocks.AIR) {
+                    world.setBlockState(currentBlockPos, block.defaultState)
+                    itemStack.decrement(1)
+                    return itemStack
+                }
+            }
+        }
+
         if  (validBlocksToPlantOn.contains(currentBlockState.block) && plantBlockState.block == Blocks.AIR) {
             world.setBlockState(plantBlockPos, block.defaultState)
             itemStack.decrement(1)
@@ -79,5 +95,9 @@ object DispenserPlant {
         DispenserBlock.registerBehavior(Items.SUGAR_CANE, seedsDispenserBehavior(Blocks.SUGAR_CANE, listOf(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.PODZOL, Blocks.SAND, Blocks.RED_SAND, Blocks.COARSE_DIRT)))
         DispenserBlock.registerBehavior(Items.CHORUS_FLOWER, seedsDispenserBehavior(Blocks.CHORUS_FLOWER, listOf(Blocks.END_STONE)))
         DispenserBlock.registerBehavior(Items.BAMBOO, seedsDispenserBehavior(Blocks.BAMBOO, listOf(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.PODZOL, Blocks.SAND, Blocks.RED_SAND, Blocks.COARSE_DIRT, Blocks.GRAVEL, Blocks.MYCELIUM)))
+        DispenserBlock.registerBehavior(Items.RED_MUSHROOM, seedsDispenserBehavior(Blocks.RED_MUSHROOM, listOf()))
+        DispenserBlock.registerBehavior(Items.BROWN_MUSHROOM, seedsDispenserBehavior(Blocks.BROWN_MUSHROOM, listOf()))
+        DispenserBlock.registerBehavior(Items.CRIMSON_FUNGUS, seedsDispenserBehavior(Blocks.CRIMSON_FUNGUS, listOf(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.FARMLAND, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM, Blocks.SOUL_SOIL, Blocks.MYCELIUM)))
+        DispenserBlock.registerBehavior(Items.WARPED_FUNGUS, seedsDispenserBehavior(Blocks.WARPED_FUNGUS, listOf(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.FARMLAND, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM, Blocks.SOUL_SOIL, Blocks.MYCELIUM)))
     }
 }

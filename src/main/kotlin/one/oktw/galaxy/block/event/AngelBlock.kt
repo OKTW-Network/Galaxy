@@ -19,6 +19,8 @@
 package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+import net.minecraft.block.Blocks
+import net.minecraft.item.ItemStack
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundCategory
@@ -43,31 +45,39 @@ class AngelBlock {
     private fun placeAngelBlock(player: ServerPlayerEntity, hand: Hand) {
         val playerLookVec = player.rotationVector
         val playerPosition = player.pos
-        CustomBlockUtil.placeBlock(
-            player.serverWorld,
-            BlockPos(
-                Vec3d(
-                    playerPosition.x + playerLookVec.x * 3,
-                    playerPosition.y + playerLookVec.y * 3 + 1.5,
-                    playerPosition.z + playerLookVec.z * 3
-                )
-            ),
-            Block(BlockType.ANGEL_BLOCK).item!!.createItemStack(), BlockType.ANGEL_BLOCK
+        val placePosition = Vec3d(
+            playerPosition.x + playerLookVec.x * 3,
+            playerPosition.y + playerLookVec.y * 3 + 1.5,
+            playerPosition.z + playerLookVec.z * 3
         )
-            .run {
-                player.setStackInHand(hand, Block(BlockType.ANGEL_BLOCK).item!!.createItemStack().also { it.count = player.getStackInHand(hand).count - 1 })
-            }
+        val allowReplaceBlocks = listOf<net.minecraft.block.Block>(Blocks.AIR, Blocks.WATER, Blocks.LAVA)
+        if (allowReplaceBlocks.contains(player.serverWorld.getBlockState(BlockPos(placePosition)).block)) {
+            CustomBlockUtil.placeBlock(
+                player.serverWorld,
+                BlockPos(placePosition),
+                Block(BlockType.ANGEL_BLOCK).item!!.createItemStack(), BlockType.ANGEL_BLOCK
+            )
+                .run {
+                    player.setStackInHand(hand, Block(BlockType.ANGEL_BLOCK).item!!.createItemStack().also { it.count = player.getStackInHand(hand).count - 1 })
+                    player.swingHand(hand)
+                }
+        }
     }
 
-    @EventListener
+    @EventListener(sync = true)
     fun onPlace(event: PlayerInteractItemEvent) {
         val player = event.player
-        val customBlockInHandIsAngelBlock = player.getStackInHand(Hand.MAIN_HAND).tag?.get("customBlockType")?.asString() == "ANGEL_BLOCK"
-        if (customBlockInHandIsAngelBlock) {
+        val angelBlockItemStack = Block(BlockType.ANGEL_BLOCK).item!!.createItemStack()
+        val mainHandItemStack = player.getStackInHand(Hand.MAIN_HAND)
+        val offHandItemStack = player.getStackInHand(Hand.OFF_HAND)
+        if (ItemStack.areItemsEqual(angelBlockItemStack, mainHandItemStack) &&
+            ItemStack.areTagsEqual(angelBlockItemStack, mainHandItemStack)
+        ) {
             placeAngelBlock(player, Hand.MAIN_HAND)
         }
-
-        if (customBlockInHandIsAngelBlock) {
+        if (ItemStack.areItemsEqual(angelBlockItemStack, offHandItemStack) &&
+            ItemStack.areTagsEqual(angelBlockItemStack, offHandItemStack)
+        ) {
             placeAngelBlock(player, Hand.OFF_HAND)
         }
     }

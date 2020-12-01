@@ -205,9 +205,11 @@ class Wrench {
         }
 
         world.setBlockState(blockPos, newState)
-        newState = Block.postProcessState(newState, world, blockPos)
         newState.neighborUpdate(world, blockPos, newState.block, blockPos, true)
-        world.setBlockState(blockPos, newState, 2) // Only send update to client
+
+        if (world.isReceivingRedstonePower(blockPos)) {
+            world.setBlockState(blockPos, Block.postProcessState(newState, world, blockPos), 2)
+        }
 
         return true
     }

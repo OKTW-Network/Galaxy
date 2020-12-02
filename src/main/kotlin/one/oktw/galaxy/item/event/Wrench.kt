@@ -207,9 +207,8 @@ class Wrench {
         world.setBlockState(blockPos, newState)
         newState.neighborUpdate(world, blockPos, newState.block, blockPos, true)
 
-        if (world.isReceivingRedstonePower(blockPos)) {
-            world.setBlockState(blockPos, Block.postProcessState(newState, world, blockPos), 2)
-        }
+        val new = Block.postProcessState(newState, world, blockPos)
+        if (!new.isAir) world.setBlockState(blockPos, new, 2)
 
         return true
     }

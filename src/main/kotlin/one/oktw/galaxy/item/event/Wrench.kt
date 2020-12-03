@@ -18,19 +18,20 @@
 
 package one.oktw.galaxy.item.event
 
+import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks.*
 import net.minecraft.block.ChestBlock
-import net.minecraft.block.RepeaterBlock
-import net.minecraft.block.TrappedChestBlock
 import net.minecraft.block.WallMountedBlock.FACE
 import net.minecraft.block.entity.ShulkerBoxBlockEntity
 import net.minecraft.block.enums.ChestType
 import net.minecraft.block.enums.RailShape
 import net.minecraft.block.enums.SlabType
+import net.minecraft.item.ItemStack
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.state.property.Properties.*
-import net.minecraft.util.Hand
+import net.minecraft.util.Hand.MAIN_HAND
+import net.minecraft.util.Hand.OFF_HAND
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import one.oktw.galaxy.event.annotation.EventListener
@@ -38,39 +39,32 @@ import one.oktw.galaxy.event.type.PlayerSneakReleaseEvent
 import one.oktw.galaxy.event.type.PlayerUseItemOnBlock
 import one.oktw.galaxy.item.Tool
 import one.oktw.galaxy.item.type.ToolType
-import one.oktw.galaxy.mixin.accessor.ShulkerBoxBlockEntityAccessor
-import java.util.concurrent.ConcurrentHashMap
+import java.util.*
+import kotlin.collections.set
 
 class Wrench {
-    private val faceLock = ConcurrentHashMap<ServerPlayerEntity, BlockPos>()
-    private val originalFace = ConcurrentHashMap<BlockPos, Direction>()
+    private val wrenchItemStack = Tool(ToolType.WRENCH).createItemStack()
+    private val startDirection = WeakHashMap<ServerPlayerEntity, Pair<BlockPos, Direction>>() // Don't leak ServerPlayerEntity
 
     @EventListener(true)
     fun onUseItemOnBlock(event: PlayerUseItemOnBlock) {
-        val player = event.context.player
-        val hand = event.context.hand
+        val player = event.context.player ?: return
 
-        if (player != null) {
-            if (
-                player.getStackInHand(Hand.MAIN_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) &&
-                hand == Hand.MAIN_HAND && player.shouldCancelInteraction()
-            ) {
-                if (wrenchSpin(event)) player.swingHand(Hand.MAIN_HAND, true)
-            } else if (
-                player.getStackInHand(Hand.OFF_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack()) &&
-                player.mainHandStack.isEmpty && hand == Hand.OFF_HAND && player.shouldCancelInteraction()
-            ) {
-                if (wrenchSpin(event)) player.swingHand(Hand.OFF_HAND, true)
+        if (!player.shouldCancelInteraction()) return
+
+        when (event.context.hand ?: return) {
+            MAIN_HAND -> if (ItemStack.areEqual(player.mainHandStack, wrenchItemStack)) {
+                if (wrenchSpin(event)) player.swingHand(MAIN_HAND, true)
+            }
+            OFF_HAND -> if (player.mainHandStack.isEmpty && ItemStack.areEqual(player.offHandStack, wrenchItemStack)) {
+                if (wrenchSpin(event)) player.swingHand(OFF_HAND, true)
             }
         }
     }
 
     @EventListener(true)
     fun onSneakRelease(event: PlayerSneakReleaseEvent) {
-        if (faceLock.containsKey(event.player)) {
-            if (originalFace.containsKey(faceLock[event.player])) originalFace.remove(faceLock[event.player])
-            faceLock.remove(event.player)
-        }
+        startDirection.remove(event.player)
     }
 
     private fun wrenchSpin(event: PlayerUseItemOnBlock): Boolean {
@@ -78,303 +72,189 @@ class Wrench {
         val player = event.context.player as ServerPlayerEntity
         val blockPos = event.context.blockPos
         val blockState = world.getBlockState(blockPos)
-        val clickDirection = event.context.side
+        val block = blockState.block
+        val clickSide: Direction = event.context.side
 
         // Check destructible
         if (blockState.getHardness(world, blockPos) < 0.0) return false
-        if (((blockState.block == PISTON || blockState.block == STICKY_PISTON) && blockState.get(EXTENDED)) || blockState.block == PISTON_HEAD) return false
+        if (block == PISTON_HEAD || (block == PISTON || block == STICKY_PISTON) && blockState.get(EXTENDED)) return false
         if (blockState.contains(BED_PART)) return false
 
+        // Remove outdated start direction
+        if (startDirection[player]?.first != blockPos) startDirection.remove(player)
 
-        if (faceLock.containsKey(player) && blockPos != faceLock[player]) {
-            if (originalFace.containsKey(faceLock[player])) originalFace.remove(faceLock[player])
+        // Change torch to wall torch
+        when (block) {
+            TORCH, SOUL_TORCH, REDSTONE_TORCH -> {
+                val direction = if (!startDirection.contains(player) && clickSide !in listOf(Direction.UP, Direction.DOWN)) clickSide else Direction.NORTH
+
+                world.setBlockState(blockPos, switchTorch(block).defaultState.with(HORIZONTAL_FACING, direction))
+
+                startDirection[player] = blockPos to direction
+                return true
+            }
         }
 
-        when {
-            blockState.block == TORCH -> {
-                world.setBlockState(
-                    blockPos, WALL_TORCH.defaultState.with(
-                        HORIZONTAL_FACING,
-                        if (!faceLock.containsValue(blockPos) && clickDirection != Direction.UP && clickDirection != Direction.DOWN)
-                            clickDirection else originalFace[blockPos] ?: Direction.NORTH
-                    )
-                )
-
-                if (!faceLock.containsValue(blockPos)) originalFace[blockPos] = if (clickDirection != Direction.UP && clickDirection != Direction.DOWN)
-                    clickDirection else Direction.NORTH
-                faceLock[player] = blockPos
-                return true
-            }
-            blockState.block == SOUL_TORCH -> {
-                world.setBlockState(
-                    blockPos, SOUL_WALL_TORCH.defaultState.with(
-                        HORIZONTAL_FACING,
-                        if (!faceLock.containsValue(blockPos) && clickDirection != Direction.UP && clickDirection != Direction.DOWN)
-                            clickDirection else originalFace[blockPos] ?: Direction.NORTH
-                    )
-                )
-
-                if (!faceLock.containsValue(blockPos)) originalFace[blockPos] = if (clickDirection != Direction.UP && clickDirection != Direction.DOWN)
-                    clickDirection else Direction.NORTH
-                faceLock[player] = blockPos
-                return true
-            }
-            blockState.block == REDSTONE_TORCH -> {
-                val newState = REDSTONE_WALL_TORCH.defaultState.with(
-                    HORIZONTAL_FACING,
-                    if (!faceLock.containsValue(blockPos) && clickDirection != Direction.UP && clickDirection != Direction.DOWN)
-                        clickDirection else originalFace[blockPos] ?: Direction.NORTH
-                )
-                world.setBlockState(blockPos, newState)
-                world.updateNeighborsAlways(blockPos, newState.block)
-                world.updateNeighborsAlways(blockPos.offset(newState.get(HORIZONTAL_FACING)), blockState.block)
-
-                if (!faceLock.containsValue(blockPos)) originalFace[blockPos] = if (clickDirection != Direction.UP && clickDirection != Direction.DOWN)
-                    clickDirection else Direction.NORTH
-                faceLock[player] = blockPos
-                return true
-            }
+        // Rotate Direction
+        var allowUp = true
+        var allowDown = true
+        val propAndDirection = when {
             blockState.contains(FACING) -> {
-                val currentFacing = blockState.get(FACING)
-
-                if (blockState.block == SHULKER_BOX) {
-                    val entity = world.getBlockEntity(blockPos)
-                    if (entity is ShulkerBoxBlockEntity) {
-                        if ((entity as ShulkerBoxBlockEntityAccessor).animationStage != ShulkerBoxBlockEntity.AnimationStage.CLOSED) return false
-                    }
+                // Only allow rotate closed shulker box
+                if (block == SHULKER_BOX) {
+                    val entity = world.getBlockEntity(blockPos) as? ShulkerBoxBlockEntity ?: return false
+                    if (entity.animationStage != ShulkerBoxBlockEntity.AnimationStage.CLOSED) return false
                 }
 
-                if (currentFacing != clickDirection && !faceLock.containsValue(blockPos)) {
-                    world.setBlockState(blockPos, blockState.with(FACING, clickDirection))
-                } else {
-                    world.setBlockState(
-                        blockPos, blockState.with(
-                            FACING,
-                            (if (currentFacing != Direction.UP && currentFacing != Direction.DOWN) {
-                                val toUpDownDirection = if (originalFace[blockPos] != Direction.UP && originalFace[blockPos] != Direction.DOWN)
-                                    originalFace[blockPos] else Direction.NORTH
-                                if (toUpDownDirection == currentFacing.rotateYClockwise()) {
-                                    if (originalFace[blockPos] == Direction.DOWN) {
-                                        Direction.DOWN
-                                    } else {
-                                        Direction.UP
-                                    }
-                                } else {
-                                    currentFacing.rotateYClockwise()
-                                }
-                            } else if (currentFacing == Direction.UP) {
-                                if (originalFace[blockPos] == Direction.DOWN) {
-                                    if (originalFace[blockPos] != Direction.UP && originalFace[blockPos] != Direction.DOWN) {
-                                        originalFace[blockPos]
-                                    } else {
-                                        Direction.NORTH
-                                    }
-                                } else {
-                                    Direction.DOWN
-                                }
-                            } else {
-                                if (!originalFace.containsKey(blockPos) && clickDirection == Direction.DOWN) {
-                                    Direction.UP
-                                } else if (originalFace[blockPos] == Direction.DOWN) {
-                                    Direction.UP
-                                } else {
-                                    if (originalFace[blockPos] != Direction.UP && originalFace[blockPos] != Direction.DOWN) {
-                                        originalFace[blockPos]
-                                    } else {
-                                        Direction.NORTH
-                                    }
-                                }
-                            }) ?: rotateYClockwiseWithUpDown(currentFacing)
-                        )
-                    )
-                }
-
-                if (!faceLock.containsValue(blockPos)) originalFace[blockPos] = clickDirection
-                faceLock[player] = blockPos
-                return true
+                FACING to blockState[FACING]
             }
             blockState.contains(HORIZONTAL_FACING) -> {
-                val currentFacing = blockState.get(HORIZONTAL_FACING)
+                allowUp = false
+                allowDown = false
 
+                // Chest merge & split
                 if (blockState.contains(CHEST_TYPE)) {
-                    val chestFacing: Direction = if (blockState.block == CHEST) {
-                        ChestBlock.getFacing(blockState)
-                    } else {
-                        TrappedChestBlock.getFacing(blockState)
-                    }
+                    val chestFacing = ChestBlock.getFacing(blockState)
 
-                    when (blockState.get(CHEST_TYPE)) {
+                    when (blockState[CHEST_TYPE]!!) {
                         ChestType.LEFT, ChestType.RIGHT -> {
                             val anotherPos = blockPos.offset(chestFacing)
-                            val anotherState = world.getBlockState(anotherPos)
                             world.setBlockState(blockPos, blockState.with(CHEST_TYPE, ChestType.SINGLE))
-                            world.setBlockState(anotherPos, anotherState.with(CHEST_TYPE, ChestType.SINGLE))
+                            world.setBlockState(anotherPos, world.getBlockState(anotherPos).with(CHEST_TYPE, ChestType.SINGLE))
                             return true
                         }
                         ChestType.SINGLE -> {
-                            if (chestFacing == clickDirection) {
+                            // TODO refactor
+                            if (chestFacing == clickSide) {
                                 if (connectChest(event, chestFacing, blockPos, blockState, false)) return true
-                            } else if (chestFacing.opposite == clickDirection) {
+                            } else if (chestFacing.opposite == clickSide) {
                                 if (connectChest(event, chestFacing, blockPos, blockState, true)) return true
                             }
                         }
-                        else -> Unit
                     }
                 }
 
-                val newDirection: Direction
-
-                if (
-                    currentFacing != clickDirection && clickDirection != Direction.UP &&
-                    clickDirection != Direction.DOWN && !faceLock.containsValue(blockPos)
-                ) {
-                    world.setBlockState(blockPos, blockState.with(HORIZONTAL_FACING, clickDirection))
-                    originalFace[blockPos] = clickDirection
-                    faceLock[player] = blockPos
-                    return true
-                } else {
-                    newDirection = blockState.get(HORIZONTAL_FACING).rotateYClockwise()
-                }
-
-                var newState = blockState.with(HORIZONTAL_FACING, newDirection)
-
-                if (blockState.contains(BLOCK_HALF)) {
-                    if (originalFace.containsKey(blockPos) && (newDirection == originalFace[blockPos] ?: Direction.NORTH)) {
-                        newState = newState.cycle(BLOCK_HALF)
-                    }
-                }
-
-                if (blockState.block == WALL_TORCH) {
-                    if (originalFace.containsKey(blockPos) && (newDirection == originalFace[blockPos] ?: Direction.NORTH)) {
-                        newState = TORCH.defaultState
-                    }
-                }
-
-                if (blockState.block == SOUL_WALL_TORCH) {
-                    if (originalFace.containsKey(blockPos) && (newDirection == originalFace[blockPos] ?: Direction.NORTH)) {
-                        newState = SOUL_TORCH.defaultState
-                    }
-                }
-
-                if (blockState.block == REDSTONE_WALL_TORCH) {
-                    if (originalFace.containsKey(blockPos) && (newDirection == originalFace[blockPos] ?: Direction.NORTH)) {
-                        newState = REDSTONE_TORCH.defaultState
-                    }
-                }
-
-                if (blockState.contains(FACE)) {
-                    if (originalFace.containsKey(blockPos) && (newDirection == originalFace[blockPos] ?: Direction.NORTH)) {
-                        newState = newState.cycle(FACE)
-                    }
-                }
-
-                if (blockState.contains(ATTACHMENT)) {
-                    if (originalFace.containsKey(blockPos) && (newDirection == originalFace[blockPos] ?: Direction.NORTH)) {
-                        newState = newState.cycle(ATTACHMENT)
-                    }
-                }
-
-                if (blockState.block == REPEATER) {
-                    newState = newState.with(LOCKED, (blockState.block as RepeaterBlock).isLocked(world, blockPos, newState))
-                }
-
-                if (!faceLock.containsValue(blockPos)) originalFace[blockPos] = if (clickDirection != Direction.UP && clickDirection != Direction.DOWN)
-                    clickDirection else newDirection
-                world.setBlockState(blockPos, newState)
-                world.updateNeighborsAlways(blockPos, newState.block)
-                if (newState.contains(HORIZONTAL_FACING)) {
-                    world.updateNeighborsAlways(blockPos.offset(newState.get(HORIZONTAL_FACING)), newState.block)
-                }
-                faceLock[player] = blockPos
-                return true
+                HORIZONTAL_FACING to blockState[HORIZONTAL_FACING]
             }
             blockState.contains(HOPPER_FACING) -> {
-                val currentFacing = blockState.get(HOPPER_FACING)
-
-                if (currentFacing != clickDirection && clickDirection != Direction.UP && !faceLock.containsValue(blockPos)) {
-                    world.setBlockState(blockPos, blockState.with(HOPPER_FACING, clickDirection))
-                } else {
-                    world.setBlockState(blockPos, blockState.with(HOPPER_FACING, rotateHopper(currentFacing, blockPos)))
+                allowUp = false
+                HOPPER_FACING to blockState[HOPPER_FACING]
+            }
+            else -> when { // Not direction rotate
+                blockState.contains(RAIL_SHAPE) -> {
+                    val currentState = blockState[RAIL_SHAPE]
+                    world.setBlockState(blockPos, blockState.with(RAIL_SHAPE, spinRail(currentState)))
+                    return currentState != spinRail(currentState)
                 }
-                if (!faceLock.containsValue(blockPos)) originalFace[blockPos] = if (clickDirection != Direction.UP)
-                    clickDirection else rotateHopper(currentFacing, blockPos)
-                faceLock[player] = blockPos
-                return true
-            }
-            blockState.contains(RAIL_SHAPE) -> {
-                val currentState = blockState.get(RAIL_SHAPE)
-                world.setBlockState(blockPos, blockState.with(RAIL_SHAPE, spinRail(currentState)))
-                return currentState != spinRail(currentState)
-            }
-            blockState.contains(STRAIGHT_RAIL_SHAPE) -> {
-                val currentState = blockState.get(STRAIGHT_RAIL_SHAPE)
-                world.setBlockState(blockPos, blockState.with(STRAIGHT_RAIL_SHAPE, spinRail(currentState)))
-                return currentState != spinRail(currentState)
-            }
-            blockState.contains(AXIS) -> {
-                world.setBlockState(blockPos, blockState.cycle(AXIS))
-                return true
-            }
-            blockState.contains(ROTATION) -> {
-                world.setBlockState(blockPos, blockState.cycle(ROTATION))
-                return true
-            }
-            blockState.contains(SLAB_TYPE) -> {
-                val direction = blockState.get(SLAB_TYPE)
-                if (direction == SlabType.TOP) {
-                    world.setBlockState(blockPos, blockState.with(SLAB_TYPE, SlabType.BOTTOM))
-                } else if (direction == SlabType.BOTTOM) {
-                    world.setBlockState(blockPos, blockState.with(SLAB_TYPE, SlabType.TOP))
+                blockState.contains(STRAIGHT_RAIL_SHAPE) -> {
+                    val currentState = blockState[STRAIGHT_RAIL_SHAPE]
+                    world.setBlockState(blockPos, blockState.with(STRAIGHT_RAIL_SHAPE, spinRail(currentState)))
+                    return currentState != spinRail(currentState)
                 }
-                return true
+                blockState.contains(AXIS) -> {
+                    world.setBlockState(blockPos, blockState.cycle(AXIS))
+                    return true
+                }
+                blockState.contains(ROTATION) -> {
+                    world.setBlockState(blockPos, blockState.cycle(ROTATION))
+                    return true
+                }
+                blockState.contains(SLAB_TYPE) -> {
+                    val direction = blockState[SLAB_TYPE]
+                    if (direction == SlabType.TOP) {
+                        world.setBlockState(blockPos, blockState.with(SLAB_TYPE, SlabType.BOTTOM))
+                    } else if (direction == SlabType.BOTTOM) {
+                        world.setBlockState(blockPos, blockState.with(SLAB_TYPE, SlabType.TOP))
+                    }
+                    return true
+                }
+                else -> return false
             }
         }
 
-        return false
+        val direction = if (startDirection.contains(player)) {
+            rotate(propAndDirection.second, startDirection[player]!!.second, allowUp, allowDown)
+        } else when (clickSide) { // First rotate
+            Direction.UP -> if (allowUp && propAndDirection.second != Direction.UP) Direction.UP else null
+            Direction.DOWN -> if (allowDown && propAndDirection.second != Direction.DOWN) Direction.DOWN else null
+            propAndDirection.second -> null
+            else -> clickSide
+        } ?: rotate(propAndDirection.second, propAndDirection.second, allowUp, allowDown)
+
+        var newState = blockState.with(propAndDirection.first, direction)
+        if (!startDirection.contains(player)) {
+            // Always set clickSide as start
+            startDirection[player] = blockPos to when (clickSide) {
+                Direction.UP -> if (allowUp) clickSide else propAndDirection.second // fallback to origin direction
+                Direction.DOWN -> if (allowDown) clickSide else propAndDirection.second // fallback to origin direction
+                else -> clickSide
+            }
+        } else if (direction == startDirection[player]?.second && blockState.contains(HORIZONTAL_FACING)) { // Magic rotate
+            // Torch
+            if (block in listOf(WALL_TORCH, SOUL_WALL_TORCH, REDSTONE_WALL_TORCH)) {
+                newState = switchTorch(block).defaultState
+            }
+
+            // Cycle property
+            for (prop in listOf(BLOCK_HALF, FACE, ATTACHMENT)) {
+                if (newState!!.contains(prop)) {
+                    newState = newState.cycle(prop)
+                    break
+                }
+            }
+        }
+
+        world.setBlockState(blockPos, newState)
+        newState.neighborUpdate(world, blockPos, newState.block, blockPos, true)
+        Block.postProcessState(newState, world, blockPos).let { if (!it.isAir) world.setBlockState(blockPos, it, 2) }
+
+        return true
     }
 
-    private fun rotateHopper(hopperDirection: Direction, blockPos: BlockPos): Direction = if (hopperDirection == Direction.DOWN) {
-        (if (originalFace[blockPos] != Direction.DOWN) originalFace[blockPos] else Direction.NORTH) ?: Direction.NORTH
-    } else {
-        if (
-            originalFace.containsKey(blockPos) &&
-            (hopperDirection.rotateYClockwise() == (if (originalFace[blockPos] != Direction.DOWN) originalFace[blockPos] else Direction.NORTH) ?: Direction.NORTH)
-        ) {
-            Direction.DOWN
-        } else {
-            hopperDirection.rotateYClockwise()
+    private fun rotate(now: Direction, start: Direction, up: Boolean = true, down: Boolean = true): Direction {
+        return when (now) {
+            Direction.DOWN -> if (start.axis.isHorizontal) start else Direction.NORTH
+            Direction.UP -> if (down) Direction.DOWN else if (start.axis.isHorizontal) start else Direction.NORTH
+            Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST -> {
+                val direction = now.rotateYClockwise()
+                if (direction == start || direction == Direction.NORTH && (start.axis.isVertical)) when {
+                    up -> Direction.UP
+                    down -> Direction.DOWN
+                    else -> direction
+                } else direction
+            }
         }
     }
 
+    private fun switchTorch(block: Block) = when (block) {
+        TORCH -> WALL_TORCH
+        SOUL_TORCH -> SOUL_WALL_TORCH
+        REDSTONE_TORCH -> REDSTONE_WALL_TORCH
+        WALL_TORCH -> TORCH
+        SOUL_WALL_TORCH -> SOUL_TORCH
+        REDSTONE_WALL_TORCH -> REDSTONE_TORCH
+        else -> throw IllegalArgumentException("Not supported block.")
+    }
 
+    // TODO clean up
     private fun connectChest(event: PlayerUseItemOnBlock, chestFacing: Direction, blockPos: BlockPos, blockState: BlockState, opposite: Boolean): Boolean {
         val world = event.context.world
-        val facing = blockState.get(HORIZONTAL_FACING)
         val anotherPos = blockPos.offset(if (opposite) chestFacing.opposite else chestFacing)
         val anotherState = world.getBlockState(anotherPos)
 
         if (anotherState.block != blockState.block) return false
 
-        if ((anotherState.block == CHEST || anotherState.block == TRAPPED_CHEST) && anotherState.get(CHEST_TYPE) == ChestType.SINGLE) {
-            val anotherFacing = anotherState.get(HORIZONTAL_FACING)
-
-            if (facing == anotherFacing) {
-                world.setBlockState(blockPos, blockState.with(CHEST_TYPE, if (opposite) ChestType.LEFT else ChestType.RIGHT))
-                world.setBlockState(anotherPos, anotherState.with(CHEST_TYPE, if (opposite) ChestType.RIGHT else ChestType.LEFT))
-                return true
-            }
+        if (
+            (anotherState.block == CHEST || anotherState.block == TRAPPED_CHEST) &&
+            anotherState.get(CHEST_TYPE) == ChestType.SINGLE &&
+            blockState.get(HORIZONTAL_FACING) == anotherState.get(HORIZONTAL_FACING)
+        ) {
+            world.setBlockState(blockPos, blockState.with(CHEST_TYPE, if (opposite) ChestType.LEFT else ChestType.RIGHT))
+            world.setBlockState(anotherPos, anotherState.with(CHEST_TYPE, if (opposite) ChestType.RIGHT else ChestType.LEFT))
+            return true
         }
 
         return false
-    }
-
-    private fun rotateYClockwiseWithUpDown(direction: Direction) = when (direction) {
-        Direction.NORTH -> Direction.EAST
-        Direction.EAST -> Direction.SOUTH
-        Direction.SOUTH -> Direction.WEST
-        Direction.WEST -> Direction.UP
-        Direction.UP -> Direction.DOWN
-        Direction.DOWN -> Direction.NORTH
     }
 
     private fun spinRail(shape: RailShape) = when (shape) {

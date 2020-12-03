@@ -206,9 +206,7 @@ class Wrench {
 
         world.setBlockState(blockPos, newState)
         newState.neighborUpdate(world, blockPos, newState.block, blockPos, true)
-
-        val new = Block.postProcessState(newState, world, blockPos)
-        if (!new.isAir) world.setBlockState(blockPos, new, 2)
+        Block.postProcessState(newState, world, blockPos).let { if (!it.isAir) world.setBlockState(blockPos, it, 2) }
 
         return true
     }

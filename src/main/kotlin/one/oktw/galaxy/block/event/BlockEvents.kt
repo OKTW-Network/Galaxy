@@ -21,6 +21,7 @@ package one.oktw.galaxy.block.event
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.block.Blocks
 import net.minecraft.item.ItemPlacementContext
+import net.minecraft.item.ItemStack
 import net.minecraft.item.ItemUsageContext
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
@@ -40,6 +41,7 @@ import one.oktw.galaxy.item.type.ToolType
 class BlockEvents {
     private val eventLock = HashSet<PlayerInteractBlockC2SPacket>()
     private val usedLock = HashSet<ServerPlayerEntity>()
+    private val wrench = Tool(ToolType.WRENCH).createItemStack()
 
     init {
         ServerTickEvents.END_WORLD_TICK.register(
@@ -80,7 +82,7 @@ class BlockEvents {
         }
         if (item.item == Tool().baseItem) {
             if (tryBreakBlock(event.context)) {
-                if (player.getStackInHand(Hand.MAIN_HAND).isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
+                if (ItemStack.areEqual(player.mainHandStack, wrench)) {
                     player.swingHand(Hand.MAIN_HAND, true)
                 } else {
                     player.swingHand(event.context.hand, true)
@@ -125,7 +127,7 @@ class BlockEvents {
         val position = context.blockPos
         val player = context.player as ServerPlayerEntity
         if (world.getBlockState(position).block != Blocks.BARRIER) return false
-        if (player.shouldCancelInteraction() && context.stack.isItemEqual(Tool(ToolType.WRENCH).createItemStack())) {
+        if (player.shouldCancelInteraction() && ItemStack.areEqual(context.stack, wrench)) {
             CustomBlockUtil.getCustomBlockEntity(world, position) ?: return false
             CustomBlockUtil.removeBlock(world, position)
             return true

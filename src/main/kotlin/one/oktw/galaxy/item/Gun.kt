@@ -25,6 +25,8 @@ import net.minecraft.util.Formatting
 import one.oktw.galaxy.item.type.GunType
 import one.oktw.galaxy.item.type.ItemType.GUN
 import one.oktw.galaxy.item.util.CustomItemBuilder
+import one.oktw.galaxy.item.util.Gun
+import java.util.*
 
 class Gun(
     val type: GunType = GunType.DUMMY,
@@ -33,7 +35,8 @@ class Gun(
     val cooling: Int = 0,
     val damage: Double = 0.0,
     val range: Double = 0.0,
-    val through: Int = 1
+    val through: Int = 1,
+    val uuid: UUID = UUID.randomUUID()
 ) : Item {
     override val itemType = GUN
 
@@ -44,6 +47,7 @@ class Gun(
             .setBaseItem(baseItem)
             .setModel(type.customModelData)
             .setItemType(itemType)
+            .setUUID("gunUUID", uuid)
             .setCustomString("gunType", type.name)
             .setCustomInt("heat", heat)
             .setCustomInt("maxTemp", maxTemp)
@@ -57,10 +61,11 @@ class Gun(
 
         if (type.languageKey != "") {
             TranslatableText(type.languageKey).styled {
-                it.withColor(Formatting.GREEN) //TODO Advanced weapon
-                it.withItalic(false)
+                it.withColor(Formatting.GREEN).withItalic(false) //TODO Advanced weapon
             }.let(item::setName)
         }
+
+        Gun.fromItem(item.build())?.toLoreTag()?.let(item::setLore)
 
         return item.build()
     }

@@ -26,6 +26,7 @@ import net.minecraft.nbt.ListTag
 import net.minecraft.text.Text
 import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.item.type.ItemType
+import java.util.*
 
 class CustomItemBuilder {
     private var baseItem: ItemConvertible = AIR
@@ -82,6 +83,18 @@ class CustomItemBuilder {
 
     fun setBlockType(blockType: BlockType): CustomItemBuilder {
         this.tags.putString("customBlockType", blockType.name)
+        return this
+    }
+
+    fun setLore(value: ListTag): CustomItemBuilder {
+        val subTag = if (this.tags.contains("display")) this.tags.getCompound("display") else CompoundTag()
+        subTag.put("Lore", value)
+        this.tags.put("display", subTag)
+        return this
+    }
+
+    fun setUUID(name: String, value: UUID): CustomItemBuilder {
+        this.tags.putUuid(name, value)
         return this
     }
 

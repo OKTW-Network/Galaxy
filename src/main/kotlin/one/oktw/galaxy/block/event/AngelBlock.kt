@@ -23,6 +23,8 @@ import net.minecraft.block.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
@@ -90,6 +92,7 @@ class AngelBlock {
             !justBreaked.contains(player)
         ) {
             CustomBlockUtil.removeBlock(player.serverWorld, blockPos)
+            player.serverWorld.playSound(null, blockPos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
             justBreaked.add(player)
         }
     }

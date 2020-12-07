@@ -79,6 +79,7 @@ class Wrench {
         if (blockState.getHardness(world, blockPos) < 0.0) return false
         if (block == PISTON_HEAD || (block == PISTON || block == STICKY_PISTON) && blockState.get(EXTENDED)) return false
         if (blockState.contains(BED_PART)) return false
+        if (block == MELON_STEM || block == PUMPKIN_STEM || block == COCOA || block == ATTACHED_MELON_STEM || block == ATTACHED_PUMPKIN_STEM) return false
 
         // Remove outdated start direction
         if (startDirection[player]?.first != blockPos) startDirection.remove(player)

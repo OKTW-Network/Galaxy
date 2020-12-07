@@ -47,14 +47,14 @@ object DispenserPlant {
             if (dispenserFacing == Direction.UP) {
                 if (plantBlockState.block == Blocks.AIR && world.getBaseLightLevel(plantBlockPos, 0) < 13 && currentBlockState.isOpaqueFullCube(world, currentBlockPos)) {
                     world.setBlockState(plantBlockPos, block.defaultState)
-                    world.playSound(null, plantBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 1.0F)
+                    world.playSound(null, plantBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
                     itemStack.decrement(1)
                     return itemStack
                 }
             } else {
                 if (currentBlockState.block == Blocks.AIR && world.getBaseLightLevel(currentBlockPos, 0) < 13 && plantBlockState.isOpaqueFullCube(world, plantBlockPos)) {
                     world.setBlockState(currentBlockPos, block.defaultState)
-                    world.playSound(null, currentBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 1.0F)
+                    world.playSound(null, currentBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
                     itemStack.decrement(1)
                     return itemStack
                 }
@@ -63,14 +63,14 @@ object DispenserPlant {
 
         if  (validBlocksToPlantOn.contains(currentBlockState.block) && plantBlockState.block == Blocks.AIR) {
             world.setBlockState(plantBlockPos, block.defaultState)
-            world.playSound(null, plantBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 1.0F)
+            world.playSound(null, plantBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
             itemStack.decrement(1)
             return itemStack
         }
 
         if (validBlocksToPlantOn.contains(plantBlockState.block) && currentBlockState.block == Blocks.AIR) {
             world.setBlockState(currentBlockPos, block.defaultState)
-            world.playSound(null, currentBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 1.0F)
+            world.playSound(null, currentBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
             itemStack.decrement(1)
             return itemStack
         }

@@ -28,6 +28,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.minecraft.recipe.RecipeType
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
+import one.oktw.galaxy.block.event.AngelBlock
 import one.oktw.galaxy.block.event.BlockEvents
 import one.oktw.galaxy.block.event.Elevator
 import one.oktw.galaxy.chat.Exchange
@@ -96,6 +97,7 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(Sign())
             eventManager.register(one.oktw.galaxy.item.event.Wrench())
             eventManager.register(Elevator())
+            eventManager.register(AngelBlock())
         })
 
         // server.log("current server id is $selfUID

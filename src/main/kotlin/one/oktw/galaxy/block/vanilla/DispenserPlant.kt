@@ -42,13 +42,13 @@ object DispenserPlant {
 
         if (block == Blocks.RED_MUSHROOM || block == Blocks.BROWN_MUSHROOM) {
             if (dispenserFacing == Direction.UP) {
-                if (plantBlockState.block == Blocks.AIR) {
+                if (plantBlockState.block == Blocks.AIR && world.getBaseLightLevel(plantBlockPos, 0) < 13 && currentBlockState.isOpaqueFullCube(world, currentBlockPos)) {
                     world.setBlockState(plantBlockPos, block.defaultState)
                     itemStack.decrement(1)
                     return itemStack
                 }
             } else {
-                if (currentBlockState.block == Blocks.AIR) {
+                if (currentBlockState.block == Blocks.AIR && world.getBaseLightLevel(currentBlockPos, 0) < 13 && plantBlockState.isOpaqueFullCube(world, plantBlockPos)) {
                     world.setBlockState(currentBlockPos, block.defaultState)
                     itemStack.decrement(1)
                     return itemStack

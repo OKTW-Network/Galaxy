@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy.block.util
 
+import net.minecraft.block.Blocks
 import net.minecraft.block.Blocks.AIR
 import net.minecraft.entity.Entity
 import net.minecraft.item.BlockItem
@@ -40,6 +41,22 @@ object CustomBlockUtil {
         val blockPos = context.blockPos
         val placeResult = (BARRIER as BlockItem).place(context)
         if (placeResult == ActionResult.SUCCESS || placeResult == ActionResult.CONSUME) {
+            CustomBlockEntityBuilder()
+                .setBlockItem(blockItem)
+                .setBlockType(blockType)
+                .setPosition(blockPos)
+                .setWorld(world)
+                .setSmall()
+                .setSlotsDisabled()
+                .create()
+            playSound(world, blockPos)
+            return true
+        }
+        return false
+    }
+
+    fun placeBlock(world: ServerWorld, blockPos: BlockPos, blockItem: ItemStack, blockType: BlockType): Boolean {
+        if (world.setBlockState(blockPos, Blocks.BARRIER.defaultState)) {
             CustomBlockEntityBuilder()
                 .setBlockItem(blockItem)
                 .setBlockType(blockType)

@@ -56,7 +56,7 @@ class AngelBlock {
                 Block(BlockType.ANGEL_BLOCK).item!!.createItemStack(), BlockType.ANGEL_BLOCK
             )
                 .run {
-                    player.setStackInHand(hand, player.getStackInHand(hand).also { it.decrement(1) })
+                    if(!player.isCreative) player.setStackInHand(hand, player.getStackInHand(hand).also { it.decrement(1) })
                     player.swingHand(hand)
                 }
         }

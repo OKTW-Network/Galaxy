@@ -61,18 +61,20 @@ object DispenserPlant {
             }
         }
 
-        if  (validBlocksToPlantOn.contains(currentBlockState.block) && plantBlockState.block == Blocks.AIR) {
-            world.setBlockState(plantBlockPos, block.defaultState)
-            world.playSound(null, plantBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
-            itemStack.decrement(1)
-            return itemStack
-        }
-
-        if (validBlocksToPlantOn.contains(plantBlockState.block) && currentBlockState.block == Blocks.AIR) {
-            world.setBlockState(currentBlockPos, block.defaultState)
-            world.playSound(null, currentBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
-            itemStack.decrement(1)
-            return itemStack
+        if (dispenserFacing == Direction.UP) {
+            if  (validBlocksToPlantOn.contains(currentBlockState.block) && plantBlockState.block == Blocks.AIR) {
+                world.setBlockState(plantBlockPos, block.defaultState)
+                world.playSound(null, plantBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
+                itemStack.decrement(1)
+                return itemStack
+            }
+        } else {
+            if (validBlocksToPlantOn.contains(plantBlockState.block) && currentBlockState.block == Blocks.AIR) {
+                world.setBlockState(currentBlockPos, block.defaultState)
+                world.playSound(null, currentBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
+                itemStack.decrement(1)
+                return itemStack
+            }
         }
 
         return ItemDispenserBehavior().dispense(blockPointer, itemStack)

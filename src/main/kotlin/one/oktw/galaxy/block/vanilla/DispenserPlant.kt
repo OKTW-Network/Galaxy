@@ -27,6 +27,7 @@ import net.minecraft.item.Items
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
+import net.minecraft.state.property.Properties
 import net.minecraft.util.math.BlockPointer
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
@@ -42,6 +43,17 @@ object DispenserPlant {
 
         val plantBlockPos = if (dispenserFacing == Direction.UP) currentBlockPos.up(1) else currentBlockPos.down(1)
         val plantBlockState = world.getBlockState(plantBlockPos)
+
+        if (block == Blocks.COCOA && dispenserFacing != Direction.UP && dispenserFacing != Direction.DOWN && currentBlockState.block == Blocks.AIR) {
+            val cocoaPlantBlockState = world.getBlockState(currentBlockPos.offset(dispenserFacing, 1))
+
+            if (cocoaPlantBlockState.block == Blocks.JUNGLE_LOG) {
+                world.setBlockState(currentBlockPos, block.defaultState.with(Properties.HORIZONTAL_FACING, dispenserFacing))
+                world.playSound(null, currentBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
+                itemStack.decrement(1)
+                return itemStack
+            }
+        }
 
         if (block == Blocks.RED_MUSHROOM || block == Blocks.BROWN_MUSHROOM) {
             if (dispenserFacing == Direction.UP) {
@@ -108,5 +120,6 @@ object DispenserPlant {
         DispenserBlock.registerBehavior(Items.BROWN_MUSHROOM, plantDispenserBehavior(Blocks.BROWN_MUSHROOM, listOf(), SoundEvents.BLOCK_GRASS_PLACE))
         DispenserBlock.registerBehavior(Items.CRIMSON_FUNGUS, plantDispenserBehavior(Blocks.CRIMSON_FUNGUS, listOf(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.FARMLAND, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM, Blocks.SOUL_SOIL, Blocks.MYCELIUM), SoundEvents.BLOCK_FUNGUS_PLACE))
         DispenserBlock.registerBehavior(Items.WARPED_FUNGUS, plantDispenserBehavior(Blocks.WARPED_FUNGUS, listOf(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.FARMLAND, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM, Blocks.SOUL_SOIL, Blocks.MYCELIUM), SoundEvents.BLOCK_FUNGUS_PLACE))
+        DispenserBlock.registerBehavior(Items.COCOA_BEANS, plantDispenserBehavior(Blocks.COCOA, listOf(Blocks.JUNGLE_LOG), SoundEvents.BLOCK_WOOD_PLACE))
     }
 }

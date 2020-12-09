@@ -120,6 +120,6 @@ object DispenserPlant {
         DispenserBlock.registerBehavior(Items.BROWN_MUSHROOM, plantDispenserBehavior(Blocks.BROWN_MUSHROOM, listOf(), SoundEvents.BLOCK_GRASS_PLACE))
         DispenserBlock.registerBehavior(Items.CRIMSON_FUNGUS, plantDispenserBehavior(Blocks.CRIMSON_FUNGUS, listOf(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.FARMLAND, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM, Blocks.SOUL_SOIL, Blocks.MYCELIUM), SoundEvents.BLOCK_FUNGUS_PLACE))
         DispenserBlock.registerBehavior(Items.WARPED_FUNGUS, plantDispenserBehavior(Blocks.WARPED_FUNGUS, listOf(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.FARMLAND, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM, Blocks.SOUL_SOIL, Blocks.MYCELIUM), SoundEvents.BLOCK_FUNGUS_PLACE))
-        DispenserBlock.registerBehavior(Items.COCOA_BEANS, plantDispenserBehavior(Blocks.COCOA, listOf(Blocks.JUNGLE_LOG), SoundEvents.BLOCK_WOOD_PLACE))
+        DispenserBlock.registerBehavior(Items.COCOA_BEANS, plantDispenserBehavior(Blocks.COCOA, listOf(Blocks.JUNGLE_LOG, Blocks.JUNGLE_WOOD, Blocks.STRIPPED_JUNGLE_LOG, Blocks.STRIPPED_JUNGLE_WOOD), SoundEvents.BLOCK_WOOD_PLACE))
     }
 }

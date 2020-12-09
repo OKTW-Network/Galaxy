@@ -18,6 +18,8 @@
 
 package one.oktw.galaxy.command.commands.admin
 
+import com.mojang.brigadier.arguments.DoubleArgumentType
+import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.minecraft.command.CommandSource
@@ -119,6 +121,32 @@ class GetItem {
                     }
             )
 
+    // /admin getItem gun <item> [<heat>] <maxTemp> <cooling> <damage> <range> <through>
+    private val throughArgument = CommandManager.argument("through", IntegerArgumentType.integer())
+        .executes { context ->
+            getItem(
+                context.source,
+                Gun(
+                    GunType.valueOf(StringArgumentType.getString(context, "item")),
+                    IntegerArgumentType.getInteger(context, "heat"),
+                    IntegerArgumentType.getInteger(context, "maxTemp"),
+                    DoubleArgumentType.getDouble(context, "cooling"),
+                    DoubleArgumentType.getDouble(context, "damage"),
+                    DoubleArgumentType.getDouble(context, "range"),
+                    IntegerArgumentType.getInteger(context, "through")
+                )
+            )
+        }
+    private val rangeArgument = CommandManager.argument("range", DoubleArgumentType.doubleArg())
+        .then(throughArgument)
+    private val damageArgument = CommandManager.argument("damage", DoubleArgumentType.doubleArg())
+        .then(rangeArgument)
+    private val coolingArgument = CommandManager.argument("cooling", DoubleArgumentType.doubleArg())
+        .then(damageArgument)
+    private val maxTempArgument = CommandManager.argument("maxTemp", IntegerArgumentType.integer())
+        .then(coolingArgument)
+    private val heatArgument = CommandManager.argument("heat", IntegerArgumentType.integer())
+        .then(maxTempArgument)
     private val gun =
         CommandManager.literal("gun")
             .then(
@@ -132,8 +160,10 @@ class GetItem {
                     .executes { context ->
                         getItem(context.source, Gun(GunType.valueOf(StringArgumentType.getString(context, "item"))))
                     }
+                    .then(heatArgument)
             )
 
+    // /admin getItem sword <item>
     private val sword =
         CommandManager.literal("sword")
             .then(

@@ -44,14 +44,18 @@ object DispenserPlant {
         val plantBlockPos = if (dispenserFacing == Direction.UP) currentBlockPos.up(1) else currentBlockPos.down(1)
         val plantBlockState = world.getBlockState(plantBlockPos)
 
-        if (block == Blocks.COCOA && dispenserFacing != Direction.UP && dispenserFacing != Direction.DOWN && currentBlockState.block == Blocks.AIR) {
-            val cocoaPlantBlockState = world.getBlockState(currentBlockPos.offset(dispenserFacing, 1))
+        if (block == Blocks.COCOA) {
+            if (dispenserFacing != Direction.UP && dispenserFacing != Direction.DOWN && currentBlockState.block == Blocks.AIR) {
+                val cocoaPlantBlockState = world.getBlockState(currentBlockPos.offset(dispenserFacing, 1))
 
-            if (cocoaPlantBlockState.block == Blocks.JUNGLE_LOG) {
-                world.setBlockState(currentBlockPos, block.defaultState.with(Properties.HORIZONTAL_FACING, dispenserFacing))
-                world.playSound(null, currentBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
-                itemStack.decrement(1)
-                return itemStack
+                if (cocoaPlantBlockState.block == Blocks.JUNGLE_LOG) {
+                    world.setBlockState(currentBlockPos, block.defaultState.with(Properties.HORIZONTAL_FACING, dispenserFacing))
+                    world.playSound(null, currentBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
+                    itemStack.decrement(1)
+                    return itemStack
+                }
+            } else {
+                return ItemDispenserBehavior().dispense(blockPointer, itemStack)
             }
         }
 
@@ -73,7 +77,7 @@ object DispenserPlant {
             }
         }
 
-        if (dispenserFacing == Direction.UP && block != Blocks.COCOA) {
+        if (dispenserFacing == Direction.UP) {
             if  (validBlocksToPlantOn.contains(currentBlockState.block) && plantBlockState.block == Blocks.AIR) {
                 world.setBlockState(plantBlockPos, block.defaultState)
                 world.playSound(null, plantBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)

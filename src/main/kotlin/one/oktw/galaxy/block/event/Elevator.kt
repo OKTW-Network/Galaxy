@@ -18,14 +18,14 @@
 
 package one.oktw.galaxy.block.event
 
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Position
-import net.minecraft.util.math.Vec3d
 import one.oktw.galaxy.block.type.BlockType
 import one.oktw.galaxy.block.util.CustomBlockUtil
 import one.oktw.galaxy.event.annotation.EventListener
@@ -33,34 +33,40 @@ import one.oktw.galaxy.event.type.PlayerJumpEvent
 import one.oktw.galaxy.event.type.PlayerSneakEvent
 
 class Elevator {
-    private fun canWeTeleport(player: ServerPlayerEntity, position: Position): Boolean {
-        return listOf<Block>(Blocks.AIR, Blocks.WATER).contains(player.serverWorld.getBlockState(BlockPos(position)).block)
+    private fun isElevator(world: ServerWorld, blockPos: BlockPos): Boolean {
+        return CustomBlockUtil.positionMatchesCustomBlock(world, blockPos, BlockType.ELEVATOR)
     }
 
-    private fun isElevator(player: ServerPlayerEntity, position: Position): Boolean {
-        return CustomBlockUtil.positionMatchesCustomBlock(player.serverWorld, BlockPos(position), BlockType.ELEVATOR)
+    private fun canWeTeleport(world: ServerWorld, blockPos: BlockPos): Boolean {
+        return !world.getBlockState(blockPos.up()).material.isSolid
+    }
+
+    private fun doTeleport(player: ServerPlayerEntity, pos: BlockPos) {
+        GlobalScope.launch {
+            delay(50)
+            player.requestTeleport(pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5)
+            player.world.playSound(
+                null,
+                BlockPos(pos),
+                SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
+                SoundCategory.BLOCKS,
+                1.0f,
+                1.0f
+            )
+        }
     }
 
     @EventListener(sync = true)
     fun onJump(event: PlayerJumpEvent) {
         val player = event.player
-        val playerPosition = player.pos
-        val currentElevatorPosition: Vec3d = playerPosition.subtract(0.0, 1.0, 0.0)
-        var nextElevatorPosition: Vec3d
+        val playerWorld = player.serverWorld
+        val blockPos = BlockPos(player.pos)
 
-        if (isElevator(player, currentElevatorPosition) && canWeTeleport(player, playerPosition)) {
+        if (isElevator(playerWorld, blockPos.down()) && canWeTeleport(playerWorld, blockPos)) {
             for (i in 2..8) {
-                nextElevatorPosition = currentElevatorPosition.add(0.0, i.toDouble(), 0.0)
-                if (isElevator(player, nextElevatorPosition) && canWeTeleport(player, nextElevatorPosition.add(0.0, 1.0, 0.0))) {
-                    event.player.requestTeleport(nextElevatorPosition.x, nextElevatorPosition.y + 1, nextElevatorPosition.z)
-                    event.player.world.playSound(
-                        null,
-                        BlockPos(nextElevatorPosition),
-                        SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
-                        SoundCategory.BLOCKS,
-                        1.0f,
-                        1.0f
-                    )
+                val nextBlockPos = blockPos.up(i)
+                if (isElevator(playerWorld, nextBlockPos) && canWeTeleport(playerWorld, nextBlockPos)) {
+                    doTeleport(player, nextBlockPos.up())
                     break
                 }
             }
@@ -70,27 +76,17 @@ class Elevator {
     @EventListener(sync = true)
     fun onSneak(event: PlayerSneakEvent) {
         val player = event.player
-        val playerPosition = player.pos
-        val currentElevatorPosition: Vec3d = playerPosition.subtract(0.0, 1.0, 0.0)
-        var nextElevatorPosition: Vec3d
+        val playerWorld = player.serverWorld
+        val blockPos = BlockPos(player.pos)
 
-        if (isElevator(player, currentElevatorPosition) && canWeTeleport(player, playerPosition)) {
+        if (isElevator(playerWorld, blockPos.down()) && canWeTeleport(playerWorld, blockPos)) {
             for (i in 2..8) {
-                nextElevatorPosition = currentElevatorPosition.subtract(0.0, i.toDouble(), 0.0)
-                if (isElevator(player, nextElevatorPosition) && canWeTeleport(player, nextElevatorPosition.add(0.0, 1.0, 0.0))) {
-                    event.player.requestTeleport(nextElevatorPosition.x, nextElevatorPosition.y + 1, nextElevatorPosition.z)
-                    event.player.world.playSound(
-                        null,
-                        BlockPos(nextElevatorPosition),
-                        SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
-                        SoundCategory.BLOCKS,
-                        1.0f,
-                        1.0f
-                    )
+                val nextBlockPos = blockPos.down(i)
+                if (isElevator(playerWorld, nextBlockPos) && canWeTeleport(playerWorld, nextBlockPos)) {
+                    doTeleport(player, nextBlockPos.up())
                     break
                 }
             }
         }
     }
-
 }

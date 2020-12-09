@@ -73,7 +73,7 @@ object DispenserPlant {
             }
         }
 
-        if (dispenserFacing == Direction.UP) {
+        if (dispenserFacing == Direction.UP && block != Blocks.COCOA) {
             if  (validBlocksToPlantOn.contains(currentBlockState.block) && plantBlockState.block == Blocks.AIR) {
                 world.setBlockState(plantBlockPos, block.defaultState)
                 world.playSound(null, plantBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)

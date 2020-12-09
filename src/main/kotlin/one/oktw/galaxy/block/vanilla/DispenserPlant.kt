@@ -28,6 +28,7 @@ import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
 import net.minecraft.state.property.Properties
+import net.minecraft.tag.FluidTags
 import net.minecraft.util.math.BlockPointer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
@@ -60,6 +61,25 @@ object DispenserPlant {
             }
         }
 
+        if (block == Blocks.SUGAR_CANE) {
+            if (dispenserFacing == Direction.UP) {
+                if (sugarCanePlantCheck(validBlocksToPlantOn, currentBlockState.block, world, currentBlockPos)) {
+                    if (plantBlockState.block == Blocks.AIR) {
+                        return plantingBlock(world, plantBlockPos, block, soundEvent, itemStack)
+                    }
+                } else {
+                    return ItemDispenserBehavior().dispense(blockPointer, itemStack)
+                }
+            } else {
+                if (sugarCanePlantCheck(validBlocksToPlantOn, plantBlockState.block, world, plantBlockPos)) {
+                    if (currentBlockState.block == Blocks.AIR) {
+                        return plantingBlock(world, currentBlockPos, block, soundEvent, itemStack)
+                    }
+                } else {
+                    return ItemDispenserBehavior().dispense(blockPointer, itemStack)
+                }
+            }
+        }
         if (block == Blocks.RED_MUSHROOM || block == Blocks.BROWN_MUSHROOM) {
             if (dispenserFacing == Direction.UP) {
                 if (plantBlockState.block == Blocks.AIR && world.getBaseLightLevel(plantBlockPos, 0) < 13 && currentBlockState.isOpaqueFullCube(world, currentBlockPos)) {
@@ -83,6 +103,30 @@ object DispenserPlant {
         }
 
         return ItemDispenserBehavior().dispense(blockPointer, itemStack)
+    }
+
+    private fun sugarCanePlantCheck(validBlocksToPlantOn: List<Block>,block: Block, world: World, blockPos: BlockPos): Boolean {
+        val blockState = world.getBlockState(blockPos)
+
+        if (blockState.block == Blocks.SUGAR_CANE) {
+            return true
+        } else {
+            if (validBlocksToPlantOn.contains(block)) {
+                val sugarCanePlant = Direction.Type.HORIZONTAL.iterator()
+
+                while (sugarCanePlant.hasNext()) {
+                    val direction = sugarCanePlant.next()
+                    val plantState = world.getBlockState(blockPos.offset(direction))
+                    val fluidState = world.getFluidState(blockPos.offset(direction))
+
+                    if (fluidState.isIn(FluidTags.WATER) || plantState.isOf(Blocks.FROSTED_ICE)) {
+                        return true
+                    }
+                }
+            }
+
+            return false
+        }
     }
 
     private fun plantingBlock(world: World, blockPos: BlockPos, block: Block, soundEvent: SoundEvent, itemStack: ItemStack): ItemStack {

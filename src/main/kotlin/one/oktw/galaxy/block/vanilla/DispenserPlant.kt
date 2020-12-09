@@ -21,6 +21,7 @@ package one.oktw.galaxy.block.vanilla
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
 import net.minecraft.block.DispenserBlock
+import net.minecraft.block.Material
 import net.minecraft.block.dispenser.ItemDispenserBehavior
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
@@ -80,6 +81,15 @@ object DispenserPlant {
                 }
             }
         }
+
+        if (block == Blocks.CACTUS) {
+            if (dispenserFacing != Direction.UP || !cactusPlantCheck(validBlocksToPlantOn, currentBlockState.block, world, plantBlockPos)) return ItemDispenserBehavior().dispense(blockPointer, itemStack)
+
+            if (plantBlockState.block == Blocks.AIR) {
+                return plantingBlock(world, plantBlockPos, block, soundEvent, itemStack)
+            }
+        }
+
         if (block == Blocks.RED_MUSHROOM || block == Blocks.BROWN_MUSHROOM) {
             if (dispenserFacing == Direction.UP) {
                 if (plantBlockState.block == Blocks.AIR && world.getBaseLightLevel(plantBlockPos, 0) < 13 && currentBlockState.isOpaqueFullCube(world, currentBlockPos)) {
@@ -129,6 +139,23 @@ object DispenserPlant {
         }
     }
 
+    private fun cactusPlantCheck(validBlocksToPlantOn: List<Block>, block: Block, world: World, blockPos: BlockPos): Boolean {
+        val cactusPlant = Direction.Type.HORIZONTAL.iterator()
+
+        var direction: Direction?
+        var material: Material
+        do {
+            if (!cactusPlant.hasNext()) {
+                return (validBlocksToPlantOn.contains(block) && !world.getBlockState(blockPos).material.isLiquid)
+            }
+            direction = cactusPlant.next()
+            val blockState = world.getBlockState(blockPos.offset(direction))
+            material = blockState.material
+        } while (!material.isSolid && !world.getFluidState(blockPos.offset(direction)).isIn(FluidTags.LAVA))
+
+        return false
+    }
+
     private fun plantingBlock(world: World, blockPos: BlockPos, block: Block, soundEvent: SoundEvent, itemStack: ItemStack): ItemStack {
         world.setBlockState(blockPos, block.defaultState)
         world.playSound(null, blockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
@@ -165,5 +192,6 @@ object DispenserPlant {
         DispenserBlock.registerBehavior(Items.CRIMSON_FUNGUS, plantDispenserBehavior(Blocks.CRIMSON_FUNGUS, listOf(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.FARMLAND, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM, Blocks.SOUL_SOIL, Blocks.MYCELIUM), SoundEvents.BLOCK_FUNGUS_PLACE))
         DispenserBlock.registerBehavior(Items.WARPED_FUNGUS, plantDispenserBehavior(Blocks.WARPED_FUNGUS, listOf(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.FARMLAND, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM, Blocks.SOUL_SOIL, Blocks.MYCELIUM), SoundEvents.BLOCK_FUNGUS_PLACE))
         DispenserBlock.registerBehavior(Items.COCOA_BEANS, plantDispenserBehavior(Blocks.COCOA, listOf(Blocks.JUNGLE_LOG, Blocks.JUNGLE_WOOD, Blocks.STRIPPED_JUNGLE_LOG, Blocks.STRIPPED_JUNGLE_WOOD), SoundEvents.BLOCK_WOOD_PLACE))
+        DispenserBlock.registerBehavior(Items.CACTUS, plantDispenserBehavior(Blocks.CACTUS, listOf(Blocks.SAND, Blocks.RED_SAND), SoundEvents.BLOCK_WOOL_PLACE))
     }
 }

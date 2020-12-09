@@ -28,7 +28,7 @@ import java.util.*
 class Gun(
     val heat: Int,
     val maxTemp: Int,
-    val cooling: Int,
+    val cooling: Double,
     val damage: Double,
     val range: Double,
     val through: Int,
@@ -41,7 +41,7 @@ class Gun(
             return Gun(
                 tag.getInt("heat"),
                 tag.getInt("maxTemp"),
-                tag.getInt("cooling"),
+                tag.getDouble("cooling"),
                 tag.getDouble("damage"),
                 tag.getDouble("range"),
                 tag.getInt("through"),

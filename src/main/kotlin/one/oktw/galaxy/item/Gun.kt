@@ -32,7 +32,7 @@ class Gun(
     val type: GunType = GunType.DUMMY,
     val heat: Int = 0,
     val maxTemp: Int = 0,
-    val cooling: Int = 0,
+    val cooling: Double = 0.0,
     val damage: Double = 0.0,
     val range: Double = 0.0,
     val through: Int = 1,
@@ -51,7 +51,7 @@ class Gun(
             .setCustomString("gunType", type.name)
             .setCustomInt("heat", heat)
             .setCustomInt("maxTemp", maxTemp)
-            .setCustomInt("cooling", cooling)
+            .setCustomDouble("cooling", cooling)
             .setCustomDouble("damage", damage)
             .setCustomDouble("range", range)
             .setCustomInt("through", through)

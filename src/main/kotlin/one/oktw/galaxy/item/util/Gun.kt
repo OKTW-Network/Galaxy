@@ -54,7 +54,7 @@ class Gun(
         return ItemLoreBuilder() // TODO Localize
             .addText(loreText("傷害", damage.toString()))
             .addText(loreText("射程", range.toString(), "B"))
-            .addText(loreText("穿透", through.toString(), "B"))
+            .addText(loreText("穿透", through.toString(), ""))
             .addText(loreText("積熱", heat.toString(), "K/shot"))
             .addText(loreText("耐熱", maxTemp.toString(), "K"))
             .addText(loreText("冷卻", cooling.toString(), "K/t"))

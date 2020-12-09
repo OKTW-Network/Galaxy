@@ -73,7 +73,7 @@ object DispenserPlant {
         }
 
         if (dispenserFacing == Direction.UP) {
-            if  (validBlocksToPlantOn.contains(currentBlockState.block) && plantBlockState.block == Blocks.AIR) {
+            if (validBlocksToPlantOn.contains(currentBlockState.block) && plantBlockState.block == Blocks.AIR) {
                 return plantingBlock(world, plantBlockPos, block, soundEvent, itemStack)
             }
         } else {

@@ -42,10 +42,7 @@ class Tool(val type: ToolType = DUMMY) : Item {
             .removeAllModifiers()
 
         if (type.languageKey != "") {
-            TranslatableText(type.languageKey).styled {
-                it.withColor(Formatting.YELLOW)
-                it.withItalic(false)
-            }.let(item::setName)
+            TranslatableText(type.languageKey).styled { it.withColor(Formatting.YELLOW).withItalic(false) }.let(item::setName)
         }
 
         return item.build()

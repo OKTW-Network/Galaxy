@@ -38,7 +38,7 @@ class Elevator {
     }
 
     private fun canWeTeleport(world: ServerWorld, blockPos: BlockPos): Boolean {
-        return !world.getBlockState(blockPos).material.isSolid
+        return !world.getBlockState(blockPos).isOpaqueFullCube(world, blockPos)
     }
 
     private fun doTeleport(player: ServerPlayerEntity, pos: BlockPos) {

@@ -19,7 +19,7 @@
 package one.oktw.galaxy.block.event
 
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
@@ -42,8 +42,7 @@ class Elevator {
     }
 
     private fun doTeleport(player: ServerPlayerEntity, pos: BlockPos) {
-        GlobalScope.launch {
-            delay(50)
+        GlobalScope.launch(player.server.asCoroutineDispatcher()) {
             player.requestTeleport(pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5)
             player.world.playSound(
                 null,

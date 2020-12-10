@@ -79,7 +79,7 @@ class Elevator {
         val blockPos = BlockPos(player.pos)
 
         if (isElevator(playerWorld, blockPos.down()) && canWeTeleport(playerWorld, blockPos)) {
-            for (i in 1..7) {
+            for (i in 3..9) {
                 val nextBlockPos = blockPos.down(i)
                 if (isElevator(playerWorld, nextBlockPos) && canWeTeleport(playerWorld, nextBlockPos.up())) {
                     doTeleport(player, nextBlockPos.up())

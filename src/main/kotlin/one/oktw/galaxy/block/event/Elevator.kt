@@ -38,7 +38,7 @@ class Elevator {
     }
 
     private fun canWeTeleport(world: ServerWorld, blockPos: BlockPos): Boolean {
-        return !world.getBlockState(blockPos.up()).material.isSolid
+        return !world.getBlockState(blockPos).material.isSolid
     }
 
     private fun doTeleport(player: ServerPlayerEntity, pos: BlockPos) {
@@ -62,9 +62,9 @@ class Elevator {
         val blockPos = BlockPos(player.pos)
 
         if (isElevator(playerWorld, blockPos.down()) && canWeTeleport(playerWorld, blockPos)) {
-            for (i in 2..8) {
+            for (i in 1..7) {
                 val nextBlockPos = blockPos.up(i)
-                if (isElevator(playerWorld, nextBlockPos) && canWeTeleport(playerWorld, nextBlockPos)) {
+                if (isElevator(playerWorld, nextBlockPos) && canWeTeleport(playerWorld, nextBlockPos.up())) {
                     doTeleport(player, nextBlockPos.up())
                     break
                 }
@@ -79,9 +79,9 @@ class Elevator {
         val blockPos = BlockPos(player.pos)
 
         if (isElevator(playerWorld, blockPos.down()) && canWeTeleport(playerWorld, blockPos)) {
-            for (i in 2..8) {
+            for (i in 1..7) {
                 val nextBlockPos = blockPos.down(i)
-                if (isElevator(playerWorld, nextBlockPos) && canWeTeleport(playerWorld, nextBlockPos)) {
+                if (isElevator(playerWorld, nextBlockPos) && canWeTeleport(playerWorld, nextBlockPos.up())) {
                     doTeleport(player, nextBlockPos.up())
                     break
                 }

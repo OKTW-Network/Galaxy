@@ -109,7 +109,7 @@ object CustomBlockUtil {
     }
 
     fun getCustomBlockEntity(world: ServerWorld, blockPos: BlockPos): Entity? {
-        val entities = world.getEntitiesByType(EntityType.ARMOR_STAND) { it.scoreboardTags.contains("BLOCK") && it.blockPos == blockPos }
+        val entities = world.getEntitiesByType(EntityType.ARMOR_STAND) { it.blockPos == blockPos && it.scoreboardTags.contains("BLOCK") }
         return entities.firstOrNull()
     }
 

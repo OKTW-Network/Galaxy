@@ -43,8 +43,7 @@ class Weapon(val type: WeaponType = DUMMY) : Item {
 
         if (type.languageKey != "") {
             TranslatableText(type.languageKey).styled {
-                it.withColor(Formatting.GREEN) //TODO Advanced weapon
-                it.withItalic(false)
+                it.withColor(Formatting.GREEN).withItalic(false) //TODO Advanced weapon
             }.let(item::setName)
         }
 

@@ -48,17 +48,15 @@ object DispenserPlant {
         val plantBlockState = world.getBlockState(plantBlockPos)
 
         if (block == Blocks.COCOA) {
-            if (dispenserFacing != Direction.UP && dispenserFacing != Direction.DOWN && currentBlockState.block == Blocks.AIR) {
-                val cocoaPlantBlockState = world.getBlockState(currentBlockPos.offset(dispenserFacing, 1))
+            val cocoaPlantBlockState = world.getBlockState(currentBlockPos.offset(dispenserFacing, 1))
 
-                if (cocoaPlantBlockState.block == Blocks.JUNGLE_LOG) {
-                    world.setBlockState(currentBlockPos, block.defaultState.with(Properties.HORIZONTAL_FACING, dispenserFacing))
-                    world.playSound(null, currentBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
-                    itemStack.decrement(1)
-                    return itemStack
-                }
+            return if (dispenserFacing != Direction.UP && dispenserFacing != Direction.DOWN && currentBlockState.block == Blocks.AIR && validBlocksToPlantOn.contains(cocoaPlantBlockState.block)) {
+                world.setBlockState(currentBlockPos, block.defaultState.with(Properties.HORIZONTAL_FACING, dispenserFacing))
+                world.playSound(null, currentBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
+                itemStack.decrement(1)
+                itemStack
             } else {
-                return ItemDispenserBehavior().dispense(blockPointer, itemStack)
+                ItemDispenserBehavior().dispense(blockPointer, itemStack)
             }
         }
 

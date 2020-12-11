@@ -37,7 +37,7 @@ class Elevator {
         return CustomBlockUtil.positionMatchesCustomBlock(world, blockPos, BlockType.ELEVATOR)
     }
 
-    private fun canWeTeleport(world: ServerWorld, blockPos: BlockPos): Boolean {
+    private fun isSafe(world: ServerWorld, blockPos: BlockPos): Boolean {
         return !world.getBlockState(blockPos).isOpaqueFullCube(world, blockPos)
     }
 

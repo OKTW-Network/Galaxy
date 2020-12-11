@@ -43,7 +43,7 @@ class Elevator {
 
     private fun doTeleport(player: ServerPlayerEntity, pos: BlockPos) {
         GlobalScope.launch(player.server.asCoroutineDispatcher()) {
-            player.requestTeleport(pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5)
+            player.requestTeleport(player.pos.x, pos.y.toDouble(), player.pos.z)
             player.world.playSound(
                 null,
                 BlockPos(pos),

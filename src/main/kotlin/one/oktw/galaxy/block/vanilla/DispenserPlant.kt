@@ -18,10 +18,7 @@
 
 package one.oktw.galaxy.block.vanilla
 
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks
-import net.minecraft.block.DispenserBlock
-import net.minecraft.block.Material
+import net.minecraft.block.*
 import net.minecraft.block.dispenser.ItemDispenserBehavior
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
@@ -41,73 +38,47 @@ object DispenserPlant {
         val world: World = blockPointer.world
         val dispenserFacing = blockPointer.blockState.get(DispenserBlock.FACING)
 
-        val currentBlockPos = blockPointer.blockPos.offset(dispenserFacing)
+        val currentBlockPos = if (dispenserFacing == Direction.UP) blockPointer.blockPos.offset(dispenserFacing).up(1) else blockPointer.blockPos.offset(dispenserFacing)
         val currentBlockState = world.getBlockState(currentBlockPos)
 
-        val plantBlockPos = if (dispenserFacing == Direction.UP) currentBlockPos.up(1) else currentBlockPos.down(1)
+        val plantBlockPos = currentBlockPos.down(1)
         val plantBlockState = world.getBlockState(plantBlockPos)
 
         if (block == Blocks.COCOA) {
             val cocoaPlantBlockState = world.getBlockState(currentBlockPos.offset(dispenserFacing, 1))
 
             return if (dispenserFacing != Direction.UP && dispenserFacing != Direction.DOWN && currentBlockState.block == Blocks.AIR && validBlocksToPlantOn.contains(cocoaPlantBlockState.block)) {
-                world.setBlockState(currentBlockPos, block.defaultState.with(Properties.HORIZONTAL_FACING, dispenserFacing))
-                world.playSound(null, currentBlockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
-                itemStack.decrement(1)
-                itemStack
+                val blockState = block.defaultState.with(Properties.HORIZONTAL_FACING, dispenserFacing)
+                plantingBlock(world, currentBlockPos, blockState, soundEvent, itemStack)
             } else {
                 ItemDispenserBehavior().dispense(blockPointer, itemStack)
             }
         }
 
         if (block == Blocks.SUGAR_CANE) {
-            if (dispenserFacing == Direction.UP) {
-                if (sugarCanePlantCheck(validBlocksToPlantOn, currentBlockState.block, world, currentBlockPos)) {
-                    if (plantBlockState.block == Blocks.AIR) {
-                        return plantingBlock(world, plantBlockPos, block, soundEvent, itemStack)
-                    }
-                } else {
-                    return ItemDispenserBehavior().dispense(blockPointer, itemStack)
-                }
+            return if (sugarCanePlantCheck(validBlocksToPlantOn, plantBlockState.block, world, plantBlockPos) && currentBlockState.block == Blocks.AIR) {
+                plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
             } else {
-                if (sugarCanePlantCheck(validBlocksToPlantOn, plantBlockState.block, world, plantBlockPos)) {
-                    if (currentBlockState.block == Blocks.AIR) {
-                        return plantingBlock(world, currentBlockPos, block, soundEvent, itemStack)
-                    }
-                } else {
-                    return ItemDispenserBehavior().dispense(blockPointer, itemStack)
-                }
+                ItemDispenserBehavior().dispense(blockPointer, itemStack)
             }
         }
 
         if (block == Blocks.CACTUS) {
-            if (dispenserFacing != Direction.UP || !cactusPlantCheck(validBlocksToPlantOn, currentBlockState.block, world, plantBlockPos)) return ItemDispenserBehavior().dispense(blockPointer, itemStack)
+            if (dispenserFacing != Direction.UP || !cactusPlantCheck(validBlocksToPlantOn, plantBlockState.block, world, plantBlockPos)) return ItemDispenserBehavior().dispense(blockPointer, itemStack)
 
             if (plantBlockState.block == Blocks.AIR) {
-                return plantingBlock(world, plantBlockPos, block, soundEvent, itemStack)
+                return plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
             }
         }
 
         if (block == Blocks.RED_MUSHROOM || block == Blocks.BROWN_MUSHROOM) {
-            if (dispenserFacing == Direction.UP) {
-                if (plantBlockState.block == Blocks.AIR && world.getBaseLightLevel(plantBlockPos, 0) < 13 && currentBlockState.isOpaqueFullCube(world, currentBlockPos)) {
-                    return plantingBlock(world, plantBlockPos, block, soundEvent, itemStack)
-                }
-            } else {
-                if (currentBlockState.block == Blocks.AIR && world.getBaseLightLevel(currentBlockPos, 0) < 13 && plantBlockState.isOpaqueFullCube(world, plantBlockPos)) {
-                    return plantingBlock(world, currentBlockPos, block, soundEvent, itemStack)
-                }
+            if (currentBlockState.block == Blocks.AIR && world.getBaseLightLevel(currentBlockPos, 0) < 13 && plantBlockState.isOpaqueFullCube(world, plantBlockPos)) {
+                return plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
             }
         }
 
-        if (dispenserFacing == Direction.UP) {
-            if (validBlocksToPlantOn.contains(currentBlockState.block) && plantBlockState.block == Blocks.AIR) {
-                return plantingBlock(world, plantBlockPos, block, soundEvent, itemStack)
-            }
-        } else {
-            if (validBlocksToPlantOn.contains(plantBlockState.block) && currentBlockState.block == Blocks.AIR) {
-                return plantingBlock(world, currentBlockPos, block, soundEvent, itemStack)
-            }
+        if (validBlocksToPlantOn.contains(plantBlockState.block) && currentBlockState.block == Blocks.AIR) {
+            return plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
         }
 
         return ItemDispenserBehavior().dispense(blockPointer, itemStack)
@@ -154,8 +125,8 @@ object DispenserPlant {
         return false
     }
 
-    private fun plantingBlock(world: World, blockPos: BlockPos, block: Block, soundEvent: SoundEvent, itemStack: ItemStack): ItemStack {
-        world.setBlockState(blockPos, block.defaultState)
+    private fun plantingBlock(world: World, blockPos: BlockPos, blockState: BlockState, soundEvent: SoundEvent, itemStack: ItemStack): ItemStack {
+        world.setBlockState(blockPos, blockState)
         world.playSound(null, blockPos, soundEvent, SoundCategory.BLOCKS, 1.0F, 0.8F)
         itemStack.decrement(1)
         return itemStack

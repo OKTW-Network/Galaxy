@@ -61,10 +61,10 @@ class Elevator {
         val playerWorld = player.serverWorld
         val blockPos = BlockPos(player.pos)
 
-        if (isElevator(playerWorld, blockPos.down()) && canWeTeleport(playerWorld, blockPos)) {
+        if (isElevator(playerWorld, blockPos.down()) && isSafe(playerWorld, blockPos)) {
             for (i in 1..7) {
                 val nextBlockPos = blockPos.up(i)
-                if (isElevator(playerWorld, nextBlockPos) && canWeTeleport(playerWorld, nextBlockPos.up())) {
+                if (isElevator(playerWorld, nextBlockPos) && isSafe(playerWorld, nextBlockPos.up())) {
                     doTeleport(player, nextBlockPos.up())
                     break
                 }
@@ -78,10 +78,10 @@ class Elevator {
         val playerWorld = player.serverWorld
         val blockPos = BlockPos(player.pos)
 
-        if (isElevator(playerWorld, blockPos.down()) && canWeTeleport(playerWorld, blockPos)) {
+        if (isElevator(playerWorld, blockPos.down()) && isSafe(playerWorld, blockPos)) {
             for (i in 3..9) {
                 val nextBlockPos = blockPos.down(i)
-                if (isElevator(playerWorld, nextBlockPos) && canWeTeleport(playerWorld, nextBlockPos.up())) {
+                if (isElevator(playerWorld, nextBlockPos) && isSafe(playerWorld, nextBlockPos.up())) {
                     doTeleport(player, nextBlockPos.up())
                     break
                 }

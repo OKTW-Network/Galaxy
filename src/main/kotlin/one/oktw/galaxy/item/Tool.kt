@@ -21,7 +21,6 @@ package one.oktw.galaxy.item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.IRON_SWORD
 import net.minecraft.text.TranslatableText
-import net.minecraft.util.Formatting
 import one.oktw.galaxy.item.type.ItemType.TOOL
 import one.oktw.galaxy.item.type.ToolType
 import one.oktw.galaxy.item.type.ToolType.DUMMY
@@ -42,7 +41,7 @@ class Tool(val type: ToolType = DUMMY) : Item {
             .removeAllModifiers()
 
         if (type.languageKey != "") {
-            TranslatableText(type.languageKey).styled { it.withColor(Formatting.YELLOW).withItalic(false) }.let(item::setName)
+            TranslatableText(type.languageKey).styled { it.withItalic(false) }.let(item::setName)
         }
 
         return item.build()

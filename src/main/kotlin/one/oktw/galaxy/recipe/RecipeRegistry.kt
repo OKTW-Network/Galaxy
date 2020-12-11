@@ -43,6 +43,7 @@ object RecipeRegistry {
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, RedstoneRepeater())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, TrappedChest())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStick())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, WarpedFungusOnAStick())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, BookAndQuill())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Minecart())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Stick())

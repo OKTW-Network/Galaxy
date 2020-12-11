@@ -25,7 +25,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import java.util.*
 
-class Gun(
+data class Gun(
     val heat: Int,
     val maxTemp: Int,
     val cooling: Double,
@@ -38,15 +38,21 @@ class Gun(
         fun fromItem(item: ItemStack): Gun? {
             val tag = item.tag ?: return null
 
-            return Gun(
-                tag.getInt("heat"),
-                tag.getInt("maxTemp"),
-                tag.getDouble("cooling"),
-                tag.getDouble("damage"),
-                tag.getDouble("range"),
-                tag.getInt("through"),
-                tag.getUuid("gunUUID")
-            )
+            if (tag.getString("customItemType") != "GUN") return null
+
+            return try {
+                Gun(
+                    tag.getInt("heat"),
+                    tag.getInt("maxTemp"),
+                    tag.getDouble("cooling"),
+                    tag.getDouble("damage"),
+                    tag.getDouble("range"),
+                    tag.getInt("through"),
+                    tag.getUuid("gunUUID")
+                )
+            } catch (_: NullPointerException) {
+                null
+            }
         }
     }
 

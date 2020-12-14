@@ -64,11 +64,9 @@ object DispenserPlant {
         }
 
         if (block == Blocks.CACTUS) {
-            if (dispenserFacing != Direction.UP || !cactusPlantCheck(validBlocksToPlantOn, plantBlockState.block, world, plantBlockPos)) return ItemDispenserBehavior().dispense(blockPointer, itemStack)
+            if (dispenserFacing != Direction.UP || !cactusPlantCheck(validBlocksToPlantOn, plantBlockState.block, world, currentBlockPos) || currentBlockState.block != Blocks.AIR) return ItemDispenserBehavior().dispense(blockPointer, itemStack)
 
-            if (plantBlockState.block == Blocks.AIR) {
-                return plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
-            }
+            return plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
         }
 
         if (block == Blocks.RED_MUSHROOM || block == Blocks.BROWN_MUSHROOM) {

@@ -25,6 +25,7 @@ import kotlinx.coroutines.withContext
 import net.fabricmc.api.DedicatedServerModInitializer
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.recipe.RecipeType
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
@@ -82,7 +83,7 @@ class Main : DedicatedServerModInitializer {
             eventManager = EventManager(server)
 
             ServerPlayNetworking.registerGlobalReceiver(PROXY_IDENTIFIER) { _, player, _, packet, _ ->
-                this.eventManager.emit(PacketReceiveEvent(PROXY_IDENTIFIER, packet, player))
+                this.eventManager.emit(PacketReceiveEvent(PROXY_IDENTIFIER, PacketByteBufs.copy(packet), player))
             }
 
             val resourcePackUrl: String? = System.getenv("resourcePack")

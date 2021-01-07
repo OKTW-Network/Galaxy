@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -65,7 +65,7 @@ public abstract class AbstractFurnaceBlockEntityMixin_RealTime {
     private static void realTimeImpl$adjustForRealTimeBurnTime(AbstractFurnaceBlockEntity self, int value) {
         final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
 
-        var accessor = (AbstractFurnaceBlockEntityAccessor) self;
+        AbstractFurnaceBlockEntityAccessor accessor = (AbstractFurnaceBlockEntityAccessor) self;
         accessor.setBurnTime(Math.max(0, accessor.getBurnTime() - Math.max(1, ticks - 1)));
     }
 
@@ -75,7 +75,7 @@ public abstract class AbstractFurnaceBlockEntityMixin_RealTime {
     private static void realTimeImpl$adjustForRealTimeCookTime(final AbstractFurnaceBlockEntity self, final int modifier) {
         final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
 
-        var accessor = (AbstractFurnaceBlockEntityAccessor) self;
+        AbstractFurnaceBlockEntityAccessor accessor = (AbstractFurnaceBlockEntityAccessor) self;
         accessor.setCookTime(Math.min(accessor.getCookTimeTotal(), accessor.getCookTime() + ticks));
     }
 
@@ -100,7 +100,7 @@ public abstract class AbstractFurnaceBlockEntityMixin_RealTime {
     private static void realTimeImpl$adjustForRealTimeCookTimeCooldown(final AbstractFurnaceBlockEntity self, final int modifier) {
         final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
 
-        var accessor = (AbstractFurnaceBlockEntityAccessor) self;
+        AbstractFurnaceBlockEntityAccessor accessor = (AbstractFurnaceBlockEntityAccessor) self;
         accessor.setCookTime(MathHelper.clamp(accessor.getCookTime() - (2 * ticks), 0, accessor.getCookTimeTotal()));
     }
 }

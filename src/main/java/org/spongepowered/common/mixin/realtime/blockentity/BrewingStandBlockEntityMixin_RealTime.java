@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -58,7 +58,7 @@ public abstract class BrewingStandBlockEntityMixin_RealTime {
     private static void realTimeImpl$adjustForRealTimeBrewTime(final BrewingStandBlockEntity self, final int modifier) {
         final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
 
-        var accessor = (BrewingStandBlockEntityAccessor) self;
+        BrewingStandBlockEntityAccessor accessor = (BrewingStandBlockEntityAccessor) self;
         accessor.setBrewTime(Math.max(0, accessor.getBrewTime() - ticks));
     }
 }

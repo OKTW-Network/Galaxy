@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -38,7 +38,7 @@ class PlayerControl {
     private val completeID = ConcurrentHashMap<UUID, Int>()
     private val completeInput = ConcurrentHashMap<UUID, String>()
 
-    @EventListener
+    @EventListener(true)
     fun onRequestCommandComplete(event: RequestCommandCompletionsEvent) {
         val command = event.packet.partialCommand
 
@@ -57,7 +57,7 @@ class PlayerControl {
     }
 
     //從 proxy 接收回覆並送自動完成封包給玩家
-    @EventListener
+    @EventListener(true)
     fun onSearchResult(event: PacketReceiveEvent) {
         if (event.channel != PROXY_IDENTIFIER) return
         val data = decode<Packet>(event.packet.nioBuffer()) as? SearchPlayer.Result ?: return

@@ -6,7 +6,6 @@
     "MixinBlockBreak_EnderDragonEntity",
     "MixinBlockBreak_Explosion",
     "MixinBlockBreak_WitherEntity",
-    "MixinCustomPayload_NetworkHandler",
     "MixinPlayerAction_NetworkHandler",
     "MixinPlayerBlockBreak_Block",
     "MixinPlayerChat_MeCommand",

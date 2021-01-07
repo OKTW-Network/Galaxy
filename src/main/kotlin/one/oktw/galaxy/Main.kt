@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -25,6 +25,7 @@ import kotlinx.coroutines.withContext
 import net.fabricmc.api.DedicatedServerModInitializer
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.recipe.RecipeType
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
@@ -37,6 +38,7 @@ import one.oktw.galaxy.command.commands.Home
 import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.command.commands.Spawn
 import one.oktw.galaxy.event.EventManager
+import one.oktw.galaxy.event.type.PacketReceiveEvent
 import one.oktw.galaxy.mixin.interfaces.CustomRecipeManager
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.PlayerControl
@@ -78,6 +80,10 @@ class Main : DedicatedServerModInitializer {
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer
             eventManager = EventManager(server)
+
+            ServerPlayNetworking.registerGlobalReceiver(PROXY_IDENTIFIER) { _, player, _, packet, _ ->
+                this.eventManager.emit(PacketReceiveEvent(PROXY_IDENTIFIER, packet, player))
+            }
 
             val resourcePackUrl: String? = System.getenv("resourcePack")
             if (!resourcePackUrl.isNullOrBlank()) {

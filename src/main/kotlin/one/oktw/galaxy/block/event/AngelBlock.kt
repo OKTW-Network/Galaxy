@@ -50,7 +50,7 @@ class AngelBlock {
             playerPosition.y + playerLookVec.y * 3 + 1.5,
             playerPosition.z + playerLookVec.z * 3
         )
-        val allowReplaceBlocks = listOf<net.minecraft.block.Block>(Blocks.AIR, Blocks.WATER, Blocks.LAVA)
+        val allowReplaceBlocks = listOf<net.minecraft.block.Block>(Blocks.AIR, Blocks.CAVE_AIR, Blocks.WATER, Blocks.LAVA)
         if (allowReplaceBlocks.contains(player.serverWorld.getBlockState(BlockPos(placePosition)).block)) {
             CustomBlockUtil.placeBlock(
                 player.serverWorld,

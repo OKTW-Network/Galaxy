@@ -48,19 +48,15 @@ object DispenserPlant {
         if (block == Blocks.COCOA) {
             val cocoaPlantBlockState = world.getBlockState(currentBlockPos.offset(dispenserFacing, 1))
 
-            return if (dispenserFacing != Direction.DOWN && currentBlockState.block == Blocks.AIR && validBlocksToPlantOn.contains(cocoaPlantBlockState.block)) {
+            if (dispenserFacing != Direction.DOWN && currentBlockState.block == Blocks.AIR && validBlocksToPlantOn.contains(cocoaPlantBlockState.block)) {
                 val blockState = block.defaultState.with(Properties.HORIZONTAL_FACING, dispenserFacing)
-                plantingBlock(world, currentBlockPos, blockState, soundEvent, itemStack)
-            } else {
-                ItemDispenserBehavior().dispense(blockPointer, itemStack)
+                return plantingBlock(world, currentBlockPos, blockState, soundEvent, itemStack)
             }
         }
 
         if (block == Blocks.SUGAR_CANE) {
-            return if (sugarCanePlantCheck(validBlocksToPlantOn, plantBlockState.block, world, plantBlockPos) && currentBlockState.block == Blocks.AIR) {
-                plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
-            } else {
-                ItemDispenserBehavior().dispense(blockPointer, itemStack)
+            if (sugarCanePlantCheck(validBlocksToPlantOn, plantBlockState.block, world, plantBlockPos) && currentBlockState.block == Blocks.AIR) {
+                return plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
             }
         }
 
@@ -86,7 +82,7 @@ object DispenserPlant {
             return plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
         }
 
-        return ItemDispenserBehavior().dispense(blockPointer, itemStack)
+        return itemStack
     }
 
     private fun sugarCanePlantCheck(validBlocksToPlantOn: List<Block>,block: Block, world: World, blockPos: BlockPos): Boolean {

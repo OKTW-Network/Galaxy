@@ -21,7 +21,6 @@ package one.oktw.galaxy.item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.DIAMOND_SWORD
 import net.minecraft.text.TranslatableText
-import net.minecraft.util.Formatting
 import one.oktw.galaxy.item.type.ItemType.WEAPON
 import one.oktw.galaxy.item.type.WeaponType
 import one.oktw.galaxy.item.type.WeaponType.DUMMY
@@ -43,8 +42,7 @@ class Weapon(val type: WeaponType = DUMMY) : Item {
 
         if (type.languageKey != "") {
             TranslatableText(type.languageKey).styled {
-                it.withColor(Formatting.GREEN) //TODO Advanced weapon
-                it.withItalic(false)
+                it.withItalic(false) //TODO Advanced weapon
             }.let(item::setName)
         }
 

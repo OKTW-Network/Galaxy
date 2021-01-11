@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.event.type
 
-import net.minecraft.network.packet.c2s.play.RequestCommandCompletionsC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
+import one.oktw.galaxy.proxy.api.packet.Packet
 
-class RequestCommandCompletionsEvent(val packet: RequestCommandCompletionsC2SPacket, val player: ServerPlayerEntity) : CancelableEvent()
+class ProxyResponseEvent(val player: ServerPlayerEntity, val packet: Packet) : Event

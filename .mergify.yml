@@ -1,0 +1,26 @@
+pull_request_rules:
+  - name: Automatic merge on approval
+    conditions:
+      - base=master
+      - "label!=status: blocked"
+      - check-success=Build
+      - check-success=Docker-image
+      - "#approved-reviews-by>=2"
+      - "#review-requested=0"
+      - "#changes-requested-reviews-by=0"
+    actions:
+      merge:
+        method: merge
+        strict: smart+fasttrack
+  - name: Automatic merge on ready lable
+    conditions:
+      - base=master
+      - check-success=Build
+      - check-success=Docker-image
+      - "label=status: ready to merge"
+      - "#review-requested=0"
+      - "#changes-requested-reviews-by=0"
+    actions:
+      merge:
+        method: merge
+        strict: smart+fasttrack

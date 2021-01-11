@@ -37,8 +37,9 @@ object DispenserPlant {
     private fun plant(blockPointer: BlockPointer, itemStack: ItemStack, block: Block, validBlocksToPlantOn: List<Block>, soundEvent: SoundEvent): ItemStack {
         val world: World = blockPointer.world
         val dispenserFacing = blockPointer.blockState.get(DispenserBlock.FACING)
+        if (dispenserFacing == Direction.UP) return ItemDispenserBehavior().dispense(blockPointer, itemStack)
 
-        val currentBlockPos = if (dispenserFacing == Direction.UP) blockPointer.blockPos.offset(dispenserFacing).up(1) else blockPointer.blockPos.offset(dispenserFacing)
+        val currentBlockPos = blockPointer.blockPos.offset(dispenserFacing)
         val currentBlockState = world.getBlockState(currentBlockPos)
 
         val plantBlockPos = currentBlockPos.down(1)
@@ -47,7 +48,7 @@ object DispenserPlant {
         if (block == Blocks.COCOA) {
             val cocoaPlantBlockState = world.getBlockState(currentBlockPos.offset(dispenserFacing, 1))
 
-            return if (dispenserFacing != Direction.UP && dispenserFacing != Direction.DOWN && currentBlockState.block == Blocks.AIR && validBlocksToPlantOn.contains(cocoaPlantBlockState.block)) {
+            return if (dispenserFacing != Direction.DOWN && currentBlockState.block == Blocks.AIR && validBlocksToPlantOn.contains(cocoaPlantBlockState.block)) {
                 val blockState = block.defaultState.with(Properties.HORIZONTAL_FACING, dispenserFacing)
                 plantingBlock(world, currentBlockPos, blockState, soundEvent, itemStack)
             } else {
@@ -64,7 +65,7 @@ object DispenserPlant {
         }
 
         if (block == Blocks.CACTUS) {
-            if (dispenserFacing != Direction.UP || !cactusPlantCheck(validBlocksToPlantOn, plantBlockState.block, world, currentBlockPos) || currentBlockState.block != Blocks.AIR) return ItemDispenserBehavior().dispense(blockPointer, itemStack)
+            if (!cactusPlantCheck(validBlocksToPlantOn, plantBlockState.block, world, currentBlockPos) || currentBlockState.block != Blocks.AIR) return ItemDispenserBehavior().dispense(blockPointer, itemStack)
 
             return plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
         }

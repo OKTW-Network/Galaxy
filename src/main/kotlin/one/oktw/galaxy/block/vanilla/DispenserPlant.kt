@@ -76,6 +76,12 @@ object DispenserPlant {
             }
         }
 
+        if (block == Blocks.KELP) {
+            if (currentBlockState.isOf(Blocks.WATER)) {
+                return plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
+            }
+        }
+
         if (validBlocksToPlantOn.contains(plantBlockState.block) && currentBlockState.block == Blocks.AIR) {
             return plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
         }
@@ -161,5 +167,6 @@ object DispenserPlant {
         DispenserBlock.registerBehavior(Items.WARPED_FUNGUS, plantDispenserBehavior(Blocks.WARPED_FUNGUS, listOf(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.FARMLAND, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM, Blocks.SOUL_SOIL, Blocks.MYCELIUM), SoundEvents.BLOCK_FUNGUS_PLACE))
         DispenserBlock.registerBehavior(Items.COCOA_BEANS, plantDispenserBehavior(Blocks.COCOA, listOf(Blocks.JUNGLE_LOG, Blocks.JUNGLE_WOOD, Blocks.STRIPPED_JUNGLE_LOG, Blocks.STRIPPED_JUNGLE_WOOD), SoundEvents.BLOCK_WOOD_PLACE))
         DispenserBlock.registerBehavior(Items.CACTUS, plantDispenserBehavior(Blocks.CACTUS, listOf(Blocks.SAND, Blocks.RED_SAND), SoundEvents.BLOCK_WOOL_PLACE))
+        DispenserBlock.registerBehavior(Items.KELP, plantDispenserBehavior(Blocks.KELP, listOf(), SoundEvents.BLOCK_WET_GRASS_PLACE))
     }
 }

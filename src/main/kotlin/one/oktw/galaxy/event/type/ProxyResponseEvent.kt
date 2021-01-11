@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,8 +18,7 @@
 
 package one.oktw.galaxy.event.type
 
-import net.minecraft.network.PacketByteBuf
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.Identifier
+import one.oktw.galaxy.proxy.api.packet.Packet
 
-class PacketReceiveEvent(val channel: Identifier, val packet: PacketByteBuf, val player: ServerPlayerEntity) : Event
+class ProxyResponseEvent(val player: ServerPlayerEntity, val packet: Packet) : Event

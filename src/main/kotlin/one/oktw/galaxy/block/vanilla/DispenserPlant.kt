@@ -37,7 +37,7 @@ object DispenserPlant {
     private fun plant(blockPointer: BlockPointer, itemStack: ItemStack, block: Block, validBlocksToPlantOn: List<Block>, soundEvent: SoundEvent): ItemStack {
         val world: World = blockPointer.world
         val dispenserFacing = blockPointer.blockState.get(DispenserBlock.FACING)
-        if (dispenserFacing == Direction.UP) return ItemDispenserBehavior().dispense(blockPointer, itemStack)
+        if (dispenserFacing == Direction.UP && block != Blocks.KELP) return ItemDispenserBehavior().dispense(blockPointer, itemStack)
 
         val currentBlockPos = blockPointer.blockPos.offset(dispenserFacing)
         val currentBlockState = world.getBlockState(currentBlockPos)
@@ -77,7 +77,7 @@ object DispenserPlant {
         }
 
         if (block == Blocks.KELP) {
-            if (currentBlockState.isOf(Blocks.WATER)) {
+            if (currentBlockState.isOf(Blocks.WATER) && plantBlockState.block != Blocks.WATER) {
                 return plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
             }
         }

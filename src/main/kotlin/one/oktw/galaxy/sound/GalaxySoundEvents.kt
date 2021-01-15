@@ -16,17 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.event
+package one.oktw.galaxy.sound
 
-import one.oktw.galaxy.event.annotation.EventListener
-import one.oktw.galaxy.event.type.PlayerInteractItemEvent
-import one.oktw.galaxy.item.util.Gun
+import net.minecraft.sound.SoundEvent
+import net.minecraft.util.Identifier
+import net.minecraft.util.registry.Registry
 
-class Gun {
-    @EventListener(true)
-    fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
-        val gun = Gun.fromItem(event.player.getStackInHand(event.packet.hand)) ?: return
-        println(gun)
-        gun.shoot(event.player, event.player.serverWorld)
+object GalaxySoundEvents {
+    val GUN_SHOOT = register("galaxy:gun.shot")
+    val GUN_OVERHEAT = register("galaxy:gun.overheat")
+
+    private fun register(id: String): SoundEvent {
+        return Registry.register(Registry.SOUND_EVENT, id, SoundEvent(Identifier(id))) as SoundEvent
     }
 }

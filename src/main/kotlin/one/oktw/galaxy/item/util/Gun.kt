@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -58,17 +58,17 @@ data class Gun(
 
     fun toLoreTag(): ListTag {
         return ItemLoreBuilder() // TODO Localize
-            .addText(loreText("傷害", damage.toString()))
-            .addText(loreText("射程", range.toString(), "B"))
-            .addText(loreText("穿透", through.toString(), ""))
-            .addText(loreText("積熱", heat.toString(), "K/shot"))
-            .addText(loreText("耐熱", maxTemp.toString(), "K"))
-            .addText(loreText("冷卻", cooling.toString(), "K/t"))
+            .addText(loreText(LiteralText("傷害"), damage.toString()))
+            .addText(loreText(LiteralText("射程"), range.toString(), "B"))
+            .addText(loreText(LiteralText("穿透"), through.toString(), ""))
+            .addText(loreText(LiteralText("積熱"), heat.toString(), "K/shot"))
+            .addText(loreText(LiteralText("耐熱"), maxTemp.toString(), "K"))
+            .addText(loreText(LiteralText("冷卻"), cooling.toString(), "K/t"))
             .toTag()
     }
 
-    private fun loreText(key: String, value: String, unit: String = ""): Text =
-        LiteralText(key).styled { it.withColor(Formatting.AQUA) }
+    private fun loreText(key: Text, value: String, unit: String = ""): Text =
+        key.copy().styled { it.withColor(Formatting.AQUA) }
             .append(LiteralText(": ").styled { it.withColor(Formatting.DARK_GRAY) })
             .append(LiteralText(value).styled { it.withColor(Formatting.GRAY) })
             .append(LiteralText(unit).styled { it.withColor(Formatting.DARK_GRAY) })

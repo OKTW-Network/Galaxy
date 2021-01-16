@@ -90,6 +90,11 @@ data class Gun(
             .styled { it.withItalic(false) }
 
     fun shoot(player: ServerPlayerEntity, world: ServerWorld) {
+        showTrajectory(player, world)
+        playSound(player.server, world, player.blockPos, type)
+    }
+
+    private fun showTrajectory(player: ServerPlayerEntity, world: ServerWorld) {
         val playerLookVec = player.rotationVector
         val line = playerLookVec.multiply(this.range)
 
@@ -105,8 +110,6 @@ data class Gun(
             world.spawnParticles(ParticleTypes.ENCHANTED_HIT, pos.x, pos.y, pos.z, 1, 0.0, 0.0, 0.0, 0.0)
             pos = pos.add(vecDiv(line, interval))
         }
-
-        playSound(player.server, world, player.blockPos, type)
     }
 
     private fun playSound(server: MinecraftServer, world: ServerWorld, pos: BlockPos, type: GunType) {

@@ -21,6 +21,7 @@ package one.oktw.galaxy.item.util
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.ListTag
 import net.minecraft.particle.ParticleTypes
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
@@ -31,7 +32,7 @@ import net.minecraft.util.Formatting
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import one.oktw.galaxy.item.type.GunType
-import one.oktw.galaxy.sound.GalaxySoundEvents
+import one.oktw.galaxy.sound.GalaxySound
 import java.lang.Math.random
 import java.util.*
 import kotlin.math.abs
@@ -105,19 +106,22 @@ data class Gun(
             pos = pos.add(vecDiv(line, interval))
         }
 
-        playSound(world, player.blockPos, type)
+        playSound(player.server, world, player.blockPos, type)
     }
 
-    private fun playSound(world: ServerWorld, pos: BlockPos, type: GunType) {
+    private fun playSound(server: MinecraftServer, world: ServerWorld, pos: BlockPos, type: GunType) {
         when (type) {
-            GunType.PISTOL, GunType.PISTOL_LASOR, GunType.PISTOL_LASOR_AIMING -> world.playSound(
-                null,
-                pos,
-                GalaxySoundEvents.GUN_SHOOT,
-                SoundCategory.PLAYERS,
-                1.0f,
-                (1 + random() / 10 - random() / 10).toFloat()
-            )
+            GunType.PISTOL, GunType.PISTOL_LASOR, GunType.PISTOL_LASOR_AIMING ->
+                GalaxySound.playSound(
+                    server,
+                    world,
+                    null,
+                    pos,
+                    GalaxySound.GUN_SHOOT,
+                    SoundCategory.PLAYERS,
+                    1.0f,
+                    (1 + random() / 10 - random() / 10).toFloat()
+                )
             GunType.SNIPER, GunType.SNIPER_AIMING -> {
                 world.playSound(
                     null,
@@ -144,7 +148,7 @@ data class Gun(
                     2.0f
                 )
             }
-            else -> Unit
+            else -> Unit // TODO RailGun
         }
     }
 

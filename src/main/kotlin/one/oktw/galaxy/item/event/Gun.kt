@@ -18,9 +18,12 @@
 
 package one.oktw.galaxy.item.event
 
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.Hand
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
+import one.oktw.galaxy.event.type.PlayerSneakEvent
+import one.oktw.galaxy.event.type.PlayerSneakReleaseEvent
 import one.oktw.galaxy.item.util.Gun
 
 class Gun {
@@ -36,5 +39,25 @@ class Gun {
         }
         if (gun == null) return
         gun.shoot(event.player, event.player.serverWorld)
+    }
+
+    @EventListener(true)
+    fun onPlayerSneak(event: PlayerSneakEvent) {
+        switchAiming(event.player, true)
+    }
+
+    @EventListener(true)
+    fun onPlayerSneakRelease(event: PlayerSneakReleaseEvent) {
+        switchAiming(event.player, false)
+    }
+
+    private fun switchAiming(player: ServerPlayerEntity, aiming: Boolean) {
+        var hand = Hand.MAIN_HAND
+        var gun = Gun.fromItem(player.getStackInHand(hand))
+        if (gun == null) {
+            hand = Hand.OFF_HAND
+            gun = Gun.fromItem(player.getStackInHand(hand)) ?: return
+        }
+        player.setStackInHand(hand, gun.switchAiming(aiming))
     }
 }

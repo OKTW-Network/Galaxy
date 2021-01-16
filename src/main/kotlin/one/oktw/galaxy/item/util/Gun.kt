@@ -39,7 +39,7 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 data class Gun(
-    val type: GunType,
+    var type: GunType,
     val heat: Int,
     val maxTemp: Int,
     val cooling: Double,
@@ -84,6 +84,10 @@ data class Gun(
             .toTag()
     }
 
+    private fun toItemStack(): ItemStack {
+        return one.oktw.galaxy.item.Gun(type, heat, maxTemp, cooling, damage, range, through, uuid).createItemStack()
+    }
+
     private fun loreText(key: Text, value: String, unit: String = ""): Text =
         key.copy().styled { it.withColor(Formatting.AQUA) }
             .append(LiteralText(": ").styled { it.withColor(Formatting.DARK_GRAY) })
@@ -94,6 +98,25 @@ data class Gun(
     fun shoot(player: ServerPlayerEntity, world: ServerWorld) {
         showTrajectory(player, world)
         playSound(player.server, world, player.blockPos, type)
+    }
+
+    fun switchAiming(aiming: Boolean): ItemStack {
+        type = if (aiming) {
+            when (type) {
+                GunType.PISTOL_LASOR -> GunType.PISTOL_LASOR_AIMING
+                GunType.SNIPER -> GunType.SNIPER_AIMING
+                GunType.RAILGUN -> GunType.RAILGUN_AIMING
+                else -> type
+            }
+        } else{
+            when (type) {
+                GunType.PISTOL_LASOR_AIMING -> GunType.PISTOL_LASOR
+                GunType.SNIPER_AIMING -> GunType.SNIPER
+                GunType.RAILGUN_AIMING -> GunType.RAILGUN
+                else -> type
+            }
+        }
+        return toItemStack()
     }
 
     private fun showTrajectory(player: ServerPlayerEntity, world: ServerWorld) {

@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy.item.event
 
+import net.minecraft.util.Hand
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
 import one.oktw.galaxy.item.util.Gun
@@ -25,8 +26,15 @@ import one.oktw.galaxy.item.util.Gun
 class Gun {
     @EventListener(true)
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
-        val gun = Gun.fromItem(event.player.getStackInHand(event.packet.hand)) ?: return
-        println(gun)
+        var hand = Hand.MAIN_HAND
+        var gun = Gun.fromItem(event.player.getStackInHand(hand))
+        if (event.packet.hand == Hand.OFF_HAND) {
+            if (gun == null) {
+                hand = Hand.OFF_HAND
+                gun = Gun.fromItem(event.player.getStackInHand(hand))
+            }
+        }
+        if (gun == null) return
         gun.shoot(event.player, event.player.serverWorld)
     }
 }

@@ -97,7 +97,8 @@ data class Gun(
     }
 
     private fun showTrajectory(player: ServerPlayerEntity, world: ServerWorld) {
-        val playerLookVec = player.rotationVector
+        var playerLookVec = player.rotationVector
+        if (!player.shouldCancelInteraction()) playerLookVec = drift(playerLookVec)
         val line = playerLookVec.multiply(this.range)
 
         val interval = when (maxAxis(vecAbs(line))) {
@@ -112,6 +113,13 @@ data class Gun(
             world.spawnParticles(ParticleTypes.ENCHANTED_HIT, pos.x, pos.y, pos.z, 1, 0.0, 0.0, 0.0, 0.0)
             pos = pos.add(vecDiv(line, interval))
         }
+    }
+
+    private fun drift(vec: Vec3d): Vec3d {
+        return vecDiv(
+            vec.multiply(10.0).add(random(), random(), random())
+                .subtract(random(), random(), random()), 10.0
+        )
     }
 
     private fun playSound(server: MinecraftServer, world: ServerWorld, pos: BlockPos, type: GunType) {

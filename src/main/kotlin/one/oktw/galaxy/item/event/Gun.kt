@@ -40,28 +40,18 @@ class Gun {
     }
 
     @EventListener(true)
-    fun onPlayerSneak(event: PlayerSneakEvent) {
-        switchAiming(event.player, true)
-    }
+    fun onPlayerSneak(event: PlayerSneakEvent) = switchAiming(event.player, true)
 
     @EventListener(true)
-    fun onPlayerSneakRelease(event: PlayerSneakReleaseEvent) {
-        switchAiming(event.player, false)
-    }
+    fun onPlayerSneakRelease(event: PlayerSneakReleaseEvent) = switchAiming(event.player, false)
 
     @EventListener(true)
-    fun onUpdateSelectedSlot(event: UpdateSelectedSlotEvent) {
-        updateInventory(event.player)
-    }
+    fun onUpdateSelectedSlot(event: UpdateSelectedSlotEvent) = updateInventory(event.player)
 
     @EventListener(true)
-    fun onHotBarSlotUpdate(event: HotBarSlotUpdateEvent) {
-        updateInventory(event.player)
-    }
+    fun onHotBarSlotUpdate(event: HotBarSlotUpdateEvent) = updateInventory(event.player)
 
-    private fun updateInventory(player: ServerPlayerEntity) {
-        switchAiming(player, player.shouldCancelInteraction())
-    }
+    private fun updateInventory(player: ServerPlayerEntity) = switchAiming(player, player.shouldCancelInteraction())
 
     private fun switchAiming(player: ServerPlayerEntity, aiming: Boolean) {
         var hand = Hand.MAIN_HAND

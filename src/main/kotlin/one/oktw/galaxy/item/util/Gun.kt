@@ -84,9 +84,7 @@ data class Gun(
             .toTag()
     }
 
-    private fun toItemStack(): ItemStack {
-        return one.oktw.galaxy.item.Gun(type, heat, maxTemp, cooling, damage, range, through, uuid).createItemStack()
-    }
+    private fun toItemStack() = one.oktw.galaxy.item.Gun(type, heat, maxTemp, cooling, damage, range, through, uuid).createItemStack()
 
     private fun loreText(key: Text, value: String, unit: String = ""): Text =
         key.copy().styled { it.withColor(Formatting.AQUA) }
@@ -108,7 +106,7 @@ data class Gun(
                 GunType.RAILGUN -> GunType.RAILGUN_AIMING
                 else -> type
             }
-        } else{
+        } else {
             when (type) {
                 GunType.PISTOL_LASOR_AIMING -> GunType.PISTOL_LASOR
                 GunType.SNIPER_AIMING -> GunType.SNIPER
@@ -138,69 +136,59 @@ data class Gun(
         }
     }
 
-    private fun drift(vec: Vec3d): Vec3d {
-        return vecDiv(
-            vec.multiply(10.0).add(random(), random(), random())
-                .subtract(random(), random(), random()), 10.0
-        )
-    }
+    private fun drift(vec: Vec3d) = vecDiv(
+        vec.multiply(10.0).add(random(), random(), random())
+            .subtract(random(), random(), random()), 10.0
+    )
 
-    private fun playSound(server: MinecraftServer, world: ServerWorld, pos: BlockPos, type: GunType) {
-        when (type) {
-            GunType.PISTOL, GunType.PISTOL_LASOR, GunType.PISTOL_LASOR_AIMING ->
-                GalaxySound.playSound(
-                    server,
-                    world,
-                    null,
-                    pos,
-                    GalaxySound.GUN_SHOOT,
-                    SoundCategory.PLAYERS,
-                    1.0f,
-                    (1 + random() / 10 - random() / 10).toFloat()
-                )
-            GunType.SNIPER, GunType.SNIPER_AIMING -> {
-                world.playSound(
-                    null,
-                    pos,
-                    SoundEvents.ENTITY_BLAZE_HURT,
-                    SoundCategory.PLAYERS,
-                    1.0f,
-                    2.0f
-                )
-                world.playSound(
-                    null,
-                    pos,
-                    SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST,
-                    SoundCategory.PLAYERS,
-                    1.0f,
-                    0.0f
-                )
-                world.playSound(
-                    null,
-                    pos,
-                    SoundEvents.BLOCK_PISTON_EXTEND,
-                    SoundCategory.PLAYERS,
-                    1.0f,
-                    2.0f
-                )
-            }
-            else -> Unit // TODO RailGun
+    private fun playSound(server: MinecraftServer, world: ServerWorld, pos: BlockPos, type: GunType) = when (type) {
+        GunType.PISTOL, GunType.PISTOL_LASOR, GunType.PISTOL_LASOR_AIMING ->
+            GalaxySound.playSound(
+                server,
+                world,
+                null,
+                pos,
+                GalaxySound.GUN_SHOOT,
+                SoundCategory.PLAYERS,
+                1.0f,
+                (1 + random() / 10 - random() / 10).toFloat()
+            )
+        GunType.SNIPER, GunType.SNIPER_AIMING -> {
+            world.playSound(
+                null,
+                pos,
+                SoundEvents.ENTITY_BLAZE_HURT,
+                SoundCategory.PLAYERS,
+                1.0f,
+                2.0f
+            )
+            world.playSound(
+                null,
+                pos,
+                SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST,
+                SoundCategory.PLAYERS,
+                1.0f,
+                0.0f
+            )
+            world.playSound(
+                null,
+                pos,
+                SoundEvents.BLOCK_PISTON_EXTEND,
+                SoundCategory.PLAYERS,
+                1.0f,
+                2.0f
+            )
         }
+        else -> Unit // TODO RailGun
     }
 
-    private fun vecAbs(vec: Vec3d): Vec3d {
-        return Vec3d(abs(vec.x), abs(vec.y), abs(vec.z))
+    private fun vecAbs(vec: Vec3d) = Vec3d(abs(vec.x), abs(vec.y), abs(vec.z))
+
+    private fun maxAxis(vec: Vec3d) = if (vec.x < vec.y) {
+        if (vec.y < vec.z) 2 else 1
+    } else {
+        if (vec.x < vec.z) 2 else 0
     }
 
-    private fun maxAxis(vec: Vec3d): Int {
-        return if (vec.x < vec.y) {
-            if (vec.y < vec.z) 2 else 1
-        } else {
-            if (vec.x < vec.z) 2 else 0
-        }
-    }
-
-    private fun vecDiv(vec: Vec3d, value: Double): Vec3d {
-        return Vec3d(vec.x / value, vec.y / value, vec.z / value)
-    }
+    private fun vecDiv(vec: Vec3d, value: Double) = Vec3d(vec.x / value, vec.y / value, vec.z / value)
 }

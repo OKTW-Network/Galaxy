@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,12 +30,12 @@ import java.util.*
 
 class Gun(
     val type: GunType = GunType.DUMMY,
-    val heat: Int = 0,
-    val maxTemp: Int = 0,
-    val cooling: Double = 0.0,
-    val damage: Double = 0.0,
-    val range: Double = 0.0,
-    val through: Int = 1,
+    val heat: Int = 20,
+    val maxTemp: Int = 100,
+    val cooling: Double = 1.0,
+    val damage: Double = 10.0,
+    val range: Double = 10.0,
+    val through: Int = 0,
     val uuid: UUID = UUID.randomUUID()
 ) : Item {
     override val itemType = GUN

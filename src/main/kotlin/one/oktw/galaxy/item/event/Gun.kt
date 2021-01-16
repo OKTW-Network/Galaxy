@@ -21,9 +21,7 @@ package one.oktw.galaxy.item.event
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.Hand
 import one.oktw.galaxy.event.annotation.EventListener
-import one.oktw.galaxy.event.type.PlayerInteractItemEvent
-import one.oktw.galaxy.event.type.PlayerSneakEvent
-import one.oktw.galaxy.event.type.PlayerSneakReleaseEvent
+import one.oktw.galaxy.event.type.*
 import one.oktw.galaxy.item.util.Gun
 
 class Gun {
@@ -51,12 +49,31 @@ class Gun {
         switchAiming(event.player, false)
     }
 
+    @EventListener(true)
+    fun onUpdateSelectedSlot(event: UpdateSelectedSlotEvent) {
+        updateInventory(event.player)
+    }
+
+    @EventListener(true)
+    fun onHotBarSlotUpdate(event: HotBarSlotUpdateEvent) {
+        updateInventory(event.player)
+    }
+
+    private fun updateInventory(player: ServerPlayerEntity) {
+        switchAiming(player, player.shouldCancelInteraction())
+    }
+
     private fun switchAiming(player: ServerPlayerEntity, aiming: Boolean) {
         var hand = Hand.MAIN_HAND
         var gun = Gun.fromItem(player.getStackInHand(hand))
         if (gun == null) {
             hand = Hand.OFF_HAND
             gun = Gun.fromItem(player.getStackInHand(hand)) ?: return
+        } else {
+            val offGun = Gun.fromItem(player.getStackInHand(Hand.OFF_HAND))
+            if (offGun != null) { // turn off offhand aim
+                player.setStackInHand(Hand.OFF_HAND, offGun.switchAiming(false))
+            }
         }
         player.setStackInHand(hand, gun.switchAiming(aiming))
     }

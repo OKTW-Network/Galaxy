@@ -67,6 +67,8 @@ data class Gun(
                 )
             } catch (_: NullPointerException) {
                 null
+            } catch (_: IllegalArgumentException) {
+                null
             }
         }
     }

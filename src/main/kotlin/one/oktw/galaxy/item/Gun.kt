@@ -61,7 +61,9 @@ class Gun(
 
         if (type.languageKey != "") {
             TranslatableText(type.languageKey).styled {
-                it.withColor(Formatting.GREEN).withItalic(false) //TODO Advanced weapon
+                if (type in arrayOf(GunType.SNIPER, GunType.SNIPER_AIMING, GunType.RAILGUN, GunType.RAILGUN_AIMING)) {
+                    it.withColor(Formatting.GREEN).withItalic(false)
+                } else it.withItalic(false)
             }.let(item::setName)
         }
 

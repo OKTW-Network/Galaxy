@@ -87,6 +87,7 @@ class BlockEvents {
             CustomBlockUtil.getCustomBlockEntity(world, blockPos) ?: return // Check is custom block
             CustomBlockUtil.removeBlock(world, blockPos)
             event.swing = true
+            usedLock.add(player)
         }
     }
 

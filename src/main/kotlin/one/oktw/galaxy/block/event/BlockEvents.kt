@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,7 +19,6 @@
 package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
-import net.minecraft.block.Blocks
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.item.ItemStack
 import net.minecraft.item.ItemUsageContext
@@ -73,22 +72,21 @@ class BlockEvents {
     fun onUseItemOnBlock(event: PlayerUseItemOnBlock) {
         val item = event.context.stack
         val player = event.context.player as ServerPlayerEntity
-        if (item.item == BlockItem().baseItem) {
-            if (player.isCreativeLevelTwoOp) return
-            if (tryPlaceBlock(event.context)) {
-                player.swingHand(event.context.hand, true)
-                usedLock.add(player)
-            }
+
+        // Place custom block
+        if (item.item == BlockItem().baseItem && tryPlaceBlock(event.context)) {
+            event.swing = true
+            usedLock.add(player)
+            return
         }
-        if (item.item == Tool().baseItem) {
-            if (tryBreakBlock(event.context)) {
-                if (ItemStack.areEqual(player.mainHandStack, wrench)) {
-                    player.swingHand(Hand.MAIN_HAND, true)
-                } else {
-                    player.swingHand(event.context.hand, true)
-                }
-                usedLock.add(player)
-            }
+
+        // Wrench
+        if (item.item == Tool().baseItem && player.isSneaking && ItemStack.areEqual(item, wrench)) {
+            val world = player.serverWorld
+            val blockPos = event.context.blockPos
+            CustomBlockUtil.getCustomBlockEntity(world, blockPos) ?: return // Check is custom block
+            CustomBlockUtil.removeBlock(world, blockPos)
+            event.swing = true
         }
     }
 
@@ -98,45 +96,17 @@ class BlockEvents {
     }
 
     @EventListener(true)
-    fun onInteractEntity(event: PlayerInteractEntityEvent) {
-        if (usedLock.contains(event.player)) return
-        val entity = event.packet.getEntity(event.player.serverWorld) ?: return
-        if (!event.player.shouldCancelInteraction()) {
-            val blockType = CustomBlockUtil.getTypeFromCustomBlockEntity(entity) ?: return
-            if (blockType.hasGUI && event.packet.hand == Hand.MAIN_HAND) {
-                openGUI(blockType, event.player)
-                event.player.swingHand(Hand.MAIN_HAND, true)
-                usedLock.add(event.player)
-            }
-        }
-    }
-
-    @EventListener(true)
     fun onBlockBreak(event: BlockBreakEvent) {
         CustomBlockUtil.getCustomBlockEntity((event.world as ServerWorld), event.pos) ?: return
+        if (event.player?.isCreative == true) {
+            CustomBlockUtil.removeBlock(event.world, event.pos, false)
+        }
         event.cancel = true
     }
 
     @EventListener(true)
     fun onBlockExplode(event: BlockExplodeEvent) {
         event.affectedPos.removeIf { CustomBlockUtil.positionIsAnyCustomBlock((event.world as ServerWorld), it) }
-    }
-
-    private fun tryBreakBlock(context: ItemUsageContext): Boolean {
-        val world = context.world as ServerWorld
-        val position = context.blockPos
-        val player = context.player as ServerPlayerEntity
-        if (world.getBlockState(position).block != Blocks.BARRIER) return false
-        if (player.shouldCancelInteraction() && ItemStack.areEqual(context.stack, wrench)) {
-            CustomBlockUtil.getCustomBlockEntity(world, position)
-                .let {
-                    it ?: return false
-                    if (CustomBlockUtil.getTypeFromCustomBlockEntity(it) == BlockType.ANGEL_BLOCK) return false
-                }
-            CustomBlockUtil.removeBlock(world, position)
-            return true
-        }
-        return false
     }
 
     private fun tryOpenGUI(event: PlayerInteractBlockEvent): Boolean {
@@ -148,21 +118,17 @@ class BlockEvents {
         if (!player.shouldCancelInteraction()) {
             val entity = CustomBlockUtil.getCustomBlockEntity(world, position) ?: return false
             val blockType = CustomBlockUtil.getTypeFromCustomBlockEntity(entity) ?: return false
-            if (blockType.hasGUI && hand == Hand.MAIN_HAND) openGUI(blockType, player)
+            if (blockType.hasGUI && hand == Hand.MAIN_HAND) when (blockType) { // TODO activate GUI
+                BlockType.CONTROL_PANEL -> player.sendMessage(LiteralText("Control Panel"), false)
+                BlockType.PLANET_TERMINAL -> player.sendMessage(LiteralText("Planet Terminal"), false)
+                BlockType.HT_CRAFTING_TABLE -> player.sendMessage(LiteralText("HTCT"), false)
+                BlockType.TELEPORTER_CORE_BASIC -> player.sendMessage(LiteralText("Basic Teleporter"), false)
+                BlockType.TELEPORTER_CORE_ADVANCE -> player.sendMessage(LiteralText("Advanced Teleporter"), false)
+                else -> Unit
+            }
             return blockType.hasGUI
         }
         return false
-    }
-
-    private fun openGUI(blockType: BlockType, player: ServerPlayerEntity) {
-        when (blockType) { // TODO activate GUI
-            BlockType.CONTROL_PANEL -> player.sendMessage(LiteralText("Control Panel"), false)
-            BlockType.PLANET_TERMINAL -> player.sendMessage(LiteralText("Planet Terminal"), false)
-            BlockType.HT_CRAFTING_TABLE -> player.sendMessage(LiteralText("HTCT"), false)
-            BlockType.TELEPORTER_CORE_BASIC -> player.sendMessage(LiteralText("Basic Teleporter"), false)
-            BlockType.TELEPORTER_CORE_ADVANCE -> player.sendMessage(LiteralText("Advanced Teleporter"), false)
-            else -> Unit
-        }
     }
 
     private fun tryPlaceBlock(context: ItemUsageContext): Boolean {

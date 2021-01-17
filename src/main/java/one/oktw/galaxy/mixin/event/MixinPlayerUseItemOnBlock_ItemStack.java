@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,10 +30,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemStack.class)
 public class MixinPlayerUseItemOnBlock_ItemStack {
-    @Inject(method = "useOnBlock", at = @At(value = "HEAD"))
+    @Inject(method = "useOnBlock", at = @At(value = "HEAD"), cancellable = true)
     private void useItemOnBlock(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
         Main main = Main.Companion.getMain();
         if (main == null || context.getPlayer() == null) return;
-        main.getEventManager().emit(new PlayerUseItemOnBlock(context));
+
+        PlayerUseItemOnBlock event = main.getEventManager().emit(new PlayerUseItemOnBlock(context));
+        if (event.getCancel()) {
+            cir.setReturnValue(event.getSwing() ? ActionResult.SUCCESS : ActionResult.CONSUME);
+            cir.cancel();
+        }
     }
 }

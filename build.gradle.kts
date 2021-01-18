@@ -41,9 +41,9 @@ minecraft {
 
 dependencies {
     // Core
-    minecraft(group = "com.mojang", name = "minecraft", version = "1.16.4")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.16.4+build.7", classifier = "v2")
-    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.10.8")
+    minecraft(group = "com.mojang", name = "minecraft", version = "1.16.5")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.16.5+build.1", classifier = "v2")
+    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.11.1")
 
     // fabric api
     modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.29.3+1.16")

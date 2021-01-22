@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -84,12 +84,12 @@ object CustomBlockUtil {
         return true
     }
 
-    fun removeBlock(world: ServerWorld, blockPos: BlockPos) {
+    fun removeBlock(world: ServerWorld, blockPos: BlockPos, drop: Boolean = true) {
         val entity = getCustomBlockEntity(world, blockPos) ?: return
         val block = Block(getTypeFromCustomBlockEntity(entity) ?: return)
         world.setBlockState(blockPos, AIR.defaultState)
         entity.kill()
-        minecraftBlock.dropStack(world, blockPos, block.item!!.createItemStack())
+        if (drop) minecraftBlock.dropStack(world, blockPos, block.item!!.createItemStack())
     }
 
     fun unregisterBlock(world: ServerWorld, blockPos: BlockPos): Boolean {

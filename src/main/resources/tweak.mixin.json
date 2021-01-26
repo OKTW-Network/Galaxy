@@ -12,6 +12,7 @@
     "MixinOptimizeContainer_LootableContainerBlockEntity",
     "MixinRCON_RconBase",
     "MixinRCON_RconClient",
+    "MixinSkipEnchantingTableTick",
     "MixinThrownCountdown_Entity",
     "MixinThrownCountdown_ProjectileEntity",
     "MixinThrownCountdown_ThrownEntity"

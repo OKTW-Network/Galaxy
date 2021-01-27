@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,7 +21,9 @@ package one.oktw.galaxy.mixin.tweak;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.entity.projectile.thrown.ThrownEntity;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import one.oktw.galaxy.mixin.interfaces.IThrownCountdown_Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,12 +36,12 @@ import java.util.function.Predicate;
 public class MixinThrownCountdown_ThrownEntity {
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/ProjectileUtil;getCollision(Lnet/minecraft/entity/Entity;Ljava/util/function/Predicate;)Lnet/minecraft/util/hit/HitResult;"))
     private HitResult addWaterHit(Entity entity, Predicate<Entity> predicate) {
-        var hit = ProjectileUtil.getCollision(entity, predicate);
+        HitResult hit = ProjectileUtil.getCollision(entity, predicate);
 
         if (hit.getType() == HitResult.Type.MISS && ((IThrownCountdown_Entity) this).getIntoWater() > 10) {
-            var pos = entity.getPos();
-            var velocity = pos.add(entity.getVelocity());
-            var newHit = entity.world.raycast(new RaycastContext(pos, velocity, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.ANY, entity));
+            Vec3d pos = entity.getPos();
+            Vec3d velocity = pos.add(entity.getVelocity());
+            BlockHitResult newHit = entity.world.raycast(new RaycastContext(pos, velocity, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.ANY, entity));
             if (newHit.getType() != HitResult.Type.MISS) {
                 hit = newHit;
             }

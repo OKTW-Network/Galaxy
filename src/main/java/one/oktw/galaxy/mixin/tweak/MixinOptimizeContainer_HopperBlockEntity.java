@@ -26,6 +26,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
+import one.oktw.galaxy.mixin.interfaces.InventoryAvailableSlots;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -83,7 +84,7 @@ public abstract class MixinOptimizeContainer_HopperBlockEntity extends LootableC
         locals = LocalCapture.CAPTURE_FAILHARD,
         cancellable = true)
     private static void extract_EarlyCheck(Hopper hopper, Inventory inventory, int slot, Direction side, CallbackInfoReturnable<Boolean> cir, ItemStack itemStack) {
-        for (int i : getAvailableSlots_NoStream(hopper, side)) {
+        for (int i : getAvailableSlots_NoStream(hopper, null)) {
             ItemStack slotItem = hopper.getStack(i);
             if (slotItem.isEmpty() || canMergeItems(slotItem, itemStack)) return;
         }
@@ -122,7 +123,7 @@ public abstract class MixinOptimizeContainer_HopperBlockEntity extends LootableC
 
     private static int[] getAvailableSlots_NoStream(Inventory inventory, Direction side) {
         if (inventory instanceof SidedInventory) return ((SidedInventory) inventory).getAvailableSlots(side);
-        if (inventory instanceof HopperBlockEntity) return availableSlots;
+        if (inventory instanceof InventoryAvailableSlots) return (((InventoryAvailableSlots) inventory).getAvailableSlots());
 
         int[] array = new int[inventory.size()];
         Arrays.setAll(array, i -> i);

@@ -8,8 +8,12 @@
     "MixinMapExistingChunk_FilledMapItem",
     "MixinOneSpawnChunk_MinecraftServer",
     "MixinOneSpawnChunk_ServerWorld",
+    "MixinOptimizeContainer_AvailableSlots",
+    "MixinOptimizeContainer_HopperBlockEntity",
+    "MixinOptimizeContainer_LootableContainerBlockEntity",
     "MixinRCON_RconBase",
     "MixinRCON_RconClient",
+    "MixinSkipEnchantingTableTick",
     "MixinThrownCountdown_Entity",
     "MixinThrownCountdown_ProjectileEntity",
     "MixinThrownCountdown_ThrownEntity"

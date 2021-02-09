@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,14 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.util
+package one.oktw.galaxy.util
 
-enum class Flags(val id: Int) {
-    ALL(63),
-    ENCHANTMENTS(1),
-    ATTRIBUTE_MODIFIERS(2),
-    UNBREAKABLE(4),
-    CAN_BREAK(8),
-    CAN_PLACE(16),
-    OTHERS(32)
+import net.minecraft.util.Identifier
+
+interface Registrable {
+    val identifier: Identifier
 }

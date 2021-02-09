@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,32 +18,15 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.item.ItemStack
 import net.minecraft.item.Items.IRON_SWORD
+import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
-import one.oktw.galaxy.item.type.ItemType.TOOL
-import one.oktw.galaxy.item.type.ToolType
-import one.oktw.galaxy.item.type.ToolType.DUMMY
-import one.oktw.galaxy.item.util.CustomItemBuilder
+import net.minecraft.util.Identifier
 
-class Tool(val type: ToolType = DUMMY) : Item {
-    override val itemType = TOOL
-
-    override val baseItem: net.minecraft.item.Item = IRON_SWORD
-
-    override fun createItemStack(): ItemStack {
-        val item = CustomItemBuilder()
-            .setBaseItem(baseItem)
-            .setModel(type.customModelData)
-            .setItemType(itemType)
-            .setUnbreakable()
-            .hideAllFlags()
-            .removeAllModifiers()
-
-        if (type.languageKey != "") {
-            TranslatableText(type.languageKey).styled { it.withItalic(false) }.let(item::setName)
-        }
-
-        return item.build()
+class Tool(id: String, modelData: Int, private val name: String) : CustomItem(Identifier("galaxy", "item/tool/$id"), IRON_SWORD, modelData) {
+    companion object {
+        val WRENCH = registry.register(Tool("wrench", 1010100, "item.Tool.WRENCH"))
     }
+
+    override fun getName(): Text? = TranslatableText(name).styled { it.withItalic(false) }
 }

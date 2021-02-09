@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -27,10 +27,9 @@ import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import one.oktw.galaxy.item.Tool
-import one.oktw.galaxy.item.type.ToolType
 
 class Wrench : CraftingRecipe {
-    private val item = Tool(ToolType.WRENCH).createItemStack()
+    private val item = Tool.WRENCH.createItemStack()
     private val list = listOf(
         IRON_INGOT, AIR, IRON_INGOT,
         AIR, STICK, AIR,

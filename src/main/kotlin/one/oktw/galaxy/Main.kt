@@ -43,6 +43,7 @@ import one.oktw.galaxy.mixin.interfaces.CustomRecipeManager
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.proxy.api.ProxyAPI
+import one.oktw.galaxy.recipe.tools.Wrench
 import one.oktw.galaxy.resourcepack.ResourcePack
 import java.util.*
 
@@ -74,7 +75,7 @@ class Main : DedicatedServerModInitializer {
         })
 
         // Recipe
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, one.oktw.galaxy.recipe.tools.Wrench())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Wrench())
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer

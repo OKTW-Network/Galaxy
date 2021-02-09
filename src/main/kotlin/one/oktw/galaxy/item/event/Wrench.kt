@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -27,39 +27,28 @@ import net.minecraft.block.entity.ShulkerBoxBlockEntity
 import net.minecraft.block.enums.ChestType
 import net.minecraft.block.enums.RailShape
 import net.minecraft.block.enums.SlabType
-import net.minecraft.item.ItemStack
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.state.property.Properties.*
-import net.minecraft.util.Hand.MAIN_HAND
-import net.minecraft.util.Hand.OFF_HAND
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerSneakReleaseEvent
 import one.oktw.galaxy.event.type.PlayerUseItemOnBlock
+import one.oktw.galaxy.item.CustomItemHelper
 import one.oktw.galaxy.item.Tool
-import one.oktw.galaxy.item.type.ToolType
 import java.util.*
 import kotlin.collections.set
 
 class Wrench {
-    private val wrenchItemStack = Tool(ToolType.WRENCH).createItemStack()
     private val startDirection = WeakHashMap<ServerPlayerEntity, Pair<BlockPos, Direction>>() // Don't leak ServerPlayerEntity
 
     @EventListener(true)
     fun onUseItemOnBlock(event: PlayerUseItemOnBlock) {
         val player = event.context.player ?: return
 
-        if (!player.shouldCancelInteraction()) return
+        if (!player.isSneaking) return
 
-        when (event.context.hand ?: return) {
-            MAIN_HAND -> if (ItemStack.areEqual(player.mainHandStack, wrenchItemStack)) {
-                if (wrenchSpin(event)) player.swingHand(MAIN_HAND, true)
-            }
-            OFF_HAND -> if (player.mainHandStack.isEmpty && ItemStack.areEqual(player.offHandStack, wrenchItemStack)) {
-                if (wrenchSpin(event)) player.swingHand(OFF_HAND, true)
-            }
-        }
+        if (CustomItemHelper.getItem(event.context.stack) == Tool.WRENCH && wrenchSpin(event)) event.swing = true
     }
 
     @EventListener(true)

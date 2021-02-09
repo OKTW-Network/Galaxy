@@ -37,6 +37,7 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
             Material
             Tool
             Upgrade
+            Weapon
             CustomBlockItem
         }
     }

@@ -69,14 +69,13 @@ object CustomBlockHelper {
         val entity = getCustomBlockEntity(world, pos)
         val blockEntity = world.getBlockEntity(pos) as? CustomBlockEntity ?: return
         world.setBlockState(pos, Blocks.AIR.defaultState)
-        entity?.kill()
+        entity.forEach(Entity::kill)
         if (drop) net.minecraft.block.Block.dropStack(world, pos, CustomBlock.registry.get(blockEntity.getId())!!.toItem()!!.createItemStack())
     }
 
     // TODO move to BlockEntity
-    fun getCustomBlockEntity(world: ServerWorld, blockPos: BlockPos): Entity? {
-        val entities = world.getEntitiesByType(EntityType.ARMOR_STAND) { it.blockPos == blockPos && it.scoreboardTags.contains("BLOCK") }
-        return entities.firstOrNull()
+    private fun getCustomBlockEntity(world: ServerWorld, blockPos: BlockPos): List<Entity> {
+        return world.getEntitiesByType(EntityType.ARMOR_STAND) { it.blockPos == blockPos && it.scoreboardTags.contains("BLOCK") }
     }
 
     /**

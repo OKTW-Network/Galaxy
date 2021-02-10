@@ -21,6 +21,7 @@ package one.oktw.galaxy.item
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.util.CustomRegistry
@@ -60,11 +61,11 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
         if (this::cacheItemStack.isInitialized) return cacheItemStack.copy()
 
         cacheItemStack = ItemStack(baseItem).apply {
-            removeSubTag("AttributeModifiers")
             orCreateTag.apply {
                 putInt("HideFlags", ItemStack.TooltipSection.values().map(ItemStack.TooltipSection::getFlag).reduce { acc, i -> acc or i }) // ALL
                 putInt("CustomModelData", modelData)
                 putBoolean("Unbreakable", true)
+                put("AttributeModifiers", ListTag())
             }
             setCustomName(this@CustomItem.getName())
             writeCustomNbt(getOrCreateSubTag("GalaxyData"))

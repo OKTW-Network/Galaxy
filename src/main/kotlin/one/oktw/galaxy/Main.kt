@@ -29,6 +29,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.recipe.RecipeType
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
+import one.oktw.galaxy.block.CustomBlock
 import one.oktw.galaxy.block.event.AngelBlock
 import one.oktw.galaxy.block.event.BlockEvents
 import one.oktw.galaxy.block.event.Elevator
@@ -73,6 +74,9 @@ class Main : DedicatedServerModInitializer {
         CommandRegistrationCallback.EVENT.register(CommandRegistrationCallback { dispatcher, _ ->
             listOf(Join(), Admin(), Home(), Spawn()).forEach { dispatcher.let(it::register) }
         })
+
+        // Register CustomBlockEntity
+        CustomBlock
 
         // Recipe
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Wrench())

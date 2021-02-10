@@ -19,14 +19,9 @@
 package one.oktw.galaxy.block
 
 import net.minecraft.block.Blocks
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.item.Items
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
@@ -36,17 +31,6 @@ import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.CustomItemHelper
 
 object CustomBlockHelper {
-    private val armorStandTag = CompoundTag().apply {
-        putString("id", "minecraft:armor_stand")
-        putBoolean("Invisible", true)
-        putBoolean("Invulnerable", true)
-        putBoolean("Marker", true)
-        putBoolean("NoGravity", true)
-        putBoolean("Silent", true)
-        putBoolean("Small", true)
-        putInt("DisabledSlots", 4144959)
-    }
-
     fun place(world: ServerWorld, pos: BlockPos, block: CustomBlock): Boolean {
         if (world.setBlockState(pos, block.baseBlock.defaultState)) {
             postPlace(world, pos, block)
@@ -66,16 +50,9 @@ object CustomBlockHelper {
     }
 
     fun destroy(world: ServerWorld, pos: BlockPos, drop: Boolean = true) {
-        val entity = getCustomBlockEntity(world, pos)
         val blockEntity = world.getBlockEntity(pos) as? CustomBlockEntity ?: return
         world.setBlockState(pos, Blocks.AIR.defaultState)
-        entity.forEach(Entity::kill)
         if (drop) net.minecraft.block.Block.dropStack(world, pos, CustomBlock.registry.get(blockEntity.getId())!!.toItem()!!.createItemStack())
-    }
-
-    // TODO move to BlockEntity
-    private fun getCustomBlockEntity(world: ServerWorld, blockPos: BlockPos): List<Entity> {
-        return world.getEntitiesByType(EntityType.ARMOR_STAND) { it.blockPos == blockPos && it.scoreboardTags.contains("BLOCK") }
     }
 
     /**
@@ -83,15 +60,6 @@ object CustomBlockHelper {
      */
     private fun postPlace(world: ServerWorld, pos: BlockPos, block: CustomBlock) {
         world.setBlockEntity(pos, block.createBlockEntity())
-
-        if (block.modelItem != null) {
-            val entity: ArmorStandEntity = EntityType.getEntityFromTag(armorStandTag, world).get() as ArmorStandEntity
-            entity.refreshPositionAndAngles(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, 0.0F, 0.0F)
-            entity.equipStack(EquipmentSlot.HEAD, block.modelItem)
-            entity.addScoreboardTag("BLOCK")
-            entity.addScoreboardTag(block.identifier.toString()) // TODO fallback
-            world.spawnEntity(entity)
-        }
 
         world.playSound(null, pos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
     }

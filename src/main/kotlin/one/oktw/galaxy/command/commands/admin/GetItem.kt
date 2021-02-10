@@ -39,7 +39,7 @@ class GetItem {
                     val item = CustomItem.registry.get(identifier)
 
                     if (item == null) {
-                        it.source.sendFeedback(TranslatableText("argument.item.id.invalid", identifier), false)
+                        it.source.sendError(TranslatableText("argument.item.id.invalid", identifier))
                         return@executes 0
                     }
 

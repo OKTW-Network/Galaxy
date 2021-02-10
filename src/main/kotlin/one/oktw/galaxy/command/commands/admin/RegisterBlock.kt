@@ -54,6 +54,7 @@ class RegisterBlock {
             }
 
     private fun registerBlock(source: ServerCommandSource, block: CustomBlock, blockPos: BlockPos): Int {
+        source.world.removeBlockEntity(blockPos)
         source.world.setBlockEntity(blockPos, block.createBlockEntity())
         source.sendFeedback(LiteralText("Registered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z} to ${block.identifier}"), true)
 

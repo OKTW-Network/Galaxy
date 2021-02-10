@@ -48,7 +48,7 @@ object CustomBlockHelper {
     }
 
     fun place(world: ServerWorld, pos: BlockPos, block: CustomBlock): Boolean {
-        if (world.setBlockState(pos, block.baseBlock)) {
+        if (world.setBlockState(pos, block.baseBlock.defaultState)) {
             postPlace(world, pos, block)
             return true
         }

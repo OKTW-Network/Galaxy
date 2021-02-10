@@ -18,8 +18,8 @@
 
 package one.oktw.galaxy.block
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks.BARRIER
+import net.minecraft.block.Block
+import net.minecraft.block.Blocks.*
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Identifier
@@ -30,19 +30,19 @@ import one.oktw.galaxy.item.CustomItemHelper
 import one.oktw.galaxy.util.CustomRegistry
 import one.oktw.galaxy.util.Registrable
 
-open class CustomBlock(final override val identifier: Identifier, val modelItem: ItemStack? = null, val baseBlock: BlockState = BARRIER.defaultState) :
+open class CustomBlock(final override val identifier: Identifier, val modelItem: ItemStack? = null, val baseBlock: Block = BARRIER) :
     Registrable {
-    constructor(id: String, modelItem: ItemStack? = null, baseBlock: BlockState = BARRIER.defaultState) :
+    constructor(id: String, modelItem: ItemStack? = null, baseBlock: Block = BARRIER) :
         this(Identifier("galaxy", "block/$id"), modelItem, baseBlock)
 
     private val blockEntityType =
-        Registry.register(Registry.BLOCK_ENTITY_TYPE, identifier, BlockEntityType.Builder.create({ createBlockEntity() }, BARRIER).build(null))
+        Registry.register(Registry.BLOCK_ENTITY_TYPE, identifier, BlockEntityType.Builder.create({ createBlockEntity() }, baseBlock).build(null))
 
     companion object {
         val registry = CustomRegistry<CustomBlock>()
 
-        val CONTROL_PANEL = Companion.registry.register(CustomBlock("control_panel"))
-        val PLANET_TERMINAL = Companion.registry.register(CustomBlock("planet_terminal"))
+        val CONTROL_PANEL = registry.register(CustomBlock("control_panel", baseBlock = COMPARATOR))
+        val PLANET_TERMINAL = registry.register(CustomBlock("planet_terminal", baseBlock = BEACON))
         val HT_CRAFTING_TABLE = registry.register(CustomBlock("ht_crafting_table", CustomBlockItem.HT_CRAFTING_TABLE.createItemStack()))
         val ELEVATOR = registry.register(CustomBlock("elevator", CustomBlockItem.ELEVATOR.createItemStack()))
         val ANGEL_BLOCK = registry.register(CustomBlock("angel_block", CustomBlockItem.ANGEL_BLOCK.createItemStack()))

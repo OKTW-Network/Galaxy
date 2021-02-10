@@ -21,6 +21,7 @@ package one.oktw.galaxy.item
 import net.minecraft.item.Items.COMMAND_BLOCK
 import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
+import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
 class Material private constructor(id: String, modelData: Int, private val name: String) :
@@ -39,5 +40,5 @@ class Material private constructor(id: String, modelData: Int, private val name:
         val BARREL = registry.register(Material("barrel", 2010503, "item.Material.BARREL"))
     }
 
-    override fun getName(): Text? = TranslatableText(name).styled { it.withItalic(false) }
+    override fun getName(): Text? = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
 }

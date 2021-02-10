@@ -87,7 +87,7 @@ class AngelBlock {
             (player.serverWorld.getBlockEntity(blockPos) as? CustomBlockEntity)?.getId() == CustomBlock.ANGEL_BLOCK.identifier &&
             !justBreaked.contains(player)
         ) {
-            CustomBlockHelper.destroy(player.serverWorld, blockPos)
+            CustomBlockHelper.destroyAndDrop(player.serverWorld, blockPos)
             player.serverWorld.playSound(null, blockPos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
             justBreaked.add(player)
         }

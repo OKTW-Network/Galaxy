@@ -79,7 +79,7 @@ class BlockEvents {
             val world = player.serverWorld
             val blockPos = event.context.blockPos
             if (world.getBlockEntity(blockPos) !is CustomBlockEntity) return // Check is custom block
-            CustomBlockHelper.destroy(world, blockPos)
+            CustomBlockHelper.destroyAndDrop(world, blockPos)
             event.swing = true
             usedLock.add(player)
         }

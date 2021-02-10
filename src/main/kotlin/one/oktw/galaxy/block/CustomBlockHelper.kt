@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy.block
 
+import net.minecraft.block.Block
 import net.minecraft.block.Blocks
 import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemPlacementContext
@@ -26,7 +27,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
-import one.oktw.galaxy.block.entity.CustomBlockEntity
+import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.CustomItemHelper
 
@@ -49,10 +50,10 @@ object CustomBlockHelper {
         return false
     }
 
-    fun destroy(world: ServerWorld, pos: BlockPos, drop: Boolean = true) {
-        val blockEntity = world.getBlockEntity(pos) as? CustomBlockEntity ?: return
+    fun destroyAndDrop(world: ServerWorld, pos: BlockPos) {
+        val blockEntity = world.getBlockEntity(pos) as? ModelCustomBlockEntity ?: return
         world.setBlockState(pos, Blocks.AIR.defaultState)
-        if (drop) net.minecraft.block.Block.dropStack(world, pos, CustomBlock.registry.get(blockEntity.getId())!!.toItem()!!.createItemStack())
+        Block.dropStack(world, pos, CustomBlock.registry.get(blockEntity.getId())!!.toItem()!!.createItemStack())
     }
 
     /**

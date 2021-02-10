@@ -23,7 +23,7 @@ import net.minecraft.item.ItemPlacementContext
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import one.oktw.galaxy.block.CustomBlockHelper
-import one.oktw.galaxy.block.entity.CustomBlockEntity
+import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
@@ -78,7 +78,7 @@ class BlockEvents {
         if (player.isSneaking && CustomItemHelper.getItem(item) == Tool.WRENCH) {
             val world = player.serverWorld
             val blockPos = event.context.blockPos
-            if (world.getBlockEntity(blockPos) !is CustomBlockEntity) return // Check is custom block
+            if (world.getBlockEntity(blockPos) !is ModelCustomBlockEntity) return // Check is custom block
             CustomBlockHelper.destroyAndDrop(world, blockPos)
             event.swing = true
             usedLock.add(player)

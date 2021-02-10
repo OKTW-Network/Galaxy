@@ -22,11 +22,12 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.server.world.ServerWorld
 import one.oktw.galaxy.block.CustomBlockHelper
 import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.event.annotation.EventListener
-import one.oktw.galaxy.event.type.*
+import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
+import one.oktw.galaxy.event.type.PlayerInteractItemEvent
+import one.oktw.galaxy.event.type.PlayerUseItemOnBlock
 import one.oktw.galaxy.item.CustomItemHelper
 import one.oktw.galaxy.item.Tool
 
@@ -87,21 +88,6 @@ class BlockEvents {
     @EventListener(true)
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
         if (usedLock.contains(event.player)) event.cancel = true
-    }
-
-    @EventListener(true)
-    fun onBlockBreak(event: BlockBreakEvent) {
-        val world = event.world as ServerWorld
-        if (world.getBlockEntity(event.pos) !is CustomBlockEntity) return
-        if (event.player?.isCreative == true) {
-            CustomBlockHelper.destroy(world, event.pos, false)
-        }
-        event.cancel = true
-    }
-
-    @EventListener(true)
-    fun onBlockExplode(event: BlockExplodeEvent) {
-        event.affectedPos.removeIf { event.world.getBlockEntity(it) is CustomBlockEntity }
     }
 
     // TODO GUI

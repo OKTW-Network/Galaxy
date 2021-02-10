@@ -18,13 +18,13 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.item.Items.STONE_SWORD
+import net.minecraft.item.Items.COMMAND_BLOCK
 import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Identifier
 
 class Material private constructor(id: String, modelData: Int, private val name: String) :
-    CustomItem(Identifier("galaxy", "item/material/$id"), STONE_SWORD, modelData) {
+    CustomItem(Identifier("galaxy", "item/material/$id"), COMMAND_BLOCK, modelData) {
     companion object {
         val RAW_BASE_PLATE = registry.register(Material("raw_base_plate", 1010100, "item.Material.PART_RAW_BASE"))
         val BASE_PLATE = registry.register(Material("base_plate", 1010101, "item.Material.PART_BASE"))

@@ -18,13 +18,13 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.item.Items
+import net.minecraft.item.Items.DIAMOND_SWORD
 import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Identifier
 
 class Upgrade(id: String, modelData: Int, private val name: String, private val level: Int) :
-    CustomItem(Identifier("galaxy", "item/upgrade/$id"), Items.IRON_SWORD, modelData) {
+    CustomItem(Identifier("galaxy", "item/upgrade/$id"), DIAMOND_SWORD, modelData) {
     companion object {
         val BASE = registry.register(Upgrade("base", 2010100, "item.Upgrade.BASE", 0))
         val COOLING_LV1 = registry.register(Upgrade("cooling_lv1", 2020100, "item.Upgrade.COOLING", 1))

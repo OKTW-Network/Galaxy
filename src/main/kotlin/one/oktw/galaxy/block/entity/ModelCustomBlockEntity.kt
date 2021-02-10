@@ -49,9 +49,7 @@ class ModelCustomBlockEntity(type: BlockEntityType<*>, private val modelItem: It
     override fun tick() {
         if (entityUUID == null || (world as ServerWorld).getEntity(entityUUID) == null) {
             // Kill leak entities
-            (world as ServerWorld).getEntitiesByType(EntityType.ARMOR_STAND) {
-                it.blockPos == pos && it.scoreboardTags.containsAll(listOf("BLOCK", getId().toString()))
-            }.forEach(Entity::kill)
+            (world as ServerWorld).getEntitiesByType(EntityType.ARMOR_STAND) { it.blockPos == pos && it.scoreboardTags.contains("BLOCK") }.forEach(Entity::kill)
 
             spawnEntity()
         }

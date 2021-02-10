@@ -18,12 +18,12 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.item.Items
+import net.minecraft.item.Items.DIAMOND_SWORD
 import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Identifier
 
-class Weapon(id: String, modelData: Int, private val name: String) : CustomItem(Identifier("galaxy", "item/weapon/$id"), Items.IRON_SWORD, modelData) {
+class Weapon(id: String, modelData: Int, private val name: String) : CustomItem(Identifier("galaxy", "item/weapon/$id"), DIAMOND_SWORD, modelData) {
     companion object {
         val PISTOL = registry.register(Weapon("pistol", 1010100, "item.Gun.PISTOL"))
         val PISTOL_LASOR = registry.register(Weapon("pistol_lasor", 1010200, "item.Gun.PISTOL"))

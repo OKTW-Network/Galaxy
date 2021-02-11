@@ -6,6 +6,7 @@
     "MixinAsyncChunk_StorageIoWorker",
     "MixinAsyncChunk_ThreadedAnvilChunkStorage",
     "MixinCustomBlockEntity_BarrierBlock",
+    "MixinCustomBlockEntity_Structure",
     "MixinMapExistingChunk_FilledMapItem",
     "MixinOneSpawnChunk_MinecraftServer",
     "MixinOneSpawnChunk_ServerWorld",

@@ -27,6 +27,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import one.oktw.galaxy.block.CustomBlock;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -39,7 +40,7 @@ public abstract class MixinCustomBlockEntity_BarrierBlock extends AbstractBlock 
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockView world) {
-        return null;
+        return CustomBlock.Companion.getDUMMY().createBlockEntity();
     }
 
     @Override

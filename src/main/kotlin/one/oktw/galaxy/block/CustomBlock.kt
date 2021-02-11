@@ -36,6 +36,7 @@ open class CustomBlock(final override val identifier: Identifier, val baseBlock:
     companion object {
         val registry = CustomRegistry<CustomBlock>()
 
+        val DUMMY = registry.register(DummyBlock())
         val CONTROL_PANEL = registry.register(CustomBlock("control_panel", baseBlock = COMPARATOR))
         val PLANET_TERMINAL = registry.register(CustomBlock("planet_terminal", baseBlock = BEACON))
         val HT_CRAFTING_TABLE = registry.register(ModelCustomBlock("ht_crafting_table", CustomBlockItem.HT_CRAFTING_TABLE.createItemStack()))

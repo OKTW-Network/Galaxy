@@ -30,7 +30,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.Tickable
 import java.util.*
 
-class ModelCustomBlockEntity(type: BlockEntityType<*>, private val modelItem: ItemStack) : CustomBlockEntity(type), Tickable {
+open class ModelCustomBlockEntity(type: BlockEntityType<*>, private val modelItem: ItemStack) : CustomBlockEntity(type), Tickable {
     companion object {
         private val armorStandTag = CompoundTag().apply {
             putString("id", "minecraft:armor_stand")

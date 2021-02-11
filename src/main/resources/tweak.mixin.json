@@ -10,6 +10,7 @@
     "MixinMapExistingChunk_FilledMapItem",
     "MixinOneSpawnChunk_MinecraftServer",
     "MixinOneSpawnChunk_ServerWorld",
+    "MixinOptimizeArmorStand_ArmorStandEntity",
     "MixinOptimizeContainer_AvailableSlots",
     "MixinOptimizeContainer_HopperBlockEntity",
     "MixinOptimizeContainer_LootableContainerBlockEntity",

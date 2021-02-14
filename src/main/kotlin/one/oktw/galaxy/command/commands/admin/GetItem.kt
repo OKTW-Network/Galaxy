@@ -20,7 +20,6 @@ package one.oktw.galaxy.command.commands.admin
 
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import net.minecraft.command.CommandSource
 import net.minecraft.command.argument.IdentifierArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
@@ -28,12 +27,20 @@ import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.TranslatableText
 import one.oktw.galaxy.item.*
+import java.util.*
 
 class GetItem {
     val command: LiteralArgumentBuilder<ServerCommandSource> = CommandManager.literal("getItem")
         .then(
             CommandManager.argument("item", IdentifierArgumentType.identifier())
-                .suggests { _, builder -> CommandSource.suggestIdentifiers(CustomItem.registry.getAll().keys, builder) }
+                .suggests { _, builder ->
+                    CustomItem.registry.getAll().keys.forEach { identifier ->
+                        if (identifier.toString().contains(builder.remaining, ignoreCase = true)) {
+                            builder.suggest(identifier.toString())
+                        }
+                    }
+                    return@suggests builder.buildFuture()
+                }
                 .executes {
                     val identifier = IdentifierArgumentType.getIdentifier(it, "item")
                     val item = CustomItem.registry.get(identifier)

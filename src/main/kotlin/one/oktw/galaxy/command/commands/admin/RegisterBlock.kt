@@ -19,13 +19,11 @@
 package one.oktw.galaxy.command.commands.admin
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import net.minecraft.command.CommandSource
 import net.minecraft.command.argument.BlockPosArgumentType
 import net.minecraft.command.argument.IdentifierArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
-import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.CustomBlock
 
@@ -42,8 +40,12 @@ class RegisterBlock {
     private val block =
         CommandManager.argument("block", IdentifierArgumentType.identifier())
             .suggests { _, builder ->
-                val blocks: Set<Identifier> = CustomBlock.registry.getAll().keys
-                return@suggests CommandSource.suggestIdentifiers(blocks, builder)
+                CustomBlock.registry.getAll().keys.forEach { identifier ->
+                    if (identifier.toString().contains(builder.remaining, ignoreCase = true)) {
+                        builder.suggest(identifier.toString())
+                    }
+                }
+                return@suggests builder.buildFuture()
             }
             .executes { context ->
                 registerBlock(

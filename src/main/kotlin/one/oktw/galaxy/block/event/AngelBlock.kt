@@ -20,7 +20,6 @@ package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.block.Blocks
-import net.minecraft.item.ItemStack
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundCategory
@@ -35,22 +34,27 @@ import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerActionEvent
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
 import one.oktw.galaxy.item.CustomBlockItem
+import one.oktw.galaxy.item.CustomItemHelper
 
 class AngelBlock {
     private val justBreaked = HashSet<ServerPlayerEntity>()
+    private val usedLock = HashSet<ServerPlayerEntity>()
     private val allowReplaceBlocks = arrayOf(Blocks.AIR, Blocks.CAVE_AIR, Blocks.WATER, Blocks.LAVA)
 
     init {
-        ServerTickEvents.END_WORLD_TICK.register(ServerTickEvents.EndWorldTick { justBreaked.clear() })
+        ServerTickEvents.END_WORLD_TICK.register(ServerTickEvents.EndWorldTick {
+            justBreaked.clear()
+            usedLock.clear()
+        })
     }
 
     private fun placeAngelBlock(player: ServerPlayerEntity, hand: Hand) {
         val playerLookVec = player.rotationVector
         val playerPosition = player.pos
         val placePosition = Vec3d(
-            playerPosition.x + playerLookVec.x * 3,
-            playerPosition.y + playerLookVec.y * 3 + 1.5,
-            playerPosition.z + playerLookVec.z * 3
+            playerPosition.x + playerLookVec.x * 2,
+            playerPosition.y + playerLookVec.y * 2 + 1.5,
+            playerPosition.z + playerLookVec.z * 2
         )
         if (allowReplaceBlocks.contains(player.serverWorld.getBlockState(BlockPos(placePosition)).block)) {
             CustomBlockHelper.place(player.serverWorld, BlockPos(placePosition), CustomBlock.ANGEL_BLOCK)
@@ -64,18 +68,16 @@ class AngelBlock {
     @EventListener(sync = true)
     fun onPlace(event: PlayerInteractItemEvent) {
         val player = event.player
-        val angelBlockItemStack = CustomBlockItem.ANGEL_BLOCK.createItemStack()
-        val mainHandItemStack = player.getStackInHand(Hand.MAIN_HAND)
-        val offHandItemStack = player.getStackInHand(Hand.OFF_HAND)
-        if (ItemStack.areItemsEqual(angelBlockItemStack, mainHandItemStack) &&
-            ItemStack.areTagsEqual(angelBlockItemStack, mainHandItemStack)
-        ) {
-            placeAngelBlock(player, Hand.MAIN_HAND)
+
+        if (usedLock.contains(player)) {
+            event.cancel = true
+            return
         }
-        if (ItemStack.areItemsEqual(angelBlockItemStack, offHandItemStack) &&
-            ItemStack.areTagsEqual(angelBlockItemStack, offHandItemStack)
-        ) {
-            placeAngelBlock(player, Hand.OFF_HAND)
+
+        if (CustomItemHelper.getItem(player.getStackInHand(event.packet.hand)) == CustomBlockItem.ANGEL_BLOCK) {
+            placeAngelBlock(player, event.packet.hand)
+            event.swing = true
+            usedLock.add(player)
         }
     }
 

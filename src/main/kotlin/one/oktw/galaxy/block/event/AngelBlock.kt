@@ -37,13 +37,13 @@ import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.CustomItemHelper
 
 class AngelBlock {
-    private val justBreaked = HashSet<ServerPlayerEntity>()
+    private val justBroke = HashSet<ServerPlayerEntity>()
     private val usedLock = HashSet<ServerPlayerEntity>()
     private val allowReplaceBlocks = arrayOf(Blocks.AIR, Blocks.CAVE_AIR, Blocks.WATER, Blocks.LAVA)
 
     init {
         ServerTickEvents.END_WORLD_TICK.register(ServerTickEvents.EndWorldTick {
-            justBreaked.clear()
+            justBroke.clear()
             usedLock.clear()
         })
     }
@@ -60,7 +60,6 @@ class AngelBlock {
             CustomBlockHelper.place(player.serverWorld, BlockPos(placePosition), CustomBlock.ANGEL_BLOCK)
                 .run {
                     if (!player.isCreative) player.setStackInHand(hand, player.getStackInHand(hand).also { it.decrement(1) })
-                    player.swingHand(hand)
                 }
         }
     }
@@ -87,11 +86,11 @@ class AngelBlock {
         val blockPos = event.packet.pos
         if (event.packet.action == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK &&
             (player.serverWorld.getBlockEntity(blockPos) as? CustomBlockEntity)?.getId() == CustomBlock.ANGEL_BLOCK.identifier &&
-            !justBreaked.contains(player)
+            !justBroke.contains(player)
         ) {
             CustomBlockHelper.destroyAndDrop(player.serverWorld, blockPos)
             player.serverWorld.playSound(null, blockPos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
-            justBreaked.add(player)
+            justBroke.add(player)
         }
     }
 }

@@ -37,7 +37,6 @@ object CustomBlockHelper {
             postPlace(world, pos, block)
             return true
         }
-
         return false
     }
 

@@ -18,13 +18,14 @@
 
 package one.oktw.galaxy.command.commands.admin
 
+import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.minecraft.command.argument.BlockPosArgumentType
 import net.minecraft.command.argument.IdentifierArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
-import net.minecraft.util.math.BlockPos
+import net.minecraft.text.TranslatableText
 import one.oktw.galaxy.block.CustomBlock
 
 class RegisterBlock {
@@ -36,7 +37,6 @@ class RegisterBlock {
             )
     }
 
-
     private val block =
         CommandManager.argument("block", IdentifierArgumentType.identifier())
             .suggests { _, builder ->
@@ -47,19 +47,21 @@ class RegisterBlock {
                 }
                 return@suggests builder.buildFuture()
             }
-            .executes { context ->
-                registerBlock(
-                    context.source,
-                    CustomBlock.registry.get(IdentifierArgumentType.getIdentifier(context, "block"))!!,
-                    BlockPosArgumentType.getLoadedBlockPos(context, "pos")
-                )
+            .executes {
+                val identifier = IdentifierArgumentType.getIdentifier(it, "block")
+                val block = CustomBlock.registry.get(identifier)
+
+                if (block == null) {
+                    it.source.sendError(TranslatableText("argument.block.id.invalid", identifier))
+                    return@executes 0
+                }
+
+                val blockPos = BlockPosArgumentType.getLoadedBlockPos(it, "pos")
+
+                it.source.world.removeBlockEntity(blockPos)
+                it.source.world.setBlockEntity(blockPos, block.createBlockEntity())
+                it.source.sendFeedback(LiteralText("Registered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z} to ${block.identifier}"), true)
+
+                return@executes Command.SINGLE_SUCCESS
             }
-
-    private fun registerBlock(source: ServerCommandSource, block: CustomBlock, blockPos: BlockPos): Int {
-        source.world.removeBlockEntity(blockPos)
-        source.world.setBlockEntity(blockPos, block.createBlockEntity())
-        source.sendFeedback(LiteralText("Registered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z} to ${block.identifier}"), true)
-
-        return com.mojang.brigadier.Command.SINGLE_SUCCESS
-    }
 }

@@ -43,6 +43,7 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
         }
     }
 
+    open val cacheable = true
     private lateinit var cacheItemStack: ItemStack
 
     abstract fun getName(): Text?
@@ -58,9 +59,9 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
     }
 
     open fun createItemStack(): ItemStack {
-        if (this::cacheItemStack.isInitialized) return cacheItemStack.copy()
+        if (cacheable && this::cacheItemStack.isInitialized) return cacheItemStack.copy()
 
-        cacheItemStack = ItemStack(baseItem).apply {
+        val itemStack = ItemStack(baseItem).apply {
             orCreateTag.apply {
                 putInt("HideFlags", ItemStack.TooltipSection.values().map(ItemStack.TooltipSection::getFlag).reduce { acc, i -> acc or i }) // ALL
                 putInt("CustomModelData", modelData)
@@ -71,6 +72,6 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
             writeCustomNbt(getOrCreateSubTag("GalaxyData"))
         }
 
-        return cacheItemStack.copy()
+        return if (cacheable) itemStack.also { cacheItemStack = it } else itemStack
     }
 }

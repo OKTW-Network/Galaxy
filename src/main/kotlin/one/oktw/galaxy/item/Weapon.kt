@@ -19,13 +19,17 @@
 package one.oktw.galaxy.item
 
 import net.minecraft.item.Items.COMMAND_BLOCK
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
+import net.minecraft.util.math.MathHelper
 
 class Weapon private constructor(id: String, modelData: Int, private val name: String) :
     CustomItem(Identifier("galaxy", "item/weapon/$id"), COMMAND_BLOCK, modelData) {
+    override val cacheable = false
+
     companion object {
         val PISTOL = registry.register(Weapon("pistol", 3010100, "item.Gun.PISTOL"))
         val PISTOL_LASOR = registry.register(Weapon("pistol_lasor", 3010200, "item.Gun.PISTOL"))
@@ -54,4 +58,9 @@ class Weapon private constructor(id: String, modelData: Int, private val name: S
     }
 
     override fun getName(): Text = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
+
+    override fun writeCustomNbt(tag: CompoundTag) {
+        super.writeCustomNbt(tag)
+        tag.put("WeaponData", CompoundTag().apply { putUuid("id", MathHelper.randomUuid()) })
+    }
 }

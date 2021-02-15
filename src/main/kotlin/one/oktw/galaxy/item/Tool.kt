@@ -19,16 +19,25 @@
 package one.oktw.galaxy.item
 
 import net.minecraft.item.Items.COMMAND_BLOCK
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
+import net.minecraft.util.math.MathHelper
 
 class Tool private constructor(id: String, modelData: Int, private val name: String) :
     CustomItem(Identifier("galaxy", "item/tool/$id"), COMMAND_BLOCK, modelData) {
+    override val cacheable = false
+
     companion object {
         val WRENCH = registry.register(Tool("wrench", 2010100, "item.Tool.WRENCH"))
     }
 
     override fun getName(): Text = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
+
+    override fun writeCustomNbt(tag: CompoundTag) {
+        super.writeCustomNbt(tag)
+        tag.put("ToolData", CompoundTag().apply { putUuid("id", MathHelper.randomUuid()) })
+    }
 }

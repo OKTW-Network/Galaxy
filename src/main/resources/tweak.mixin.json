@@ -7,6 +7,7 @@
     "MixinAsyncChunk_ThreadedAnvilChunkStorage",
     "MixinCustomBlockEntity_BarrierBlock",
     "MixinCustomBlockEntity_Structure",
+    "MixinFixBeacon_BeaconBlockEntity",
     "MixinMapExistingChunk_FilledMapItem",
     "MixinOneSpawnChunk_MinecraftServer",
     "MixinOneSpawnChunk_ServerWorld",

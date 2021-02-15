@@ -40,6 +40,7 @@ import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.command.commands.Spawn
 import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.event.type.ProxyResponseEvent
+import one.oktw.galaxy.item.event.CustomItemEventHandler
 import one.oktw.galaxy.mixin.interfaces.CustomRecipeManager
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.Sign
@@ -108,6 +109,7 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(one.oktw.galaxy.item.event.Wrench())
             eventManager.register(Elevator())
             eventManager.register(AngelBlock())
+            eventManager.register(CustomItemEventHandler())
         })
 
         // server.log("current server id is $selfUID

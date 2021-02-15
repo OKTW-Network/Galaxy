@@ -40,5 +40,5 @@ class Material private constructor(id: String, modelData: Int, private val name:
         val BARREL = registry.register(Material("barrel", 4010503, "item.Material.BARREL"))
     }
 
-    override fun getName(): Text? = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
+    override fun getName(): Text = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
 }

@@ -30,5 +30,5 @@ class Tool private constructor(id: String, modelData: Int, private val name: Str
         val WRENCH = registry.register(Tool("wrench", 2010100, "item.Tool.WRENCH"))
     }
 
-    override fun getName(): Text? = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
+    override fun getName(): Text = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
 }

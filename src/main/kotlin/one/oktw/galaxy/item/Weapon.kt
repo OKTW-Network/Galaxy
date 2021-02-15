@@ -53,5 +53,5 @@ class Weapon private constructor(id: String, modelData: Int, private val name: S
         val SWORD_NANOSABER_SCABBARD = registry.register(Weapon("sword_nanosaber_scabbard", 3020702, "item.Weapon.NANOSABER.SCABARD"))
     }
 
-    override fun getName(): Text? = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
+    override fun getName(): Text = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
 }

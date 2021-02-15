@@ -24,7 +24,7 @@ import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
-class Upgrade private constructor(id: String, modelData: Int, private val name: String) :
+class Upgrade private constructor(id: String, modelData: Int, private val name: String, private val level: Int) :
     CustomItem(Identifier("galaxy", "item/upgrade/$id"), COMMAND_BLOCK, modelData) {
     companion object {
         val BASE = registry.register(Upgrade("base", 5000100, "item.Upgrade.BASE", 0))
@@ -65,7 +65,7 @@ class Upgrade private constructor(id: String, modelData: Int, private val name: 
         val FIRE_RESISTANCE_LV5 = registry.register(Upgrade("fire_resistance_lv5", 5010704, "item.Upgrade.HEAT", 5))
     }
 
-    override fun getName(): Text? = TranslatableText("item.Upgrade.Item", TranslatableText(name))
+    override fun getName(): Text = TranslatableText("item.Upgrade.Item", TranslatableText(name))
         .also { if (level > 0) it.append(" Lv.${level}") }
         .styled { it.withColor(Formatting.WHITE).withItalic(false) }
 }

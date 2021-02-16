@@ -9,7 +9,7 @@ plugins {
 val version = "0.0.1"
 val group = "one.oktw"
 
-val galaxyLibVersion = "dc1e26cd"
+val galaxyLibVersion = "78eec6fa"
 
 repositories {
     mavenCentral()
@@ -53,8 +53,6 @@ dependencies {
 
     // Jar in Jar
     include(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion, classifier = "all")
-
-    implementation(group = "org.mongodb", name= "mongodb-driver-reactivestreams", version = "4.2.0")
 }
 
 tasks.getByName<ProcessResources>("processResources") {

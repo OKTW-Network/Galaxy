@@ -121,5 +121,8 @@ class Main : DedicatedServerModInitializer {
         println("current server id is $selfUUID")
 
         dbManager = DatabaseManager(dbPath)
+
+        // server.log("current server id is $selfUID
+        println("database is ready")
     }
 }

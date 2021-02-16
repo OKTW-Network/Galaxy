@@ -21,36 +21,28 @@ package one.oktw.galaxy.internal
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.reactivestreams.client.MongoClients
-import com.mongodb.reactivestreams.client.MongoDatabase
 import org.bson.codecs.configuration.CodecRegistries.fromRegistries
 import org.bson.codecs.pojo.Conventions.*
 import org.bson.codecs.pojo.PojoCodecProvider
 
 class DatabaseManager(dbPath: String) {
-    companion object {
-        lateinit var database: MongoDatabase
-            private set
-    }
-
-    init {
-        database = PojoCodecProvider.builder() // POJO settings
-            .automatic(true)
-            .conventions(listOf(SET_PRIVATE_FIELDS_CONVENTION, ANNOTATION_CONVENTION, CLASS_AND_PROPERTY_CONVENTION))
-            .build()
-            .let {
-                // register codec
-                fromRegistries(
-                    MongoClientSettings.getDefaultCodecRegistry()
-                )
-            }
-            .let {
-                // connect settings
-                MongoClientSettings.builder()
-                    .codecRegistry(it)
-                    .applyConnectionString(ConnectionString(dbPath))
-                    .build()
-            }
-            .let(MongoClients::create) // connect
-            .getDatabase(ConnectionString(dbPath).database!!) // get database
-    }
+    val database = PojoCodecProvider.builder() // POJO settings
+        .automatic(true)
+        .conventions(listOf(SET_PRIVATE_FIELDS_CONVENTION, ANNOTATION_CONVENTION, CLASS_AND_PROPERTY_CONVENTION))
+        .build()
+        .let {
+            // register codec
+            fromRegistries(
+                MongoClientSettings.getDefaultCodecRegistry()
+            )
+        }
+        .let {
+            // connect settings
+            MongoClientSettings.builder()
+                .codecRegistry(it)
+                .applyConnectionString(ConnectionString(dbPath))
+                .build()
+        }
+        .let(MongoClients::create) // connect
+        .getDatabase(ConnectionString(dbPath).database!!) // get database
 }

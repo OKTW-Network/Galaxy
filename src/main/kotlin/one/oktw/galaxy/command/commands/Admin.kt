@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -25,18 +25,15 @@ import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.command.commands.admin.FlySpeed
 import one.oktw.galaxy.command.commands.admin.GetItem
 import one.oktw.galaxy.command.commands.admin.RegisterBlock
-import one.oktw.galaxy.command.commands.admin.UnregisterBlock
 
 class Admin : Command {
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
             CommandManager.literal("admin")
                 .requires { source -> source.hasPermissionLevel(2) }
-                .then(GetItem.command)
+                .then(GetItem().command)
                 .then(RegisterBlock.command)
-                .then(UnregisterBlock.command)
                 .then(FlySpeed().command)
         )
     }
 }
-

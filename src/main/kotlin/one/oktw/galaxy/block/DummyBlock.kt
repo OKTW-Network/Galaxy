@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,9 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.event.type
+package one.oktw.galaxy.block
 
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
+import net.minecraft.util.Identifier
+import one.oktw.galaxy.block.entity.DummyBlockEntity
 
-class BlockExplodeEvent(val world: World, var affectedPos: MutableSet<BlockPos>) : Event
+class DummyBlock : CustomBlock(Identifier("galaxy", "block/dummy")) {
+    override fun createBlockEntity() = DummyBlockEntity(blockEntityType)
+}

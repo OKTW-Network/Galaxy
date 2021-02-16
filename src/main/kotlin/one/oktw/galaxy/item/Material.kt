@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,32 +18,27 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items.STONE_SWORD
+import net.minecraft.item.Items.COMMAND_BLOCK
+import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
-import one.oktw.galaxy.item.type.ItemType.MATERIAL
-import one.oktw.galaxy.item.type.MaterialType
-import one.oktw.galaxy.item.type.MaterialType.DUMMY
-import one.oktw.galaxy.item.util.CustomItemBuilder
+import net.minecraft.util.Formatting
+import net.minecraft.util.Identifier
 
-class Material(val type: MaterialType = DUMMY) : Item {
-    override val itemType = MATERIAL
-
-    override val baseItem: net.minecraft.item.Item = STONE_SWORD
-
-    override fun createItemStack(): ItemStack {
-        val item = CustomItemBuilder()
-            .setBaseItem(baseItem)
-            .setModel(type.customModelData)
-            .setItemType(itemType)
-            .setUnbreakable()
-            .hideAllFlags()
-            .removeAllModifiers()
-
-        if (type.languageKey != "") {
-            TranslatableText(type.languageKey).styled { it.withItalic(false) }.let(item::setName)
-        }
-
-        return item.build()
+class Material private constructor(id: String, modelData: Int, private val name: String) :
+    CustomItem(Identifier("galaxy", "item/material/$id"), COMMAND_BLOCK, modelData) {
+    companion object {
+        val RAW_BASE_PLATE = registry.register(Material("raw_base_plate", 4010100, "item.Material.PART_RAW_BASE"))
+        val BASE_PLATE = registry.register(Material("base_plate", 4010101, "item.Material.PART_BASE"))
+        val COOLANT = registry.register(Material("coolant", 4010102, "item.Material.COOLANT"))
+        val CPU = registry.register(Material("cpu", 4010103, "item.Material.CPU"))
+        val SCOPE = registry.register(Material("scope", 4010200, "item.Material.SCOPE"))
+        val BATTERY = registry.register(Material("battery", 4010300, "item.Material.BATTERY"))
+        val LASER = registry.register(Material("laser", 4010400, "item.Material.LASER"))
+        val BUTT = registry.register(Material("butt", 4010500, "item.Material.BUTT"))
+        val TRIGGER = registry.register(Material("trigger", 4010501, "item.Material.TRIGGER"))
+        val HANDLE = registry.register(Material("handle", 4010502, "item.Material.HANDLE"))
+        val BARREL = registry.register(Material("barrel", 4010503, "item.Material.BARREL"))
     }
+
+    override fun getName(): Text = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
 }

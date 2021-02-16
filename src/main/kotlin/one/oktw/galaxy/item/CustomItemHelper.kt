@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,19 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.type
+package one.oktw.galaxy.item
 
-enum class MaterialType(val customModelData: Int, val languageKey: String) {
-    DUMMY(0, ""),
-    RAW_BASE_PLATE(1010100, "item.Material.PART_RAW_BASE"),
-    BASE_PLATE(1010101, "item.Material.PART_BASE"),
-    COOLANT(1010102, "item.Material.COOLANT"),
-    CPU(1010103, "item.Material.CPU"),
-    SCOPE(1010200, "item.Material.SCOPE"),
-    BATTERY(1010300, "item.Material.BATTERY"),
-    LASER(1010400, "item.Material.LASER"),
-    BUTT(1010500, "item.Material.BUTT"),
-    TRIGGER(1010501, "item.Material.TRIGGER"),
-    HANDLE(1010502, "item.Material.HANDLE"),
-    BARREL(1010503, "item.Material.BARREL")
+import net.minecraft.item.ItemStack
+import net.minecraft.util.Identifier
+
+object CustomItemHelper {
+    fun getItem(itemStack: ItemStack): CustomItem? {
+        val customNbt = itemStack.getSubTag("GalaxyData")
+
+        return customNbt?.getString("CustomItemIdentifier")?.let(Identifier::tryParse)
+            ?.let(CustomItem.registry::get)
+            ?.run { readCustomNbt(customNbt) }
+    }
 }

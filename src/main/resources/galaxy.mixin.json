@@ -3,11 +3,7 @@
   "package": "one.oktw.galaxy.mixin.event",
   "compatibilityLevel": "JAVA_14",
   "mixins": [
-    "MixinBlockBreak_EnderDragonEntity",
-    "MixinBlockBreak_Explosion",
-    "MixinBlockBreak_WitherEntity",
     "MixinPlayerAction_NetworkHandler",
-    "MixinPlayerBlockBreak_Block",
     "MixinPlayerChat_MeCommand",
     "MixinPlayerChat_NetworkHandler",
     "MixinPlayerChat_SayCommand",

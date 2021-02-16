@@ -29,6 +29,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.recipe.RecipeType
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
 import net.minecraft.util.Identifier
+import one.oktw.galaxy.block.CustomBlock
 import one.oktw.galaxy.block.event.AngelBlock
 import one.oktw.galaxy.block.event.BlockEvents
 import one.oktw.galaxy.block.event.Elevator
@@ -39,10 +40,12 @@ import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.command.commands.Spawn
 import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.event.type.ProxyResponseEvent
+import one.oktw.galaxy.item.event.CustomItemEventHandler
 import one.oktw.galaxy.mixin.interfaces.CustomRecipeManager
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.proxy.api.ProxyAPI
+import one.oktw.galaxy.recipe.tools.Wrench
 import one.oktw.galaxy.resourcepack.ResourcePack
 import java.util.*
 
@@ -73,8 +76,11 @@ class Main : DedicatedServerModInitializer {
             listOf(Join(), Admin(), Home(), Spawn()).forEach { dispatcher.let(it::register) }
         })
 
+        // Register CustomBlockEntity
+        CustomBlock
+
         // Recipe
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, one.oktw.galaxy.recipe.tools.Wrench())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Wrench())
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer
@@ -103,6 +109,7 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(one.oktw.galaxy.item.event.Wrench())
             eventManager.register(Elevator())
             eventManager.register(AngelBlock())
+            eventManager.register(CustomItemEventHandler())
         })
 
         // server.log("current server id is $selfUID

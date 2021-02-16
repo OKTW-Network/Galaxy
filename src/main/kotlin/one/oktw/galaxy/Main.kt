@@ -40,6 +40,7 @@ import one.oktw.galaxy.command.commands.Join
 import one.oktw.galaxy.command.commands.Spawn
 import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.event.type.ProxyResponseEvent
+import one.oktw.galaxy.internal.DatabaseManager
 import one.oktw.galaxy.item.event.CustomItemEventHandler
 import one.oktw.galaxy.mixin.interfaces.CustomRecipeManager
 import one.oktw.galaxy.player.Harvest
@@ -55,6 +56,9 @@ class Main : DedicatedServerModInitializer {
         private set
     lateinit var eventManager: EventManager
         private set
+    lateinit var dbManager: DatabaseManager
+        private set
+
 
     companion object {
         val PROXY_IDENTIFIER = Identifier("galaxy", "proxy")
@@ -67,6 +71,7 @@ class Main : DedicatedServerModInitializer {
                 null
             } ?: ProxyAPI.dummyUUID
         }
+        val dbPath = System.getenv("dbPath") ?: ""
     }
 
     override fun onInitializeServer() {
@@ -114,5 +119,7 @@ class Main : DedicatedServerModInitializer {
 
         // server.log("current server id is $selfUID
         println("current server id is $selfUUID")
+
+        dbManager = DatabaseManager(dbPath)
     }
 }

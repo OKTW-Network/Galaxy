@@ -53,6 +53,8 @@ dependencies {
 
     // Jar in Jar
     include(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion, classifier = "all")
+
+    implementation(group = "org.mongodb", name= "mongodb-driver-reactivestreams", version = "4.2.0")
 }
 
 tasks.getByName<ProcessResources>("processResources") {

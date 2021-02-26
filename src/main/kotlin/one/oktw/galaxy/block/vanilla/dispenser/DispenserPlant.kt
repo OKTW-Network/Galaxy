@@ -74,7 +74,7 @@ object DispenserPlant {
         }
 
         if (block == Blocks.KELP || block == Blocks.SEAGRASS) {
-            if (currentBlockState.isOf(Blocks.WATER) && plantBlockState.block != Blocks.WATER) {
+            if (currentBlockState.isOf(Blocks.WATER) && plantBlockState.isOpaqueFullCube(world, plantBlockPos)) {
                 return plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
             }
         }

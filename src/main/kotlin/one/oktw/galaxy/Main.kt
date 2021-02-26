@@ -32,7 +32,7 @@ import net.minecraft.util.Identifier
 import one.oktw.galaxy.block.event.AngelBlock
 import one.oktw.galaxy.block.event.BlockEvents
 import one.oktw.galaxy.block.event.Elevator
-import one.oktw.galaxy.block.vanilla.DispenserPlant
+import one.oktw.galaxy.block.vanilla.dispenser.DispenserPlant
 import one.oktw.galaxy.chat.Exchange
 import one.oktw.galaxy.command.commands.Admin
 import one.oktw.galaxy.command.commands.Home

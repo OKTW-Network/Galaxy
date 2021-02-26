@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.block.vanilla
+package one.oktw.galaxy.block.vanilla.dispenser
 
 import net.minecraft.block.*
 import net.minecraft.block.dispenser.ItemDispenserBehavior
@@ -26,11 +26,12 @@ import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
 import net.minecraft.state.property.Properties
-import net.minecraft.tag.FluidTags
 import net.minecraft.util.math.BlockPointer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
+import one.oktw.galaxy.block.vanilla.dispenser.PlantLogic.cactusPlantCheck
+import one.oktw.galaxy.block.vanilla.dispenser.PlantLogic.sugarCanePlantCheck
 
 
 object DispenserPlant {
@@ -83,47 +84,6 @@ object DispenserPlant {
         }
 
         return itemStack
-    }
-
-    private fun sugarCanePlantCheck(validBlocksToPlantOn: List<Block>,block: Block, world: World, blockPos: BlockPos): Boolean {
-        val blockState = world.getBlockState(blockPos)
-
-        if (blockState.block == Blocks.SUGAR_CANE) {
-            return true
-        } else {
-            if (validBlocksToPlantOn.contains(block)) {
-                val sugarCanePlant = Direction.Type.HORIZONTAL.iterator()
-
-                while (sugarCanePlant.hasNext()) {
-                    val direction = sugarCanePlant.next()
-                    val plantState = world.getBlockState(blockPos.offset(direction))
-                    val fluidState = world.getFluidState(blockPos.offset(direction))
-
-                    if (fluidState.isIn(FluidTags.WATER) || plantState.isOf(Blocks.FROSTED_ICE)) {
-                        return true
-                    }
-                }
-            }
-
-            return false
-        }
-    }
-
-    private fun cactusPlantCheck(validBlocksToPlantOn: List<Block>, block: Block, world: World, blockPos: BlockPos): Boolean {
-        val cactusPlant = Direction.Type.HORIZONTAL.iterator()
-
-        var direction: Direction?
-        var material: Material
-        do {
-            if (!cactusPlant.hasNext()) {
-                return (validBlocksToPlantOn.contains(block) && !world.getBlockState(blockPos).material.isLiquid)
-            }
-            direction = cactusPlant.next()
-            val blockState = world.getBlockState(blockPos.offset(direction))
-            material = blockState.material
-        } while (!material.isSolid && !world.getFluidState(blockPos.offset(direction)).isIn(FluidTags.LAVA))
-
-        return false
     }
 
     private fun plantingBlock(world: World, blockPos: BlockPos, blockState: BlockState, soundEvent: SoundEvent, itemStack: ItemStack): ItemStack {

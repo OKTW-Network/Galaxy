@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -32,8 +32,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MixinMapExistingChunk_FilledMapItem {
     @Redirect(method = "updateColors", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getWorldChunk(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/world/chunk/WorldChunk;"))
     private WorldChunk getExistingChunk(World world, BlockPos pos) {
-        var chunkPos = new ChunkPos(pos);
-        var chunk = (WorldChunk) world.getExistingChunk(chunkPos.x, chunkPos.z);
+        ChunkPos chunkPos = new ChunkPos(pos);
+        WorldChunk chunk = (WorldChunk) world.getExistingChunk(chunkPos.x, chunkPos.z);
         if (chunk == null) chunk = new EmptyChunk(world, chunkPos);
         return chunk;
     }

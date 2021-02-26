@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,12 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.event.type
+package one.oktw.galaxy.block.entity
 
 import net.minecraft.block.BlockState
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
-import one.oktw.galaxy.event.enums.BreakType
+import net.minecraft.block.entity.BlockEntityType
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.util.Identifier
+import one.oktw.galaxy.block.CustomBlock
 
-class BlockBreakEvent(val world: World, val pos: BlockPos, val state: BlockState, val type: BreakType, val player: PlayerEntity?) : CancelableEvent()
+class DummyBlockEntity(type: BlockEntityType<*>) : CustomBlockEntity(type) {
+    override fun fromTag(state: BlockState, tag: CompoundTag) {
+        super.fromTag(state, tag)
+        tag.getString("id")?.let(Identifier::tryParse)?.let(CustomBlock.registry::get)?.let {
+            if (it != CustomBlock.DUMMY) {
+                world?.removeBlockEntity(pos)
+                world?.setBlockEntity(pos, it.createBlockEntity())
+            }
+        }
+    }
+}

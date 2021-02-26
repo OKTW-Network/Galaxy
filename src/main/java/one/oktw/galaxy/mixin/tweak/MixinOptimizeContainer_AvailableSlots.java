@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,14 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.accessor;
+package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.block.entity.LootableContainerBlockEntity;
+import net.minecraft.inventory.Inventory;
+import one.oktw.galaxy.mixin.interfaces.InventoryAvailableSlots;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(ShulkerBoxBlockEntity.class)
-public interface ShulkerBoxBlockEntityAccessor {
-    @Accessor("animationStage")
-    ShulkerBoxBlockEntity.AnimationStage getAnimationStage();
+import java.util.Arrays;
+
+@Mixin(LootableContainerBlockEntity.class)
+public abstract class MixinOptimizeContainer_AvailableSlots implements InventoryAvailableSlots, Inventory {
+    private int[] availableSlots;
+
+    @Override
+    public int[] getAvailableSlots() {
+        if (availableSlots == null) {
+            int[] array = new int[size()];
+            Arrays.setAll(array, i -> i);
+            availableSlots = array;
+        }
+
+        return availableSlots;
+    }
 }

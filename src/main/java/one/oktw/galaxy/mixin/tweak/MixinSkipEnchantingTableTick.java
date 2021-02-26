@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,10 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.event.enums
+package one.oktw.galaxy.mixin.tweak;
 
-enum class BreakType {
-    PLAYER,
-    WITHER,
-    DRAGON
+import net.minecraft.block.entity.EnchantingTableBlockEntity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+
+@Mixin(EnchantingTableBlockEntity.class)
+public class MixinSkipEnchantingTableTick {
+    /**
+     * @author James58899
+     * @reason No need tick at server side
+     */
+    @Overwrite
+    public void tick() {
+    }
 }

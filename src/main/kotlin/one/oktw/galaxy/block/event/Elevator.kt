@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -26,15 +26,15 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
-import one.oktw.galaxy.block.type.BlockType
-import one.oktw.galaxy.block.util.CustomBlockUtil
+import one.oktw.galaxy.block.CustomBlock
+import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerJumpEvent
 import one.oktw.galaxy.event.type.PlayerSneakEvent
 
 class Elevator {
     private fun isElevator(world: ServerWorld, blockPos: BlockPos): Boolean {
-        return CustomBlockUtil.positionMatchesCustomBlock(world, blockPos, BlockType.ELEVATOR)
+        return (world.getBlockEntity(blockPos) as? CustomBlockEntity)?.getId() == CustomBlock.ELEVATOR.identifier
     }
 
     private fun isSafe(world: ServerWorld, blockPos: BlockPos): Boolean {

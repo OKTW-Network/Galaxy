@@ -16,29 +16,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.event;
+package one.oktw.galaxy.mixin.tweak;
 
+import net.minecraft.block.entity.LootableContainerBlockEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.util.ActionResult;
-import one.oktw.galaxy.Main;
-import one.oktw.galaxy.event.type.PlayerUseItemOnBlock;
+import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(ItemStack.class)
-public class MixinPlayerUseItemOnBlock_ItemStack {
-    @Inject(method = "useOnBlock", at = @At(value = "HEAD"), cancellable = true)
-    private void useItemOnBlock(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
-        Main main = Main.Companion.getMain();
-        if (main == null || context.getPlayer() == null) return;
+@Mixin(LootableContainerBlockEntity.class)
+public abstract class MixinOptimizeContainer_LootableContainerBlockEntity {
+    @Shadow
+    protected abstract DefaultedList<ItemStack> getInvStackList();
 
-        PlayerUseItemOnBlock event = main.getEventManager().emit(new PlayerUseItemOnBlock(context));
-        if (event.getCancel()) {
-            cir.setReturnValue(event.getSwing() ? ActionResult.SUCCESS : ActionResult.CONSUME);
-            cir.cancel();
+    @Inject(method = "isEmpty",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/LootableContainerBlockEntity;checkLootInteraction(Lnet/minecraft/entity/player/PlayerEntity;)V", shift = At.Shift.AFTER),
+        cancellable = true)
+    private void replaceStream(CallbackInfoReturnable<Boolean> cir) {
+        for (ItemStack itemStack : getInvStackList()) {
+            if (!itemStack.isEmpty()) {
+                cir.setReturnValue(false);
+                return;
+            }
         }
+
+        cir.setReturnValue(true);
     }
 }

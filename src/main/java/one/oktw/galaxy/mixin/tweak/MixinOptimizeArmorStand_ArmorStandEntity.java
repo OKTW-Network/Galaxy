@@ -16,17 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.event.type
+package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.item.ItemUsageContext
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-class PlayerUseItemOnBlock(val context: ItemUsageContext) : CancelableEvent() {
-    /**
-     * Set swing also cancel event.
-     */
-    var swing = false
-        set(swing) {
-            if (!this.cancel) cancel = true // Force swing need cancel event.
-            field = swing
-        }
+@Mixin(ArmorStandEntity.class)
+public abstract class MixinOptimizeArmorStand_ArmorStandEntity {
+    @Shadow
+    public abstract boolean isMarker();
+
+    @Inject(method = "tickCramming", at = @At("HEAD"), cancellable = true)
+    private void skipMarkerCramming(CallbackInfo ci) {
+        if (isMarker()) ci.cancel();
+    }
 }

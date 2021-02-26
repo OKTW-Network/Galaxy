@@ -38,7 +38,7 @@ object DispenserPlant {
     private fun plant(blockPointer: BlockPointer, itemStack: ItemStack, block: Block, validBlocksToPlantOn: List<Block>, soundEvent: SoundEvent): ItemStack {
         val world: World = blockPointer.world
         val dispenserFacing = blockPointer.blockState.get(DispenserBlock.FACING)
-        if (dispenserFacing == Direction.UP && block != Blocks.KELP) return ItemDispenserBehavior().dispense(blockPointer, itemStack)
+        if (dispenserFacing == Direction.UP && block != Blocks.KELP && block != Blocks.SEAGRASS) return ItemDispenserBehavior().dispense(blockPointer, itemStack)
 
         val currentBlockPos = blockPointer.blockPos.offset(dispenserFacing)
         val currentBlockState = world.getBlockState(currentBlockPos)
@@ -73,7 +73,7 @@ object DispenserPlant {
             }
         }
 
-        if (block == Blocks.KELP) {
+        if (block == Blocks.KELP || block == Blocks.SEAGRASS) {
             if (currentBlockState.isOf(Blocks.WATER) && plantBlockState.block != Blocks.WATER) {
                 return plantingBlock(world, currentBlockPos, block.defaultState, soundEvent, itemStack)
             }
@@ -124,5 +124,10 @@ object DispenserPlant {
         DispenserBlock.registerBehavior(Items.COCOA_BEANS, plantDispenserBehavior(Blocks.COCOA, listOf(Blocks.JUNGLE_LOG, Blocks.JUNGLE_WOOD, Blocks.STRIPPED_JUNGLE_LOG, Blocks.STRIPPED_JUNGLE_WOOD), SoundEvents.BLOCK_WOOD_PLACE))
         DispenserBlock.registerBehavior(Items.CACTUS, plantDispenserBehavior(Blocks.CACTUS, listOf(Blocks.SAND, Blocks.RED_SAND), SoundEvents.BLOCK_WOOL_PLACE))
         DispenserBlock.registerBehavior(Items.KELP, plantDispenserBehavior(Blocks.KELP, listOf(), SoundEvents.BLOCK_WET_GRASS_PLACE))
+        DispenserBlock.registerBehavior(Items.DEAD_BUSH, plantDispenserBehavior(Blocks.DEAD_BUSH, listOf(Blocks.SAND, Blocks.RED_SAND, Blocks.TERRACOTTA, Blocks.WHITE_TERRACOTTA, Blocks.ORANGE_TERRACOTTA, Blocks.MAGENTA_TERRACOTTA, Blocks.LIGHT_BLUE_TERRACOTTA, Blocks.YELLOW_TERRACOTTA, Blocks.LIME_TERRACOTTA, Blocks.PINK_TERRACOTTA, Blocks.GRAY_TERRACOTTA, Blocks.LIGHT_GRAY_TERRACOTTA, Blocks.CYAN_TERRACOTTA, Blocks.PURPLE_TERRACOTTA, Blocks.BLUE_TERRACOTTA, Blocks.BROWN_TERRACOTTA, Blocks.GREEN_TERRACOTTA, Blocks.RED_TERRACOTTA, Blocks.BLACK_TERRACOTTA, Blocks.DIRT, Blocks.COARSE_DIRT, Blocks.PODZOL), SoundEvents.BLOCK_GRASS_PLACE))
+        DispenserBlock.registerBehavior(Items.GRASS, plantDispenserBehavior(Blocks.GRASS, listOf(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.FARMLAND), SoundEvents.BLOCK_GRASS_PLACE))
+        DispenserBlock.registerBehavior(Items.FERN, plantDispenserBehavior(Blocks.FERN, listOf(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.FARMLAND), SoundEvents.BLOCK_GRASS_PLACE))
+        DispenserBlock.registerBehavior(Items.LILY_PAD, plantDispenserBehavior(Blocks.LILY_PAD, listOf(Blocks.WATER, Blocks.ICE), SoundEvents.BLOCK_LILY_PAD_PLACE))
+        DispenserBlock.registerBehavior(Items.SEAGRASS, plantDispenserBehavior(Blocks.SEAGRASS, listOf(), SoundEvents.BLOCK_WET_GRASS_PLACE))
     }
 }

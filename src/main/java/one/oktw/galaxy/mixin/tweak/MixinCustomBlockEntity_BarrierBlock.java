@@ -18,16 +18,21 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.BarrierBlock;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import one.oktw.galaxy.block.CustomBlock;
+import one.oktw.galaxy.block.listener.CustomBlockClickListener;
+import one.oktw.galaxy.block.listener.CustomBlockNeighborUpdateListener;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -51,5 +56,26 @@ public abstract class MixinCustomBlockEntity_BarrierBlock extends AbstractBlock 
     @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
+    }
+
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        BlockEntity entity = world.getBlockEntity(pos);
+        if (entity instanceof CustomBlockClickListener) return ((CustomBlockClickListener) entity).onClick(player, hand, hit);
+        return super.onUse(state, world, pos, player, hand, hit);
+    }
+
+    @Override
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
+        BlockEntity entity = world.getBlockEntity(pos);
+        if (entity instanceof CustomBlockNeighborUpdateListener) ((CustomBlockNeighborUpdateListener) entity).onNeighborUpdate(false);
+        super.neighborUpdate(state, world, pos, block, fromPos, notify);
+    }
+
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        BlockEntity entity = world.getBlockEntity(pos);
+        if (entity instanceof CustomBlockNeighborUpdateListener) ((CustomBlockNeighborUpdateListener) entity).onNeighborUpdate(true);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 }

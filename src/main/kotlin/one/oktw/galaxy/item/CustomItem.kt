@@ -40,13 +40,14 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
             Upgrade
             Weapon
             CustomBlockItem
+            PipeModelItem
         }
     }
 
     open val cacheable = true
     private lateinit var cacheItemStack: ItemStack
 
-    abstract fun getName(): Text?
+    open fun getName(): Text? = null
 
     open fun writeCustomNbt(tag: CompoundTag) {
         tag.putString("CustomItemIdentifier", identifier.toString())

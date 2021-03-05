@@ -34,6 +34,7 @@ class CustomBlockItem private constructor(private val id: String, modelData: Int
         val TELEPORTER_CORE_BASIC = registry.register(CustomBlockItem("teleporter_core_basic", 1010300, "block.TELEPORTER"))
         val TELEPORTER_CORE_ADVANCE = registry.register(CustomBlockItem("teleporter_core_advance", 1010301, "block.TELEPORTER_ADVANCED"))
         val TELEPORTER_FRAME = registry.register(CustomBlockItem("teleporter_frame", 1010302, "block.TELEPORTER_FRAME"))
+        val PIPE = registry.register(CustomBlockItem("pipe", 1010500, "block.PIPE"))
     }
 
     fun getBlock(): CustomBlock {

@@ -55,7 +55,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, private val modelIte
         }
     }
 
-    override fun fromTag(state: BlockState?, tag: CompoundTag) {
+    override fun fromTag(state: BlockState, tag: CompoundTag) {
         super.fromTag(state, tag)
         entityUUID = (tag.get("GalaxyData") as? CompoundTag)?.getUuid("ModelEntity") ?: return
     }

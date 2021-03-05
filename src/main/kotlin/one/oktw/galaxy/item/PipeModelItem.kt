@@ -16,22 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.block
+package one.oktw.galaxy.item
 
-import net.minecraft.block.Blocks.BARRIER
-import net.minecraft.item.ItemStack
+import net.minecraft.item.Items
 import net.minecraft.util.Identifier
-import one.oktw.galaxy.block.entity.CustomBlockEntity
-import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
-import one.oktw.galaxy.item.CustomBlockItem
-import one.oktw.galaxy.item.CustomItemHelper
 
-open class ModelCustomBlock(identifier: Identifier, protected val modelItem: ItemStack) : CustomBlock(identifier, BARRIER) {
-    constructor(id: String, modelItem: ItemStack) : this(Identifier("galaxy", "block/$id"), modelItem)
-
-    override fun toItem() = modelItem.let { CustomItemHelper.getItem(it) as? CustomBlockItem }
-
-    override fun createBlockEntity(): CustomBlockEntity {
-        return ModelCustomBlockEntity(blockEntityType, modelItem)
+class PipeModelItem private constructor(id: String, modelData: Int) : CustomItem(Identifier("galaxy", "item/pipe/$id"), Items.COMMAND_BLOCK, modelData) {
+    companion object {
+        val PIPE_EXTENDED = registry.register(PipeModelItem("pipe_extended", 1010501))
+        val PIPE_PORT_EXPORT = registry.register(PipeModelItem("pipe_port_export", 1010502))
+        val PIPE_PORT_IMPORT = registry.register(PipeModelItem("pipe_port_import", 1010503))
+        val PIPE_PORT_STORAGE = registry.register(PipeModelItem("pipe_port_storage", 1010504))
     }
 }

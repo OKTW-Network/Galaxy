@@ -43,6 +43,10 @@ import kotlin.collections.HashMap
 
 open class PipeBlockEntity(type: BlockEntityType<*>, modelItem: ItemStack) : ModelCustomBlockEntity(type, modelItem), CustomBlockClickListener,
     CustomBlockNeighborUpdateListener {
+    companion object {
+        private val POSITIVE_DIRECTION = Direction.values().filter { it.direction == Direction.AxisDirection.POSITIVE }
+    }
+
     private val sideMode = HashMap<Direction, SideMode>()
     private val sideEntity = HashMap<Direction, UUID>()
     private val queue = LinkedList<ItemTransferPacket>()
@@ -129,7 +133,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, modelItem: ItemStack) : Mod
 
     private fun updatePipeConnect() {
         val world = (world as ServerWorld)
-        for (direction in Direction.values()) {
+        for (direction in POSITIVE_DIRECTION) {
             if (sideMode.getOrDefault(direction, SideMode.NONE) != SideMode.NONE || world.getBlockEntity(pos.offset(direction.opposite)) !is PipeBlockEntity) {
                 sideEntity.remove(direction)?.let(world::getEntity)?.remove()
                 continue

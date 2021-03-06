@@ -59,7 +59,7 @@ object CustomBlockHelper {
      * Set BlockEntity and ARMOR_STAND and play sound
      */
     private fun postPlace(world: ServerWorld, pos: BlockPos, block: CustomBlock) {
-        world.setBlockEntity(pos, block.createBlockEntity())
+        world.addBlockEntity(block.createBlockEntity(pos))
 
         world.playSound(null, pos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
     }

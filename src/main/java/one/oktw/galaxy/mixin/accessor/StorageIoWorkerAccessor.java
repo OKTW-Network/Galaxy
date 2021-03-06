@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -29,5 +29,5 @@ import java.util.concurrent.CompletableFuture;
 @Mixin(StorageIoWorker.class)
 public interface StorageIoWorkerAccessor {
     @Invoker
-    CompletableFuture<CompoundTag> callMethod_31738(ChunkPos chunkPos);
+    CompletableFuture<CompoundTag> callReadChunkData(ChunkPos chunkPos);
 }

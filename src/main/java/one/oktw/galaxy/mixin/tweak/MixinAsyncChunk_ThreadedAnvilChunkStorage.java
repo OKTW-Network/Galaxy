@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -122,7 +122,7 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
     }
 
     private CompletableFuture<CompoundTag> getUpdatedChunkTagAsync(ChunkPos pos) {
-        return ((StorageIoWorkerAccessor) ((AsyncChunk_VersionedChunkStorage) this).getWorker()).callMethod_31738(pos)
-            .thenApplyAsync(compoundTag -> compoundTag == null ? null : this.updateChunkTag(world.getRegistryKey(), this.persistentStateManagerFactory, compoundTag), mainThreadExecutor);
+        return ((StorageIoWorkerAccessor) ((AsyncChunk_VersionedChunkStorage) this).getWorker()).callReadChunkData(pos)
+            .thenApplyAsync(compoundTag -> compoundTag == null ? null : this.updateChunkNbt(world.getRegistryKey(), this.persistentStateManagerFactory, compoundTag), mainThreadExecutor);
     }
 }

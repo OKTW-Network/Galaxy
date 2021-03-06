@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,9 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.event.type
+package one.oktw.galaxy.mixin.accessor;
 
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.block.entity.BeaconBlockEntity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-class PlayerInteractEntityEvent(val packet: PlayerInteractEntityC2SPacket, val player: ServerPlayerEntity) : Event
+@Mixin(BeaconBlockEntity.class)
+public interface BeaconLevelAccessor {
+    @Accessor
+    int getLevel();
+}

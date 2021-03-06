@@ -16,19 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.tweak;
+package one.oktw.galaxy.block.listener
 
-import net.minecraft.block.entity.EnchantingTableBlockEntity;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-
-@Mixin(EnchantingTableBlockEntity.class)
-public class MixinSkipEnchantingTableTick {
-    /**
-     * @author James58899
-     * @reason No need tick at server side
-     */
-    @Overwrite
-    public void tick() {
-    }
+interface CustomBlockTickListener {
+    fun tick()
 }

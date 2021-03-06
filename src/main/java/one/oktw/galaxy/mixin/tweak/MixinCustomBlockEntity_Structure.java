@@ -42,8 +42,8 @@ import java.util.Random;
 public class MixinCustomBlockEntity_Structure {
     @Inject(method = "place(Lnet/minecraft/world/ServerWorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/structure/StructurePlacementData;Ljava/util/Random;I)Z",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/world/ServerWorldAccess;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z", ordinal = 1), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void hackPlace(ServerWorldAccess serverWorldAccess, BlockPos pos, BlockPos blockPos, StructurePlacementData placementData, Random random, int i, CallbackInfoReturnable<Boolean> cir, List<Structure.StructureBlockInfo> list, BlockBox blockBox, List<BlockPos> list2, List<Pair<BlockPos, CompoundTag>> list3, int j, int k, int l, int m, int n, int o, List<Structure.StructureBlockInfo> list4, Iterator<Structure.StructureBlockInfo> var18, Structure.StructureBlockInfo structureBlockInfo, BlockPos blockPos2, FluidState fluidState, BlockState blockState) {
+    private void hackPlace(ServerWorldAccess world, BlockPos pos, BlockPos blockPos, StructurePlacementData placementData, Random random, int i, CallbackInfoReturnable<Boolean> cir, List<Structure.StructureBlockInfo> list, BlockBox blockBox, List<BlockPos> list2, List<BlockPos> list3, List<Pair<BlockPos, CompoundTag>> list4, int j, int k, int l, int m, int n, int o, List<Structure.StructureBlockInfo> list5, Iterator<Structure.StructureBlockInfo> var19, Structure.StructureBlockInfo structureBlockInfo, BlockPos blockPos2, FluidState fluidState, BlockState blockState) {
         // Workaround structure barrier bug
-        if (structureBlockInfo.state.getBlock() == Blocks.BARRIER) serverWorldAccess.setBlockState(blockPos2, Blocks.AIR.getDefaultState(), 20);
+        if (structureBlockInfo.state.getBlock() == Blocks.BARRIER) world.setBlockState(blockPos2, Blocks.AIR.getDefaultState(), 20);
     }
 }

@@ -18,10 +18,12 @@
 
 package one.oktw.galaxy.block.entity
 
+import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.entity.BlockEntityType
+import net.minecraft.util.math.BlockPos
 
 // BlockEntity need extend
-open class CustomBlockEntity(type: BlockEntityType<*>) : BlockEntity(type) {
+open class CustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : BlockEntity(type, pos, Blocks.BARRIER.defaultState) {
     fun getId() = BlockEntityType.getId(type)!!
 }

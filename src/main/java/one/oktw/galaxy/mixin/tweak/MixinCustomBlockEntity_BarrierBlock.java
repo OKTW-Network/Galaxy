@@ -23,11 +23,13 @@ import net.minecraft.block.BarrierBlock;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import one.oktw.galaxy.block.CustomBlock;
+import one.oktw.galaxy.block.CustomBlockEntityTicker;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -39,8 +41,8 @@ public abstract class MixinCustomBlockEntity_BarrierBlock extends AbstractBlock 
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockView world) {
-        return CustomBlock.Companion.getDUMMY().createBlockEntity();
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return CustomBlock.Companion.getDUMMY().createBlockEntity(pos);
     }
 
     @Override
@@ -51,5 +53,11 @@ public abstract class MixinCustomBlockEntity_BarrierBlock extends AbstractBlock 
     @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return new CustomBlockEntityTicker<>();
     }
 }

@@ -38,12 +38,12 @@ minecraft {
 
 dependencies {
     // Core
-    minecraft(group = "com.mojang", name = "minecraft", version = "20w51a")
-    mappings(group = "net.fabricmc", name = "yarn", version = "20w51a+build.28", classifier = "v2")
-    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.10.8")
+    minecraft(group = "com.mojang", name = "minecraft", version = "21w08b")
+    mappings(group = "net.fabricmc", name = "yarn", version = "21w08b+build.20", classifier = "v2")
+    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.11.2")
 
     // fabric api
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.29.3+1.17")
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.31.2+1.17")
 
     // galaxy api
     implementation(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion)

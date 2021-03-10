@@ -15,6 +15,7 @@
     "MixinOptimizeContainer_AvailableSlots",
     "MixinOptimizeContainer_HopperBlockEntity",
     "MixinOptimizeContainer_LootableContainerBlockEntity",
+    "MixinPipe_ComparatorBlock",
     "MixinRCON_RconBase",
     "MixinRCON_RconClient",
     "MixinSkipEnchantingTableTick",

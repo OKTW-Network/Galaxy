@@ -51,15 +51,21 @@ open class PipeBlockEntity(type: BlockEntityType<*>, modelItem: ItemStack) : Mod
     private val sideEntity = HashMap<Direction, UUID>()
     private val queue = LinkedList<ItemTransferPacket>()
     private var showingItemEntity: ItemEntity? = null
+    private var redstone = 0
     private var needUpdatePipeConnect = true
 
     /**
      * Push [ItemTransferPacket] into pipe queue.
-     *
-     * @param item [ItemTransferPacket]
      */
     fun pushItem(item: ItemTransferPacket) {
         queue.offer(item)
+    }
+
+    /**
+     * Get pipe I/O mode.
+     */
+    fun getMode(side: Direction): SideMode {
+        return sideMode.getOrDefault(side, SideMode.NONE)
     }
 
     override fun tick() {
@@ -117,28 +123,37 @@ open class PipeBlockEntity(type: BlockEntityType<*>, modelItem: ItemStack) : Mod
     override fun onNeighborUpdate(direct: Boolean) {
         if (direct) {
             updatePipeConnect()
-            needUpdatePipeConnect = true
+            needUpdatePipeConnect = true // Also update on next tick
         } else {
-            // TODO update redstone
+            redstone = world!!.getReceivedRedstonePower(pos)
         }
     }
 
     private fun setSideMode(side: Direction, mode: SideMode) {
         if (mode == SideMode.NONE) {
-            sideMode.remove(side) // TODO spawn entity
+            sideMode.remove(side)?.let {
+                // Remove IO entity
+                val world = world as ServerWorld
+                sideEntity[side]?.let(world::getEntity)?.remove()
+
+                // Reconnect pipe
+                updatePipeConnect()
+            }
         } else {
             sideMode[side] = mode
+            spawnSideEntity(side, mode)
         }
     }
 
     private fun updatePipeConnect() {
         val world = (world as ServerWorld)
         for (direction in POSITIVE_DIRECTION) {
-            if (sideMode.getOrDefault(direction, SideMode.NONE) != SideMode.NONE || world.getBlockEntity(pos.offset(direction.opposite)) !is PipeBlockEntity) {
+            val connectPipe = world.getBlockEntity(pos.offset(direction.opposite))
+            if (sideMode.getOrDefault(direction, SideMode.NONE) != SideMode.NONE || connectPipe !is PipeBlockEntity) {
                 sideEntity.remove(direction)?.let(world::getEntity)?.remove()
                 continue
             }
-            if (!sideEntity.contains(direction)) {
+            if (!sideEntity.contains(direction) && connectPipe.getMode(direction.opposite) == SideMode.NONE) {
                 spawnSideEntity(direction, SideMode.NONE)
             }
         }

@@ -44,7 +44,7 @@ public class MixinPlayerInteractItem_NetworkHandler {
         PlayerInteractItemEvent event = main.getEventManager().emit(new PlayerInteractItemEvent(packet, player));
         if (event.getCancel()) {
             info.cancel();
-            player.refreshScreenHandler(player.currentScreenHandler);
+            player.currentScreenHandler.method_34252();
         }
         if (event.getSwing()) this.player.swingHand(packet.getHand(), true);
     }

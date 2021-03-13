@@ -27,12 +27,12 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(CraftingResultSlot.class)
 public class MixinCustomRecipe_CraftingResultSlot {
     @Inject(method = "onTakeItem", at = @At("RETURN"))
-    private void consumeInput(PlayerEntity player, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
+    private void consumeInput(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
         ScreenHandler handler = player.currentScreenHandler;
         ((ServerPlayerEntity) player).networkHandler.sendPacket(new InventoryS2CPacket(handler.syncId, handler.getStacks()));
     }

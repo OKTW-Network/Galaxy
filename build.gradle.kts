@@ -2,18 +2,17 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     //    "maven-publish"
-    kotlin("jvm") version "1.4.30"
-    id("fabric-loom") version "0.5-SNAPSHOT"
+    kotlin("jvm") version "1.5.0"
+    id("fabric-loom") version "0.6-SNAPSHOT"
 }
 
 val version = "0.0.1"
 val group = "one.oktw"
 
-val galaxyLibVersion = "dc1e26cd"
+val galaxyLibVersion = "966a3109"
 
 repositories {
     mavenCentral()
-    jcenter()
     maven(url = "https://jitpack.io")
 }
 
@@ -28,10 +27,9 @@ java {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        apiVersion = "1.4"
-        languageVersion = "1.4"
-        jvmTarget = "15"
-        useIR = true
+        apiVersion = "1.5"
+        languageVersion = "1.5"
+        jvmTarget = "16"
     }
 }
 
@@ -42,11 +40,11 @@ minecraft {
 dependencies {
     // Core
     minecraft(group = "com.mojang", name = "minecraft", version = "1.16.5")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.16.5+build.4", classifier = "v2")
-    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.11.1")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.16.5+build.9", classifier = "v2")
+    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.11.3")
 
     // fabric api
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.30.0+1.16")
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.34.2+1.16")
 
     // galaxy api
     implementation(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion)
@@ -58,13 +56,8 @@ dependencies {
 tasks.getByName<ProcessResources>("processResources") {
     inputs.property("version", version)
 
-    from(sourceSets.getByName("main").resources.srcDirs) {
-        include("fabric.mod.json")
+    filesMatching("fabric.mod.json") {
         expand(Pair("version", version))
-    }
-
-    from(sourceSets.getByName("main").resources.srcDirs) {
-        exclude("fabric.mod.json")
     }
 }
 

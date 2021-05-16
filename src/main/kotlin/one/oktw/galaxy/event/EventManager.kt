@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,7 +30,10 @@ import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.valueParameters
-import kotlin.reflect.jvm.*
+import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaMethod
+import kotlin.reflect.jvm.jvmErasure
+import kotlin.reflect.jvm.jvmName
 
 class EventManager(private val serverThread: ThreadExecutor<*>) : CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     private val asyncEventListeners = ConcurrentHashMap<KClass<*>, ConcurrentHashMap<Any, CopyOnWriteArrayList<KFunction<*>>>>()
@@ -66,24 +69,24 @@ class EventManager(private val serverThread: ThreadExecutor<*>) : CoroutineScope
             it.isAccessible = true
 
             if (annotation.sync) {
-                syncEventListeners.getOrPut(event, { hashMapOf() }).getOrPut(obj) { arrayListOf() }.add(it)
+                syncEventListeners.getOrPut(event) { hashMapOf() }.getOrPut(obj) { arrayListOf() }.add(it)
             } else {
-                asyncEventListeners.getOrPut(event, { ConcurrentHashMap() }).getOrPut(obj) { CopyOnWriteArrayList() }.add(it)
+                asyncEventListeners.getOrPut(event) { ConcurrentHashMap() }.getOrPut(obj) { CopyOnWriteArrayList() }.add(it)
             }
         }
     }
 
     @Suppress("UNCHECKED_CAST")
     fun <T : Event> register(event: KClass<T>, listener: (T) -> Unit) {
-        if (listener.reflect()?.findAnnotation<EventListener>()?.sync == true) {
-            syncEventCallback.getOrPut(event, { arrayListOf() }).add(listener as (Event) -> Unit)
+        if (listener::class.findAnnotation<EventListener>()?.sync == true) {
+            syncEventCallback.getOrPut(event) { arrayListOf() }.add(listener as (Event) -> Unit)
         } else {
-            asyncEventCallback.getOrPut(event, { CopyOnWriteArrayList() }).add(listener as (Event) -> Unit)
+            asyncEventCallback.getOrPut(event) { CopyOnWriteArrayList() }.add(listener as (Event) -> Unit)
         }
     }
 
     fun <T : Event> unregister(event: KClass<T>, listener: (T) -> Unit) {
-        if (listener.reflect()?.findAnnotation<EventListener>()?.sync == true) {
+        if (listener::class.findAnnotation<EventListener>()?.sync == true) {
             syncEventCallback[event]?.remove(listener)
         } else {
             asyncEventCallback[event]?.remove(listener)

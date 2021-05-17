@@ -78,7 +78,7 @@ class EventManager(private val serverThread: ThreadExecutor<*>) : CoroutineScope
 
     @Suppress("UNCHECKED_CAST")
     fun <T : Event> register(event: KClass<T>, listener: (T) -> Unit) {
-        if (listener::class.findAnnotation<EventListener>()?.sync == true) {
+        if (listener.javaClass.methods.first().getAnnotation(EventListener::class.java)?.sync == true) {
             syncEventCallback.getOrPut(event) { arrayListOf() }.add(listener as (Event) -> Unit)
         } else {
             asyncEventCallback.getOrPut(event) { CopyOnWriteArrayList() }.add(listener as (Event) -> Unit)
@@ -86,7 +86,7 @@ class EventManager(private val serverThread: ThreadExecutor<*>) : CoroutineScope
     }
 
     fun <T : Event> unregister(event: KClass<T>, listener: (T) -> Unit) {
-        if (listener::class.findAnnotation<EventListener>()?.sync == true) {
+        if (listener.javaClass.methods.first().getAnnotation(EventListener::class.java)?.sync == true) {
             syncEventCallback[event]?.remove(listener)
         } else {
             asyncEventCallback[event]?.remove(listener)

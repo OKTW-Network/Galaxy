@@ -14,7 +14,7 @@ jobs:
       - name: JDK
         uses: actions/setup-java@v1
         with:
-          java-version: '15'
+          java-version: '16'
 
       - name: cache
         uses: actions/cache@v2
@@ -40,9 +40,9 @@ jobs:
     needs: Build
     runs-on: ubuntu-latest
     env:
-      REGISTRY_IMAGE: registry.oktw.one/galaxy/galaxy
-      USERNAME: ${{ secrets.OKTW_REGISTRY_USERNAME }}
-      PASSWORD: ${{ secrets.OKTW_REGISTRY_PASSWORD }}
+      REGISTRY_IMAGE: harbor.k8s.oktw.one/galaxy/galaxy
+      USERNAME: ${{ secrets.OKTW_HARBOR_USERNAME }}
+      PASSWORD: ${{ secrets.OKTW_HARBOR_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -60,9 +60,9 @@ jobs:
         if: github.event_name == 'push' && env.USERNAME != '' && env.PASSWORD != ''
         uses: azure/docker-login@v1
         with:
-          login-server: registry.oktw.one
-          username: ${{ secrets.OKTW_REGISTRY_USERNAME }}
-          password: ${{ secrets.OKTW_REGISTRY_PASSWORD }}
+          login-server: harbor.k8s.oktw.one
+          username: ${{ secrets.OKTW_HARBOR_USERNAME }}
+          password: ${{ secrets.OKTW_HARBOR_PASSWORD }}
       - name: pull cache
         if: github.event_name == 'push'
         run: |

@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "one.oktw.galaxy.mixin.event",
-  "compatibilityLevel": "JAVA_14",
+  "compatibilityLevel": "JAVA_16",
   "mixins": [
     "MixinPlayerAction_NetworkHandler",
     "MixinPlayerChat_MeCommand",

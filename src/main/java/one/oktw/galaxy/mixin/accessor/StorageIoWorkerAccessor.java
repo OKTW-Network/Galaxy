@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.mixin.accessor;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.storage.StorageIoWorker;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,5 +29,5 @@ import java.util.concurrent.CompletableFuture;
 @Mixin(StorageIoWorker.class)
 public interface StorageIoWorkerAccessor {
     @Invoker
-    CompletableFuture<CompoundTag> callReadChunkData(ChunkPos chunkPos);
+    CompletableFuture<NbtCompound> callReadChunkData(ChunkPos chunkPos);
 }

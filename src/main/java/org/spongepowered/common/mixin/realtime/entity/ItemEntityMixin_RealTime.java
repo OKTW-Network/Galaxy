@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -55,7 +55,7 @@ public abstract class ItemEntityMixin_RealTime extends EntityMixin_RealTime {
     @Shadow
     private int pickupDelay;
     @Shadow
-    private int age;
+    private int itemAge;
 
     @Redirect(method = "tick",
         at = @At(value = "FIELD", target = "Lnet/minecraft/entity/ItemEntity;pickupDelay:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
@@ -65,9 +65,9 @@ public abstract class ItemEntityMixin_RealTime extends EntityMixin_RealTime {
     }
 
     @Redirect(method = "tick",
-        at = @At(value = "FIELD", target = "Lnet/minecraft/entity/ItemEntity;age:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
+        at = @At(value = "FIELD", target = "Lnet/minecraft/entity/ItemEntity;itemAge:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
     private void realTimeImpl$adjustForRealTimeAge(final ItemEntity self, final int modifier) {
         final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
-        this.age += ticks;
+        this.itemAge += ticks;
     }
 }

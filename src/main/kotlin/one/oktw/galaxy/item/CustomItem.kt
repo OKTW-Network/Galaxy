@@ -20,13 +20,12 @@ package one.oktw.galaxy.item
 
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.NbtList
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.util.CustomRegistry
 import one.oktw.galaxy.util.Registrable
-import java.util.*
 
 abstract class CustomItem(override val identifier: Identifier, private val baseItem: Item, private val modelData: Int) : Registrable {
     companion object {
@@ -48,11 +47,11 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
 
     abstract fun getName(): Text?
 
-    open fun writeCustomNbt(tag: CompoundTag) {
+    open fun writeCustomNbt(tag: NbtCompound) {
         tag.putString("CustomItemIdentifier", identifier.toString())
     }
 
-    open fun readCustomNbt(tag: CompoundTag): CustomItem {
+    open fun readCustomNbt(tag: NbtCompound): CustomItem {
         require(tag.getString("CustomItemIdentifier") == identifier.toString())
 
         return this
@@ -66,7 +65,7 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
                 putInt("HideFlags", ItemStack.TooltipSection.values().map(ItemStack.TooltipSection::getFlag).reduce { acc, i -> acc or i }) // ALL
                 putInt("CustomModelData", modelData)
                 putBoolean("Unbreakable", true)
-                put("AttributeModifiers", ListTag())
+                put("AttributeModifiers", NbtList())
             }
             setCustomName(this@CustomItem.getName())
             writeCustomNbt(getOrCreateSubTag("GalaxyData"))

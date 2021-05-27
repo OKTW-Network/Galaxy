@@ -24,7 +24,7 @@ import net.minecraft.entity.EntityType
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.listener.CustomBlockTickListener
@@ -33,7 +33,7 @@ import java.util.*
 open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, private val modelItem: ItemStack) : CustomBlockEntity(type, pos),
     CustomBlockTickListener {
     companion object {
-        private val armorStandTag = CompoundTag().apply {
+        private val armorStandTag = NbtCompound().apply {
             putString("id", "minecraft:armor_stand")
             putBoolean("Invisible", true)
             putBoolean("Invulnerable", true)
@@ -56,14 +56,14 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         }
     }
 
-    override fun readNbt(tag: CompoundTag) {
+    override fun readNbt(tag: NbtCompound) {
         super.readNbt(tag)
-        entityUUID = (tag.get("GalaxyData") as? CompoundTag)?.getUuid("ModelEntity") ?: return
+        entityUUID = (tag.get("GalaxyData") as? NbtCompound)?.getUuid("ModelEntity") ?: return
     }
 
-    override fun writeNbt(tag: CompoundTag): CompoundTag {
+    override fun writeNbt(tag: NbtCompound): NbtCompound {
         super.writeNbt(tag)
-        entityUUID?.let { tag.put("GalaxyData", CompoundTag().apply { putUuid("ModelEntity", it) }) }
+        entityUUID?.let { tag.put("GalaxyData", NbtCompound().apply { putUuid("ModelEntity", it) }) }
         return tag
     }
 

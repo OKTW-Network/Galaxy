@@ -19,7 +19,7 @@
 package one.oktw.galaxy.item
 
 import net.minecraft.item.Items.COMMAND_BLOCK
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
@@ -59,8 +59,8 @@ class Weapon private constructor(id: String, modelData: Int, private val name: S
 
     override fun getName(): Text = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
 
-    override fun writeCustomNbt(tag: CompoundTag) {
+    override fun writeCustomNbt(tag: NbtCompound) {
         super.writeCustomNbt(tag)
-        tag.put("WeaponData", CompoundTag().apply { putUuid("id", MathHelper.randomUuid()) })
+        tag.put("WeaponData", NbtCompound().apply { putUuid("id", MathHelper.randomUuid()) })
     }
 }

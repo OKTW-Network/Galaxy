@@ -20,7 +20,7 @@ package one.oktw.galaxy.mixin.tweak;
 
 import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.util.Either;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
@@ -121,7 +121,7 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
         }, this.mainThreadExecutor);
     }
 
-    private CompletableFuture<CompoundTag> getUpdatedChunkTagAsync(ChunkPos pos) {
+    private CompletableFuture<NbtCompound> getUpdatedChunkTagAsync(ChunkPos pos) {
         return ((StorageIoWorkerAccessor) ((AsyncChunk_VersionedChunkStorage) this).getWorker()).callReadChunkData(pos)
             .thenApplyAsync(compoundTag -> compoundTag == null ? null : this.updateChunkNbt(world.getRegistryKey(), this.persistentStateManagerFactory, compoundTag), mainThreadExecutor);
     }

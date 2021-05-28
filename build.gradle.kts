@@ -9,7 +9,7 @@ plugins {
 val version = "0.0.1"
 val group = "one.oktw"
 
-val galaxyLibVersion = "dc1e26cd"
+val galaxyLibVersion = "78eec6fa"
 
 repositories {
     mavenCentral()

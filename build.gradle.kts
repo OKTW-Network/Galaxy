@@ -2,14 +2,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     //    "maven-publish"
-    kotlin("jvm") version "1.5.0"
+    kotlin("jvm") version "1.5.10"
     id("fabric-loom") version "0.6-SNAPSHOT"
 }
 
 val version = "0.0.1"
 val group = "one.oktw"
 
-val galaxyLibVersion = "612144a8"
+val galaxyLibVersion = "11f67fd9"
 
 repositories {
     mavenCentral()

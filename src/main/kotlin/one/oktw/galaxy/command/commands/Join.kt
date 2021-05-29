@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,12 +20,13 @@ package one.oktw.galaxy.command.commands
 
 import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.CommandDispatcher
+import com.mojang.brigadier.suggestion.Suggestions
 import io.netty.buffer.Unpooled.wrappedBuffer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.command.argument.GameProfileArgumentType
 import net.minecraft.network.PacketByteBuf
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
@@ -33,13 +34,13 @@ import net.minecraft.text.LiteralText
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
-import one.oktw.galaxy.event.type.PacketReceiveEvent
-import one.oktw.galaxy.proxy.api.ProxyAPI.decode
+import one.oktw.galaxy.event.type.ProxyResponseEvent
 import one.oktw.galaxy.proxy.api.ProxyAPI.encode
 import one.oktw.galaxy.proxy.api.packet.CreateGalaxy
-import one.oktw.galaxy.proxy.api.packet.Packet
 import one.oktw.galaxy.proxy.api.packet.ProgressStage.*
+import one.oktw.galaxy.proxy.api.packet.SearchPlayer
 import java.time.Duration
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
@@ -48,14 +49,32 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
             CommandManager.literal("join")
-                .executes { context ->
-                    execute(context.source, listOf(context.source.player.gameProfile))
-                }
+                .executes { context -> execute(context.source, listOf(context.source.player.gameProfile)) }
                 .then(
                     CommandManager.argument("player", GameProfileArgumentType.gameProfile())
-                        .suggests { _, suggestionsBuilder ->
-                            //先給個空的 Suggest
-                            return@suggests suggestionsBuilder.buildFuture()
+                        .suggests { commandContext, suggestionsBuilder ->
+                            val future = CompletableFuture<Suggestions>()
+
+                            ServerPlayNetworking.send(
+                                commandContext.source.player,
+                                PROXY_IDENTIFIER,
+                                PacketByteBuf(wrappedBuffer(encode(SearchPlayer(suggestionsBuilder.remaining, 10))))
+                            )
+
+                            val listeners = fun(event: ProxyResponseEvent) {
+                                val result = event.packet as? SearchPlayer.Result ?: return
+                                if (event.player.uuid != commandContext.source.player.uuid) return
+
+                                result.players.forEach(suggestionsBuilder::suggest)
+                                future.complete(suggestionsBuilder.build())
+                            }
+
+                            val eventManager = main!!.eventManager
+
+                            eventManager.register(ProxyResponseEvent::class, listeners)
+                            future.thenRun { eventManager.unregister(ProxyResponseEvent::class, listeners) } // TODO check leak
+
+                            return@suggests future
                         }
                         .executes { context ->
                             execute(context.source, GameProfileArgumentType.getProfileArgument(context, "player"))
@@ -72,16 +91,16 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
 
         val targetPlayer = collection.first()
 
-        source.player.networkHandler.sendPacket(CustomPayloadS2CPacket(PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(targetPlayer.id))))))
+        ServerPlayNetworking.send(source.player, PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(targetPlayer.id)))))
         source.sendFeedback(LiteralText(if (source.player.gameProfile == targetPlayer) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系"), false)
 
         launch {
             val sourcePlayer = source.player
 
-            val listener = fun(event: PacketReceiveEvent) {
-                if (event.player.gameProfile != sourcePlayer.gameProfile || event.channel != PROXY_IDENTIFIER) return
+            val listener = fun(event: ProxyResponseEvent) {
+                if (event.player.gameProfile != sourcePlayer.gameProfile) return
 
-                val data = decode<Packet>(event.packet.nioBuffer()) as? CreateGalaxy.CreateProgress ?: return
+                val data = event.packet as? CreateGalaxy.CreateProgress ?: return
 
                 if (data.uuid != targetPlayer.id) return
 
@@ -102,9 +121,9 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                 }
             }
 
-            main!!.eventManager.register(PacketReceiveEvent::class, listener)
+            main!!.eventManager.register(ProxyResponseEvent::class, listener)
             delay(Duration.ofMinutes(5).toMillis()) // TODO change to kotlin Duration
-            main!!.eventManager.unregister(PacketReceiveEvent::class, listener)
+            main!!.eventManager.unregister(ProxyResponseEvent::class, listener)
             lock[sourcePlayer]?.unlock()
             lock.remove(sourcePlayer)
         }

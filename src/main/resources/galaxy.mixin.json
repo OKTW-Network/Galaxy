@@ -1,13 +1,9 @@
 {
   "required": true,
   "package": "one.oktw.galaxy.mixin.event",
-  "compatibilityLevel": "JAVA_14",
+  "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "MixinBlockBreak_EnderDragonEntity",
-    "MixinBlockBreak_Explosion",
-    "MixinBlockBreak_WitherEntity",
-    "MixinCustomPayload_NetworkHandler",
-    "MixinPlayerBlockBreak_Block",
+    "MixinPlayerAction_NetworkHandler",
     "MixinPlayerChat_MeCommand",
     "MixinPlayerChat_NetworkHandler",
     "MixinPlayerChat_SayCommand",
@@ -17,8 +13,7 @@
     "MixinPlayerJump_NetworkHandler",
     "MixinPlayerSneak_NetworkHandler",
     "MixinPlayerUpdateSign_NetworkHandler",
-    "MixinPlayerUseItemOnBlock_ItemStack",
-    "MixinRequestCompletions_NetworkHandler"
+    "MixinPlayerUseItemOnBlock_ItemStack"
   ],
   "client": [],
   "injectors": {

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -35,14 +35,14 @@ public class MixinCustomRecipe_PlayerManager {
 
     @Redirect(method = "onPlayerConnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/recipe/RecipeManager;values()Ljava/util/Collection;"))
     private Collection<Recipe<?>> skipSendRecipe(RecipeManager recipeManager) {
-        var recipes = recipeManager.values();
+        Collection<Recipe<?>> recipes = recipeManager.values();
         recipes.removeAll(CustomRecipeManager.customRecipes.values().stream().flatMap(i -> i.values().stream()).collect(Collectors.toList()));
         return recipes;
     }
 
     @Redirect(method = "onDataPacksReloaded", at = @At(value = "INVOKE", target = "Lnet/minecraft/recipe/RecipeManager;values()Ljava/util/Collection;"))
     private Collection<Recipe<?>> skipSyncRecipe(RecipeManager recipeManager) {
-        var recipes = recipeManager.values();
+        Collection<Recipe<?>> recipes = recipeManager.values();
         recipes.removeAll(CustomRecipeManager.customRecipes.values().stream().flatMap(i -> i.values().stream()).collect(Collectors.toList()));
         return recipes;
     }

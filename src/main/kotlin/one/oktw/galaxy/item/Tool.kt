@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,36 +18,26 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items.IRON_SWORD
+import net.minecraft.item.Items.COMMAND_BLOCK
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
-import one.oktw.galaxy.item.type.ItemType.TOOL
-import one.oktw.galaxy.item.type.ToolType
-import one.oktw.galaxy.item.type.ToolType.DUMMY
-import one.oktw.galaxy.item.util.CustomItemBuilder
+import net.minecraft.util.Identifier
+import net.minecraft.util.math.MathHelper
 
-class Tool(val type: ToolType = DUMMY) : Item {
-    override val itemType = TOOL
+class Tool private constructor(id: String, modelData: Int, private val name: String) :
+    CustomItem(Identifier("galaxy", "item/tool/$id"), COMMAND_BLOCK, modelData) {
+    override val cacheable = false
 
-    override val baseItem: net.minecraft.item.Item = IRON_SWORD
+    companion object {
+        val WRENCH = registry.register(Tool("wrench", 2010100, "item.Tool.WRENCH"))
+    }
 
-    override fun createItemStack(): ItemStack {
-        val item = CustomItemBuilder()
-            .setBaseItem(baseItem)
-            .setModel(type.customModelData)
-            .setItemType(itemType)
-            .setUnbreakable()
-            .hideAllFlags()
-            .removeAllModifiers()
+    override fun getName(): Text = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
 
-        if (type.languageKey != "") {
-            TranslatableText(type.languageKey).styled {
-                it.withColor(Formatting.YELLOW)
-                it.withItalic(false)
-            }.let(item::setName)
-        }
-
-        return item.build()
+    override fun writeCustomNbt(tag: CompoundTag) {
+        super.writeCustomNbt(tag)
+        tag.put("ToolData", CompoundTag().apply { putUuid("id", MathHelper.randomUuid()) })
     }
 }

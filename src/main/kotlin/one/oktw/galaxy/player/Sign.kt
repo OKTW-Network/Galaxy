@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -35,7 +35,7 @@ class Sign {
 
         if (player.isSneaking && player.mainHandStack.isEmpty && player.offHandStack.isEmpty) {
             val entity = player.serverWorld.getBlockEntity(event.packet.blockHitResult.blockPos) as? SignBlockEntity ?: return
-            player.openEditSignScreen(entity)
+            if (entity.editor == null) player.openEditSignScreen(entity)
         }
     }
 
@@ -45,6 +45,7 @@ class Sign {
             event.blockEntity.setTextOnRow(i, LiteralText(regex.replace(event.packet.text[i], "§")))
         }
 
+        event.blockEntity.editor = null
         event.cancel = true
     }
 }

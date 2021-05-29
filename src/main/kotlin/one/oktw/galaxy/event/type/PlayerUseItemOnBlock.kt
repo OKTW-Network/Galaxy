@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,4 +20,13 @@ package one.oktw.galaxy.event.type
 
 import net.minecraft.item.ItemUsageContext
 
-class PlayerUseItemOnBlock(val context: ItemUsageContext) : Event
+class PlayerUseItemOnBlock(val context: ItemUsageContext) : CancelableEvent() {
+    /**
+     * Set swing also cancel event.
+     */
+    var swing = false
+        set(swing) {
+            if (!this.cancel) cancel = true // Force swing need cancel event.
+            field = swing
+        }
+}

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,6 +23,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.storage.RegionBasedStorage;
 import net.minecraft.world.storage.StorageIoWorker;
+import net.minecraft.world.storage.StorageIoWorker.Result;
 import one.oktw.galaxy.mixin.interfaces.AsyncChunk_StorageIoWorker;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -54,7 +55,7 @@ public abstract class MixinAsyncChunk_StorageIoWorker implements AsyncChunk_Stor
     @Override
     public CompletableFuture<CompoundTag> getNbt(ChunkPos pos) {
         return run(() -> {
-            var result = this.results.get(pos);
+            Result result = this.results.get(pos);
             if (result != null) {
                 return Either.left(result.nbt);
             } else {

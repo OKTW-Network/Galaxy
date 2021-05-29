@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -26,13 +26,12 @@ import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
-import one.oktw.galaxy.block.item.BlockItem
-import one.oktw.galaxy.block.type.BlockType
+import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class Elevator : CraftingRecipe {
-    private val item = BlockItem(BlockType.ELEVATOR).createItemStack()
+    private val item = CustomBlockItem.ELEVATOR.createItemStack()
     private val list =
         listOf(Ingredient(items = listOf(Items.ENDER_PEARL)), Ingredient(items = listOf(Items.IRON_BLOCK)))
 

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,15 +23,14 @@ import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.recipe.SmeltingRecipe
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.item.Material
-import one.oktw.galaxy.item.type.MaterialType
 import java.util.stream.Stream
 
 class CeramicPlate :
     SmeltingRecipe(
         Identifier("galaxy", "material/ceramic_plate"),
         "",
-        Ingredient.ofStacks(Stream.of(Material(MaterialType.RAW_BASE_PLATE).createItemStack())),
-        Material(MaterialType.BASE_PLATE).createItemStack(),
+        Ingredient.ofStacks(Stream.of(Material.RAW_BASE_PLATE.createItemStack())),
+        Material.BASE_PLATE.createItemStack(),
         5.0F,
         200
     ) {

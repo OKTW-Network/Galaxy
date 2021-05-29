@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,7 +18,6 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -42,11 +41,11 @@ public class MixinPlayerInteractItem_NetworkHandler {
     private void onPlayerInteractItem(PlayerInteractItemC2SPacket packet, CallbackInfo info) {
         Main main = Main.Companion.getMain();
         if (main == null) return;
-        if (main.getEventManager().emit(new PlayerInteractItemEvent(packet, player)).getCancel()) {
+        PlayerInteractItemEvent event = main.getEventManager().emit(new PlayerInteractItemEvent(packet, player));
+        if (event.getCancel()) {
             info.cancel();
-            ItemStack item = player.getStackInHand(packet.getHand());
-            player.setStackInHand(packet.getHand(), ItemStack.EMPTY);
-            player.setStackInHand(packet.getHand(), item);
+            player.refreshScreenHandler(player.currentScreenHandler);
         }
+        if (event.getSwing()) this.player.swingHand(packet.getHand(), true);
     }
 }

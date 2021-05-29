@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -79,7 +79,7 @@ public abstract class LivingEntityMixin_RealTime extends EntityMixin_RealTime {
         this.deathTime = newDeathTime;
     }
 
-    @Redirect(method = "tickActiveItemStack", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;itemUseTimeLeft:I", opcode = Opcodes.GETFIELD))
+    @Redirect(method = "method_37119", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;itemUseTimeLeft:I", opcode = Opcodes.GETFIELD))
     private int realTimeImpl$adjustForRealTimeUseTime(final LivingEntity self) {
         final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         return itemUseTimeLeft - Math.min(itemUseTimeLeft, ticks) + 1;

@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     //    "maven-publish"
     kotlin("jvm") version "1.5.10"
-    id("fabric-loom") version "0.6-SNAPSHOT"
+    id("fabric-loom") version "0.8-SNAPSHOT"
 }
 
 val version = "0.0.1"
@@ -38,12 +38,12 @@ minecraft {
 
 dependencies {
     // Core
-    minecraft(group = "com.mojang", name = "minecraft", version = "21w20a")
-    mappings(group = "net.fabricmc", name = "yarn", version = "21w20a+build.7", classifier = "v2")
+    minecraft(group = "com.mojang", name = "minecraft", version = "1.17-pre1")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.17-pre1+build.6", classifier = "v2")
     modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.11.3")
 
     // fabric api
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.34.5+1.17")
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.34.8+1.17")
 
     // galaxy api
     implementation(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion)

@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "one.oktw.galaxy.mixin.accessor",
-  "compatibilityLevel": "JAVA_14",
+  "compatibilityLevel": "JAVA_16",
   "mixins": [
     "AsyncChunk_VersionedChunkStorage",
     "PlayerAbilitiesAccessor",

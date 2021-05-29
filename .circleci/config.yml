@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: openjdk:15-jdk-slim
+      - image: openjdk:16-jdk-slim
 
     working_directory: ~/repo
 

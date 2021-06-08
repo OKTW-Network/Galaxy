@@ -79,7 +79,7 @@ public abstract class LivingEntityMixin_RealTime extends EntityMixin_RealTime {
         this.deathTime = newDeathTime;
     }
 
-    @Redirect(method = "method_37119", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;itemUseTimeLeft:I", opcode = Opcodes.GETFIELD))
+    @Redirect(method = "tickItemStackUsage", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;itemUseTimeLeft:I", opcode = Opcodes.GETFIELD))
     private int realTimeImpl$adjustForRealTimeUseTime(final LivingEntity self) {
         final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         return itemUseTimeLeft - Math.min(itemUseTimeLeft, ticks) + 1;

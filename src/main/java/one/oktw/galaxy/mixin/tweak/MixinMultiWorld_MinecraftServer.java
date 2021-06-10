@@ -21,12 +21,9 @@ package one.oktw.galaxy.mixin.tweak;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldGenerationProgressLogger;
-import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Unit;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
@@ -75,6 +72,10 @@ public class MixinMultiWorld_MinecraftServer implements MultiWorldMinecraftServe
     @Final
     protected DynamicRegistryManager.Impl registryManager;
 
+    @Shadow
+    private static void setupSpawn(ServerWorld world, ServerWorldProperties worldProperties, boolean bonusChest, boolean debugWorld) {
+    }
+
     @Override
     public void createWorld(Identifier identifier) {
         RegistryKey<World> key = RegistryKey.of(Registry.WORLD_KEY, identifier);
@@ -117,7 +118,7 @@ public class MixinMultiWorld_MinecraftServer implements MultiWorldMinecraftServe
             true
         );
 
-        world.getChunkManager().addTicket(ChunkTicketType.START, new ChunkPos(world.getSpawnPos()), 1, Unit.INSTANCE);
+        setupSpawn(world, serverWorldProperties, false, false);
         worlds.put(key, world);
     }
 }

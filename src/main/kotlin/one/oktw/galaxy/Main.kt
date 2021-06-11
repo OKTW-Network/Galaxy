@@ -34,7 +34,10 @@ import one.oktw.galaxy.block.event.AngelBlock
 import one.oktw.galaxy.block.event.BlockEvents
 import one.oktw.galaxy.block.event.Elevator
 import one.oktw.galaxy.chat.Exchange
-import one.oktw.galaxy.command.commands.*
+import one.oktw.galaxy.command.commands.Admin
+import one.oktw.galaxy.command.commands.Home
+import one.oktw.galaxy.command.commands.Join
+import one.oktw.galaxy.command.commands.Spawn
 import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.event.type.ProxyResponseEvent
 import one.oktw.galaxy.item.event.CustomItemEventHandler
@@ -70,7 +73,7 @@ class Main : DedicatedServerModInitializer {
         main = this
 
         CommandRegistrationCallback.EVENT.register(CommandRegistrationCallback { dispatcher, _ ->
-            listOf(Join(), Admin(), Home(), Spawn(), Test()).forEach { dispatcher.let(it::register) }
+            listOf(Join(), Admin(), Home(), Spawn()).forEach { dispatcher.let(it::register) }
         })
 
         // Register CustomBlockEntity

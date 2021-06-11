@@ -16,31 +16,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.command.commands
+package one.oktw.galaxy.command.commands.admin
 
-import com.mojang.brigadier.CommandDispatcher
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.mojang.brigadier.context.CommandContext
+import net.minecraft.command.argument.IdentifierArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.util.Identifier
 import net.minecraft.util.registry.Registry
 import net.minecraft.util.registry.RegistryKey
-import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.mixin.interfaces.MultiWorldMinecraftServer
 
-class Test : Command {
-    override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
-        dispatcher.register(
-            CommandManager.literal("test")
-                .executes { context ->
-                    execute(context.source)
-                }
-
+class MW {
+    val command: LiteralArgumentBuilder<ServerCommandSource> = CommandManager.literal("mw")
+        .then(CommandManager.argument("name", IdentifierArgumentType.identifier())
+            .suggests { context, builder ->
+                context.source.minecraftServer.worldRegistryKeys.forEach { builder.suggest(it.value.toString()) }
+                builder.buildFuture()
+            }
+            .executes(::execute)
         )
-    }
 
-    private fun execute(source: ServerCommandSource): Int {
-        val player = source.player
-        val id = Identifier("galaxy", "test")
+
+    private fun execute(context: CommandContext<ServerCommandSource>): Int {
+        val player = context.source.player
+        val id = IdentifierArgumentType.getIdentifier(context, "name")
 
         (player.server as MultiWorldMinecraftServer).createWorld(id)
         player.server.getWorld(RegistryKey.of(Registry.WORLD_KEY, id)).let(player::moveToWorld)

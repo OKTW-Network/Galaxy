@@ -24,6 +24,7 @@ import net.minecraft.server.command.ServerCommandSource
 import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.command.commands.admin.FlySpeed
 import one.oktw.galaxy.command.commands.admin.GetItem
+import one.oktw.galaxy.command.commands.admin.MW
 import one.oktw.galaxy.command.commands.admin.RegisterBlock
 
 class Admin : Command {
@@ -34,6 +35,7 @@ class Admin : Command {
                 .then(GetItem().command)
                 .then(RegisterBlock.command)
                 .then(FlySpeed().command)
+                .then(MW().command)
         )
     }
 }

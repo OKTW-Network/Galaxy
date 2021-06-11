@@ -19,10 +19,10 @@
 package one.oktw.galaxy.mixin.tweak;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.serialization.Lifecycle;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldGenerationProgressLogger;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.registry.Registry;
@@ -31,12 +31,13 @@ import net.minecraft.village.ZombieSiegeManager;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.WanderingTraderManager;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.source.HorizontalVoronoiBiomeAccessType;
+import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.CatSpawner;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.gen.PhantomSpawner;
 import net.minecraft.world.gen.PillagerSpawner;
+import net.minecraft.world.gen.chunk.NoiseChunkGenerator;
 import net.minecraft.world.level.ServerWorldProperties;
 import net.minecraft.world.level.UnmodifiableLevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
@@ -46,12 +47,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.Map;
-import java.util.OptionalLong;
 import java.util.Random;
 import java.util.concurrent.Executor;
 
 @Mixin(MinecraftServer.class)
-public class MixinMultiWorld_MinecraftServer implements MultiWorldMinecraftServer {
+public abstract class MixinMultiWorld_MinecraftServer implements MultiWorldMinecraftServer {
     @Shadow
     @Final
     private Map<RegistryKey<World>, ServerWorld> worlds;
@@ -76,13 +76,18 @@ public class MixinMultiWorld_MinecraftServer implements MultiWorldMinecraftServe
     private static void setupSpawn(ServerWorld world, ServerWorldProperties worldProperties, boolean bonusChest, boolean debugWorld) {
     }
 
+    @Shadow
+    public abstract ServerWorld getOverworld();
+
     @Override
-    public void createWorld(Identifier identifier) {
+    public void createWorld(Identifier identifier) { // TODO nether, end
         RegistryKey<World> key = RegistryKey.of(Registry.WORLD_KEY, identifier);
         if (worlds.containsKey(key)) return;
 
         ServerWorldProperties serverWorldProperties = saveProperties.getMainWorldProperties();
-        GeneratorOptions generatorOptions = saveProperties.getGeneratorOptions();
+        long seed = (new Random()).nextLong();
+        DimensionType type = registryManager.get(Registry.DIMENSION_TYPE_KEY).getOrThrow(DimensionType.OVERWORLD_REGISTRY_KEY); // TODO custom type
+        NoiseChunkGenerator generator = GeneratorOptions.createOverworldGenerator(registryManager.get(Registry.BIOME_KEY), registryManager.get(Registry.CHUNK_GENERATOR_SETTINGS_KEY), seed);
 
         ServerWorld world = new ServerWorld(
             (MinecraftServer) (Object) this,
@@ -90,35 +95,22 @@ public class MixinMultiWorld_MinecraftServer implements MultiWorldMinecraftServe
             session,
             new UnmodifiableLevelProperties(saveProperties, serverWorldProperties),
             key,
-            DimensionType.create(
-                OptionalLong.empty(),
-                true,
-                false,
-                false,
-                true,
-                1.0D,
-                false,
-                false,
-                true,
-                false,
-                true,
-                0,
-                256,
-                256,
-                HorizontalVoronoiBiomeAccessType.INSTANCE,
-                BlockTags.INFINIBURN_OVERWORLD.getId(),
-                identifier,
-                0.0F
-            ),
-            new WorldGenerationProgressLogger(0),
-            GeneratorOptions.createOverworldGenerator(registryManager.get(Registry.BIOME_KEY), registryManager.get(Registry.CHUNK_GENERATOR_SETTINGS_KEY), (new Random()).nextLong()),
+            type,
+            new WorldGenerationProgressLogger(0), // TODO progress log
+            generator,
             false,
-            generatorOptions.getSeed(), // TODO other seed
+            seed,
             ImmutableList.of(new PhantomSpawner(), new PillagerSpawner(), new CatSpawner(), new ZombieSiegeManager(), new WanderingTraderManager(serverWorldProperties)),
             true
         );
 
         setupSpawn(world, serverWorldProperties, false, false);
+
+        // Add to level.dat
+        saveProperties.getGeneratorOptions().getDimensions().add(RegistryKey.of(Registry.DIMENSION_KEY, identifier), new DimensionOptions(() -> type, generator), Lifecycle.experimental());
+        getOverworld().getPersistentStateManager().save();
+
+        // Start tick
         worlds.put(key, world);
     }
 }

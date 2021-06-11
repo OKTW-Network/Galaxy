@@ -19,8 +19,10 @@
 package one.oktw.galaxy.mixin.tweak;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.TeleportTarget;
@@ -41,9 +43,15 @@ public abstract class MixinMultiWorld_Entity {
     @Shadow
     public abstract float getPitch();
 
+    @Shadow
+    public abstract int getId();
+
     @Inject(method = "getTeleportTarget", at = @At("RETURN"), cancellable = true)
     private void defaultTeleportTarget(ServerWorld destination, CallbackInfoReturnable<TeleportTarget> cir) {
         if (cir.getReturnValue() == null) {
+            BlockPos spawn = destination.getSpawnPos();
+            destination.getChunk(spawn); // Load spawn chunk
+            destination.getChunkManager().addTicket(ChunkTicketType.POST_TELEPORT, new ChunkPos(spawn), 1, getId());
             BlockPos pos = destination.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, destination.getSpawnPos());
 
             cir.setReturnValue(new TeleportTarget(new Vec3d(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D), getVelocity(), getYaw(), this.getPitch()));

@@ -47,7 +47,7 @@ class Wrench : CraftingRecipe {
         return true
     }
 
-    override fun craft(inv: CraftingInventory) = item.copy()
+    override fun craft(inv: CraftingInventory) = Tool.WRENCH.createItemStack()
 
     @Environment(EnvType.CLIENT)
     override fun fits(width: Int, height: Int): Boolean {

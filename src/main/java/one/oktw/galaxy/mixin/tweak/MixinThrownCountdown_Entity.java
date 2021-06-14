@@ -33,7 +33,7 @@ public abstract class MixinThrownCountdown_Entity implements IThrownCountdown_En
     private int intoWater = 0;
 
     @Shadow
-    public abstract void remove();
+    public abstract void discard();
 
     @Inject(method = "checkWaterState",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;onSwimmingStart()V"))
@@ -41,7 +41,7 @@ public abstract class MixinThrownCountdown_Entity implements IThrownCountdown_En
         //noinspection ConstantConditions
         if (((Object) this) instanceof ArrowEntity || ((Object) this) instanceof SpectralArrowEntity) {
             if (intoWater > 10) {
-                remove();
+                discard();
             }
         }
         intoWater++;

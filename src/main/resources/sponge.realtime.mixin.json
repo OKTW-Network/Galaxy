@@ -3,6 +3,8 @@
   "package": "org.spongepowered.common.mixin.realtime",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "accessor.AbstractFurnaceBlockEntityAccessor",
+    "accessor.BrewingStandBlockEntityAccessor",
     "blockentity.AbstractFurnaceBlockEntityMixin_RealTime",
     "blockentity.BrewingStandBlockEntityMixin_RealTime",
     "entity.EntityMixin_RealTime",

@@ -1,4 +1,22 @@
 /*
+ * OKTW Galaxy Project
+ * Copyright (C) 2018-2021
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/*
  * This file is part of Sponge, licensed under the MIT License (MIT).
  *
  * Copyright (c) SpongePowered <https://www.spongepowered.org>
@@ -24,35 +42,23 @@
  */
 package org.spongepowered.common.mixin.realtime.blockentity;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.BrewingStandBlockEntity;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
+import org.spongepowered.common.mixin.realtime.accessor.BrewingStandBlockEntityAccessor;
 
 @Mixin(BrewingStandBlockEntity.class)
-public abstract class BrewingStandBlockEntityMixin_RealTime extends BlockEntity {
-    @Shadow
-    private int brewTime;
-
-    public BrewingStandBlockEntityMixin_RealTime(BlockEntityType<?> blockEntityType_1) {
-        super(blockEntityType_1);
-    }
-
+public abstract class BrewingStandBlockEntityMixin_RealTime {
     @Redirect(
         method = "tick",
-        at = @At(
-            value = "FIELD",
-            target = "Lnet/minecraft/block/entity/BrewingStandBlockEntity;brewTime:I",
-            opcode = Opcodes.PUTFIELD, ordinal = 0
-        )
-    )
-    private void realTimeImpl$adjustForRealTimeBrewTime(final BrewingStandBlockEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) this.world).realTimeBridge$getRealTimeTicks();
-        this.brewTime = Math.max(0, this.brewTime - ticks);
+        at = @At(value = "FIELD", target = "Lnet/minecraft/block/entity/BrewingStandBlockEntity;brewTime:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
+    private static void realTimeImpl$adjustForRealTimeBrewTime(final BrewingStandBlockEntity self, final int modifier) {
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+
+        BrewingStandBlockEntityAccessor accessor = (BrewingStandBlockEntityAccessor) self;
+        accessor.setBrewTime(Math.max(0, accessor.getBrewTime() - ticks));
     }
 }

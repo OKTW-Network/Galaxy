@@ -33,7 +33,7 @@ public abstract class MixinMapExistingChunk_FilledMapItem {
     @Redirect(method = "updateColors", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getWorldChunk(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/world/chunk/WorldChunk;"))
     private WorldChunk getExistingChunk(World world, BlockPos pos) {
         ChunkPos chunkPos = new ChunkPos(pos);
-        WorldChunk chunk = (WorldChunk) world.getExistingChunk(chunkPos.x, chunkPos.z);
+        WorldChunk chunk = (WorldChunk) world.getChunkAsView(chunkPos.x, chunkPos.z);
         if (chunk == null) chunk = new EmptyChunk(world, chunkPos);
         return chunk;
     }

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -42,7 +42,7 @@ public class MixinPlayerUpdateSign_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Inject(method = "method_31282",
+    @Inject(method = "onSignUpdate(Lnet/minecraft/network/packet/c2s/play/UpdateSignC2SPacket;Ljava/util/List;)V",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/SignBlockEntity;isEditable()Z"),
         cancellable = true,
         locals = LocalCapture.CAPTURE_FAILSOFT)

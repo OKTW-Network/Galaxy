@@ -16,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.block.entity
+package one.oktw.galaxy.mixin.accessor;
 
-import net.minecraft.block.Blocks
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.util.math.BlockPos
+import net.minecraft.block.entity.BeaconBlockEntity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-// BlockEntity need extend
-open class CustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : BlockEntity(type, pos, Blocks.BARRIER.defaultState) {
-    fun getId() = BlockEntityType.getId(type)!!
+@Mixin(BeaconBlockEntity.class)
+public interface BeaconLevelAccessor {
+    @Accessor
+    int getLevel();
 }

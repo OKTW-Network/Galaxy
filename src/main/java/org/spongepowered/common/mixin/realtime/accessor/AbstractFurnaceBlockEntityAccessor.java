@@ -16,9 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.event.type
+package org.spongepowered.common.mixin.realtime.accessor;
 
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-class PlayerInteractEntityEvent(val packet: PlayerInteractEntityC2SPacket, val player: ServerPlayerEntity) : Event
+@Mixin(AbstractFurnaceBlockEntity.class)
+public interface AbstractFurnaceBlockEntityAccessor {
+    @Accessor
+    int getBurnTime();
+
+    @Accessor
+    void setBurnTime(int i);
+
+    @Accessor
+    int getCookTime();
+
+    @Accessor
+    void setCookTime(int i);
+
+    @Accessor
+    int getCookTimeTotal();
+}

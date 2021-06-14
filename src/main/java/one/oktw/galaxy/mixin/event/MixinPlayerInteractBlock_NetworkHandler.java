@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -51,7 +51,7 @@ public class MixinPlayerInteractBlock_NetworkHandler {
             BlockPos blockPos = packet.getBlockHitResult().getBlockPos();
             player.networkHandler.sendPacket(new BlockUpdateS2CPacket(world, blockPos));
             player.networkHandler.sendPacket(new BlockUpdateS2CPacket(world, blockPos.offset(packet.getBlockHitResult().getSide())));
-            player.refreshScreenHandler(player.currentScreenHandler);
+            player.currentScreenHandler.syncState();
         }
     }
 }

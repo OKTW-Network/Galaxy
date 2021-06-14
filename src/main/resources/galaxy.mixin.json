@@ -8,7 +8,6 @@
     "MixinPlayerChat_NetworkHandler",
     "MixinPlayerChat_SayCommand",
     "MixinPlayerInteractBlock_NetworkHandler",
-    "MixinPlayerInteractEntity_NetworkHandler",
     "MixinPlayerInteractItem_NetworkHandler",
     "MixinPlayerJump_NetworkHandler",
     "MixinPlayerSneak_NetworkHandler",

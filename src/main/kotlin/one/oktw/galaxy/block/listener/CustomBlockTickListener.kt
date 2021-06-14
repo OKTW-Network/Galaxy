@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,13 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.interfaces;
+package one.oktw.galaxy.block.listener
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.math.ChunkPos;
-
-import java.util.concurrent.CompletableFuture;
-
-public interface AsyncChunk_StorageIoWorker {
-    CompletableFuture<CompoundTag> getNbt(ChunkPos pos);
+interface CustomBlockTickListener {
+    fun tick()
 }

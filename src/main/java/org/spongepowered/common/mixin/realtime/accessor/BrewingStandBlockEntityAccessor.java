@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2020
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,19 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.tweak;
+package org.spongepowered.common.mixin.realtime.accessor;
 
-import net.minecraft.block.entity.EnchantingTableBlockEntity;
+import net.minecraft.block.entity.BrewingStandBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(EnchantingTableBlockEntity.class)
-public class MixinSkipEnchantingTableTick {
-    /**
-     * @author James58899
-     * @reason No need tick at server side
-     */
-    @Overwrite
-    public void tick() {
-    }
+@Mixin(BrewingStandBlockEntity.class)
+public interface BrewingStandBlockEntityAccessor {
+    @Accessor
+    int getBrewTime();
+
+    @Accessor
+    void setBrewTime(int i);
 }

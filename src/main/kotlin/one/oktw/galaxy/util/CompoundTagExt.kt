@@ -18,8 +18,8 @@
 
 package one.oktw.galaxy.util
 
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtCompound
 
-fun CompoundTag.getOrCreateSubTag(key: String): CompoundTag {
-    return if (contains(key, 10)) getCompound(key) else CompoundTag().also { put(key, it) }
+fun NbtCompound.getOrCreateSubTag(key: String): NbtCompound {
+    return if (contains(key, 10)) getCompound(key) else NbtCompound().also { put(key, it) }
 }

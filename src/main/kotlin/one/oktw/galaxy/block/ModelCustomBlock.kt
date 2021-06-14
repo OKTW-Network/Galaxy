@@ -21,6 +21,7 @@ package one.oktw.galaxy.block
 import net.minecraft.block.Blocks.BARRIER
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Identifier
+import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
@@ -31,7 +32,7 @@ open class ModelCustomBlock(identifier: Identifier, protected val modelItem: Ite
 
     override fun toItem() = modelItem.let { CustomItemHelper.getItem(it) as? CustomBlockItem }
 
-    override fun createBlockEntity(): CustomBlockEntity {
-        return ModelCustomBlockEntity(blockEntityType, modelItem)
+    override fun createBlockEntity(pos: BlockPos): CustomBlockEntity {
+        return ModelCustomBlockEntity(blockEntityType, pos, modelItem)
     }
 }

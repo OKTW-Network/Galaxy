@@ -18,21 +18,22 @@
 
 package one.oktw.galaxy.block.entity
 
-import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.Tickable
+import net.minecraft.util.math.BlockPos
+import one.oktw.galaxy.block.listener.CustomBlockTickListener
 import java.util.*
 
-open class ModelCustomBlockEntity(type: BlockEntityType<*>, private val modelItem: ItemStack) : CustomBlockEntity(type), Tickable {
+open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, private val modelItem: ItemStack) : CustomBlockEntity(type, pos),
+    CustomBlockTickListener {
     companion object {
-        private val armorStandTag = CompoundTag().apply {
+        private val armorStandTag = NbtCompound().apply {
             putString("id", "minecraft:armor_stand")
             putBoolean("Invisible", true)
             putBoolean("Invulnerable", true)
@@ -55,14 +56,14 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, private val modelIte
         }
     }
 
-    override fun fromTag(state: BlockState, tag: CompoundTag) {
-        super.fromTag(state, tag)
-        entityUUID = (tag.get("GalaxyData") as? CompoundTag)?.getUuid("ModelEntity") ?: return
+    override fun readNbt(tag: NbtCompound) {
+        super.readNbt(tag)
+        entityUUID = (tag.get("GalaxyData") as? NbtCompound)?.getUuid("ModelEntity") ?: return
     }
 
-    override fun toTag(tag: CompoundTag): CompoundTag {
-        super.toTag(tag)
-        entityUUID?.let { tag.put("GalaxyData", CompoundTag().apply { putUuid("ModelEntity", it) }) }
+    override fun writeNbt(tag: NbtCompound): NbtCompound {
+        super.writeNbt(tag)
+        entityUUID?.let { tag.put("GalaxyData", NbtCompound().apply { putUuid("ModelEntity", it) }) }
         return tag
     }
 
@@ -72,7 +73,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, private val modelIte
     }
 
     private fun spawnEntity() {
-        val entity: ArmorStandEntity = EntityType.getEntityFromTag(armorStandTag, world).get() as ArmorStandEntity
+        val entity: ArmorStandEntity = EntityType.getEntityFromNbt(armorStandTag, world).get() as ArmorStandEntity
         entity.refreshPositionAndAngles(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, 0.0F, 0.0F)
         entity.equipStack(EquipmentSlot.HEAD, modelItem)
         entity.addScoreboardTag("BLOCK")

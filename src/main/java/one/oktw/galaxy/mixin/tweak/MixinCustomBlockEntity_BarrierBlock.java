@@ -20,6 +20,8 @@ package one.oktw.galaxy.mixin.tweak;
 
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.ActionResult;
@@ -27,10 +29,10 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import one.oktw.galaxy.block.CustomBlock;
+import one.oktw.galaxy.block.CustomBlockEntityTicker;
 import one.oktw.galaxy.block.listener.CustomBlockClickListener;
 import one.oktw.galaxy.block.listener.CustomBlockNeighborUpdateListener;
 import org.jetbrains.annotations.Nullable;
@@ -44,8 +46,8 @@ public abstract class MixinCustomBlockEntity_BarrierBlock extends AbstractBlock 
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockView world) {
-        return CustomBlock.Companion.getDUMMY().createBlockEntity();
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return CustomBlock.Companion.getDUMMY().createBlockEntity(pos);
     }
 
     @Override
@@ -56,6 +58,12 @@ public abstract class MixinCustomBlockEntity_BarrierBlock extends AbstractBlock 
     @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return new CustomBlockEntityTicker<>();
     }
 
     @Override

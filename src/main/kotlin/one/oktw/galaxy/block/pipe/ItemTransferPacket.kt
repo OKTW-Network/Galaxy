@@ -19,7 +19,7 @@
 package one.oktw.galaxy.block.pipe
 
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtCompound
 import java.util.*
 
 data class ItemTransferPacket(
@@ -28,17 +28,17 @@ data class ItemTransferPacket(
     val mode: TransferMode
 ) {
     companion object {
-        fun createFromTag(tag: CompoundTag): ItemTransferPacket {
+        fun createFromTag(tag: NbtCompound): ItemTransferPacket {
             val uuid = tag.getUuid("source")
-            val item = (tag.get("item") as CompoundTag).let(ItemStack::fromTag)
+            val item = (tag.get("item") as NbtCompound).let(ItemStack::fromNbt)
             val mode = tag.getString("mode").let(TransferMode::valueOf)
             return ItemTransferPacket(uuid, item, mode)
         }
     }
 
-    fun toTag(tag: CompoundTag): CompoundTag {
+    fun toTag(tag: NbtCompound): NbtCompound {
         tag.putUuid("source", source)
-        tag.put("item", item.toTag(CompoundTag()))
+        tag.put("item", item.writeNbt(NbtCompound()))
         tag.putString("mode", mode.name)
         return tag
     }

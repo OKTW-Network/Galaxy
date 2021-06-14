@@ -20,8 +20,10 @@ package one.oktw.galaxy.block
 
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks.*
+import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.block.entity.BlockEntityType.Builder
 import net.minecraft.util.Identifier
+import net.minecraft.util.math.BlockPos
 import net.minecraft.util.registry.Registry
 import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
@@ -31,7 +33,11 @@ import one.oktw.galaxy.util.Registrable
 open class CustomBlock(final override val identifier: Identifier, val baseBlock: Block = BARRIER) : Registrable {
     constructor(id: String, baseBlock: Block = BARRIER) : this(Identifier("galaxy", "block/$id"), baseBlock)
 
-    protected val blockEntityType = Registry.register(Registry.BLOCK_ENTITY_TYPE, identifier, Builder.create({ createBlockEntity() }, baseBlock).build(null))!!
+    protected val blockEntityType: BlockEntityType<CustomBlockEntity> = Registry.register(
+        Registry.BLOCK_ENTITY_TYPE,
+        identifier,
+        Builder.create({ pos, _ -> createBlockEntity(pos) }, BARRIER).build(null)
+    )
 
     companion object {
         val registry = CustomRegistry<CustomBlock>()
@@ -50,5 +56,5 @@ open class CustomBlock(final override val identifier: Identifier, val baseBlock:
 
     open fun toItem(): CustomBlockItem? = null
 
-    open fun createBlockEntity(): CustomBlockEntity = CustomBlockEntity(blockEntityType)
+    open fun createBlockEntity(pos: BlockPos): CustomBlockEntity = CustomBlockEntity(blockEntityType, pos)
 }

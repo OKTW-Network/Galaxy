@@ -19,8 +19,9 @@
 package one.oktw.galaxy.block
 
 import net.minecraft.util.Identifier
+import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.entity.DummyBlockEntity
 
 class DummyBlock : CustomBlock(Identifier("galaxy", "block/dummy")) {
-    override fun createBlockEntity() = DummyBlockEntity(blockEntityType)
+    override fun createBlockEntity(pos: BlockPos) = DummyBlockEntity(blockEntityType, pos)
 }

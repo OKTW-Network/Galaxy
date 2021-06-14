@@ -3,7 +3,6 @@
   "package": "one.oktw.galaxy.mixin.tweak",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "MixinAsyncChunk_StorageIoWorker",
     "MixinAsyncChunk_ThreadedAnvilChunkStorage",
     "MixinCustomBlockEntity_BarrierBlock",
     "MixinCustomBlockEntity_Structure",
@@ -18,7 +17,6 @@
     "MixinPipe_ComparatorBlock",
     "MixinRCON_RconBase",
     "MixinRCON_RconClient",
-    "MixinSkipEnchantingTableTick",
     "MixinThrownCountdown_Entity",
     "MixinThrownCountdown_ProjectileEntity",
     "MixinThrownCountdown_ThrownEntity"

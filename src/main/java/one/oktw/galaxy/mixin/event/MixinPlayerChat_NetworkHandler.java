@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -34,6 +34,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.UUID;
+import java.util.function.Function;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class MixinPlayerChat_NetworkHandler {
@@ -44,14 +45,14 @@ public class MixinPlayerChat_NetworkHandler {
     @Final
     private MinecraftServer server;
 
-    @Redirect(method = "method_31286", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"))
-    private void onChat(PlayerManager playerManager, Text message, MessageType type, UUID senderUuid) {
+    @Redirect(method = "handleMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Ljava/util/function/Function;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"))
+    private void onChat(PlayerManager playerManager, Text serverMessage, Function<ServerPlayerEntity, Text> playerMessageFactory, MessageType playerMessageType, UUID sender) {
         Main main = Main.Companion.getMain();
 
-        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, message)).getCancel()) {
-            playerManager.broadcastChatMessage(message, type, senderUuid);
+        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, serverMessage)).getCancel()) {
+            playerManager.broadcastChatMessage(serverMessage, playerMessageType, sender);
         } else {
-            server.sendSystemMessage(((BaseText) message).append(" (Canceled)"), senderUuid);
+            server.sendSystemMessage(((BaseText) serverMessage).append(" (Canceled)"), sender);
         }
     }
 }

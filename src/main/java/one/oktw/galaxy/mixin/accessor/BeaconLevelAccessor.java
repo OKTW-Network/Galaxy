@@ -16,15 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.block
+package one.oktw.galaxy.mixin.accessor;
 
-import net.minecraft.item.ItemStack
-import net.minecraft.util.math.BlockPos
-import one.oktw.galaxy.block.entity.CustomBlockEntity
-import one.oktw.galaxy.block.entity.PipeBlockEntity
+import net.minecraft.block.entity.BeaconBlockEntity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-class PipeBlock(id: String, modelItem: ItemStack) : ModelCustomBlock(id, modelItem) {
-    override fun createBlockEntity(pos: BlockPos): CustomBlockEntity {
-        return PipeBlockEntity(blockEntityType, pos, modelItem)
-    }
+@Mixin(BeaconBlockEntity.class)
+public interface BeaconLevelAccessor {
+    @Accessor
+    int getLevel();
 }

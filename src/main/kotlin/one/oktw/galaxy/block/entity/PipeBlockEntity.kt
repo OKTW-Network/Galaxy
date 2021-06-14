@@ -19,18 +19,18 @@
 package one.oktw.galaxy.block.entity
 
 import net.fabricmc.fabric.api.util.NbtType
-import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.ItemEntity
 import net.minecraft.entity.decoration.ItemFrameEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.NbtList
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
+import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.block.listener.CustomBlockNeighborUpdateListener
@@ -39,9 +39,9 @@ import one.oktw.galaxy.block.pipe.SideMode
 import one.oktw.galaxy.item.PipeModelItem
 import one.oktw.galaxy.util.getOrCreateSubTag
 import java.util.*
-import kotlin.collections.HashMap
 
-open class PipeBlockEntity(type: BlockEntityType<*>, modelItem: ItemStack) : ModelCustomBlockEntity(type, modelItem), CustomBlockClickListener,
+open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : ModelCustomBlockEntity(type, pos, modelItem),
+    CustomBlockClickListener,
     CustomBlockNeighborUpdateListener {
     companion object {
         private val POSITIVE_DIRECTION = Direction.values().filter { it.direction == Direction.AxisDirection.POSITIVE }
@@ -71,7 +71,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, modelItem: ItemStack) : Mod
     override fun tick() {
         super.tick()
         if (queue.isEmpty() && showingItemEntity !== null) {
-            showingItemEntity?.remove()
+            showingItemEntity?.discard()
             showingItemEntity = null
         }
 
@@ -88,11 +88,11 @@ open class PipeBlockEntity(type: BlockEntityType<*>, modelItem: ItemStack) : Mod
     override fun markRemoved() {
         super.markRemoved()
         val world = world as ServerWorld
-        sideEntity.values.forEach { world.getEntity(it)?.remove() }
+        sideEntity.values.forEach { world.getEntity(it)?.discard() }
     }
 
-    override fun fromTag(state: BlockState, tag: CompoundTag) {
-        super.fromTag(state, tag)
+    override fun readNbt(tag: NbtCompound) {
+        super.readNbt(tag)
         val pipeData = tag.getCompound("GalaxyData").getCompound("PipeData")
 
         sideEntity.clear()
@@ -100,16 +100,16 @@ open class PipeBlockEntity(type: BlockEntityType<*>, modelItem: ItemStack) : Mod
         queue.clear()
         pipeData.getCompound("SideEntity").run { keys.forEach { sideEntity[Direction.valueOf(it)] = getUuid(it) } }
         pipeData.getCompound("SideMode").run { keys.forEach { sideMode[Direction.valueOf(it)] = SideMode.valueOf(getString(it)) } }
-        pipeData.getList("queue", NbtType.COMPOUND).mapTo(queue) { ItemTransferPacket.createFromTag(it as CompoundTag) }
+        pipeData.getList("queue", NbtType.COMPOUND).mapTo(queue) { ItemTransferPacket.createFromTag(it as NbtCompound) }
     }
 
-    override fun toTag(tag: CompoundTag): CompoundTag {
-        super.toTag(tag)
+    override fun writeNbt(tag: NbtCompound): NbtCompound {
+        super.writeNbt(tag)
 
         tag.getOrCreateSubTag("GalaxyData").getOrCreateSubTag("PipeData").apply {
-            put("Queue", queue.mapTo(ListTag()) { it.toTag(CompoundTag()) })
-            put("SideMode", CompoundTag().apply { sideMode.forEach { (k, v) -> if (v != SideMode.NONE) putString(k.name, v.name) } })
-            put("SideEntity", CompoundTag().apply { sideEntity.forEach { (k, v) -> putUuid(k.name, v) } })
+            put("Queue", queue.mapTo(NbtList()) { it.toTag(NbtCompound()) })
+            put("SideMode", NbtCompound().apply { sideMode.forEach { (k, v) -> if (v != SideMode.NONE) putString(k.name, v.name) } })
+            put("SideEntity", NbtCompound().apply { sideEntity.forEach { (k, v) -> putUuid(k.name, v) } })
         }
 
         return tag
@@ -134,7 +134,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, modelItem: ItemStack) : Mod
             sideMode.remove(side)?.let {
                 // Remove IO entity
                 val world = world as ServerWorld
-                sideEntity[side]?.let(world::getEntity)?.remove()
+                sideEntity[side]?.let(world::getEntity)?.discard()
 
                 // Reconnect pipe
                 updatePipeConnect()
@@ -150,7 +150,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, modelItem: ItemStack) : Mod
         for (direction in POSITIVE_DIRECTION) {
             val connectPipe = world.getBlockEntity(pos.offset(direction.opposite))
             if (sideMode.getOrDefault(direction, SideMode.NONE) != SideMode.NONE || connectPipe !is PipeBlockEntity) {
-                sideEntity.remove(direction)?.let(world::getEntity)?.remove()
+                sideEntity.remove(direction)?.let(world::getEntity)?.discard()
                 continue
             }
             if (!sideEntity.contains(direction) && connectPipe.getMode(direction.opposite) == SideMode.NONE) {
@@ -161,10 +161,10 @@ open class PipeBlockEntity(type: BlockEntityType<*>, modelItem: ItemStack) : Mod
 
     private fun spawnSideEntity(side: Direction, mode: SideMode) {
         val world = world as ServerWorld
-        sideEntity[side]?.let(world::getEntity)?.remove()
+        sideEntity[side]?.let(world::getEntity)?.discard()
 
         val entity = ItemFrameEntity(world, pos, side).apply {
-            readCustomDataFromTag(CompoundTag().also(this::writeCustomDataToTag).apply { putBoolean("Fixed", true) })
+            readCustomDataFromNbt(NbtCompound().also(this::writeCustomDataToNbt).apply { putBoolean("Fixed", true) })
             isInvisible = true
             isInvulnerable = true
             isSilent = true

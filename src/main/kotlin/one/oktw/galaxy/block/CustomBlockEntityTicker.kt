@@ -18,13 +18,15 @@
 
 package one.oktw.galaxy.block
 
-import net.minecraft.item.ItemStack
+import net.minecraft.block.BlockState
+import net.minecraft.block.entity.BlockEntity
+import net.minecraft.block.entity.BlockEntityTicker
 import net.minecraft.util.math.BlockPos
-import one.oktw.galaxy.block.entity.CustomBlockEntity
-import one.oktw.galaxy.block.entity.PipeBlockEntity
+import net.minecraft.world.World
+import one.oktw.galaxy.block.listener.CustomBlockTickListener
 
-class PipeBlock(id: String, modelItem: ItemStack) : ModelCustomBlock(id, modelItem) {
-    override fun createBlockEntity(pos: BlockPos): CustomBlockEntity {
-        return PipeBlockEntity(blockEntityType, pos, modelItem)
+class CustomBlockEntityTicker<T : BlockEntity> : BlockEntityTicker<T> {
+    override fun tick(world: World, pos: BlockPos, state: BlockState, blockEntity: T) {
+        if (blockEntity is CustomBlockTickListener) blockEntity.tick()
     }
 }

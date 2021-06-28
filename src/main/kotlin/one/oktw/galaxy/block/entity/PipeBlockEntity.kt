@@ -188,7 +188,8 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
     }
 
     override fun clear() {
-        // TODO
+        queue.clear()
+        Direction.values().forEach { setSideMode(it, NONE) }
     }
 
     override fun size(): Int {

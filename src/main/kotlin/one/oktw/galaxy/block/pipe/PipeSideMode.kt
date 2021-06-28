@@ -18,8 +18,9 @@
 
 package one.oktw.galaxy.block.pipe
 
-enum class TransferMode {
-    FIRST,
-    RR,
-    RANDOM
+enum class PipeSideMode {
+    NONE,
+    IMPORT,
+    EXPORT,
+    STORAGE
 }

@@ -30,7 +30,11 @@ class DummyBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : CustomBlockEnt
         tag.getString("id")?.let(Identifier::tryParse)?.let(CustomBlock.registry::get)?.let {
             if (it != CustomBlock.DUMMY) {
                 world?.removeBlockEntity(pos)
-                world?.addBlockEntity(it.createBlockEntity(pos))
+
+                val realBlockEntity = it.createBlockEntity(pos)
+                realBlockEntity.readCopyableData(tag)
+
+                world?.addBlockEntity(realBlockEntity)
             }
         }
     }

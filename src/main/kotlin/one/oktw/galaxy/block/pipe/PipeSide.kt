@@ -18,28 +18,31 @@
 
 package one.oktw.galaxy.block.pipe
 
-import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
+import one.oktw.galaxy.block.pipe.PipeSideMode.*
 import java.util.*
 
-data class ItemTransferPacket(
-    val source: UUID,
-    val item: ItemStack,
-    val destination: UUID? = null
-) {
+abstract class PipeSide(val id: UUID = UUID.randomUUID(), open val mode: PipeSideMode) {
     companion object {
-        fun createFromTag(tag: NbtCompound): ItemTransferPacket {
-            val uuid = tag.getUuid("source")
-            val item = (tag.get("item") as NbtCompound).let(ItemStack::fromNbt)
-            val destination = if (tag.containsUuid("destination")) tag.getUuid("destination") else null
-            return ItemTransferPacket(uuid, item, destination)
+        fun createFromNBT(nbt: NbtCompound): PipeSide? {
+            val mode = try {
+                valueOf(nbt.getString("mode"))
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+            return when (mode) {
+                STORAGE -> PipeSideStorage(nbt.getUuid("id"))
+                IMPORT -> PipeSideImport(nbt.getUuid("id"))
+                EXPORT -> PipeSideExport(nbt.getUuid("id"))
+                else -> null
+            }
         }
     }
 
-    fun toTag(tag: NbtCompound): NbtCompound {
-        tag.putUuid("source", source)
-        tag.put("item", item.writeNbt(NbtCompound()))
-        destination?.let { tag.putUuid("destination", it) }
-        return tag
+    open fun writeNBT(nbt: NbtCompound): NbtCompound {
+        nbt.putUuid("id", id)
+        nbt.putString("mode", mode.name)
+
+        return nbt
     }
 }

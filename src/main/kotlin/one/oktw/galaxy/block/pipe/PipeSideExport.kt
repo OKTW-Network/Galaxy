@@ -18,9 +18,6 @@
 
 package one.oktw.galaxy.block.pipe
 
-enum class SideMode {
-    NONE,
-    IMPORT,
-    EXPORT,
-    STORAGE
-}
+import java.util.*
+
+open class PipeSideExport(id: UUID = UUID.randomUUID()) : PipeSide(id, PipeSideMode.EXPORT)

@@ -16,27 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.block.entity
+package one.oktw.galaxy.block.pipe
 
-import net.minecraft.block.Blocks
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.util.math.BlockPos
+import net.minecraft.item.ItemStack
+import java.util.*
 
-// BlockEntity need extend
-open class CustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : BlockEntity(type, pos, Blocks.BARRIER.defaultState) {
-    fun getId() = BlockEntityType.getId(type)!!
+class PipeSideStorage(id: UUID = UUID.randomUUID()) : PipeSideExport(id) {
+    override val mode = PipeSideMode.STORAGE
 
-    override fun readNbt(nbt: NbtCompound) {
-        super.readNbt(nbt)
-        readCopyableData(nbt)
+    fun requestItem(itemStack: ItemStack) {
+        // TODO
     }
-
-    /**
-     * Read custom data from NBT, it will use on block clone.
-     *
-     * Also call by [readNbt].
-     */
-    open fun readCopyableData(nbt: NbtCompound) = Unit
 }

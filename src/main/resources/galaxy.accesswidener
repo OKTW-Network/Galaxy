@@ -1,0 +1,5 @@
+accessWidener v1 named
+
+# CloneCommand
+accessible    class    net/minecraft/server/command/CloneCommand$Mode
+accessible    class    net/minecraft/server/command/CloneCommand$BlockInfo

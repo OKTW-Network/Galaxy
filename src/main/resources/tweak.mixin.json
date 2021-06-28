@@ -5,6 +5,7 @@
   "mixins": [
     "MixinAsyncChunk_ThreadedAnvilChunkStorage",
     "MixinCustomBlockEntity_BarrierBlock",
+    "MixinCustomBlockEntity_Clone",
     "MixinCustomBlockEntity_Structure",
     "MixinFixBeacon_BeaconBlockEntity",
     "MixinMapExistingChunk_FilledMapItem",

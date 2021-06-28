@@ -7,7 +7,6 @@
     "MixinAsyncChunk_RegionFile",
     "MixinAsyncChunk_StorageIoWorker",
     "MixinCustomBlockEntity_BarrierBlock",
-    "MixinCustomBlockEntity_Clone",
     "MixinCustomBlockEntity_Structure",
     "MixinFixBeacon_BeaconBlockEntity",
     "MixinItemStackEqualAllowNull_ItemStack",

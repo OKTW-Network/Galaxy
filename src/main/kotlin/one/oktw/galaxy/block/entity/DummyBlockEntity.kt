@@ -34,4 +34,8 @@ class DummyBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : CustomBlockEnt
             }
         }
     }
+
+    override fun writeNbt(nbt: NbtCompound) {
+        // I'm dummy.
+    }
 }

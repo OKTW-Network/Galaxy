@@ -33,6 +33,11 @@ open class CustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : BlockEnt
         readCopyableData(nbt)
     }
 
+    override fun writeNbt(nbt: NbtCompound) {
+        super.writeNbt(nbt)
+        nbt.putString("id", getId().toString()) // We need ID to mapping block entity, always write it.
+    }
+
     /**
      * Read custom data from NBT, it will use on block clone.
      *

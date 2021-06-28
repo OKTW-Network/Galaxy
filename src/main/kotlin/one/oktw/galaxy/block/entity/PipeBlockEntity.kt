@@ -152,25 +152,29 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
     override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {
         val item = player.getStackInHand(hand)
         val direction = hit.side.opposite
-        when (item.let(CustomItemHelper::getItem)) {
+        val customItem = CustomItemHelper.getItem(item)
+
+        if (customItem == Tool.WRENCH) {
+            val dropPos = pos.offset(hit.side)
+            when (getMode(direction)) {
+                IMPORT -> PIPE_PORT_IMPORT.createItemStack()
+                EXPORT -> PIPE_PORT_EXPORT.createItemStack()
+                STORAGE -> PIPE_PORT_STORAGE.createItemStack()
+                else -> null
+            }?.let {
+                ItemScatterer.spawn(world, dropPos.x.toDouble(), dropPos.y.toDouble(), dropPos.z.toDouble(), it)
+                setSideMode(direction, NONE)
+                return ActionResult.SUCCESS
+            }
+
+            return ActionResult.PASS
+        }
+
+        if (side.contains(direction)) return ActionResult.PASS
+        when (customItem) {
             PIPE_PORT_EXPORT -> setSideMode(direction, EXPORT)
             PIPE_PORT_IMPORT -> setSideMode(direction, IMPORT)
             PIPE_PORT_STORAGE -> setSideMode(direction, STORAGE)
-            Tool.WRENCH -> {
-                val dropPos = pos.offset(hit.side)
-                when (getMode(direction)) {
-                    IMPORT -> PIPE_PORT_IMPORT.createItemStack()
-                    EXPORT -> PIPE_PORT_EXPORT.createItemStack()
-                    STORAGE -> PIPE_PORT_STORAGE.createItemStack()
-                    else -> null
-                }?.let {
-                    ItemScatterer.spawn(world, dropPos.x.toDouble(), dropPos.y.toDouble(), dropPos.z.toDouble(), it)
-                    setSideMode(direction, NONE)
-                    return ActionResult.SUCCESS
-                }
-
-                return ActionResult.PASS
-            }
             else -> return ActionResult.PASS
         }
         if (!player.isCreative) item.decrement(1)

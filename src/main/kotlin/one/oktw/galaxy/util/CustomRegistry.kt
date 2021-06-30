@@ -20,7 +20,6 @@ package one.oktw.galaxy.util
 
 import net.minecraft.util.Identifier
 import java.util.*
-import kotlin.collections.HashMap
 
 open class CustomRegistry<T : Registrable> {
     private val registry = HashMap<Identifier, T>()

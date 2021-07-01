@@ -18,10 +18,10 @@
 
 package one.oktw.galaxy.block
 
-import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.entity.DummyBlockEntity
+import one.oktw.galaxy.item.CustomBlockItem
 
-class DummyBlock : CustomBlock(Identifier("galaxy", "block/dummy")) {
+class DummyBlock : ModelCustomBlock("dummy", CustomBlockItem.DUMMY.createItemStack()) {
     override fun createBlockEntity(pos: BlockPos) = DummyBlockEntity(blockEntityType, pos)
 }

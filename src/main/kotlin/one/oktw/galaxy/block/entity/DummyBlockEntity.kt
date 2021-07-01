@@ -25,14 +25,14 @@ import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.CustomBlock
 
 class DummyBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : CustomBlockEntity(type, pos) {
-    override fun readNbt(tag: NbtCompound) {
-        super.readNbt(tag)
-        tag.getString("id")?.let(Identifier::tryParse)?.let(CustomBlock.registry::get)?.let {
+    override fun readNbt(nbt: NbtCompound) {
+        super.readNbt(nbt)
+        nbt.getString("id")?.let(Identifier::tryParse)?.let(CustomBlock.registry::get)?.let {
             if (it != CustomBlock.DUMMY) {
                 world?.removeBlockEntity(pos)
 
                 val realBlockEntity = it.createBlockEntity(pos)
-                realBlockEntity.readCopyableData(tag)
+                realBlockEntity.readCopyableData(nbt)
 
                 world?.addBlockEntity(realBlockEntity)
             }

@@ -56,9 +56,9 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         }
     }
 
-    override fun readNbt(tag: NbtCompound) {
-        super.readNbt(tag)
-        entityUUID = (tag.get("GalaxyData") as? NbtCompound)?.getUuid("ModelEntity") ?: return
+    override fun readNbt(nbt: NbtCompound) {
+        super.readNbt(nbt)
+        entityUUID = (nbt.get("GalaxyData") as? NbtCompound)?.getUuid("ModelEntity") ?: return
     }
 
     override fun writeNbt(tag: NbtCompound): NbtCompound {

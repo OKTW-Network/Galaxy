@@ -18,7 +18,10 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.block.*;
+import net.minecraft.block.BarrierBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
@@ -41,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(BarrierBlock.class)
-public abstract class MixinCustomBlockEntity_BarrierBlock extends AbstractBlock implements BlockEntityProvider {
+public abstract class MixinCustomBlockEntity_BarrierBlock extends Block implements BlockEntityProvider {
     public MixinCustomBlockEntity_BarrierBlock(Settings settings) {
         super(settings);
     }
@@ -95,7 +98,7 @@ public abstract class MixinCustomBlockEntity_BarrierBlock extends AbstractBlock 
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof Inventory) {
                 ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
-                world.updateComparators(pos, (Block) (Object) this);
+                world.updateComparators(pos, this);
             }
 
             super.onStateReplaced(state, world, pos, newState, moved);

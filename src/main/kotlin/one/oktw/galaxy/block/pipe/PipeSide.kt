@@ -45,4 +45,8 @@ abstract class PipeSide(val id: UUID = UUID.randomUUID(), open val mode: PipeSid
 
         return nbt
     }
+
+    override fun toString(): String {
+        return "PipeIO(id=$id, mode=$mode)"
+    }
 }

@@ -25,21 +25,25 @@ import java.util.*
 data class ItemTransferPacket(
     val source: UUID,
     val item: ItemStack,
-    val destination: UUID? = null
+    val destination: UUID? = null,
+    var progress: Int = 0
 ) {
     companion object {
-        fun createFromTag(tag: NbtCompound): ItemTransferPacket {
-            val uuid = tag.getUuid("source")
-            val item = (tag.get("item") as NbtCompound).let(ItemStack::fromNbt)
-            val destination = if (tag.containsUuid("destination")) tag.getUuid("destination") else null
-            return ItemTransferPacket(uuid, item, destination)
+        fun createFromTag(nbt: NbtCompound): ItemTransferPacket {
+            val uuid = nbt.getUuid("source")
+            val item = (nbt.get("item") as NbtCompound).let(ItemStack::fromNbt)
+            val destination = if (nbt.containsUuid("destination")) nbt.getUuid("destination") else null
+            val progress = nbt.getInt("progress")
+
+            return ItemTransferPacket(uuid, item, destination).also { it.progress = progress }
         }
     }
 
-    fun toTag(tag: NbtCompound): NbtCompound {
-        tag.putUuid("source", source)
-        tag.put("item", item.writeNbt(NbtCompound()))
-        destination?.let { tag.putUuid("destination", it) }
-        return tag
+    fun toTag(nbt: NbtCompound): NbtCompound {
+        nbt.putUuid("source", source)
+        nbt.put("item", item.writeNbt(NbtCompound()))
+        nbt.putInt("progress", progress)
+        destination?.let { nbt.putUuid("destination", it) }
+        return nbt
     }
 }

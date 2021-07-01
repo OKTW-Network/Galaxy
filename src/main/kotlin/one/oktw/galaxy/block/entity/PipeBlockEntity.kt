@@ -29,6 +29,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtList
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
 import net.minecraft.util.ItemScatterer
@@ -38,6 +39,8 @@ import net.minecraft.util.math.Direction
 import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.block.listener.CustomBlockNeighborUpdateListener
 import one.oktw.galaxy.block.pipe.*
+import one.oktw.galaxy.block.pipe.IOUpdateInfo.IOUpdateAction.ADD
+import one.oktw.galaxy.block.pipe.IOUpdateInfo.IOUpdateAction.REMOVE
 import one.oktw.galaxy.block.pipe.PipeSideMode.*
 import one.oktw.galaxy.item.CustomItemHelper
 import one.oktw.galaxy.item.PipeModelItem
@@ -56,10 +59,12 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
         private val POSITIVE_DIRECTION = Direction.values().filter { it.direction == Direction.AxisDirection.POSITIVE }
     }
 
-    private val side = HashMap<Direction, PipeSide>()
+    private val pipeIO = HashMap<Direction, PipeSide>()
     private val sideEntity = HashMap<Direction, UUID>()
     private val queue = LinkedList<ItemTransferPacket>()
     private val connectedPipe = MapMaker().weakValues().concurrencyLevel(1).makeMap<Direction, PipeBlockEntity>()
+    private val connectedIO = HashMap<Direction, MutableSet<PipeSide>>()
+    private val updateQueue = LinkedList<Pair<IOUpdateInfo, Direction>>()
     private var showingItemEntity: ItemEntity? = null
     private var redstone = 0
     private var needUpdatePipeConnect = true
@@ -68,6 +73,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
      * Push [ItemTransferPacket] into pipe queue.
      */
     fun pushItem(item: ItemTransferPacket): Boolean {
+        item.progress = 0
         return queue.offer(item)
     }
 
@@ -75,11 +81,22 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
      * Get pipe I/O mode.
      */
     fun getMode(side: Direction): PipeSideMode {
-        return this.side[side]?.mode ?: NONE
+        return this.pipeIO[side]?.mode ?: NONE
     }
 
-    fun getPressure() {
-        queue.size
+    fun getConnectedIO(): MutableSet<PipeSide> {
+        return Collections.newSetFromMap<PipeSide>(WeakHashMap()).apply {
+            addAll(pipeIO.values)
+            connectedIO.values.forEach(this::addAll)
+        }
+    }
+
+    fun getPressure(): Int {
+        return queue.size
+    }
+
+    fun sendIOUpdate(from: Direction, info: IOUpdateInfo) {
+        if (!info.path.contains(this) && !pipeIO.values.contains(info.side)) updateQueue.add(Pair(info, from))
     }
 
     override fun tick() {
@@ -94,6 +111,8 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
             needUpdatePipeConnect = false
         }
 
+        if (updateQueue.isNotEmpty()) processIOUpdate()
+
         // TODO show item
         // TODO scan next pipe
         // TODO push item to next pipe
@@ -103,14 +122,9 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
         super.markRemoved()
         val world = world as ServerWorld
         sideEntity.values.forEach { world.getEntity(it)?.discard() }
-        side.values.mapNotNull {
-            when (it.mode) {
-                IMPORT -> PIPE_PORT_IMPORT
-                EXPORT -> PIPE_PORT_EXPORT
-                STORAGE -> PIPE_PORT_STORAGE
-                else -> null
-            }?.createItemStack()
-        }
+        queue.clear()
+        connectedPipe.clear()
+        connectedIO.clear()
     }
 
     override fun readNbt(nbt: NbtCompound) {
@@ -125,15 +139,15 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
         pipeData.getCompound("SideEntity").run { keys.forEach { sideEntity[Direction.valueOf(it)] = getUuid(it) } }
 
         queue.clear()
-        pipeData.getList("queue", NbtType.COMPOUND).mapTo(queue) { ItemTransferPacket.createFromTag(it as NbtCompound) }
+        pipeData.getList("Queue", NbtType.COMPOUND).mapTo(queue) { ItemTransferPacket.createFromTag(it as NbtCompound) }
     }
 
     override fun readCopyableData(nbt: NbtCompound) {
         super.readCopyableData(nbt)
 
-        side.clear()
-        nbt.getCompound("GalaxyData").getCompound("PipeData").getCompound("Side").run {
-            keys.forEach { direction -> PipeSide.createFromNBT(getCompound(direction))?.let { side[Direction.valueOf(direction)] = it } }
+        pipeIO.clear()
+        nbt.getCompound("GalaxyData").getCompound("PipeData").getCompound("IO").run {
+            keys.forEach { direction -> PipeSide.createFromNBT(getCompound(direction))?.let { pipeIO[Direction.valueOf(direction)] = it } }
         }
     }
 
@@ -142,8 +156,8 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
 
         tag.getOrCreateSubTag("GalaxyData").getOrCreateSubTag("PipeData").apply {
             put("Queue", queue.mapTo(NbtList()) { it.toTag(NbtCompound()) })
-            put("Side", NbtCompound().apply { side.forEach { (direction, side) -> if (side.mode != NONE) put(direction.name, side.writeNBT(NbtCompound())) } })
-            put("SideEntity", NbtCompound().apply { sideEntity.forEach { (direction, v) -> putUuid(direction.name, v) } })
+            put("IO", NbtCompound().apply { pipeIO.forEach { (k, v) -> if (v.mode != NONE) put(k.name, v.writeNBT(NbtCompound())) } })
+            put("SideEntity", NbtCompound().apply { sideEntity.forEach { (k, v) -> putUuid(k.name, v) } })
         }
 
         return tag
@@ -151,7 +165,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
 
     override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {
         val item = player.getStackInHand(hand)
-        val direction = hit.side.opposite
+        val direction = hit.side
         val customItem = CustomItemHelper.getItem(item)
 
         if (customItem == Tool.WRENCH) {
@@ -170,7 +184,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
             return ActionResult.PASS
         }
 
-        if (side.contains(direction)) return ActionResult.PASS
+        if (pipeIO.contains(direction)) return ActionResult.PASS
         when (customItem) {
             PIPE_PORT_EXPORT -> setSideMode(direction, EXPORT)
             PIPE_PORT_IMPORT -> setSideMode(direction, IMPORT)
@@ -206,7 +220,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
         return if (slot < 54) {
             queue.getOrNull(slot)?.item ?: ItemStack.EMPTY
         } else {
-            when (side[Direction.byId(slot - 54)]?.mode) {
+            when (pipeIO[Direction.byId(slot - 54)]?.mode) {
                 IMPORT -> PIPE_PORT_IMPORT.createItemStack()
                 EXPORT -> PIPE_PORT_EXPORT.createItemStack()
                 STORAGE -> PIPE_PORT_STORAGE.createItemStack()
@@ -278,56 +292,105 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
     override fun canExtract(slot: Int, stack: ItemStack, dir: Direction) = false
 
     private fun setSideMode(side: Direction, mode: PipeSideMode) {
+        val world = world as ServerWorld
+
         if (mode == NONE) {
-            this.side.remove(side)?.let {
+            this.pipeIO.remove(side)?.let { io ->
                 // Remove IO entity
-                val world = world as ServerWorld
                 sideEntity[side]?.let(world::getEntity)?.discard()
 
                 // Reconnect pipe
                 updatePipeConnect()
+
+                // Send IO remove to connected pipe.
+                val update = IOUpdateInfo(io, REMOVE).apply { path.add(this@PipeBlockEntity) }
+                connectedPipe.forEach { (side, pipe) -> pipe.sendIOUpdate(side.opposite, update.copy()) }
             }
         } else {
-            this.side[side] = when (mode) {
+            val io = when (mode) {
                 IMPORT -> PipeSideImport()
                 EXPORT -> PipeSideExport()
                 STORAGE -> PipeSideStorage()
                 NONE -> throw IllegalStateException()
             }
+            this.pipeIO[side] = io
             spawnSideEntity(side, mode)
+
+            // Send IO add to connected pipe.
+            val update = IOUpdateInfo(io, ADD).apply { path.add(this@PipeBlockEntity) }
+            connectedPipe.forEach { (side, pipe) -> pipe.sendIOUpdate(side.opposite, update.copy()) }
         }
     }
 
     private fun updatePipeConnect() {
         val world = (world as ServerWorld)
+        val newPipe = ArrayList<Direction>()
         for (direction in Direction.values()) {
-            val connectPipe = world.getBlockEntity(pos.offset(direction.opposite)) as? PipeBlockEntity
-            val sideMode = side[direction]?.mode
-            if (connectPipe != null && sideMode == null) {
-                connectedPipe[direction] = connectPipe
+            val connectPipe = world.getBlockEntity(pos.offset(direction)) as? PipeBlockEntity
+            val sideMode = pipeIO[direction]?.mode
+            if (connectPipe != null && sideMode == null && connectPipe.getMode(direction.opposite) == NONE) {
+                if (connectPipe != connectedPipe[direction]) {
+                    connectedPipe[direction] = connectPipe
+                    newPipe += direction
+                }
 
                 // Connect pipe
-                if (direction in POSITIVE_DIRECTION && connectPipe.getMode(direction.opposite) == NONE) {
-                    spawnSideEntity(direction, NONE)
-                }
+                if (direction in POSITIVE_DIRECTION && sideEntity[direction] == null) spawnSideEntity(direction, NONE)
             } else {
-                connectedPipe.remove(direction)
+                connectedPipe.remove(direction)?.let { connectedIO.remove(direction) }?.forEach { io ->
+                    val update = IOUpdateInfo(io, REMOVE).apply { path.add(this@PipeBlockEntity) }
+                    connectedPipe.forEach { (side, pipe) -> pipe.sendIOUpdate(side.opposite, update.copy()) }
+                }
 
                 // Disconnect pipe
                 if (sideMode == null) {
                     sideEntity.remove(direction)?.let(world::getEntity)?.discard()
-                } else if (sideEntity[direction] == null) {
+                } else if (sideEntity[direction] == null) { // TODO move check and respawn IO entity to tick
                     spawnSideEntity(direction, sideMode)
                 }
             }
         }
+
+        // Update new pipe IO info
+        newPipe.forEach(::getIOInfo)
+    }
+
+    private fun getIOInfo(from: Direction) {
+        val pipe = connectedPipe[from] ?: return
+        val list = pipe.getConnectedIO()
+
+        connectedIO[from] = list
+
+        list.forEach {
+            val update = IOUpdateInfo(it, ADD).apply {
+                path.add(pipe)
+                path.add(this@PipeBlockEntity)
+            }
+            connectedPipe.forEach { (side, pipe) -> if (side != from) pipe.sendIOUpdate(side.opposite, update.copy()) }
+        }
+    }
+
+    private fun processIOUpdate() {
+        updateQueue.forEach { (info, side) ->
+            val ioList = connectedIO.getOrPut(side) { Collections.newSetFromMap(WeakHashMap()) }
+
+            when (info.action) {
+                ADD -> ioList.add(info.side)
+                REMOVE -> ioList.remove(info.side)
+            }
+
+            info.path.add(this)
+            connectedPipe.forEach { (side, pipe) -> pipe.sendIOUpdate(side.opposite, info.copy()) }
+        }
+
+        updateQueue.clear()
     }
 
     private fun spawnSideEntity(side: Direction, mode: PipeSideMode) {
         val world = world as ServerWorld
         sideEntity[side]?.let(world::getEntity)?.discard()
 
-        val entity = ItemFrameEntity(world, pos, side).apply {
+        val entity = ItemFrameEntity(world, pos, side.opposite).apply {
             readCustomDataFromNbt(NbtCompound().also(this::writeCustomDataToNbt).apply { putBoolean("Fixed", true) })
             isInvisible = true
             isInvulnerable = true

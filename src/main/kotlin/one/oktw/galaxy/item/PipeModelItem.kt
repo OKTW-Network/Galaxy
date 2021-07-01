@@ -19,13 +19,19 @@
 package one.oktw.galaxy.item
 
 import net.minecraft.item.Items
+import net.minecraft.text.Text
+import net.minecraft.text.TranslatableText
+import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
-class PipeModelItem private constructor(id: String, modelData: Int) : CustomItem(Identifier("galaxy", "item/pipe/$id"), Items.COMMAND_BLOCK, modelData) {
+class PipeModelItem private constructor(id: String, modelData: Int, private val name: String) :
+    CustomItem(Identifier("galaxy", "item/pipe/$id"), Items.COMMAND_BLOCK, modelData) {
     companion object {
-        val PIPE_EXTENDED = registry.register(PipeModelItem("pipe_extended", 1010501))
-        val PIPE_PORT_EXPORT = registry.register(PipeModelItem("pipe_port_export", 1010502))
-        val PIPE_PORT_IMPORT = registry.register(PipeModelItem("pipe_port_import", 1010503))
-        val PIPE_PORT_STORAGE = registry.register(PipeModelItem("pipe_port_storage", 1010504))
+        val PIPE_EXTENDED = registry.register(PipeModelItem("pipe_extended", 1010501, "pipe.extended"))
+        val PIPE_PORT_EXPORT = registry.register(PipeModelItem("pipe_port_export", 1010502, "pipe.export"))
+        val PIPE_PORT_IMPORT = registry.register(PipeModelItem("pipe_port_import", 1010503, "pipe.import"))
+        val PIPE_PORT_STORAGE = registry.register(PipeModelItem("pipe_port_storage", 1010504, "pipe.storage"))
     }
+
+    override fun getName(): Text? = name.let(::TranslatableText).styled { it.withColor(Formatting.WHITE).withItalic(false) }
 }

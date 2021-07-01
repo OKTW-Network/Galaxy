@@ -24,6 +24,7 @@ import net.minecraft.block.Blocks.*
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.IntProperty
+import net.minecraft.state.property.Properties.HORIZONTAL_FACING
 import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
@@ -89,8 +90,7 @@ class Harvest {
 
     private fun isPaired(world: ServerWorld, blockPos: BlockPos, stemPos: BlockPos): Boolean {
         val connectedPos = world.getBlockState(stemPos)
-            .entries.filter { (key, _) -> key.name == "facing" }
-            .values.elementAt(0)
+            .entries[HORIZONTAL_FACING]
             .let {
                 when (it) {
                     Direction.EAST -> stemPos.east()

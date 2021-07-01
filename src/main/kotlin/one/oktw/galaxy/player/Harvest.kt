@@ -26,6 +26,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.IntProperty
 import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Direction
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
@@ -80,10 +81,26 @@ class Harvest {
         else -> false
     }
 
-    private fun isNextTo(world: ServerWorld, blockPos: BlockPos, block: Block): Boolean {
-        return world.getBlockState(blockPos.add(1, 0, 0)).block == block ||
-            world.getBlockState(blockPos.add(0, 0, 1)).block == block ||
-            world.getBlockState(blockPos.add(-1, 0, 0)).block == block ||
-            world.getBlockState(blockPos.add(0, 0, -1)).block == block
+    private fun isNextTo(world: ServerWorld, blockPos: BlockPos, block: Block): Boolean =
+        (world.getBlockState(blockPos.east()).block == block && isPaired(world, blockPos, blockPos.east())) ||
+        (world.getBlockState(blockPos.west()).block == block && isPaired(world, blockPos, blockPos.west())) ||
+        (world.getBlockState(blockPos.north()).block == block && isPaired(world, blockPos, blockPos.north())) ||
+        (world.getBlockState(blockPos.south()).block == block && isPaired(world, blockPos, blockPos.south()))
+
+    private fun isPaired(world: ServerWorld, blockPos: BlockPos, stemPos: BlockPos): Boolean {
+        val connectedPos = world.getBlockState(stemPos)
+            .entries.filter { (key, _) -> key.name == "facing" }
+            .values.elementAt(0)
+            .let {
+                when (it) {
+                    Direction.EAST -> stemPos.east()
+                    Direction.WEST -> stemPos.west()
+                    Direction.NORTH -> stemPos.north()
+                    Direction.SOUTH -> stemPos.south()
+                    else -> null
+                }
+            }
+
+        return connectedPos == blockPos
     }
 }

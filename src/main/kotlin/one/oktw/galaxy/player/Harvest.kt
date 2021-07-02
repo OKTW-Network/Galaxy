@@ -89,8 +89,7 @@ class Harvest {
         (world.getBlockState(blockPos.south()).block == block && isPaired(world, blockPos, blockPos.south()))
 
     private fun isPaired(world: ServerWorld, blockPos: BlockPos, stemPos: BlockPos): Boolean {
-        val connectedPos = world.getBlockState(stemPos)
-            .entries[HORIZONTAL_FACING]
+        val connectedPos = world.getBlockState(stemPos)[HORIZONTAL_FACING]
             .let {
                 when (it) {
                     Direction.EAST -> stemPos.east()

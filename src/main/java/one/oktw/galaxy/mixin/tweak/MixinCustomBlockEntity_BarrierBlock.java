@@ -28,6 +28,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
@@ -40,8 +41,11 @@ import one.oktw.galaxy.block.CustomBlock;
 import one.oktw.galaxy.block.CustomBlockEntityTicker;
 import one.oktw.galaxy.block.listener.CustomBlockClickListener;
 import one.oktw.galaxy.block.listener.CustomBlockNeighborUpdateListener;
+import one.oktw.galaxy.block.listener.CustomBlockTickListener;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+
+import java.util.Random;
 
 @Mixin(BarrierBlock.class)
 public abstract class MixinCustomBlockEntity_BarrierBlock extends Block implements BlockEntityProvider {
@@ -103,5 +107,21 @@ public abstract class MixinCustomBlockEntity_BarrierBlock extends Block implemen
 
             super.onStateReplaced(state, world, pos, newState, moved);
         }
+    }
+
+    @Override
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        BlockEntity entity = world.getBlockEntity(pos);
+        if (entity instanceof CustomBlockTickListener) ((CustomBlockTickListener) entity).scheduledTick();
+
+        super.scheduledTick(state, world, pos, random);
+    }
+
+    @Override
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        BlockEntity entity = world.getBlockEntity(pos);
+        if (entity instanceof CustomBlockTickListener) ((CustomBlockTickListener) entity).randomTick();
+
+        super.randomTick(state, world, pos, random);
     }
 }

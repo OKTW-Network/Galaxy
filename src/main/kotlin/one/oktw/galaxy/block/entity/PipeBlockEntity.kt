@@ -20,6 +20,8 @@ package one.oktw.galaxy.block.entity
 
 import com.google.common.collect.MapMaker
 import net.fabricmc.fabric.api.util.NbtType
+import net.minecraft.block.Block
+import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.ItemEntity
 import net.minecraft.entity.decoration.ItemFrameEntity
@@ -36,11 +38,10 @@ import net.minecraft.util.ItemScatterer
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
+import net.minecraft.world.TickPriority
 import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.block.listener.CustomBlockNeighborUpdateListener
 import one.oktw.galaxy.block.pipe.*
-import one.oktw.galaxy.block.pipe.IOUpdateInfo.IOUpdateAction.ADD
-import one.oktw.galaxy.block.pipe.IOUpdateInfo.IOUpdateAction.REMOVE
 import one.oktw.galaxy.block.pipe.PipeSideMode.*
 import one.oktw.galaxy.item.CustomItemHelper
 import one.oktw.galaxy.item.PipeModelItem
@@ -50,6 +51,7 @@ import one.oktw.galaxy.item.PipeModelItem.Companion.PIPE_PORT_STORAGE
 import one.oktw.galaxy.item.Tool
 import one.oktw.galaxy.util.getOrCreateSubTag
 import java.util.*
+import kotlin.math.min
 
 open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : ModelCustomBlockEntity(type, pos, modelItem),
     CustomBlockClickListener,
@@ -63,8 +65,8 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
     private val sideEntity = HashMap<Direction, UUID>()
     private val queue = LinkedList<ItemTransferPacket>()
     private val connectedPipe = MapMaker().weakValues().concurrencyLevel(1).makeMap<Direction, PipeBlockEntity>()
-    private val connectedIO = HashMap<Direction, MutableSet<PipeSide>>()
-    private val updateQueue = LinkedList<Pair<IOUpdateInfo, Direction>>()
+    private val connectedIO = WeakHashMap<PipeSide, EnumMap<Direction, Int>>()
+    private val ioDistanceCache = EnumMap<Direction, Int>(Direction::class.java)
     private var showingItemEntity: ItemEntity? = null
     private var redstone = 0
     private var needUpdatePipeConnect = true
@@ -84,19 +86,15 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
         return this.pipeIO[side]?.mode ?: NONE
     }
 
-    fun getConnectedIO(): MutableSet<PipeSide> {
-        return Collections.newSetFromMap<PipeSide>(WeakHashMap()).apply {
-            addAll(pipeIO.values)
-            connectedIO.values.forEach(this::addAll)
+    fun getConnectedIO(exclude: Direction? = null): Map<PipeSide, Int> {
+        return WeakHashMap<PipeSide, Int>().apply {
+            pipeIO.forEach { (side, io) -> if (side != exclude) put(io, 0) }
+            connectedIO.forEach { (io, info) -> info.filterKeys { it != exclude }.values.minOrNull()?.let { put(io, it) } }
         }
     }
 
     fun getPressure(): Int {
         return queue.size
-    }
-
-    fun sendIOUpdate(from: Direction, info: IOUpdateInfo) {
-        if (!info.path.contains(this) && !pipeIO.values.contains(info.side)) updateQueue.add(Pair(info, from))
     }
 
     override fun tick() {
@@ -111,11 +109,71 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
             needUpdatePipeConnect = false
         }
 
-        if (updateQueue.isNotEmpty()) processIOUpdate()
+        if (queue.isNotEmpty()) this.markDirty()
+
+        // Tick IO CoolDown
+        pipeIO.values.forEach(PipeSide::tick)
+
+        // Output
+        queue.removeIf { packet -> pipeIO.values.any { it.output(packet.item).isEmpty } }
+
+        val transferBuffer = queue.filterTo(ArrayList()) { packet -> min(packet.progress + 1, 20).also { packet.progress = it } == 20 }
+        if (transferBuffer.isNotEmpty()) {
+            val pushed = ArrayList<ItemTransferPacket>()
+            var selfPressure = getPressure()
+
+            transferBuffer.forEach transfer@{ packet ->
+                // Push request item
+                connectedIO.filterKeys { it.id == packet.destination }.values
+                    .flatMapTo(HashSet()) { it.keys.mapNotNull(connectedPipe::get) }
+                    .sortedBy { it.getPressure() }
+                    .forEach {
+                        if (it.pushItem(packet)) {
+                            pushed.add(packet)
+                            selfPressure--
+                            return@transfer
+                        }
+                    }
+
+                // Low pressure and have export first
+                val sortedPipes = connectedPipe.map { (k, v) -> Pair(k, v) }
+                    .sortedBy { (side, _) -> ioDistanceCache[side] }
+                    .sortedBy { it.second.getPressure() }
+                sortedPipes.forEach { (side, pipe) ->
+                    if (pipe.getPressure() < selfPressure &&
+                        connectedIO.any { (io, info) -> io is PipeSideExport && info.contains(side) } &&
+                        pipe.pushItem(packet)
+                    ) {
+                        pushed.add(packet)
+                        selfPressure--
+                        return@transfer
+                    }
+                }
+
+                // Just push to low pressure pipe
+                sortedPipes.forEach { (_, pipe) ->
+                    if (pipe.getPressure() < selfPressure && pipe.pushItem(packet)) {
+                        pushed.add(packet)
+                        selfPressure--
+                        return@transfer
+                    }
+                }
+            }
+
+            queue.removeAll(pushed)
+        }
+
+        // Input
+        if (queue.size < 54) {
+            for (io in pipeIO.values) {
+                io.input().let { if (!it.isEmpty) queue.add(ItemTransferPacket(io.id, it)) }
+                if (queue.size >= 54) break
+            }
+        }
+
+        if (queue.isNotEmpty()) this.markDirty()
 
         // TODO show item
-        // TODO scan next pipe
-        // TODO push item to next pipe
     }
 
     override fun markRemoved() {
@@ -147,7 +205,10 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
 
         pipeIO.clear()
         nbt.getCompound("GalaxyData").getCompound("PipeData").getCompound("IO").run {
-            keys.forEach { direction -> PipeSide.createFromNBT(getCompound(direction))?.let { pipeIO[Direction.valueOf(direction)] = it } }
+            keys.forEach { side ->
+                val direction = Direction.valueOf(side)
+                PipeSide.createFromNBT(this@PipeBlockEntity, direction, getCompound(side))?.let { pipeIO[direction] = it }
+            }
         }
     }
 
@@ -205,13 +266,17 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
         }
     }
 
+    override fun scheduledTick() {
+        updateIOInfo()
+    }
+
     override fun clear() {
         queue.clear()
         Direction.values().forEach { setSideMode(it, NONE) }
     }
 
     override fun size(): Int {
-        return 60 // queue 54 + side 6
+        return 60 // queue 54 + io 6
     }
 
     override fun isEmpty() = false
@@ -278,7 +343,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
 //        }
     }
 
-    override fun setStack(slot: Int, stack: ItemStack?) {
+    override fun setStack(slot: Int, stack: ItemStack) {
         // Not support
     }
 
@@ -294,53 +359,49 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
     private fun setSideMode(side: Direction, mode: PipeSideMode) {
         val world = world as ServerWorld
 
+        if (pipeIO[side]?.mode == mode) return
+
         if (mode == NONE) {
-            this.pipeIO.remove(side)?.let { io ->
+            this.pipeIO.remove(side)?.let {
                 // Remove IO entity
-                sideEntity[side]?.let(world::getEntity)?.discard()
+                sideEntity.remove(side)?.let(world::getEntity)?.discard()
 
                 // Reconnect pipe
                 updatePipeConnect()
-
-                // Send IO remove to connected pipe.
-                val update = IOUpdateInfo(io, REMOVE).apply { path.add(this@PipeBlockEntity) }
-                connectedPipe.forEach { (side, pipe) -> pipe.sendIOUpdate(side.opposite, update.copy()) }
+                cachedState.updateNeighbors(world, pos, Block.NOTIFY_LISTENERS)
             }
         } else {
             val io = when (mode) {
-                IMPORT -> PipeSideImport()
-                EXPORT -> PipeSideExport()
-                STORAGE -> PipeSideStorage()
+                IMPORT -> PipeSideImport(this, side)
+                EXPORT -> PipeSideExport(this, side)
+                STORAGE -> PipeSideStorage(this, side)
                 NONE -> throw IllegalStateException()
             }
             this.pipeIO[side] = io
             spawnSideEntity(side, mode)
-
-            // Send IO add to connected pipe.
-            val update = IOUpdateInfo(io, ADD).apply { path.add(this@PipeBlockEntity) }
-            connectedPipe.forEach { (side, pipe) -> pipe.sendIOUpdate(side.opposite, update.copy()) }
         }
+
+        this.markDirty()
+
+        // Update connected pipes
+        connectedPipe.keys.forEach { world.blockTickScheduler.schedule(pos.offset(it), Blocks.BARRIER, 1, TickPriority.EXTREMELY_HIGH) }
     }
 
     private fun updatePipeConnect() {
         val world = (world as ServerWorld)
-        val newPipe = ArrayList<Direction>()
         for (direction in Direction.values()) {
             val connectPipe = world.getBlockEntity(pos.offset(direction)) as? PipeBlockEntity
             val sideMode = pipeIO[direction]?.mode
             if (connectPipe != null && sideMode == null && connectPipe.getMode(direction.opposite) == NONE) {
                 if (connectPipe != connectedPipe[direction]) {
                     connectedPipe[direction] = connectPipe
-                    newPipe += direction
+                    updateIOInfo(direction)
                 }
 
                 // Connect pipe
                 if (direction in POSITIVE_DIRECTION && sideEntity[direction] == null) spawnSideEntity(direction, NONE)
             } else {
-                connectedPipe.remove(direction)?.let { connectedIO.remove(direction) }?.forEach { io ->
-                    val update = IOUpdateInfo(io, REMOVE).apply { path.add(this@PipeBlockEntity) }
-                    connectedPipe.forEach { (side, pipe) -> pipe.sendIOUpdate(side.opposite, update.copy()) }
-                }
+                connectedPipe.remove(direction)?.let { updateIOInfo(direction) }
 
                 // Disconnect pipe
                 if (sideMode == null) {
@@ -350,40 +411,75 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
                 }
             }
         }
-
-        // Update new pipe IO info
-        newPipe.forEach(::getIOInfo)
     }
 
-    private fun getIOInfo(from: Direction) {
-        val pipe = connectedPipe[from] ?: return
-        val list = pipe.getConnectedIO()
+    private fun updateIOInfo(from: Direction) {
+        val newIO = connectedPipe[from]?.getConnectedIO(from.opposite)?.filterNot { (io, _) -> pipeIO.containsValue(io) }
+        val oldIO = connectedIO.filterValues { it.contains(from) }
 
-        connectedIO[from] = list
+        if (newIO?.equals(oldIO.mapValues { it.value.values.minOrNull() }) == true) return
 
-        list.forEach {
-            val update = IOUpdateInfo(it, ADD).apply {
-                path.add(pipe)
-                path.add(this@PipeBlockEntity)
+        val removedIO = oldIO.filter { newIO?.contains(it.key) != true }
+
+        var updated = false
+        removedIO.filterValues { it.minByOrNull { (_, value) -> value }?.key == from || it.remove(from).run { isEmpty } }.keys
+            .let { if (connectedIO.keys.removeAll(it)) updated = true }
+
+        newIO?.forEach { (io, distance) ->
+            connectedIO.getOrPut(io) {
+                updated = true
+                EnumMap(Direction::class.java)
+            }.put(from, distance + 1)?.let { updated = true }
+        }
+
+        // Update connected pipes
+        if (updated) {
+            updateIODistanceCache()
+            connectedPipe.keys.forEach {
+                if (it != from) world!!.blockTickScheduler.schedule(pos.offset(it), Blocks.BARRIER, 1, TickPriority.EXTREMELY_HIGH)
             }
-            connectedPipe.forEach { (side, pipe) -> if (side != from) pipe.sendIOUpdate(side.opposite, update.copy()) }
         }
     }
 
-    private fun processIOUpdate() {
-        updateQueue.forEach { (info, side) ->
-            val ioList = connectedIO.getOrPut(side) { Collections.newSetFromMap(WeakHashMap()) }
+    private fun updateIOInfo() {
+        val removedIO = HashMap<PipeSide, HashSet<Direction>>()
+        var updated = false
 
-            when (info.action) {
-                ADD -> ioList.add(info.side)
-                REMOVE -> ioList.remove(info.side)
+        Direction.values().forEach { side ->
+            val newIO = connectedPipe[side]?.getConnectedIO(side.opposite)?.filterNot { (io, _) -> pipeIO.containsValue(io) }
+            val oldIO = connectedIO.filterValues { it.contains(side) }
+
+            if (newIO?.equals(oldIO.mapValues { it.value.values.minOrNull() }) == true) return@forEach
+
+            oldIO.filterKeys { newIO?.contains(it) != true }.keys.forEach { removedIO.getOrPut(it) { HashSet() }.add(side) }
+
+            newIO?.forEach { (io, distance) ->
+                connectedIO.getOrPut(io) {
+                    updated = true
+                    EnumMap(Direction::class.java)
+                }.put(side, distance + 1)?.let { if (it != distance + 1) updated = true }
             }
-
-            info.path.add(this)
-            connectedPipe.forEach { (side, pipe) -> pipe.sendIOUpdate(side.opposite, info.copy()) }
         }
 
-        updateQueue.clear()
+        if (connectedIO.keys.removeAll(removedIO.filter { (io, side) -> connectedIO[io]?.minByOrNull { it.value }?.key?.let(side::contains) == true }.keys)) {
+            updated = true
+        }
+
+        // Update connected pipes
+        if (updated) {
+            updateIODistanceCache()
+            connectedPipe.keys.forEach { world!!.blockTickScheduler.schedule(pos.offset(it), Blocks.BARRIER, 1, TickPriority.EXTREMELY_HIGH) }
+        }
+    }
+
+    private fun updateIODistanceCache() {
+        ioDistanceCache.clear()
+
+        connectedIO.values.forEach {
+            it.forEach { (side, distance) ->
+                if (ioDistanceCache.getOrPut(side) { distance } > distance) ioDistanceCache[side] = distance
+            }
+        }
     }
 
     private fun spawnSideEntity(side: Direction, mode: PipeSideMode) {
@@ -404,5 +500,6 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
             }
         }
         if (world.spawnEntity(entity)) sideEntity[side] = entity.uuid
+        this.markDirty()
     }
 }

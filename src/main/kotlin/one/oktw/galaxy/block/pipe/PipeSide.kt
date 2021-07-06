@@ -18,22 +18,25 @@
 
 package one.oktw.galaxy.block.pipe
 
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.util.math.Direction
+import one.oktw.galaxy.block.entity.PipeBlockEntity
 import one.oktw.galaxy.block.pipe.PipeSideMode.*
 import java.util.*
 
-abstract class PipeSide(val id: UUID = UUID.randomUUID(), open val mode: PipeSideMode) {
+abstract class PipeSide(protected val pipe: PipeBlockEntity, protected val side: Direction, val id: UUID = UUID.randomUUID(), open val mode: PipeSideMode) {
     companion object {
-        fun createFromNBT(nbt: NbtCompound): PipeSide? {
+        fun createFromNBT(pipe: PipeBlockEntity, side: Direction, nbt: NbtCompound): PipeSide? {
             val mode = try {
                 valueOf(nbt.getString("mode"))
             } catch (e: IllegalArgumentException) {
                 null
             }
             return when (mode) {
-                STORAGE -> PipeSideStorage(nbt.getUuid("id"))
-                IMPORT -> PipeSideImport(nbt.getUuid("id"))
-                EXPORT -> PipeSideExport(nbt.getUuid("id"))
+                STORAGE -> PipeSideStorage(pipe, side, nbt.getUuid("id"))
+                IMPORT -> PipeSideImport(pipe, side, nbt.getUuid("id"))
+                EXPORT -> PipeSideExport(pipe, side, nbt.getUuid("id"))
                 else -> null
             }
         }
@@ -45,6 +48,12 @@ abstract class PipeSide(val id: UUID = UUID.randomUUID(), open val mode: PipeSid
 
         return nbt
     }
+
+    open fun tick() = Unit
+
+    open fun input(): ItemStack = ItemStack.EMPTY
+
+    open fun output(item: ItemStack): ItemStack = item
 
     override fun toString(): String {
         return "PipeIO(id=$id, mode=$mode)"

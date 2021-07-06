@@ -20,4 +20,8 @@ package one.oktw.galaxy.block.listener
 
 interface CustomBlockTickListener {
     fun tick()
+
+    fun scheduledTick() {}
+
+    fun randomTick() {}
 }

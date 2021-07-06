@@ -19,9 +19,11 @@
 package one.oktw.galaxy.block.pipe
 
 import net.minecraft.item.ItemStack
+import net.minecraft.util.math.Direction
+import one.oktw.galaxy.block.entity.PipeBlockEntity
 import java.util.*
 
-class PipeSideStorage(id: UUID = UUID.randomUUID()) : PipeSideExport(id) {
+class PipeSideStorage(pipe: PipeBlockEntity, side: Direction, id: UUID = UUID.randomUUID()) : PipeSideExport(pipe, side, id) {
     override val mode = PipeSideMode.STORAGE
 
     fun requestItem(itemStack: ItemStack) {

@@ -54,7 +54,7 @@ open class PipeSideExport(pipe: PipeBlockEntity, side: Direction, id: UUID = UUI
             if (!inventory.isValid(it, item) || (inventory as? SidedInventory)?.canInsert(it, item, side.opposite) == false) return@forEach
 
             val stack = inventory.getStack(it)
-            return stack.isEmpty || stack.canMergeWith(item)
+            if (stack.isEmpty || stack.count < stack.maxCount && stack.canMergeWith(item)) return true
         }
 
         return false

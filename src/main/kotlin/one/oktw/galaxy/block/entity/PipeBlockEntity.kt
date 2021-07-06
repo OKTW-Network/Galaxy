@@ -140,9 +140,9 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
                 // Low pressure and have export first
                 val sortedPipes = connectedPipe.map { (k, v) -> Pair(k, v) }
                     .sortedBy { (side, _) ->
-                        var min = Int.MIN_VALUE
+                        var min = Int.MAX_VALUE
                         connectedIO.forEach { (io, info) ->
-                            if (io is PipeSideExport && info.getOrDefault(side, Int.MAX_VALUE) < min && io.canExport(packet.item)) min = info[side]!!
+                            if (io is PipeSideExport && info.getOrDefault(side, Int.MAX_VALUE) < min && io.canExport(packet.item)) info[side]?.let { min = it }
                             if (min == 1) return@sortedBy min
                         }
 

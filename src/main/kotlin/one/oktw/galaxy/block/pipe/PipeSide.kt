@@ -42,6 +42,13 @@ abstract class PipeSide(protected val pipe: PipeBlockEntity, protected val side:
         }
     }
 
+    var removed = false
+        private set
+
+    fun remove() {
+        removed = true
+    }
+
     open fun writeNBT(nbt: NbtCompound): NbtCompound {
         nbt.putUuid("id", id)
         nbt.putString("mode", mode.name)

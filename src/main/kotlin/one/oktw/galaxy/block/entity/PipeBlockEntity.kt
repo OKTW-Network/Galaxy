@@ -123,6 +123,8 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
             var selfPressure = getPressure()
 
             transferBuffer.forEach transfer@{ packet ->
+                packet.progress = 0
+
                 // Push request item
                 connectedIO.filterKeys { it.id == packet.destination }.values
                     .flatMapTo(HashSet()) { it.keys.mapNotNull(connectedPipe::get) }
@@ -137,7 +139,15 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
 
                 // Low pressure and have export first
                 val sortedPipes = connectedPipe.map { (k, v) -> Pair(k, v) }
-                    .sortedBy { (side, _) -> ioDistanceCache[side] }
+                    .sortedBy { (side, _) ->
+                        var min = Int.MIN_VALUE
+                        connectedIO.forEach { (io, info) ->
+                            if (io is PipeSideExport && info.getOrDefault(side, Int.MAX_VALUE) < min && io.canExport(packet.item)) min = info[side]!!
+                            if (min == 1) return@sortedBy min
+                        }
+
+                        min
+                    }
                     .sortedBy { it.second.getPressure() }
                 sortedPipes.forEach { (side, pipe) ->
                     if (pipe.getPressure() < selfPressure &&
@@ -426,6 +436,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
             .let { if (connectedIO.keys.removeAll(it)) updated = true }
 
         newIO?.forEach { (io, distance) ->
+            if (distance > 256) return@forEach // loop
             connectedIO.getOrPut(io) {
                 updated = true
                 EnumMap(Direction::class.java)
@@ -445,15 +456,16 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
         val removedIO = HashMap<PipeSide, HashSet<Direction>>()
         var updated = false
 
-        Direction.values().forEach { side ->
+        for (side in Direction.values()) {
             val newIO = connectedPipe[side]?.getConnectedIO(side.opposite)?.filterNot { (io, _) -> pipeIO.containsValue(io) }
             val oldIO = connectedIO.filterValues { it.contains(side) }
 
-            if (newIO?.equals(oldIO.mapValues { it.value.values.minOrNull() }) == true) return@forEach
+            if (newIO?.equals(oldIO.mapValues { it.value.values.minOrNull() }) == true) continue
 
             oldIO.filterKeys { newIO?.contains(it) != true }.keys.forEach { removedIO.getOrPut(it) { HashSet() }.add(side) }
 
             newIO?.forEach { (io, distance) ->
+                if (distance > 256) return@forEach // loop
                 connectedIO.getOrPut(io) {
                     updated = true
                     EnumMap(Direction::class.java)

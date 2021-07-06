@@ -30,9 +30,36 @@ import one.oktw.galaxy.block.entity.PipeBlockEntity
 import one.oktw.galaxy.block.pipe.PipeUtil.canMergeWith
 import one.oktw.galaxy.block.pipe.PipeUtil.getAvailableSlots
 import java.lang.Integer.min
+import java.lang.ref.WeakReference
 import java.util.*
 
 open class PipeSideExport(pipe: PipeBlockEntity, side: Direction, id: UUID = UUID.randomUUID()) : PipeSide(pipe, side, id, PipeSideMode.EXPORT) {
+    private var inventoryCache = WeakReference<Inventory>(null)
+
+    fun canExport(item: ItemStack): Boolean {
+        val world = pipe.world as ServerWorld
+        val targetPos = pipe.pos.offset(side)
+
+        val inventory = inventoryCache.get() ?: when (val blockEntity = world.getBlockEntity(targetPos)) {
+            is InventoryProvider -> blockEntity.getInventory(world.getBlockState(targetPos), world, targetPos)
+            is ChestBlockEntity -> {
+                val blockState = world.getBlockState(targetPos)
+                ChestBlock.getInventory(blockState.block as ChestBlock, blockState, world, targetPos, true)
+            }
+            is Inventory -> blockEntity
+            else -> null
+        }.also { inventoryCache = WeakReference(it) } ?: return false
+
+        inventory.getAvailableSlots(side.opposite).forEach {
+            if (!inventory.isValid(it, item) || (inventory as? SidedInventory)?.canInsert(it, item, side.opposite) == false) return@forEach
+
+            val stack = inventory.getStack(it)
+            return stack.isEmpty || stack.canMergeWith(item)
+        }
+
+        return false
+    }
+
     override fun output(item: ItemStack): ItemStack {
         val world = pipe.world as ServerWorld
         val targetPos = pipe.pos.offset(side)

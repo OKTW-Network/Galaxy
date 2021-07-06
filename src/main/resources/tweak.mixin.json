@@ -13,6 +13,7 @@
     "MixinOneSpawnChunk_ServerWorld",
     "MixinOptimizeArmorStand_ArmorStandEntity",
     "MixinOptimizeContainer_AvailableSlots",
+    "MixinOptimizeContainer_AvailableSlots2",
     "MixinOptimizeContainer_HopperBlockEntity",
     "MixinOptimizeContainer_LootableContainerBlockEntity",
     "MixinPipe_ComparatorBlock",

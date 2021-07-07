@@ -121,6 +121,16 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
         val transferBuffer = queue.filterTo(ArrayList()) { packet -> min(packet.progress + 1, 20).also { packet.progress = it } == 20 }
         if (transferBuffer.isNotEmpty()) {
             val pushed = ArrayList<ItemTransferPacket>(transferBuffer.size)
+            val exportIO = connectedIO.filterKeys { it is PipeSideExport && !it.isFull() }
+            val sortedPipes = connectedPipe.map { (k, v) -> Pair(k, v) }.sortedBy { (side, pipe) ->
+                var distance = Int.MAX_VALUE
+                exportIO.forEach { (_, info) ->
+                    if (info[side] ?: Int.MAX_VALUE < distance) info[side]?.let { distance = it }
+                    if (distance == 1) return@sortedBy pipe.getPressure() * 1000 + distance
+                }
+
+                if (distance == Int.MAX_VALUE) Int.MAX_VALUE else pipe.getPressure() * 1000 + distance
+            }
             var selfPressure = getPressure()
 
             transferBuffer.forEach transfer@{ packet ->
@@ -141,18 +151,6 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
                 }
 
                 // Low pressure and have export first
-                val exportIO = connectedIO.filterKeys { it is PipeSideExport }
-                val sortedPipes = connectedPipe.map { (k, v) -> Pair(k, v) }
-                    .sortedBy { (side, _) ->
-                        var min = Int.MAX_VALUE
-                        exportIO.forEach { (_, info) ->
-                            if (info[side] ?: Int.MAX_VALUE < min) info[side]?.let { min = it }
-                            if (min == 1) return@sortedBy min
-                        }
-
-                        min
-                    }
-                    .sortedBy { it.second.getPressure() }
                 sortedPipes.forEach { (side, pipe) ->
                     if (pipe.getPressure() < selfPressure &&
                         exportIO.any { (io, info) -> info.contains(side) && (io as PipeSideExport).canExport(packet.item) } &&

@@ -18,9 +18,14 @@
 
 package one.oktw.galaxy.block.pipe
 
+import net.minecraft.block.ChestBlock
+import net.minecraft.block.InventoryProvider
+import net.minecraft.block.entity.ChestBlockEntity
 import net.minecraft.inventory.Inventory
 import net.minecraft.inventory.SidedInventory
 import net.minecraft.item.ItemStack
+import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import one.oktw.galaxy.mixin.interfaces.InventoryAvailableSlots
 
@@ -45,6 +50,18 @@ object PipeUtil {
             this.damage != item.damage -> false
             this.count > this.maxCount -> false
             else -> ItemStack.areTagsEqual(this, item)
+        }
+    }
+
+    fun getInventory(world: ServerWorld, pos: BlockPos): Inventory? {
+        return when (val blockEntity = world.getBlockEntity(pos)) {
+            is InventoryProvider -> blockEntity.getInventory(world.getBlockState(pos), world, pos)
+            is ChestBlockEntity -> {
+                val blockState = world.getBlockState(pos)
+                ChestBlock.getInventory(blockState.block as ChestBlock, blockState, world, pos, true)
+            }
+            is Inventory -> blockEntity
+            else -> null
         }
     }
 }

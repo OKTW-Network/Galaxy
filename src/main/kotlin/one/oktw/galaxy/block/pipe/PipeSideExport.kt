@@ -18,9 +18,6 @@
 
 package one.oktw.galaxy.block.pipe
 
-import net.minecraft.block.ChestBlock
-import net.minecraft.block.InventoryProvider
-import net.minecraft.block.entity.ChestBlockEntity
 import net.minecraft.inventory.Inventory
 import net.minecraft.inventory.SidedInventory
 import net.minecraft.item.ItemStack
@@ -35,44 +32,34 @@ import java.util.*
 
 open class PipeSideExport(pipe: PipeBlockEntity, side: Direction, id: UUID = UUID.randomUUID()) : PipeSide(pipe, side, id, PipeSideMode.EXPORT) {
     private var inventoryCache = WeakReference<Inventory>(null)
+    private var fullCache: Boolean? = false
+
+    override fun tick() {
+        // Null cache
+        inventoryCache = WeakReference(null)
+        fullCache = null
+    }
 
     fun canExport(item: ItemStack): Boolean {
-        val world = pipe.world as ServerWorld
-        val targetPos = pipe.pos.offset(side)
+        val inventory = inventoryCache.get() ?: getInventory()?.also { inventoryCache = WeakReference(it) } ?: return false
 
-        val inventory = inventoryCache.get() ?: when (val blockEntity = world.getBlockEntity(targetPos)) {
-            is InventoryProvider -> blockEntity.getInventory(world.getBlockState(targetPos), world, targetPos)
-            is ChestBlockEntity -> {
-                val blockState = world.getBlockState(targetPos)
-                ChestBlock.getInventory(blockState.block as ChestBlock, blockState, world, targetPos, true)
-            }
-            is Inventory -> blockEntity
-            else -> null
-        }.also { inventoryCache = WeakReference(it) } ?: return false
-
-        inventory.getAvailableSlots(side.opposite).forEach {
-            if (!inventory.isValid(it, item) || (inventory as? SidedInventory)?.canInsert(it, item, side.opposite) == false) return@forEach
-
-            val stack = inventory.getStack(it)
-            if (stack.isEmpty || stack.count < stack.maxCount && stack.canMergeWith(item)) return true
+        inventory.getAvailableSlots(side.opposite).any { slot ->
+            inventory.isValid(slot, item) &&
+                (inventory as? SidedInventory)?.canInsert(slot, item, side.opposite) != false &&
+                inventory.getStack(slot).let { it.isEmpty || it.count < it.maxCount && it.canMergeWith(item) }
         }
 
         return false
     }
 
-    override fun output(item: ItemStack): ItemStack {
-        val world = pipe.world as ServerWorld
-        val targetPos = pipe.pos.offset(side)
+    fun isFull(): Boolean {
+        return fullCache ?: (inventoryCache.get() ?: getInventory())?.also { inventoryCache = WeakReference(it) }?.let { inventory ->
+            inventory.getAvailableSlots(side.opposite).all { slot -> inventory.getStack(slot).let { !it.isStackable || it.count >= it.maxCount } }
+        }?.also { fullCache = it } ?: true
+    }
 
-        val inventory = when (val blockEntity = world.getBlockEntity(targetPos)) {
-            is InventoryProvider -> blockEntity.getInventory(world.getBlockState(targetPos), world, targetPos)
-            is ChestBlockEntity -> {
-                val blockState = world.getBlockState(targetPos)
-                ChestBlock.getInventory(blockState.block as ChestBlock, blockState, world, targetPos, true)
-            }
-            is Inventory -> blockEntity
-            else -> null
-        } ?: return item
+    override fun output(item: ItemStack): ItemStack {
+        val inventory = getInventory() ?: return item
 
         inventory.getAvailableSlots(side.opposite).forEach {
             if (item.isEmpty) return ItemStack.EMPTY
@@ -89,6 +76,8 @@ open class PipeSideExport(pipe: PipeBlockEntity, side: Direction, id: UUID = UUI
             }
         }
 
-        return item
+        return item.also { if (!it.isEmpty) fullCache = true }
     }
+
+    private fun getInventory() = PipeUtil.getInventory(pipe.world as ServerWorld, pipe.pos.offset(side))
 }

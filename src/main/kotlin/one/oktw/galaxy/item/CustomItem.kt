@@ -47,12 +47,12 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
 
     abstract fun getName(): Text?
 
-    open fun writeCustomNbt(tag: NbtCompound) {
-        tag.putString("CustomItemIdentifier", identifier.toString())
+    open fun writeCustomNbt(nbt: NbtCompound) {
+        nbt.putString("CustomItemIdentifier", identifier.toString())
     }
 
-    open fun readCustomNbt(tag: NbtCompound): CustomItem {
-        require(tag.getString("CustomItemIdentifier") == identifier.toString())
+    open fun readCustomNbt(nbt: NbtCompound): CustomItem {
+        require(nbt.getString("CustomItemIdentifier") == identifier.toString())
 
         return this
     }

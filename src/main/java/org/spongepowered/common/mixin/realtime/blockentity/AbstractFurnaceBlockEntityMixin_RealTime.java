@@ -1,4 +1,22 @@
 /*
+ * OKTW Galaxy Project
+ * Copyright (C) 2018-2021
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/*
  * This file is part of Sponge, licensed under the MIT License (MIT).
  *
  * Copyright (c) SpongePowered <https://www.spongepowered.org>
@@ -25,79 +43,40 @@
 package org.spongepowered.common.mixin.realtime.blockentity;
 
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.math.MathHelper;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
+import org.spongepowered.common.mixin.realtime.accessor.AbstractFurnaceBlockEntityAccessor;
 
 @Mixin(value = AbstractFurnaceBlockEntity.class, priority = 1001)
-public abstract class AbstractFurnaceBlockEntityMixin_RealTime extends BlockEntity {
-    @Shadow
-    private int burnTime;
-    @Shadow
-    private int cookTime;
-    @Shadow
-    private int cookTimeTotal;
-
-    public AbstractFurnaceBlockEntityMixin_RealTime(BlockEntityType<?> blockEntityType_1) {
-        super(blockEntityType_1);
-    }
-
+public abstract class AbstractFurnaceBlockEntityMixin_RealTime {
     @Redirect(method = "tick",
         at = @At(
             value = "FIELD",
             target = "Lnet/minecraft/block/entity/AbstractFurnaceBlockEntity;burnTime:I",
-            opcode = Opcodes.PUTFIELD
-        ),
-        slice = @Slice(
-            from = @At(
-                value = "INVOKE",
-                target = "Lnet/minecraft/block/entity/AbstractFurnaceBlockEntity;isBurning()Z",
-                opcode = 1
-            ),
-            to = @At(
-                value = "FIELD",
-                target = "Lnet/minecraft/block/entity/AbstractFurnaceBlockEntity;world:Lnet/minecraft/world/World;",
-                opcode = Opcodes.GETFIELD,
-                ordinal = 0
-            )
+            opcode = Opcodes.PUTFIELD,
+            ordinal = 0
         )
     )
-    private void realTimeImpl$adjustForRealTimeBurnTime(final AbstractFurnaceBlockEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) this.getWorld()).realTimeBridge$getRealTimeTicks();
-        this.burnTime = Math.max(0, this.burnTime - Math.max(1, ticks - 1));
+    private static void realTimeImpl$adjustForRealTimeBurnTime(AbstractFurnaceBlockEntity self, int value) {
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+
+        AbstractFurnaceBlockEntityAccessor accessor = (AbstractFurnaceBlockEntityAccessor) self;
+        accessor.setBurnTime(Math.max(0, accessor.getBurnTime() - Math.max(1, ticks - 1)));
     }
 
     @Redirect(
         method = "tick",
-        at = @At(
-            value = "FIELD",
-            target = "Lnet/minecraft/block/entity/AbstractFurnaceBlockEntity;cookTime:I",
-            opcode = Opcodes.PUTFIELD
-        ),
-        slice = @Slice(
-            from = @At(
-                value = "INVOKE",
-                target = "Lnet/minecraft/block/entity/AbstractFurnaceBlockEntity;canAcceptRecipeOutput(Lnet/minecraft/recipe/Recipe;)Z",
-                ordinal = 1
-            ),
-            to = @At(
-                value = "FIELD",
-                target = "Lnet/minecraft/block/entity/AbstractFurnaceBlockEntity;cookTimeTotal:I",
-                opcode = Opcodes.GETFIELD,
-                ordinal = 0
-            )
-        )
-    )
-    private void realTimeImpl$adjustForRealTimeCookTime(final AbstractFurnaceBlockEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) this.getWorld()).realTimeBridge$getRealTimeTicks();
-        this.cookTime = Math.min(this.cookTimeTotal, this.cookTime + ticks);
+        at = @At(value = "FIELD", target = "Lnet/minecraft/block/entity/AbstractFurnaceBlockEntity;cookTime:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
+    private static void realTimeImpl$adjustForRealTimeCookTime(final AbstractFurnaceBlockEntity self, final int modifier) {
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+
+        AbstractFurnaceBlockEntityAccessor accessor = (AbstractFurnaceBlockEntityAccessor) self;
+        accessor.setCookTime(Math.min(accessor.getCookTimeTotal(), accessor.getCookTime() + ticks));
     }
 
     @Redirect(
@@ -118,8 +97,10 @@ public abstract class AbstractFurnaceBlockEntityMixin_RealTime extends BlockEnti
             )
         )
     )
-    private void realTimeImpl$adjustForRealTimeCookTimeCooldown(final AbstractFurnaceBlockEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) this.getWorld()).realTimeBridge$getRealTimeTicks();
-        this.cookTime = MathHelper.clamp(this.cookTime - (2 * ticks), 0, this.cookTimeTotal);
+    private static void realTimeImpl$adjustForRealTimeCookTimeCooldown(final AbstractFurnaceBlockEntity self, final int modifier) {
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+
+        AbstractFurnaceBlockEntityAccessor accessor = (AbstractFurnaceBlockEntityAccessor) self;
+        accessor.setCookTime(MathHelper.clamp(accessor.getCookTime() - (2 * ticks), 0, accessor.getCookTimeTotal()));
     }
 }

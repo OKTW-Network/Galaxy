@@ -16,14 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.block.entity
+package one.oktw.galaxy.mixin.accessor;
 
-import net.minecraft.block.Blocks
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.util.math.BlockPos
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.storage.StorageIoWorker;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
-// BlockEntity need extend
-open class CustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : BlockEntity(type, pos, Blocks.BARRIER.defaultState) {
-    fun getId() = BlockEntityType.getId(type)!!
+import java.util.concurrent.CompletableFuture;
+
+@Mixin(StorageIoWorker.class)
+public interface StorageIoWorkerAccessor {
+    @Invoker
+    CompletableFuture<NbtCompound> callReadChunkData(ChunkPos chunkPos);
 }

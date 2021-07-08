@@ -44,7 +44,7 @@ class Wrench : CraftingRecipe {
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list = list)
 
-    override fun craft(inv: CraftingInventory) = item.copy()
+    override fun craft(inv: CraftingInventory) = Tool.WRENCH.createItemStack()
 
     @Environment(EnvType.CLIENT)
     override fun fits(width: Int, height: Int): Boolean {

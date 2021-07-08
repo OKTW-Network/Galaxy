@@ -4,8 +4,10 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "AsyncChunk_VersionedChunkStorage",
+    "BeaconLevelAccessor",
     "PlayerAbilitiesAccessor",
-    "ServerPlayerEntityFunctionAccessor"
+    "ServerPlayerEntityFunctionAccessor",
+    "StorageIoWorkerAccessor"
   ],
   "client": [],
   "injectors": {

@@ -59,7 +59,7 @@ class RegisterBlock {
                 val blockPos = BlockPosArgumentType.getLoadedBlockPos(it, "pos")
 
                 it.source.world.removeBlockEntity(blockPos)
-                it.source.world.setBlockEntity(blockPos, block.createBlockEntity())
+                it.source.world.addBlockEntity(block.createBlockEntity(blockPos))
                 it.source.sendFeedback(LiteralText("Registered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z} to ${block.identifier}"), true)
 
                 return@executes Command.SINGLE_SUCCESS

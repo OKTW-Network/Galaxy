@@ -16,12 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.block
+package one.oktw.galaxy.block.listener
 
-import net.minecraft.util.math.BlockPos
-import one.oktw.galaxy.block.entity.DummyBlockEntity
-import one.oktw.galaxy.item.CustomBlockItem
+import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.util.ActionResult
+import net.minecraft.util.Hand
+import net.minecraft.util.hit.BlockHitResult
 
-class DummyBlock : ModelCustomBlock("dummy", CustomBlockItem.DUMMY.createItemStack()) {
-    override fun createBlockEntity(pos: BlockPos) = DummyBlockEntity(blockEntityType, pos)
+interface CustomBlockClickListener {
+    fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult
 }

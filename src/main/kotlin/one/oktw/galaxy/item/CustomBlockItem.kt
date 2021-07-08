@@ -28,12 +28,14 @@ import one.oktw.galaxy.block.CustomBlock
 class CustomBlockItem private constructor(private val id: String, modelData: Int, private val name: String?) :
     CustomItem(Identifier("galaxy", "item/block/$id"), COMMAND_BLOCK, modelData) {
     companion object {
+        val DUMMY = registry.register(CustomBlockItem("dummy", 9999999, "block.DUMMY"))
         val HT_CRAFTING_TABLE = registry.register(CustomBlockItem("ht_crafting_table", 1010100, "block.HT_CRAFTING_TABLE"))
         val ELEVATOR = registry.register(CustomBlockItem("elevator", 1010200, "block.ELEVATOR"))
         val ANGEL_BLOCK = registry.register(CustomBlockItem("angel_block", 1010400, "block.ANGEL_BLOCK"))
         val TELEPORTER_CORE_BASIC = registry.register(CustomBlockItem("teleporter_core_basic", 1010300, "block.TELEPORTER"))
         val TELEPORTER_CORE_ADVANCE = registry.register(CustomBlockItem("teleporter_core_advance", 1010301, "block.TELEPORTER_ADVANCED"))
         val TELEPORTER_FRAME = registry.register(CustomBlockItem("teleporter_frame", 1010302, "block.TELEPORTER_FRAME"))
+        val PIPE = registry.register(CustomBlockItem("pipe", 1010500, "block.PIPE"))
     }
 
     fun getBlock(): CustomBlock {

@@ -25,6 +25,7 @@
     "accessor.mixin.json",
     "recipe.mixin.json"
   ],
+  "accessWidener": "galaxy-tweak.accesswidener",
   "depends": {
     "minecraft": "1.17.x",
     "fabricloader": ">=0.8.8"

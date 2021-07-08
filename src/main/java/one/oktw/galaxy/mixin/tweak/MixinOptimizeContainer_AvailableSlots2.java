@@ -16,12 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.block
+package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.util.math.BlockPos
-import one.oktw.galaxy.block.entity.DummyBlockEntity
-import one.oktw.galaxy.item.CustomBlockItem
+import net.minecraft.inventory.DoubleInventory;
+import net.minecraft.inventory.Inventory;
+import one.oktw.galaxy.mixin.interfaces.InventoryAvailableSlots;
+import org.spongepowered.asm.mixin.Mixin;
 
-class DummyBlock : ModelCustomBlock("dummy", CustomBlockItem.DUMMY.createItemStack()) {
-    override fun createBlockEntity(pos: BlockPos) = DummyBlockEntity(blockEntityType, pos)
+import java.util.Arrays;
+
+@Mixin(DoubleInventory.class)
+public abstract class MixinOptimizeContainer_AvailableSlots2 implements InventoryAvailableSlots, Inventory {
+    private int[] availableSlots;
+
+    @Override
+    public int[] getAvailableSlots() {
+        if (availableSlots == null) {
+            int[] array = new int[size()];
+            Arrays.setAll(array, i -> i);
+            availableSlots = array;
+        }
+
+        return availableSlots;
+    }
 }

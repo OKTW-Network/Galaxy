@@ -59,8 +59,8 @@ class Weapon private constructor(id: String, modelData: Int, private val name: S
 
     override fun getName(): Text = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
 
-    override fun writeCustomNbt(tag: NbtCompound) {
-        super.writeCustomNbt(tag)
-        tag.put("WeaponData", NbtCompound().apply { putUuid("id", MathHelper.randomUuid()) })
+    override fun writeCustomNbt(nbt: NbtCompound) {
+        super.writeCustomNbt(nbt)
+        nbt.put("WeaponData", NbtCompound().apply { putUuid("id", MathHelper.randomUuid()) })
     }
 }

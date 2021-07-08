@@ -18,26 +18,20 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.item.Items.COMMAND_BLOCK
-import net.minecraft.nbt.NbtCompound
+import net.minecraft.item.Items
 import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
-import net.minecraft.util.math.MathHelper
 
-class Tool private constructor(id: String, modelData: Int, private val name: String) :
-    CustomItem(Identifier("galaxy", "item/tool/$id"), COMMAND_BLOCK, modelData) {
-    override val cacheable = false
-
+class PipeModelItem private constructor(id: String, modelData: Int, private val name: String) :
+    CustomItem(Identifier("galaxy", "item/pipe/$id"), Items.COMMAND_BLOCK, modelData) {
     companion object {
-        val WRENCH = registry.register(Tool("wrench", 2010100, "item.Tool.WRENCH"))
+        val PIPE_EXTENDED = registry.register(PipeModelItem("pipe_extended", 1010501, "pipe.extended"))
+        val PIPE_PORT_EXPORT = registry.register(PipeModelItem("pipe_port_export", 1010502, "pipe.export"))
+        val PIPE_PORT_IMPORT = registry.register(PipeModelItem("pipe_port_import", 1010503, "pipe.import"))
+        val PIPE_PORT_STORAGE = registry.register(PipeModelItem("pipe_port_storage", 1010504, "pipe.storage"))
     }
 
-    override fun getName(): Text = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
-
-    override fun writeCustomNbt(nbt: NbtCompound) {
-        super.writeCustomNbt(nbt)
-        nbt.put("ToolData", NbtCompound().apply { putUuid("id", MathHelper.randomUuid()) })
-    }
+    override fun getName(): Text? = name.let(::TranslatableText).styled { it.withColor(Formatting.WHITE).withItalic(false) }
 }

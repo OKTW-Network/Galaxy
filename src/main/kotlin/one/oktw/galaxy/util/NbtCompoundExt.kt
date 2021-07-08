@@ -16,27 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.block.entity
+package one.oktw.galaxy.util
 
-import net.minecraft.block.Blocks
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.util.math.BlockPos
 
-// BlockEntity need extend
-open class CustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : BlockEntity(type, pos, Blocks.BARRIER.defaultState) {
-    fun getId() = BlockEntityType.getId(type)!!
-
-    override fun readNbt(nbt: NbtCompound) {
-        super.readNbt(nbt)
-        readCopyableData(nbt)
-    }
-
-    /**
-     * Read custom data from NBT, it will use on block clone.
-     *
-     * Also call by [readNbt].
-     */
-    open fun readCopyableData(nbt: NbtCompound) = Unit
+fun NbtCompound.getOrCreateSubNbt(key: String): NbtCompound {
+    return if (contains(key, 10)) getCompound(key) else NbtCompound().also { put(key, it) }
 }

@@ -16,12 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.block
+package one.oktw.galaxy.mixin.interfaces;
 
-import net.minecraft.util.math.BlockPos
-import one.oktw.galaxy.block.entity.DummyBlockEntity
-import one.oktw.galaxy.item.CustomBlockItem
-
-class DummyBlock : ModelCustomBlock("dummy", CustomBlockItem.DUMMY.createItemStack()) {
-    override fun createBlockEntity(pos: BlockPos) = DummyBlockEntity(blockEntityType, pos)
+public interface FakeEntity {
+    void setFake(boolean value);
 }

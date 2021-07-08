@@ -16,12 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.block
+package one.oktw.galaxy.block.pipe
 
-import net.minecraft.util.math.BlockPos
-import one.oktw.galaxy.block.entity.DummyBlockEntity
-import one.oktw.galaxy.item.CustomBlockItem
+import net.minecraft.util.math.Direction
 
-class DummyBlock : ModelCustomBlock("dummy", CustomBlockItem.DUMMY.createItemStack()) {
-    override fun createBlockEntity(pos: BlockPos) = DummyBlockEntity(blockEntityType, pos)
+data class PipeShowProgress(val packet: ItemTransferPacket, val from: Direction, var to: Direction? = null) {
+    var progress: Int = 0
 }

@@ -38,7 +38,7 @@ import net.minecraft.util.ItemScatterer
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
-import net.minecraft.world.TickPriority
+import net.minecraft.util.math.Vec3d
 import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.block.listener.CustomBlockNeighborUpdateListener
 import one.oktw.galaxy.block.pipe.*
@@ -49,8 +49,10 @@ import one.oktw.galaxy.item.PipeModelItem.Companion.PIPE_PORT_EXPORT
 import one.oktw.galaxy.item.PipeModelItem.Companion.PIPE_PORT_IMPORT
 import one.oktw.galaxy.item.PipeModelItem.Companion.PIPE_PORT_STORAGE
 import one.oktw.galaxy.item.Tool
+import one.oktw.galaxy.mixin.interfaces.FakeEntity
 import one.oktw.galaxy.util.getOrCreateSubTag
 import java.util.*
+import kotlin.math.max
 import kotlin.math.min
 
 open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : ModelCustomBlockEntity(type, pos, modelItem),
@@ -66,16 +68,48 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
     private val queue = LinkedList<ItemTransferPacket>()
     private val connectedPipe = MapMaker().weakValues().concurrencyLevel(1).makeMap<Direction, PipeBlockEntity>()
     private val connectedIO = WeakHashMap<PipeSide, EnumMap<Direction, Int>>()
-    private var showingItemEntity: ItemEntity? = null
+    private var pressureCache: Int? = null
+    private var showingItemEntity: UUID? = null
+    private var showingProgress: PipeShowProgress? = null
     private var redstone = 0
     private var needUpdatePipeConnect = true
 
     /**
      * Push [ItemTransferPacket] into pipe queue.
      */
-    fun pushItem(item: ItemTransferPacket): Boolean {
-        item.progress = 0
-        return queue.offer(item)
+    fun pushItem(packet: ItemTransferPacket, side: Direction): Boolean {
+        pressureCache = null
+        packet.progress = 0
+
+        return queue.offer(packet).also { if (showingItemEntity == null) showItem(packet, side) }
+    }
+
+    fun tryMoveShowEntity(uuid: UUID): Boolean {
+        val world = (world as ServerWorld)
+        val entity = world.getEntity(uuid) as? ItemEntity ?: return false
+        return if (entity.stack == showingProgress?.packet?.item) {
+            showingItemEntity?.let { world.getEntity(it)?.discard() }
+            showingItemEntity = entity.uuid
+            entity.setPosition(Vec3d(pos.x + 0.5, pos.y + 0.15, pos.z + 0.5).let {
+                when (showingProgress!!.from) {
+                    Direction.DOWN -> it.subtract(0.0, 0.5, 0.0)
+                    Direction.UP -> it.add(0.0, 0.5, 0.0)
+                    Direction.NORTH -> it.subtract(0.0, 0.0, 0.5)
+                    Direction.SOUTH -> it.add(0.0, 0.0, 0.5)
+                    Direction.WEST -> it.subtract(0.5, 0.0, 0.0)
+                    Direction.EAST -> it.add(0.5, 0.0, 0.0)
+                }
+            })
+            entity.velocity = when (showingProgress!!.from) {
+                Direction.DOWN -> Vec3d(0.0, 0.05, 0.0)
+                Direction.UP -> Vec3d(0.0, -0.05, 0.0)
+                Direction.NORTH -> Vec3d(0.0, 0.0, 0.05)
+                Direction.SOUTH -> Vec3d(0.0, 0.0, -0.05)
+                Direction.WEST -> Vec3d(0.05, 0.00, 0.0)
+                Direction.EAST -> Vec3d(-0.05, 0.00, 0.0)
+            }
+            true
+        } else false
     }
 
     /**
@@ -87,7 +121,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
 
     fun getConnectedIO(exclude: Direction? = null): Map<PipeSide, Int> {
         return HashMap<PipeSide, Int>(pipeIO.size + connectedIO.size).apply {
-            pipeIO.forEach { (side, io) -> if (side != exclude) put(io, 0) }
+            pipeIO.values.forEach { put(it, 0) }
             connectedIO.forEach { (io, info) ->
                 info.minOfOrNull { if (it.key == exclude) Int.MAX_VALUE else it.value }?.let { if (it != Int.MAX_VALUE) put(io, it) }
             }
@@ -95,14 +129,16 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
     }
 
     fun getPressure(): Int {
-        return queue.size
+        return queue.count { packet -> !pipeIO.values.any { it is PipeSideExport && it.canExport(packet.item) } }.also { pressureCache = it }
     }
 
     override fun tick() {
         super.tick()
         if (queue.isEmpty() && showingItemEntity !== null) {
-            showingItemEntity?.discard()
+            (world as ServerWorld).getEntity(showingItemEntity)?.discard()
             showingItemEntity = null
+            showingProgress = null
+            this.markDirty()
         }
 
         if (needUpdatePipeConnect) {
@@ -115,34 +151,32 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
         // Tick IO CoolDown and cleanup removed IO
         pipeIO.entries.removeIf { (_, io) -> io.removed || io.tick() != Unit }
 
-        // Output
-        queue.removeIf { packet -> pipeIO.values.any { it.output(packet.item).isEmpty } }
-
         val transferBuffer = queue.filterTo(ArrayList()) { packet -> min(packet.progress + 1, 20).also { packet.progress = it } == 20 }
         if (transferBuffer.isNotEmpty()) {
             val pushed = ArrayList<ItemTransferPacket>(transferBuffer.size)
-            val exportIO = connectedIO.filterKeys { it is PipeSideExport && !it.isFull() }
-            val sortedPipes = connectedPipe.map { (k, v) -> Pair(k, v) }.sortedBy { (side, pipe) ->
-                var distance = Int.MAX_VALUE
-                exportIO.forEach { (_, info) ->
-                    if (info[side] ?: Int.MAX_VALUE < distance) info[side]?.let { distance = it }
-                    if (distance == 1) return@sortedBy pipe.getPressure() * 1000 + distance
-                }
+            val exportIO by lazy { connectedIO.filterKeys { it is PipeSideExport && !it.isFull() } }
+            val sortedPipes by lazy {
+                connectedPipe.entries.sortedBy { (side, pipe) ->
+                    var distance = Int.MAX_VALUE
+                    exportIO.forEach { (_, info) ->
+                        if (info[side] ?: Int.MAX_VALUE < distance) info[side]?.let { distance = it }
+                        if (distance == 1) return@sortedBy pipe.getPressure() * 1000 + distance
+                    }
 
-                if (distance == Int.MAX_VALUE) Int.MAX_VALUE else pipe.getPressure() * 1000 + distance
+                    if (distance == Int.MAX_VALUE) Int.MAX_VALUE else pipe.getPressure() * 1000 + distance
+                }
             }
             var selfPressure = getPressure()
 
             transferBuffer.forEach transfer@{ packet ->
-                packet.progress = 0
-
                 // Push request item
                 if (packet.destination != null) {
                     connectedIO.filterKeys { it.id == packet.destination }.values
                         .flatMapTo(HashSet()) { it.keys.mapNotNull(connectedPipe::get) }
                         .sortedBy { it.getPressure() }
-                        .forEach {
-                            if (it.pushItem(packet)) {
+                        .forEach { pipe ->
+                            if (pipe.pushItem(packet, connectedPipe.entries.first { it.value == pipe }.key.opposite)) {
+                                tryMoveShowEntityTo(packet, pipe)
                                 pushed.add(packet)
                                 selfPressure--
                                 return@transfer
@@ -150,12 +184,19 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
                         }
                 }
 
+                // Output
+                if (pipeIO.values.any { it.output(packet.item).isEmpty }) {
+                    pushed.add(packet)
+                    return@transfer
+                }
+
                 // Low pressure and have export first
                 sortedPipes.forEach { (side, pipe) ->
                     if (pipe.getPressure() < selfPressure &&
                         exportIO.any { (io, info) -> info.contains(side) && (io as PipeSideExport).canExport(packet.item) } &&
-                        pipe.pushItem(packet)
+                        pipe.pushItem(packet, side.opposite)
                     ) {
+                        tryMoveShowEntityTo(packet, pipe)
                         pushed.add(packet)
                         selfPressure--
                         return@transfer
@@ -163,27 +204,39 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
                 }
 
                 // Just push to low pressure pipe
-                sortedPipes.forEach { (_, pipe) ->
-                    if (pipe.getPressure() < selfPressure && pipe.pushItem(packet)) {
+                sortedPipes.forEach { (side, pipe) ->
+                    if (pipe.getPressure() < selfPressure && pipe.pushItem(packet, side.opposite)) {
+                        tryMoveShowEntityTo(packet, pipe)
                         pushed.add(packet)
                         selfPressure--
                         return@transfer
                     }
                 }
+
+                // Retry
+                packet.progress = 0
             }
 
-            queue.removeAll(pushed)
+            if (queue.removeAll(pushed)) this.markDirty()
         }
 
         // Input
         if (queue.size < 54) {
-            for (io in pipeIO.values) {
-                io.input().let { if (!it.isEmpty) queue.add(ItemTransferPacket(io.id, it)) }
+            for ((side, io) in pipeIO) {
+                io.input().let {
+                    if (!it.isEmpty) {
+                        val packet = ItemTransferPacket(io.id, it).also(queue::add)
+                        pressureCache = null
+                        if (showingItemEntity == null) showItem(packet, side)
+                    }
+                }
                 if (queue.size >= 54) break
             }
         }
 
         if (queue.isNotEmpty()) this.markDirty()
+
+        tickShowingItem()
 
         // TODO show item
     }
@@ -192,6 +245,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
         super.markRemoved()
         val world = world as ServerWorld
         sideEntity.values.forEach { world.getEntity(it)?.discard() }
+        showingItemEntity?.let { world.getEntity(it)?.discard() }
         queue.clear()
         connectedPipe.clear()
         connectedIO.clear()
@@ -210,6 +264,11 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
 
         queue.clear()
         pipeData.getList("Queue", NbtType.COMPOUND).mapTo(queue) { ItemTransferPacket.createFromTag(it as NbtCompound) }
+
+        showingItemEntity?.let { (world as? ServerWorld)?.getEntity(it)?.discard() }
+        showingItemEntity = null
+        showingProgress = null
+        if (pipeData.containsUuid("showingEntity")) showingItemEntity = pipeData.getUuid("showingEntity")
     }
 
     override fun readCopyableData(nbt: NbtCompound) {
@@ -231,6 +290,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
             put("Queue", queue.mapTo(NbtList()) { it.toTag(NbtCompound()) })
             put("IO", NbtCompound().apply { pipeIO.forEach { (k, v) -> if (v.mode != NONE) put(k.name, v.writeNBT(NbtCompound())) } })
             put("SideEntity", NbtCompound().apply { sideEntity.forEach { (k, v) -> putUuid(k.name, v) } })
+            showingItemEntity?.let { putUuid("showingEntity", it) }
         }
 
         return tag
@@ -397,24 +457,25 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
         this.markDirty()
 
         // Update connected pipes
-        connectedPipe.keys.forEach { world.blockTickScheduler.schedule(pos.offset(it), Blocks.BARRIER, 1, TickPriority.EXTREMELY_HIGH) }
+        connectedPipe.keys.forEach { world.blockTickScheduler.schedule(pos.offset(it), Blocks.BARRIER, 1) }
     }
 
     private fun updatePipeConnect() {
         val world = (world as ServerWorld)
+        val updateQueue = ArrayList<Direction>(6)
         for (direction in Direction.values()) {
             val connectPipe = world.getBlockEntity(pos.offset(direction)) as? PipeBlockEntity
             val sideMode = pipeIO[direction]?.mode
             if (connectPipe != null && sideMode == null && connectPipe.getMode(direction.opposite) == NONE) {
                 if (connectPipe != connectedPipe[direction]) {
                     connectedPipe[direction] = connectPipe
-                    updateIOInfo(direction)
+                    updateQueue += direction
                 }
 
                 // Connect pipe
                 if (direction in POSITIVE_DIRECTION && sideEntity[direction] == null) spawnSideEntity(direction, NONE)
             } else {
-                connectedPipe.remove(direction)?.let { updateIOInfo(direction) }
+                connectedPipe.remove(direction)?.let { updateQueue += direction }
 
                 // Disconnect pipe
                 if (sideMode == null) {
@@ -424,6 +485,8 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
                 }
             }
         }
+
+        updateQueue.forEach(::updateIOInfo)
     }
 
     private fun updateIOInfo(from: Direction) {
@@ -442,10 +505,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
             connectedIO.getOrPut(io) {
                 updated = true
                 EnumMap(net.minecraft.util.math.Direction::class.java)
-            }.let {
-                if (!updated && it.values.minOrNull() ?: Int.MAX_VALUE > distance + 1) updated = true
-                it[from] = distance + 1
-            }
+            }.let { if (it.put(from, distance + 1) != distance + 1) updated = true }
         }
 
         // Update connected pipes
@@ -469,13 +529,8 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
             oldIO.forEach { (io, _) -> if (newIO?.contains(io) != true) removedIO.getOrPut(io) { EnumSet.noneOf(Direction::class.java) }.add(side) }
 
             newIO?.forEach { (io, distance) ->
-                connectedIO.getOrPut(io) {
-                    updated = true
-                    EnumMap(net.minecraft.util.math.Direction::class.java)
-                }.let {
-                    if (!updated && it.values.minOrNull() ?: Int.MAX_VALUE > distance + 1) updated = true
-                    it[side] = distance + 1
-                }
+                connectedIO.getOrPut(io) { EnumMap(net.minecraft.util.math.Direction::class.java) }
+                    .let { if (it.put(side, distance + 1) != distance + 1) updated = true }
             }
         }
 
@@ -507,6 +562,103 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
             }
         }
         if (world.spawnEntity(entity)) sideEntity[side] = entity.uuid
+        this.markDirty()
+    }
+
+    private fun tickShowingItem() {
+        val entity = showingItemEntity?.let { (world as ServerWorld).getEntity(it) as? ItemEntity }
+        val progress = showingProgress
+
+        if (entity == null || progress == null || !queue.contains(progress.packet)) {
+            entity?.discard()
+            showingItemEntity = null
+            showingProgress = null
+            this.markDirty()
+            return
+        }
+
+        if (progress.to != null && progress.packet.progress < 10) { // Retry
+            when (progress.to) {
+                Direction.DOWN -> entity.setVelocity(0.0, 0.05, 0.0)
+                Direction.UP -> entity.setVelocity(0.0, -0.05, 0.0)
+                Direction.NORTH -> entity.setVelocity(0.0, 0.0, 0.05)
+                Direction.SOUTH -> entity.setVelocity(0.0, 0.0, -0.05)
+                Direction.WEST -> entity.setVelocity(0.05, 0.00, 0.0)
+                Direction.EAST -> entity.setVelocity(-0.05, 0.00, 0.0)
+            }
+
+            progress.to = null
+        }
+
+        // Tick progress
+        if (progress.progress < 10 || progress.to != null) progress.progress++ else progress.progress--
+        entity.setCovetedItem() // prevent despawn
+        (entity as FakeEntity).setFake(true)
+
+        // Find next pipe
+        if (progress.progress == 10) {
+            entity.setPosition(pos.x + 0.5, pos.y + 0.15, pos.z + 0.5)
+            val to = pipeIO.entries.firstOrNull { (_, io) -> io is PipeSideExport && io.canExport(progress.packet.item) }?.key
+                ?: connectedPipe.entries.minByOrNull { (side, pipe) ->
+                    connectedIO.entries.minOfOrNull { (io, info) ->
+                        (if (io is PipeSideExport && info.contains(side) && io.canExport(progress.packet.item)) info[side] else null) ?: Int.MAX_VALUE
+                    }?.let { if (it == Int.MAX_VALUE) null else max(pipe.getPressure() - 1, 0) * 1000 + it } ?: Int.MAX_VALUE
+                }?.key ?: return run {
+                    entity.setVelocity(0.0, 0.0, 0.0)
+                    entity.setPosition(pos.x + 0.5, pos.y + 0.15, pos.z + 0.5)
+                }
+
+            progress.to = to
+            when (progress.to) {
+                Direction.DOWN -> entity.setVelocity(0.0, -0.05, 0.0)
+                Direction.UP -> entity.setVelocity(0.0, 0.05, 0.0)
+                Direction.NORTH -> entity.setVelocity(0.0, 0.0, -0.05)
+                Direction.SOUTH -> entity.setVelocity(0.0, 0.0, 0.05)
+                Direction.WEST -> entity.setVelocity(-0.05, 0.00, 0.0)
+                Direction.EAST -> entity.setVelocity(0.05, 0.00, 0.0)
+            }
+        }
+    }
+
+    private fun showItem(packet: ItemTransferPacket, from: Direction) {
+        if (showingItemEntity != null) return
+
+        val startPos = Vec3d(pos.x + 0.5, pos.y + 0.15, pos.z + 0.5).let {
+            when (from) {
+                Direction.DOWN -> it.subtract(0.0, 0.5, 0.0)
+                Direction.UP -> it.add(0.0, 0.5, 0.0)
+                Direction.NORTH -> it.subtract(0.0, 0.0, 0.5)
+                Direction.SOUTH -> it.add(0.0, 0.0, 0.5)
+                Direction.WEST -> it.subtract(0.5, 0.0, 0.0)
+                Direction.EAST -> it.add(0.5, 0.0, 0.0)
+            }
+        }
+        val velocity = when (from) {
+            Direction.DOWN -> Vec3d(0.0, 0.05, 0.0)
+            Direction.UP -> Vec3d(0.0, -0.05, 0.0)
+            Direction.NORTH -> Vec3d(0.0, 0.0, 0.05)
+            Direction.SOUTH -> Vec3d(0.0, 0.0, -0.05)
+            Direction.WEST -> Vec3d(0.05, 0.00, 0.0)
+            Direction.EAST -> Vec3d(-0.05, 0.00, 0.0)
+        }
+
+        val entity = ItemEntity(world, startPos.x, startPos.y, startPos.z, packet.item, velocity.x, velocity.y, velocity.z) // TODO check need copy item
+        entity.setNoGravity(true)
+        entity.setPickupDelayInfinite()
+        (entity as FakeEntity).setFake(true)
+        if ((world as ServerWorld).tryLoadEntity(entity)) {
+            showingItemEntity = entity.uuid
+            showingProgress = PipeShowProgress(packet, from)
+            this.markDirty()
+        }
+    }
+
+    private fun tryMoveShowEntityTo(packet: ItemTransferPacket, pipe: PipeBlockEntity) {
+        if (showingProgress?.packet != packet) return
+
+        showingItemEntity?.let { if (!pipe.tryMoveShowEntity(it)) (world as ServerWorld).getEntity(it)?.discard() }
+        showingItemEntity = null
+        showingProgress = null
         this.markDirty()
     }
 }

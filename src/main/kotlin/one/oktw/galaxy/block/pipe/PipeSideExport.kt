@@ -43,13 +43,11 @@ open class PipeSideExport(pipe: PipeBlockEntity, side: Direction, id: UUID = UUI
     fun canExport(item: ItemStack): Boolean {
         val inventory = inventoryCache.get() ?: getInventory()?.also { inventoryCache = WeakReference(it) } ?: return false
 
-        inventory.getAvailableSlots(side.opposite).any { slot ->
+        return inventory.getAvailableSlots(side.opposite).any { slot ->
             inventory.isValid(slot, item) &&
                 (inventory as? SidedInventory)?.canInsert(slot, item, side.opposite) != false &&
                 inventory.getStack(slot).let { it.isEmpty || it.count < it.maxCount && it.canMergeWith(item) }
         }
-
-        return false
     }
 
     fun isFull(): Boolean {

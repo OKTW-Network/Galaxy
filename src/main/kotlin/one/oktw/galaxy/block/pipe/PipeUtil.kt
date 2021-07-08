@@ -37,13 +37,6 @@ object PipeUtil {
         return (0 until this.size()).toList().toIntArray()
     }
 
-    fun Inventory.isInventoryEmpty(facing: Direction): Boolean {
-        for (i in this.getAvailableSlots(facing)) {
-            if (!this.getStack(i).isEmpty) return false
-        }
-        return true
-    }
-
     fun ItemStack.canMergeWith(item: ItemStack): Boolean {
         return when {
             this.item !== item.item -> false

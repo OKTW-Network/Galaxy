@@ -20,6 +20,6 @@ package one.oktw.galaxy.util
 
 import net.minecraft.nbt.NbtCompound
 
-fun NbtCompound.getOrCreateSubTag(key: String): NbtCompound {
+fun NbtCompound.getOrCreateSubNbt(key: String): NbtCompound {
     return if (contains(key, 10)) getCompound(key) else NbtCompound().also { put(key, it) }
 }

@@ -29,7 +29,7 @@ data class ItemTransferPacket(
     var progress: Int = 0
 ) {
     companion object {
-        fun createFromTag(nbt: NbtCompound): ItemTransferPacket {
+        fun createFromNbt(nbt: NbtCompound): ItemTransferPacket {
             val uuid = nbt.getUuid("source")
             val item = (nbt.get("item") as NbtCompound).let(ItemStack::fromNbt)
             val destination = if (nbt.containsUuid("destination")) nbt.getUuid("destination") else null
@@ -39,7 +39,7 @@ data class ItemTransferPacket(
         }
     }
 
-    fun toTag(nbt: NbtCompound): NbtCompound {
+    fun toNbt(nbt: NbtCompound): NbtCompound {
         nbt.putUuid("source", source)
         nbt.put("item", item.writeNbt(NbtCompound()))
         nbt.putInt("progress", progress)

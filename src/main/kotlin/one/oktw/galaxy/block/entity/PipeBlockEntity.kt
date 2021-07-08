@@ -50,7 +50,7 @@ import one.oktw.galaxy.item.PipeModelItem.Companion.PIPE_PORT_IMPORT
 import one.oktw.galaxy.item.PipeModelItem.Companion.PIPE_PORT_STORAGE
 import one.oktw.galaxy.item.Tool
 import one.oktw.galaxy.mixin.interfaces.FakeEntity
-import one.oktw.galaxy.util.getOrCreateSubTag
+import one.oktw.galaxy.util.getOrCreateSubNbt
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
@@ -263,7 +263,7 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
         pipeData.getCompound("SideEntity").run { keys.forEach { sideEntity[Direction.valueOf(it)] = getUuid(it) } }
 
         queue.clear()
-        pipeData.getList("Queue", NbtType.COMPOUND).mapTo(queue) { ItemTransferPacket.createFromTag(it as NbtCompound) }
+        pipeData.getList("Queue", NbtType.COMPOUND).mapTo(queue) { ItemTransferPacket.createFromNbt(it as NbtCompound) }
 
         showingItemEntity?.let { (world as? ServerWorld)?.getEntity(it)?.discard() }
         showingItemEntity = null
@@ -278,22 +278,22 @@ open class PipeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: I
         nbt.getCompound("GalaxyData").getCompound("PipeData").getCompound("IO").run {
             keys.forEach { side ->
                 val direction = Direction.valueOf(side)
-                PipeSide.createFromNBT(this@PipeBlockEntity, direction, getCompound(side))?.let { pipeIO[direction] = it }
+                PipeSide.createFromNbt(this@PipeBlockEntity, direction, getCompound(side))?.let { pipeIO[direction] = it }
             }
         }
     }
 
-    override fun writeNbt(tag: NbtCompound): NbtCompound {
-        super.writeNbt(tag)
+    override fun writeNbt(nbt: NbtCompound): NbtCompound {
+        super.writeNbt(nbt)
 
-        tag.getOrCreateSubTag("GalaxyData").getOrCreateSubTag("PipeData").apply {
-            put("Queue", queue.mapTo(NbtList()) { it.toTag(NbtCompound()) })
-            put("IO", NbtCompound().apply { pipeIO.forEach { (k, v) -> if (v.mode != NONE) put(k.name, v.writeNBT(NbtCompound())) } })
+        nbt.getOrCreateSubNbt("GalaxyData").getOrCreateSubNbt("PipeData").apply {
+            put("Queue", queue.mapTo(NbtList()) { it.toNbt(NbtCompound()) })
+            put("IO", NbtCompound().apply { pipeIO.forEach { (k, v) -> if (v.mode != NONE) put(k.name, v.writeNbt(NbtCompound())) } })
             put("SideEntity", NbtCompound().apply { sideEntity.forEach { (k, v) -> putUuid(k.name, v) } })
             showingItemEntity?.let { putUuid("showingEntity", it) }
         }
 
-        return tag
+        return nbt
     }
 
     override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {

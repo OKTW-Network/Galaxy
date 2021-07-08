@@ -27,7 +27,7 @@ import java.util.*
 
 abstract class PipeSide(protected val pipe: PipeBlockEntity, protected val side: Direction, val id: UUID = UUID.randomUUID(), open val mode: PipeSideMode) {
     companion object {
-        fun createFromNBT(pipe: PipeBlockEntity, side: Direction, nbt: NbtCompound): PipeSide? {
+        fun createFromNbt(pipe: PipeBlockEntity, side: Direction, nbt: NbtCompound): PipeSide? {
             val mode = try {
                 valueOf(nbt.getString("mode"))
             } catch (e: IllegalArgumentException) {
@@ -49,7 +49,7 @@ abstract class PipeSide(protected val pipe: PipeBlockEntity, protected val side:
         removed = true
     }
 
-    open fun writeNBT(nbt: NbtCompound): NbtCompound {
+    open fun writeNbt(nbt: NbtCompound): NbtCompound {
         nbt.putUuid("id", id)
         nbt.putString("mode", mode.name)
 

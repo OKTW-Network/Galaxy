@@ -61,10 +61,10 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         entityUUID = (nbt.get("GalaxyData") as? NbtCompound)?.getUuid("ModelEntity") ?: return
     }
 
-    override fun writeNbt(tag: NbtCompound): NbtCompound {
-        super.writeNbt(tag)
-        entityUUID?.let { tag.put("GalaxyData", NbtCompound().apply { putUuid("ModelEntity", it) }) }
-        return tag
+    override fun writeNbt(nbt: NbtCompound): NbtCompound {
+        super.writeNbt(nbt)
+        entityUUID?.let { nbt.put("GalaxyData", NbtCompound().apply { putUuid("ModelEntity", it) }) }
+        return nbt
     }
 
     override fun markRemoved() {

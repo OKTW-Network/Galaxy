@@ -48,8 +48,8 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
 
     open fun getName(): Text? = null
 
-    open fun writeCustomNbt(tag: NbtCompound) {
-        tag.putString("CustomItemIdentifier", identifier.toString())
+    open fun writeCustomNbt(nbt: NbtCompound) {
+        nbt.putString("CustomItemIdentifier", identifier.toString())
     }
 
     open fun readCustomNbt(nbt: NbtCompound): CustomItem {

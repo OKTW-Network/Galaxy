@@ -61,14 +61,14 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
         if (cacheable && this::cacheItemStack.isInitialized) return cacheItemStack.copy()
 
         val itemStack = ItemStack(baseItem).apply {
-            orCreateTag.apply {
+            orCreateNbt.apply {
                 putInt("HideFlags", ItemStack.TooltipSection.values().map(ItemStack.TooltipSection::getFlag).reduce { acc, i -> acc or i }) // ALL
                 putInt("CustomModelData", modelData)
                 putBoolean("Unbreakable", true)
                 put("AttributeModifiers", NbtList())
             }
             setCustomName(this@CustomItem.getName())
-            writeCustomNbt(getOrCreateSubTag("GalaxyData"))
+            writeCustomNbt(getOrCreateSubNbt("GalaxyData"))
         }
 
         return if (cacheable) itemStack.also { cacheItemStack = it } else itemStack

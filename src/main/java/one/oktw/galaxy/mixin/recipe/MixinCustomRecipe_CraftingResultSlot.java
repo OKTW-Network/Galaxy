@@ -34,6 +34,8 @@ public class MixinCustomRecipe_CraftingResultSlot {
     @Inject(method = "onTakeItem", at = @At("RETURN"))
     private void consumeInput(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
         ScreenHandler handler = player.currentScreenHandler;
-        ((ServerPlayerEntity) player).networkHandler.sendPacket(new InventoryS2CPacket(handler.syncId, handler.getStacks()));
+        ((ServerPlayerEntity) player).networkHandler.sendPacket(
+            new InventoryS2CPacket(handler.syncId, handler.nextRevision(), handler.getStacks(), handler.getCursorStack().copy())
+        );
     }
 }

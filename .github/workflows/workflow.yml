@@ -44,6 +44,9 @@ jobs:
       USERNAME: ${{ secrets.OKTW_HARBOR_USERNAME }}
       PASSWORD: ${{ secrets.OKTW_HARBOR_PASSWORD }}
     steps:
+      - name: Env
+        shell: bash
+        run: echo IMAGE_TAG=$([ "$GITHUB_REF" = "refs/heads/master" ] && echo "latest" || [ "$GITHUB_EVENT_NAME" = 'pull_request' ] && echo pr-${{github.event.pull_request.number}} || echo ${GITHUB_REF##*/}) >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v2
       - name: Checkout submodules
@@ -75,11 +78,7 @@ jobs:
           docker push $REGISTRY_IMAGE:build-cache
       - name: build
         working-directory: ./docker
-        run: |
-          REF_SLUG=$([ "$GITHUB_REF" = "refs/heads/master" ] && echo "latest" || github.event_name == 'pull_request' && echo ${GITHUB_REF##*:}) || echo ${GITHUB_REF##*/})
-          docker build --cache-from $REGISTRY_IMAGE:build-cache --cache-from $REGISTRY_IMAGE:latest -t $REGISTRY_IMAGE:$REF_SLUG .
+        run: docker build --cache-from $REGISTRY_IMAGE:build-cache --cache-from $REGISTRY_IMAGE:latest -t $REGISTRY_IMAGE:$IMAGE_TAG .
       - name: push
         if: env.USERNAME != '' && env.PASSWORD != ''
-        run: |
-          REF_SLUG=$([ "$GITHUB_REF" = "refs/heads/master" ] && echo "latest" || echo ${GITHUB_REF##*/})
-          docker push $REGISTRY_IMAGE:$REF_SLUG
+        run: docker push $REGISTRY_IMAGE:$IMAGE_TAG

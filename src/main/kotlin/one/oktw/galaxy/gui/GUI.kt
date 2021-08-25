@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -149,7 +149,7 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
             closeListener.forEach { it.invoke(player) }
         }
 
-        override fun onSlotClick(slot: Int, button: Int, action: SlotActionType, player: PlayerEntity): ItemStack? {
+        override fun onSlotClick(slot: Int, button: Int, action: SlotActionType, player: PlayerEntity) {
             // Trigger binding TODO allow binding cancel player change
             if (slot in 0 until inventory.size()) {
                 inventoryUtils.indexToXY(slot).let { (x, y) ->
@@ -162,26 +162,24 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
             // Cancel player change inventory
             if (slot < inventory.size() && slot != -999 && slot !in allowUseSlot) {
                 if (action == QUICK_CRAFT) endQuickCraft()
-                return null
+                return
             }
 
             return when (action) {
                 PICKUP, SWAP, CLONE, THROW, QUICK_CRAFT -> super.onSlotClick(slot, button, action, player)
                 QUICK_MOVE -> {
-                    if (slot in 0 until inventory.size() && slot !in allowUseSlot) return null
+                    if (slot in 0 until inventory.size() && slot !in allowUseSlot) return
 
-                    var itemStack = ItemStack.EMPTY
                     val inventorySlot = slots[slot]
 
-                    if (inventorySlot != null && inventorySlot.hasStack()) {
+                    if (inventorySlot.hasStack()) {
                         val slotItemStack = inventorySlot.stack
-                        itemStack = slotItemStack.copy()
 
                         // TODO move item to canUse slot
                         if (slot in playerInventoryRange) {
-                            if (!insertItem(slotItemStack, playerHotBarRange.first, playerHotBarRange.last, false)) return null
+                            if (!insertItem(slotItemStack, playerHotBarRange.first, playerHotBarRange.last, false)) return
                         } else if (slot in playerHotBarRange) {
-                            if (!insertItem(slotItemStack, playerInventoryRange.first, playerInventoryRange.last, false)) return null
+                            if (!insertItem(slotItemStack, playerInventoryRange.first, playerInventoryRange.last, false)) return
                         }
 
                         // clean up empty slot
@@ -192,12 +190,12 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
                         }
                     }
 
-                    return itemStack
+                    return
                 }
                 PICKUP_ALL -> { // Rewrite PICKUP_ALL only take from allow use slot & player inventory.
-                    if (slot < 0) return null
+                    if (slot < 0) return
 
-                    val cursorItemStack = player.inventory.cursorStack
+                    val cursorItemStack = player.currentScreenHandler.cursorStack
                     val clickSlot = slots[slot]
                     if (!cursorItemStack.isEmpty && (!clickSlot.hasStack() || !clickSlot.canTakeItems(player))) {
                         var takeFullStack = false
@@ -230,8 +228,6 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
                     }
 
                     this.sendContentUpdates()
-
-                    cursorItemStack
                 }
             }
         }
@@ -248,7 +244,7 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
             closeListener.forEach { it.invoke(player) }
         }
 
-        override fun onSlotClick(slot: Int, button: Int, action: SlotActionType, player: PlayerEntity): ItemStack? {
+        override fun onSlotClick(slot: Int, button: Int, action: SlotActionType, player: PlayerEntity) {
             // Trigger binding TODO allow binding cancel player change
             if (slot in 0 until inventory.size()) {
                 inventoryUtils.indexToXY(slot).let { (x, y) ->
@@ -261,26 +257,24 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
             // Cancel player change inventory
             if (slot < inventory.size() && slot != -999 && slot !in allowUseSlot) {
                 if (action == QUICK_CRAFT) endQuickCraft()
-                return null
+                return
             }
 
             return when (action) {
                 PICKUP, SWAP, CLONE, THROW, QUICK_CRAFT -> super.onSlotClick(slot, button, action, player)
                 QUICK_MOVE -> {
-                    if (slot in 0 until inventory.size() && slot !in allowUseSlot) return null
+                    if (slot in 0 until inventory.size() && slot !in allowUseSlot) return
 
-                    var itemStack = ItemStack.EMPTY
                     val inventorySlot = slots[slot]
 
-                    if (inventorySlot != null && inventorySlot.hasStack()) {
+                    if (inventorySlot.hasStack()) {
                         val slotItemStack = inventorySlot.stack
-                        itemStack = slotItemStack.copy()
 
                         // TODO move item to canUse slot
                         if (slot in playerInventoryRange) {
-                            if (!insertItem(slotItemStack, playerHotBarRange.first, playerHotBarRange.last, false)) return null
+                            if (!insertItem(slotItemStack, playerHotBarRange.first, playerHotBarRange.last, false)) return
                         } else if (slot in playerHotBarRange) {
-                            if (!insertItem(slotItemStack, playerInventoryRange.first, playerInventoryRange.last, false)) return null
+                            if (!insertItem(slotItemStack, playerInventoryRange.first, playerInventoryRange.last, false)) return
                         }
 
                         // clean up empty slot
@@ -291,12 +285,12 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
                         }
                     }
 
-                    return itemStack
+                    return
                 }
                 PICKUP_ALL -> { // Rewrite PICKUP_ALL only take from allow use slot & player inventory.
-                    if (slot < 0) return null
+                    if (slot < 0) return
 
-                    val cursorItemStack = player.inventory.cursorStack
+                    val cursorItemStack = player.currentScreenHandler.cursorStack
                     val clickSlot = slots[slot]
                     if (!cursorItemStack.isEmpty && (!clickSlot.hasStack() || !clickSlot.canTakeItems(player))) {
                         var takeFullStack = false
@@ -329,8 +323,6 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
                     }
 
                     this.sendContentUpdates()
-
-                    cursorItemStack
                 }
             }
         }
@@ -347,7 +339,7 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
             closeListener.forEach { it.invoke(player) }
         }
 
-        override fun onSlotClick(slot: Int, button: Int, action: SlotActionType, player: PlayerEntity): ItemStack? {
+        override fun onSlotClick(slot: Int, button: Int, action: SlotActionType, player: PlayerEntity) {
             // Trigger binding TODO allow binding cancel player change
             if (slot in 0 until inventory.size()) {
                 inventoryUtils.indexToXY(slot).let { (x, y) ->
@@ -360,26 +352,24 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
             // Cancel player change inventory
             if (slot < inventory.size() && slot != -999 && slot !in allowUseSlot) {
                 if (action == QUICK_CRAFT) endQuickCraft()
-                return null
+                return
             }
 
             return when (action) {
                 PICKUP, SWAP, CLONE, THROW, QUICK_CRAFT -> super.onSlotClick(slot, button, action, player)
                 QUICK_MOVE -> {
-                    if (slot in 0 until inventory.size() && slot !in allowUseSlot) return null
+                    if (slot in 0 until inventory.size() && slot !in allowUseSlot) return
 
-                    var itemStack = ItemStack.EMPTY
                     val inventorySlot = slots[slot]
 
-                    if (inventorySlot != null && inventorySlot.hasStack()) {
+                    if (inventorySlot.hasStack()) {
                         val slotItemStack = inventorySlot.stack
-                        itemStack = slotItemStack.copy()
 
                         // TODO move item to canUse slot
                         if (slot in playerInventoryRange) {
-                            if (!insertItem(slotItemStack, playerHotBarRange.first, playerHotBarRange.last, false)) return null
+                            if (!insertItem(slotItemStack, playerHotBarRange.first, playerHotBarRange.last, false)) return
                         } else if (slot in playerHotBarRange) {
-                            if (!insertItem(slotItemStack, playerInventoryRange.first, playerInventoryRange.last, false)) return null
+                            if (!insertItem(slotItemStack, playerInventoryRange.first, playerInventoryRange.last, false)) return
                         }
 
                         // clean up empty slot
@@ -390,12 +380,12 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
                         }
                     }
 
-                    return itemStack
+                    return
                 }
                 PICKUP_ALL -> { // Rewrite PICKUP_ALL only take from allow use slot & player inventory.
-                    if (slot < 0) return null
+                    if (slot < 0) return
 
-                    val cursorItemStack = player.inventory.cursorStack
+                    val cursorItemStack = player.currentScreenHandler.cursorStack
                     val clickSlot = slots[slot]
                     if (!cursorItemStack.isEmpty && (!clickSlot.hasStack() || !clickSlot.canTakeItems(player))) {
                         var takeFullStack = false
@@ -428,8 +418,6 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
                     }
 
                     this.sendContentUpdates()
-
-                    cursorItemStack
                 }
             }
         }

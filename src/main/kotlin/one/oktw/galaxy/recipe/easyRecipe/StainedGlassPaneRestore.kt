@@ -30,26 +30,7 @@ import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class GlassPane : CraftingRecipe {
-    private val dyes = hashMapOf(
-        Items.RED_DYE to Items.RED_STAINED_GLASS_PANE,
-        Items.GREEN_DYE to Items.GREEN_STAINED_GLASS_PANE,
-        Items.PURPLE_DYE to Items.PURPLE_STAINED_GLASS_PANE,
-        Items.CYAN_DYE to Items.CYAN_STAINED_GLASS_PANE,
-        Items.LIGHT_GRAY_DYE to Items.LIGHT_GRAY_STAINED_GLASS_PANE,
-        Items.GRAY_DYE to Items.GRAY_STAINED_GLASS_PANE,
-        Items.PINK_DYE to Items.PINK_STAINED_GLASS_PANE,
-        Items.LIME_DYE to Items.LIME_STAINED_GLASS_PANE,
-        Items.YELLOW_DYE to Items.YELLOW_STAINED_GLASS_PANE,
-        Items.LIGHT_BLUE_DYE to Items.LIGHT_BLUE_STAINED_GLASS_PANE,
-        Items.MAGENTA_DYE to Items.MAGENTA_STAINED_GLASS_PANE,
-        Items.ORANGE_DYE to Items.ORANGE_STAINED_GLASS_PANE,
-        Items.BLACK_DYE to Items.BLACK_STAINED_GLASS_PANE,
-        Items.BROWN_DYE to Items.BROWN_STAINED_GLASS_PANE,
-        Items.BLUE_DYE to Items.BLUE_STAINED_GLASS_PANE,
-        Items.WHITE_DYE to Items.WHITE_STAINED_GLASS_PANE
-    )
-
+class StainedGlassPaneRestore : CraftingRecipe {
     private val stainedGlassPane = listOf(
         Items.WHITE_STAINED_GLASS_PANE,
         Items.ORANGE_STAINED_GLASS_PANE,
@@ -71,17 +52,21 @@ class GlassPane : CraftingRecipe {
 
     override fun matches(inv: CraftingInventory, world: World): Boolean {
         var match = false
-        dyes.forEach { (recipeItem, _) ->
-            val glassPane = Ingredient(items = stainedGlassPane)
-            val dye = Ingredient(items = listOf(recipeItem))
-            val list = listOf(
-                glassPane, glassPane, glassPane,
-                glassPane, dye, glassPane,
-                glassPane, glassPane, glassPane,
-            )
-            if (RecipeUtils.isItemShapedMatches(inv, 3, 3, list)) {
+        val stainedGlassPane = Ingredient(items = stainedGlassPane)
+        val waterBucket = Ingredient(items = listOf(Items.WATER_BUCKET))
+
+        val list = listOf(waterBucket)
+
+        for (count in 1..8) {
+            val countedList = list.toMutableList()
+
+            for (addCount in 1..count) {
+                countedList.add(stainedGlassPane)
+            }
+
+            if (RecipeUtils.isItemShapelessMatches(inv, countedList)) {
                 match = true
-                return@forEach
+                break
             }
         }
         return match
@@ -89,17 +74,21 @@ class GlassPane : CraftingRecipe {
 
     override fun craft(inv: CraftingInventory): ItemStack {
         var item = ItemStack.EMPTY
-        dyes.forEach { (recipeItem, result) ->
-            val glassPane = Ingredient(items = stainedGlassPane)
-            val dye = Ingredient(items = listOf(recipeItem))
-            val list = listOf(
-                glassPane, glassPane, glassPane,
-                glassPane, dye, glassPane,
-                glassPane, glassPane, glassPane,
-            )
-            if (RecipeUtils.isItemShapedMatches(inv, 3, 3, list)) {
-                item = result.defaultStack.apply { this.count = 8 }
-                return@forEach
+        val stainedGlassPane = Ingredient(items = stainedGlassPane)
+        val waterBucket = Ingredient(items = listOf(Items.WATER_BUCKET))
+
+        val list = listOf(waterBucket)
+
+        for (count in 1..8) {
+            val countedList = list.toMutableList()
+
+            for (addCount in 1..count) {
+                countedList.add(stainedGlassPane)
+            }
+
+            if (RecipeUtils.isItemShapelessMatches(inv, countedList)) {
+                item = Items.GLASS_PANE.defaultStack.apply { this.count = count }
+                break
             }
         }
         return item
@@ -110,9 +99,9 @@ class GlassPane : CraftingRecipe {
         throw NotImplementedError()
     }
 
-    override fun getOutput() = Items.GLASS_PANE.defaultStack.apply { this.count = 8 }
+    override fun getOutput() = Items.GLASS_PANE.defaultStack.apply { this.count = 1 }
 
-    override fun getId() = Identifier("galaxy", "easy_recipe/glass_pane")
+    override fun getId() = Identifier("galaxy", "easy_recipe/stained_glass_pane_restore")
 
     override fun getSerializer(): RecipeSerializer<*> {
         TODO("Not yet implemented, support client mod.")

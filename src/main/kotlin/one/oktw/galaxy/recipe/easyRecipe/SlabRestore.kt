@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -32,6 +32,14 @@ import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class SlabRestore : CraftingRecipe {
     private val slabs = hashMapOf(
+        Items.CUT_COPPER_SLAB to Items.CUT_COPPER,
+        Items.EXPOSED_CUT_COPPER_SLAB to Items.EXPOSED_CUT_COPPER,
+        Items.WEATHERED_CUT_COPPER_SLAB to Items.WEATHERED_CUT_COPPER,
+        Items.OXIDIZED_CUT_COPPER_SLAB to Items.OXIDIZED_CUT_COPPER,
+        Items.WAXED_CUT_COPPER_SLAB to Items.WAXED_CUT_COPPER,
+        Items.WAXED_EXPOSED_CUT_COPPER_SLAB to Items.WAXED_EXPOSED_CUT_COPPER,
+        Items.WAXED_WEATHERED_CUT_COPPER_SLAB to Items.WAXED_WEATHERED_COPPER,
+        Items.WAXED_OXIDIZED_CUT_COPPER_SLAB to Items.WAXED_OXIDIZED_CUT_COPPER,
         Items.OAK_SLAB to Items.OAK_PLANKS,
         Items.SPRUCE_SLAB to Items.SPRUCE_PLANKS,
         Items.BIRCH_SLAB to Items.BIRCH_PLANKS,
@@ -41,37 +49,40 @@ class SlabRestore : CraftingRecipe {
         Items.CRIMSON_SLAB to Items.CRIMSON_PLANKS,
         Items.WARPED_SLAB to Items.WARPED_PLANKS,
         Items.STONE_SLAB to Items.STONE,
-        Items.SMOOTH_QUARTZ_SLAB to Items.SMOOTH_STONE,
-        Items.GRANITE_SLAB to Items.GRANITE,
-        Items.POLISHED_GRANITE_SLAB to Items.POLISHED_GRANITE,
-        Items.DIORITE_SLAB to Items.DIORITE,
-        Items.POLISHED_DIORITE_SLAB to Items.POLISHED_DIORITE,
-        Items.ANDESITE_SLAB to Items.ANDESITE,
-        Items.POLISHED_ANDESITE_SLAB to Items.POLISHED_ANDESITE,
-        Items.COBBLESTONE_SLAB to Items.COBBLESTONE,
-        Items.MOSSY_STONE_BRICK_SLAB to Items.MOSSY_STONE_BRICKS,
-        Items.STONE_BRICK_SLAB to Items.STONE_BRICKS,
-        Items.MOSSY_COBBLESTONE_SLAB to Items.MOSSY_COBBLESTONE,
-        Items.BRICK_SLAB to Items.BRICKS,
-        Items.END_STONE_BRICK_SLAB to Items.END_STONE_BRICKS,
-        Items.NETHER_BRICK_SLAB to Items.NETHER_BRICKS,
-        Items.RED_NETHER_BRICK_SLAB to Items.RED_NETHER_BRICKS,
+        Items.SMOOTH_STONE_SLAB to Items.SMOOTH_STONE,
         Items.SANDSTONE_SLAB to Items.SANDSTONE,
         Items.CUT_SANDSTONE_SLAB to Items.CUT_SANDSTONE,
-        Items.SMOOTH_SANDSTONE_SLAB to Items.SMOOTH_SANDSTONE,
+        Items.COBBLESTONE_SLAB to Items.COBBLESTONE,
+        Items.BRICK_SLAB to Items.BRICKS,
+        Items.STONE_BRICK_SLAB to Items.STONE_BRICKS,
+        Items.NETHER_BRICK_SLAB to Items.NETHER_BRICKS,
+        Items.QUARTZ_SLAB to Items.QUARTZ_BLOCK,
         Items.RED_SANDSTONE_SLAB to Items.RED_SANDSTONE,
         Items.CUT_RED_SANDSTONE_SLAB to Items.CUT_RED_SANDSTONE,
-        Items.SMOOTH_RED_SANDSTONE_SLAB to Items.SMOOTH_RED_SANDSTONE,
-        Items.QUARTZ_SLAB to Items.QUARTZ_BLOCK,
-        Items.SMOOTH_QUARTZ_SLAB to Items.SMOOTH_QUARTZ,
         Items.PURPUR_SLAB to Items.PURPUR_BLOCK,
         Items.PRISMARINE_SLAB to Items.PRISMARINE,
         Items.PRISMARINE_BRICK_SLAB to Items.PRISMARINE_BRICKS,
         Items.DARK_PRISMARINE_SLAB to Items.DARK_PRISMARINE,
+        Items.POLISHED_GRANITE_SLAB to Items.POLISHED_GRANITE,
+        Items.SMOOTH_RED_SANDSTONE_SLAB to Items.SMOOTH_RED_SANDSTONE,
+        Items.MOSSY_STONE_BRICK_SLAB to Items.MOSSY_STONE_BRICKS,
+        Items.POLISHED_DIORITE_SLAB to Items.POLISHED_DIORITE,
+        Items.MOSSY_COBBLESTONE_SLAB to Items.MOSSY_COBBLESTONE,
+        Items.END_STONE_BRICK_SLAB to Items.END_STONE_BRICKS,
+        Items.SMOOTH_SANDSTONE_SLAB to Items.SMOOTH_SANDSTONE,
+        Items.SMOOTH_QUARTZ_SLAB to Items.SMOOTH_QUARTZ,
+        Items.GRANITE_SLAB to Items.GRANITE,
+        Items.ANDESITE_SLAB to Items.ANDESITE,
+        Items.RED_NETHER_BRICK_SLAB to Items.RED_NETHER_BRICKS,
+        Items.POLISHED_ANDESITE_SLAB to Items.POLISHED_ANDESITE,
+        Items.DIORITE_SLAB to Items.DIORITE,
+        Items.COBBLED_DEEPSLATE_SLAB to Items.COBBLED_DEEPSLATE,
+        Items.POLISHED_DEEPSLATE_SLAB to Items.POLISHED_DEEPSLATE,
+        Items.DEEPSLATE_BRICK_SLAB to Items.DEEPSLATE_BRICKS,
+        Items.DEEPSLATE_TILE_SLAB to Items.DEEPSLATE_TILES,
         Items.BLACKSTONE_SLAB to Items.BLACKSTONE,
         Items.POLISHED_BLACKSTONE_SLAB to Items.POLISHED_BLACKSTONE,
-        Items.POLISHED_BLACKSTONE_BRICK_SLAB to Items.POLISHED_BLACKSTONE_BRICKS,
-        Items.SMOOTH_STONE_SLAB to Items.SMOOTH_STONE
+        Items.POLISHED_BLACKSTONE_BRICK_SLAB to Items.POLISHED_BLACKSTONE_BRICKS
     )
 
     override fun matches(inv: CraftingInventory, world: World): Boolean {

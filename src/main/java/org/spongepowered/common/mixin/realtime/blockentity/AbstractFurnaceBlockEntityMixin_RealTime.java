@@ -66,7 +66,12 @@ public abstract class AbstractFurnaceBlockEntityMixin_RealTime {
         final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
 
         AbstractFurnaceBlockEntityAccessor accessor = (AbstractFurnaceBlockEntityAccessor) self;
-        accessor.setBurnTime(Math.max(0, accessor.getBurnTime() - Math.max(1, ticks - 1)));
+        final int burnTime = accessor.getBurnTime();
+        if (burnTime != 1 && burnTime < ticks) {
+            accessor.setBurnTime(1); // last cook tick
+        } else {
+            accessor.setBurnTime(Math.max(0, burnTime - ticks));
+        }
     }
 
     @Redirect(

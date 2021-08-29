@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -29,19 +29,37 @@ import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class RedstoneLamp : CraftingRecipe {
-    private val item = Items.REDSTONE_LAMP.defaultStack
+class RedStoneRepeater : CraftingRecipe {
+    private val item = Items.REPEATER.defaultStack
 
     private val air = Ingredient(items = listOf(Items.AIR))
     private val redStone = Ingredient(items = listOf(Items.REDSTONE))
-    private val glowStoneDust = Ingredient(items = listOf(Items.GLOWSTONE_DUST))
-    private val list = listOf(
-        redStone, glowStoneDust, redStone,
-        glowStoneDust, air, glowStoneDust,
-        redStone, glowStoneDust, redStone
+    private val redStoneTorch = Ingredient(items = listOf(Items.REDSTONE_TORCH))
+    private val stick = Ingredient(items = listOf(Items.STICK))
+    private val stone = Ingredient(items = listOf(Items.STONE))
+    private val noTorch = listOf(
+        redStone, air, redStone,
+        stick, redStone, stick,
+        stone, stone, stone
+    )
+    private val oneTorchLeft = listOf(
+        air, air, redStone,
+        redStoneTorch, redStone, stick,
+        stone, stone, stone
+    )
+    private val oneTorchRight = listOf(
+        redStone, air, air,
+        stick, redStone, redStoneTorch,
+        stone, stone, stone
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
+    override fun matches(inv: CraftingInventory, world: World): Boolean =
+        (RecipeUtils.isItemShapedMatches(inv, 3, 3, noTorch) || RecipeUtils.isItemShapedMatches(inv, 3, 3, oneTorchLeft) || RecipeUtils.isItemShapedMatches(
+            inv,
+            3,
+            3,
+            oneTorchRight
+        ))
 
     override fun craft(inv: CraftingInventory) = item.copy()
 
@@ -52,7 +70,7 @@ class RedstoneLamp : CraftingRecipe {
 
     override fun getOutput() = item
 
-    override fun getId() = Identifier("galaxy", "easy_recipe/redstone_lamp")
+    override fun getId() = Identifier("galaxy", "easy_recipe/redstone_repeater")
 
     override fun getSerializer(): RecipeSerializer<*> {
         TODO("Not yet implemented, support client mod.")

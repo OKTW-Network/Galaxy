@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -29,17 +29,16 @@ import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class RedstoneRepeater : CraftingRecipe {
-    private val item = Items.REPEATER.defaultStack
+class RedStoneLamp : CraftingRecipe {
+    private val item = Items.REDSTONE_LAMP.defaultStack
 
     private val air = Ingredient(items = listOf(Items.AIR))
     private val redStone = Ingredient(items = listOf(Items.REDSTONE))
-    private val stick = Ingredient(items = listOf(Items.STICK))
-    private val stone = Ingredient(items = listOf(Items.STONE))
+    private val glowStoneDust = Ingredient(items = listOf(Items.GLOWSTONE_DUST))
     private val list = listOf(
-        redStone, air, redStone,
-        stick, redStone, stick,
-        stone, stone, stone
+        redStone, glowStoneDust, redStone,
+        glowStoneDust, air, glowStoneDust,
+        redStone, glowStoneDust, redStone
     )
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
@@ -53,7 +52,7 @@ class RedstoneRepeater : CraftingRecipe {
 
     override fun getOutput() = item
 
-    override fun getId() = Identifier("galaxy", "easy_recipe/redstone_repeater")
+    override fun getId() = Identifier("galaxy", "easy_recipe/redstone_lamp")
 
     override fun getSerializer(): RecipeSerializer<*> {
         TODO("Not yet implemented, support client mod.")

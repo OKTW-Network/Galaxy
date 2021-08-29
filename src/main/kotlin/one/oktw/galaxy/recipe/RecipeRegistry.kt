@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -37,10 +37,10 @@ object RecipeRegistry {
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Ladder())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Chest())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Hopper())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, RedstoneLamp())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, RedStoneLamp())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Dispenser())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, DispenserWithBow())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, RedstoneRepeater())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, RedStoneRepeater())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, TrappedChest())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, CarrotOnAStick())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, WarpedFungusOnAStick())

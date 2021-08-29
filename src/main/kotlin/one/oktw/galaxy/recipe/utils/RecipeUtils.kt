@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -73,7 +73,10 @@ object RecipeUtils {
 
         if (inputItems.count() != list.count()) return false
         list.forEach { ingredient ->
-            inputItems.removeIf { ingredient.matches(it) }
+            val predicate = inputItems.firstOrNull { ingredient.matches(it) }
+            if (predicate != null) {
+                inputItems.remove(predicate)
+            }
         }
         return inputItems.isEmpty()
     }

@@ -21,12 +21,16 @@ package one.oktw.galaxy.mixin.tweak;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.storage.RegionBasedStorage;
 import net.minecraft.world.storage.RegionFile;
+import one.oktw.galaxy.mixin.interfaces.RegionFileInputStream;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Mixin(RegionBasedStorage.class)
@@ -61,5 +65,10 @@ public abstract class MixinAsyncChunk_RegionBasedStorage {
     @Inject(method = "sync", at = @At("RETURN"))
     private void syncUnlock(CallbackInfo ci) {
         lock.unlock();
+    }
+
+    @Redirect(method = "getTagAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/storage/RegionFile;getChunkInputStream(Lnet/minecraft/util/math/ChunkPos;)Ljava/io/DataInputStream;"))
+    private DataInputStream overwriteGetIntputStream(RegionFile regionFile, ChunkPos pos) throws IOException {
+        return ((RegionFileInputStream) regionFile).getChunkInputStreamNoSync(pos);
     }
 }

@@ -88,7 +88,7 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
     @Overwrite
     private CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> loadChunk(ChunkPos pos) {
         this.world.getProfiler().visit("chunkLoad");
-        return ggetUpdatedChunkNbtAsync(pos).handleAsync((nbt, t) -> {
+        return getUpdatedChunkNbtAsync(pos).handleAsync((nbt, t) -> {
             try {
                 if (t != null) {
                     throw (Exception) t;
@@ -121,7 +121,7 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
         }, this.mainThreadExecutor);
     }
 
-    private CompletableFuture<NbtCompound> ggetUpdatedChunkNbtAsync(ChunkPos pos) {
+    private CompletableFuture<NbtCompound> getUpdatedChunkNbtAsync(ChunkPos pos) {
         return ((StorageIoWorkerAccessor) ((AsyncChunk_VersionedChunkStorage) this).getWorker()).callReadChunkData(pos)
             .thenApplyAsync(nbt -> nbt == null ? null : this.updateChunkNbt(world.getRegistryKey(), this.persistentStateManagerFactory, nbt), mainThreadExecutor);
     }

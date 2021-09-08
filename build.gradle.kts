@@ -34,6 +34,7 @@ tasks.withType<KotlinCompile> {
 }
 
 minecraft {
+    accessWidener("src/main/resources/galaxy.accesswidener")
 }
 
 dependencies {

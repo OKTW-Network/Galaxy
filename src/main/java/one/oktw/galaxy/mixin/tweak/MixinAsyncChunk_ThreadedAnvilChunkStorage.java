@@ -59,7 +59,7 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
     private ThreadExecutor<Runnable> mainThreadExecutor;
     @Shadow
     @Final
-    private ServerWorld world;
+    ServerWorld world;
     @Shadow
     @Final
     private Supplier<PersistentStateManager> persistentStateManagerFactory;
@@ -88,16 +88,16 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
     @Overwrite
     private CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> loadChunk(ChunkPos pos) {
         this.world.getProfiler().visit("chunkLoad");
-        return getUpdatedChunkTagAsync(pos).handleAsync((compoundTag, t) -> {
+        return getUpdatedChunkNbtAsync(pos).handleAsync((nbt, t) -> {
             try {
                 if (t != null) {
                     throw (Exception) t;
                 }
 
-                if (compoundTag != null) {
-                    boolean bl = compoundTag.contains("Level", 10) && compoundTag.getCompound("Level").contains("Status", 8);
+                if (nbt != null) {
+                    boolean bl = nbt.contains("Level", 10) && nbt.getCompound("Level").contains("Status", 8);
                     if (bl) {
-                        Chunk chunk = ChunkSerializer.deserialize(this.world, this.structureManager, this.pointOfInterestStorage, pos, compoundTag);
+                        Chunk chunk = ChunkSerializer.deserialize(this.world, this.structureManager, this.pointOfInterestStorage, pos, nbt);
                         this.method_27053(pos, chunk.getStatus().getChunkType());
                         return Either.left(chunk);
                     }
@@ -121,8 +121,8 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
         }, this.mainThreadExecutor);
     }
 
-    private CompletableFuture<NbtCompound> getUpdatedChunkTagAsync(ChunkPos pos) {
+    private CompletableFuture<NbtCompound> getUpdatedChunkNbtAsync(ChunkPos pos) {
         return ((StorageIoWorkerAccessor) ((AsyncChunk_VersionedChunkStorage) this).getWorker()).callReadChunkData(pos)
-            .thenApplyAsync(compoundTag -> compoundTag == null ? null : this.updateChunkNbt(world.getRegistryKey(), this.persistentStateManagerFactory, compoundTag), mainThreadExecutor);
+            .thenApplyAsync(nbt -> nbt == null ? null : this.updateChunkNbt(world.getRegistryKey(), this.persistentStateManagerFactory, nbt), mainThreadExecutor);
     }
 }

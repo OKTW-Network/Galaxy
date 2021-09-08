@@ -47,12 +47,12 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
 
     abstract fun getName(): Text?
 
-    open fun writeCustomNbt(tag: NbtCompound) {
-        tag.putString("CustomItemIdentifier", identifier.toString())
+    open fun writeCustomNbt(nbt: NbtCompound) {
+        nbt.putString("CustomItemIdentifier", identifier.toString())
     }
 
-    open fun readCustomNbt(tag: NbtCompound): CustomItem {
-        require(tag.getString("CustomItemIdentifier") == identifier.toString())
+    open fun readCustomNbt(nbt: NbtCompound): CustomItem {
+        require(nbt.getString("CustomItemIdentifier") == identifier.toString())
 
         return this
     }
@@ -60,7 +60,7 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
     open fun createItemStack(): ItemStack {
         if (cacheable && this::cacheItemStack.isInitialized) return cacheItemStack.copy()
 
-        val itemStack = ItemStack(baseItem).apply {
+        return ItemStack(baseItem).apply {
             orCreateNbt.apply {
                 putInt("HideFlags", ItemStack.TooltipSection.values().map(ItemStack.TooltipSection::getFlag).reduce { acc, i -> acc or i }) // ALL
                 putInt("CustomModelData", modelData)
@@ -69,8 +69,6 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
             }
             setCustomName(this@CustomItem.getName())
             writeCustomNbt(getOrCreateSubNbt("GalaxyData"))
-        }
-
-        return if (cacheable) itemStack.also { cacheItemStack = it } else itemStack
+        }.also { if (cacheable) cacheItemStack = it.copy() }
     }
 }

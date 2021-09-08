@@ -36,8 +36,8 @@ class Tool private constructor(id: String, modelData: Int, private val name: Str
 
     override fun getName(): Text = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
 
-    override fun writeCustomNbt(tag: NbtCompound) {
-        super.writeCustomNbt(tag)
-        tag.put("ToolData", NbtCompound().apply { putUuid("id", MathHelper.randomUuid()) })
+    override fun writeCustomNbt(nbt: NbtCompound) {
+        super.writeCustomNbt(nbt)
+        nbt.put("ToolData", NbtCompound().apply { putUuid("id", MathHelper.randomUuid()) })
     }
 }

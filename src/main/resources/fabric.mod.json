@@ -28,8 +28,9 @@
   ],
   "accessWidener": "galaxy.accesswidener",
   "depends": {
-    "minecraft": "1.17.x",
-    "fabricloader": ">=0.8.8"
+    "minecraft": "1.18.x",
+    "fabricloader": ">=0.11.7",
+    "fabric": ">=0.40.4"
   },
   "suggests": {}
 }

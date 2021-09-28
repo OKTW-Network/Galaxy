@@ -24,9 +24,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
-import net.minecraft.structure.StructureManager;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.thread.ThreadExecutor;
 import net.minecraft.world.ChunkSerializer;
 import net.minecraft.world.PersistentStateManager;
@@ -65,10 +65,6 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
     private Supplier<PersistentStateManager> persistentStateManagerFactory;
     @Shadow
     @Final
-    private StructureManager structureManager;
-
-    @Shadow
-    @Final
     private PointOfInterestStorage pointOfInterestStorage;
 
     public MixinAsyncChunk_ThreadedAnvilChunkStorage(File file, DataFixer dataFixer, boolean bl) {
@@ -97,7 +93,7 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
                 if (nbt != null) {
                     boolean bl = nbt.contains("Level", 10) && nbt.getCompound("Level").contains("Status", 8);
                     if (bl) {
-                        Chunk chunk = ChunkSerializer.deserialize(this.world, this.structureManager, this.pointOfInterestStorage, pos, nbt);
+                        Chunk chunk = ChunkSerializer.deserialize(this.world, this.pointOfInterestStorage, pos, nbt);
                         this.method_27053(pos, chunk.getStatus().getChunkType());
                         return Either.left(chunk);
                     }
@@ -117,7 +113,7 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
             }
 
             this.method_27054(pos);
-            return Either.left(new ProtoChunk(pos, UpgradeData.NO_UPGRADE_DATA, this.world));
+            return Either.left(new ProtoChunk(pos, UpgradeData.NO_UPGRADE_DATA, this.world, this.world.getRegistryManager().get(Registry.BIOME_KEY)));
         }, this.mainThreadExecutor);
     }
 

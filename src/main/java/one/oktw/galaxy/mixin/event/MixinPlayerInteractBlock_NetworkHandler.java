@@ -47,7 +47,7 @@ public class MixinPlayerInteractBlock_NetworkHandler {
         if (main.getEventManager().emit(new PlayerInteractBlockEvent(packet, player)).getCancel()) {
             info.cancel();
             // Re-sync block & inventory
-            ServerWorld world = player.getServerWorld();
+            ServerWorld world = player.getWorld();
             BlockPos blockPos = packet.getBlockHitResult().getBlockPos();
             player.networkHandler.sendPacket(new BlockUpdateS2CPacket(world, blockPos));
             player.networkHandler.sendPacket(new BlockUpdateS2CPacket(world, blockPos.offset(packet.getBlockHitResult().getSide())));

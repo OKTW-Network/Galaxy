@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -44,7 +44,7 @@ class Harvest {
         val player = event.player
         if (player in justHarvested) event.cancel = true
 
-        val world = player.serverWorld
+        val world = player.getWorld()
         val blockPos = event.packet.blockHitResult.blockPos
         val blockState = world.getBlockState(blockPos)
 

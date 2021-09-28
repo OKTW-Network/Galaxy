@@ -47,10 +47,9 @@ public class MixinPlayerChat_SayCommand {
         locals = LocalCapture.CAPTURE_FAILSOFT
     )
     private static void onCommand(CommandContext<ServerCommandSource> context, CallbackInfoReturnable<Integer> cir, Text text, Text text1, Entity entity) {
-        if (!(entity instanceof ServerPlayerEntity)) return;
+        if (!(entity instanceof ServerPlayerEntity player)) return;
 
         Main main = Main.Companion.getMain();
-        ServerPlayerEntity player = (ServerPlayerEntity) entity;
 
         if (main != null && main.getEventManager().emit(new PlayerChatEvent(player, text1)).getCancel()) {
             cir.setReturnValue(0);

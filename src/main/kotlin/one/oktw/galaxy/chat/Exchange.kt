@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,6 +23,7 @@ import net.minecraft.network.PacketByteBuf
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import one.oktw.galaxy.Main
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerChatEvent
 import one.oktw.galaxy.proxy.api.ProxyAPI
@@ -36,6 +37,8 @@ class Exchange {
 
     @EventListener(true)
     fun handleChat(event: PlayerChatEvent) {
+        if (Main.selfUUID == ProxyAPI.dummyUUID) return
+
         event.cancel = true
 
         event.player.networkHandler.sendPacket(

@@ -2,14 +2,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     //    "maven-publish"
-    kotlin("jvm") version "1.5.21"
-    id("fabric-loom") version "0.8-SNAPSHOT"
+    kotlin("jvm") version "1.5.31"
+    id("fabric-loom") version "0.9-SNAPSHOT"
 }
 
 val version = "0.0.1"
 val group = "one.oktw"
 
-val galaxyLibVersion = "ca453b2"
+val galaxyLibVersion = "5677234a"
 
 repositories {
     mavenCentral()
@@ -17,7 +17,7 @@ repositories {
 }
 
 base {
-    archivesBaseName = "Galaxy"
+    archivesName.set("Galaxy")
 }
 
 java {
@@ -33,18 +33,18 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-minecraft {
-    accessWidener = file("src/main/resources/galaxy.accesswidener")
+loom {
+    accessWidenerPath.set(file("src/main/resources/galaxy.accesswidener"))
 }
 
 dependencies {
     // Core
     minecraft(group = "com.mojang", name = "minecraft", version = "1.17.1")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.17.1+build.14", classifier = "v2")
-    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.11.6")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.17.1+build.63", classifier = "v2")
+    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.12.3")
 
     // fabric api
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.37.0+1.17")
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.41.0+1.17")
 
     // galaxy api
     implementation(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion)

@@ -34,6 +34,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.UpgradeData;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.storage.VersionedChunkStorage;
 import one.oktw.galaxy.mixin.accessor.AsyncChunk_VersionedChunkStorage;
@@ -66,16 +67,18 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
     @Shadow
     @Final
     private PointOfInterestStorage pointOfInterestStorage;
+    @Shadow
+    private ChunkGenerator chunkGenerator;
+
+    @Shadow
+    protected abstract byte mark(ChunkPos pos, ChunkStatus.ChunkType type);
+
+    @Shadow
+    protected abstract void markAsProtoChunk(ChunkPos pos);
 
     public MixinAsyncChunk_ThreadedAnvilChunkStorage(File file, DataFixer dataFixer, boolean bl) {
         super(file, dataFixer, bl);
     }
-
-    @Shadow
-    protected abstract void method_27054(ChunkPos chunkPos);
-
-    @Shadow
-    protected abstract byte method_27053(ChunkPos chunkPos, ChunkStatus.ChunkType chunkType);
 
     /**
      * @author James58899
@@ -83,7 +86,7 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
      */
     @Overwrite
     private CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> loadChunk(ChunkPos pos) {
-        this.world.getProfiler().visit("chunkLoad");
+        world.getProfiler().visit("chunkLoad");
         return getUpdatedChunkNbtAsync(pos).handleAsync((nbt, t) -> {
             try {
                 if (t != null) {
@@ -93,8 +96,8 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
                 if (nbt != null) {
                     boolean bl = nbt.contains("Level", 10) && nbt.getCompound("Level").contains("Status", 8);
                     if (bl) {
-                        Chunk chunk = ChunkSerializer.deserialize(this.world, this.pointOfInterestStorage, pos, nbt);
-                        this.method_27053(pos, chunk.getStatus().getChunkType());
+                        Chunk chunk = ChunkSerializer.deserialize(world, pointOfInterestStorage, pos, nbt);
+                        mark(pos, chunk.getStatus().getChunkType());
                         return Either.left(chunk);
                     }
 
@@ -103,7 +106,7 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
             } catch (CrashException var5) {
                 Throwable throwable = var5.getCause();
                 if (!(throwable instanceof IOException)) {
-                    this.method_27054(pos);
+                    markAsProtoChunk(pos);
                     throw var5;
                 }
 
@@ -112,13 +115,13 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
                 LOGGER.error("Couldn't load chunk {}", pos, var6);
             }
 
-            this.method_27054(pos);
-            return Either.left(new ProtoChunk(pos, UpgradeData.NO_UPGRADE_DATA, this.world, this.world.getRegistryManager().get(Registry.BIOME_KEY)));
-        }, this.mainThreadExecutor);
+            markAsProtoChunk(pos);
+            return Either.left(new ProtoChunk(pos, UpgradeData.NO_UPGRADE_DATA, world, world.getRegistryManager().get(Registry.BIOME_KEY), null));
+        }, mainThreadExecutor);
     }
 
     private CompletableFuture<NbtCompound> getUpdatedChunkNbtAsync(ChunkPos pos) {
         return ((StorageIoWorkerAccessor) ((AsyncChunk_VersionedChunkStorage) this).getWorker()).callReadChunkData(pos)
-            .thenApplyAsync(nbt -> nbt == null ? null : this.updateChunkNbt(world.getRegistryKey(), this.persistentStateManagerFactory, nbt), mainThreadExecutor);
+            .thenApplyAsync(nbt -> nbt == null ? null : updateChunkNbt(world.getRegistryKey(), persistentStateManagerFactory, nbt, chunkGenerator.getCodecKey()), mainThreadExecutor);
     }
 }

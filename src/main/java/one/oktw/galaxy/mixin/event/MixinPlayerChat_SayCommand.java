@@ -35,12 +35,11 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(SayCommand.class)
 public class MixinPlayerChat_SayCommand {
-    @SuppressWarnings("UnresolvedMixinReference")
     @Inject(
         method = "method_13563",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V",
+            target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V",
             ordinal = 0
         ),
         cancellable = true,

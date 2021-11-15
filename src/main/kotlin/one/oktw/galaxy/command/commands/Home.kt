@@ -66,7 +66,7 @@ class Home : Command {
             world,
             spawnPointPosition,
             player.spawnAngle,
-            player.isSpawnPointSet,
+            player.isSpawnForced,
             player.notInAnyWorld
         )
         if (!spawnPoint.isPresent) {
@@ -99,7 +99,7 @@ class Home : Command {
                         world,
                         spawnPointPosition,
                         player.spawnAngle,
-                        player.isSpawnPointSet,
+                        player.isSpawnForced,
                         player.notInAnyWorld
                     )
                     if (!checkAgain.isPresent) {

@@ -35,7 +35,6 @@ import java.util.function.Function;
 
 @Mixin(MeCommand.class)
 public class MixinPlayerChat_MeCommand {
-    @SuppressWarnings("UnresolvedMixinReference")
     @Redirect(method = "method_31375", at = @At(
         value = "INVOKE",
         target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Ljava/util/function/Function;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V",

@@ -18,7 +18,9 @@
 
 package one.oktw.galaxy.mixin.event;
 
+import net.minecraft.network.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import one.oktw.galaxy.Main;
@@ -30,9 +32,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayNetworkHandler.class)
-public class MixinPlayerAction_NetworkHandler {
+public abstract class MixinPlayerAction_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
+
+    @Shadow
+    public abstract void sendPacket(Packet<?> packet);
 
     @Inject(method = "onPlayerAction", at = @At(
         value = "HEAD",
@@ -41,6 +46,10 @@ public class MixinPlayerAction_NetworkHandler {
     private void onPlayerAction(PlayerActionC2SPacket packet, CallbackInfo ci) {
         Main main = Main.Companion.getMain();
         if (main == null) return;
-        main.getEventManager().emit(new PlayerActionEvent(packet, player));
+        if (main.getEventManager().emit(new PlayerActionEvent(packet, player)).getCancel()) {
+            ci.cancel();
+            sendPacket(new EntityStatusS2CPacket(player, (byte) 9));
+            player.currentScreenHandler.syncState();
+        }
     }
 }

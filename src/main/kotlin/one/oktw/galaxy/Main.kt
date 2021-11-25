@@ -104,6 +104,7 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(one.oktw.galaxy.item.event.Wrench())
             eventManager.register(Elevator())
             eventManager.register(AngelBlock())
+            eventManager.register(CustomItemEventHandler())
 
             //DispenserPlant
             DispenserPlant.register()

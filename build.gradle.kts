@@ -2,14 +2,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     //    "maven-publish"
-    kotlin("jvm") version "1.5.31"
+    kotlin("jvm") version "1.6.0"
     id("fabric-loom") version "0.10-SNAPSHOT"
 }
 
 val version = "0.0.1"
 val group = "one.oktw"
 
-val galaxyLibVersion = "5677234a"
+val galaxyLibVersion = "098fa7f6"
 
 repositories {
     mavenCentral()
@@ -27,8 +27,8 @@ java {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        apiVersion = "1.5"
-        languageVersion = "1.5"
+        apiVersion = "1.6"
+        languageVersion = "1.6"
         jvmTarget = "16"
     }
 }
@@ -39,12 +39,12 @@ loom {
 
 dependencies {
     // Core
-    minecraft(group = "com.mojang", name = "minecraft", version = "1.18-pre1")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.18-pre1+build.8", classifier = "v2")
+    minecraft(group = "com.mojang", name = "minecraft", version = "1.18-rc1")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.18-rc1+build.1", classifier = "v2")
     modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.12.5")
 
     // fabric api
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.42.2+1.18")
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.43.1+1.18")
 
     // galaxy api
     implementation(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion)

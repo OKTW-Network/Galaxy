@@ -24,6 +24,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
+import net.minecraft.util.Util;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.Registry;
@@ -45,8 +46,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -76,8 +77,8 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
     @Shadow
     protected abstract void markAsProtoChunk(ChunkPos pos);
 
-    public MixinAsyncChunk_ThreadedAnvilChunkStorage(File file, DataFixer dataFixer, boolean bl) {
-        super(file, dataFixer, bl);
+    public MixinAsyncChunk_ThreadedAnvilChunkStorage(Path directory, DataFixer dataFixer, boolean dsync) {
+        super(directory, dataFixer, dsync);
     }
 
     /**
@@ -94,7 +95,7 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
                 }
 
                 if (nbt != null) {
-                    boolean bl = nbt.contains("Level", 10) && nbt.getCompound("Level").contains("Status", 8);
+                    boolean bl = nbt.contains("Status", 8);
                     if (bl) {
                         Chunk chunk = ChunkSerializer.deserialize(world, pointOfInterestStorage, pos, nbt);
                         mark(pos, chunk.getStatus().getChunkType());
@@ -103,16 +104,15 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
 
                     LOGGER.error("Chunk file at {} is missing level data, skipping", pos);
                 }
-            } catch (CrashException var5) {
-                Throwable throwable = var5.getCause();
-                if (!(throwable instanceof IOException)) {
-                    markAsProtoChunk(pos);
-                    throw var5;
+            } catch (CrashException e) {
+                Throwable throwable = e.getCause();
+                if (throwable instanceof IOException) {
+                    LOGGER.error("Couldn't load chunk {}", pos, throwable);
                 }
-
-                LOGGER.error("Couldn't load chunk {}", pos, throwable);
-            } catch (Exception var6) {
-                LOGGER.error("Couldn't load chunk {}", pos, var6);
+                this.markAsProtoChunk(pos);
+                throw e;
+            } catch (Exception e) {
+                LOGGER.error("Couldn't load chunk {}", pos, e);
             }
 
             markAsProtoChunk(pos);
@@ -122,6 +122,7 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends Versione
 
     private CompletableFuture<NbtCompound> getUpdatedChunkNbtAsync(ChunkPos pos) {
         return ((StorageIoWorkerAccessor) ((AsyncChunk_VersionedChunkStorage) this).getWorker()).callReadChunkData(pos)
-            .thenApplyAsync(nbt -> nbt == null ? null : updateChunkNbt(world.getRegistryKey(), persistentStateManagerFactory, nbt, chunkGenerator.getCodecKey()), mainThreadExecutor);
+            .thenApplyAsync(nbt -> nbt == null ? null : updateChunkNbt(world.getRegistryKey(), persistentStateManagerFactory, nbt, chunkGenerator.getCodecKey()),
+                Util.getMainWorkerExecutor());
     }
 }

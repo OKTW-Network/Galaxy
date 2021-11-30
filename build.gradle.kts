@@ -21,15 +21,15 @@ base {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         apiVersion = "1.6"
         languageVersion = "1.6"
-        jvmTarget = "16"
+        jvmTarget = "17"
     }
 }
 
@@ -39,9 +39,9 @@ loom {
 
 dependencies {
     // Core
-    minecraft(group = "com.mojang", name = "minecraft", version = "1.18-rc1")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.18-rc1+build.1", classifier = "v2")
-    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.12.5")
+    minecraft(group = "com.mojang", name = "minecraft", version = "1.18")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.18+build.1", classifier = "v2")
+    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.12.6")
 
     // fabric api
     modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.43.1+1.18")

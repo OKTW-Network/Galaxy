@@ -58,7 +58,7 @@ class Elevator {
     @EventListener(sync = true)
     fun onJump(event: PlayerJumpEvent) {
         val player = event.player
-        val playerWorld = player.serverWorld
+        val playerWorld = player.getWorld()
         val blockPos = BlockPos(player.pos)
 
         if (isElevator(playerWorld, blockPos.down()) && isSafe(playerWorld, blockPos)) {
@@ -75,7 +75,7 @@ class Elevator {
     @EventListener(sync = true)
     fun onSneak(event: PlayerSneakEvent) {
         val player = event.player
-        val playerWorld = player.serverWorld
+        val playerWorld = player.getWorld()
         val blockPos = BlockPos(player.pos)
 
         if (isElevator(playerWorld, blockPos.down()) && isSafe(playerWorld, blockPos)) {

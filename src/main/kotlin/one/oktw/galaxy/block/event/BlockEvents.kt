@@ -76,7 +76,7 @@ class BlockEvents {
 
         // Wrench
         if (player.isSneaking && CustomItemHelper.getItem(item) == Tool.WRENCH) {
-            val world = player.serverWorld
+            val world = player.getWorld()
             val blockPos = event.context.blockPos
             if (world.getBlockEntity(blockPos) !is ModelCustomBlockEntity) return // Check is custom block
             CustomBlockHelper.destroyAndDrop(world, blockPos)

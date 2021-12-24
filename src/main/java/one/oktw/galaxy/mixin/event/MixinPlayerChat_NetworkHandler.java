@@ -50,7 +50,7 @@ public class MixinPlayerChat_NetworkHandler {
         Main main = Main.Companion.getMain();
 
         if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, serverMessage)).getCancel()) {
-            playerManager.broadcastChatMessage(serverMessage, playerMessageType, sender);
+            playerManager.broadcast(serverMessage, playerMessageType, sender);
         } else {
             server.sendSystemMessage(((BaseText) serverMessage).append(" (Canceled)"), sender);
         }

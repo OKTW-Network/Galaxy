@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,9 +18,8 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.network.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import one.oktw.galaxy.Main;
@@ -36,19 +35,15 @@ public abstract class MixinPlayerAction_NetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Shadow
-    public abstract void sendPacket(Packet<?> packet);
-
     @Inject(method = "onPlayerAction", at = @At(
         value = "HEAD",
         target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;onPlayerAction(Lnet/minecraft/network/packet/c2s/play/PlayerActionC2SPacket;)V"
     ), cancellable = true)
     private void onPlayerAction(PlayerActionC2SPacket packet, CallbackInfo ci) {
         Main main = Main.Companion.getMain();
-        if (main == null) return;
-        if (main.getEventManager().emit(new PlayerActionEvent(packet, player)).getCancel()) {
+        if (main != null && main.getEventManager().emit(new PlayerActionEvent(packet, player)).getCancel()) {
             ci.cancel();
-            sendPacket(new EntityStatusS2CPacket(player, (byte) 9));
+            player.networkHandler.sendPacket(new BlockUpdateS2CPacket(player.getWorld(), packet.getPos()));
             player.currentScreenHandler.syncState();
         }
     }

@@ -35,22 +35,20 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(SayCommand.class)
 public class MixinPlayerChat_SayCommand {
-    @SuppressWarnings("UnresolvedMixinReference")
     @Inject(
         method = "method_13563",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V",
+            target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V",
             ordinal = 0
         ),
         cancellable = true,
         locals = LocalCapture.CAPTURE_FAILSOFT
     )
     private static void onCommand(CommandContext<ServerCommandSource> context, CallbackInfoReturnable<Integer> cir, Text text, Text text1, Entity entity) {
-        if (!(entity instanceof ServerPlayerEntity)) return;
+        if (!(entity instanceof ServerPlayerEntity player)) return;
 
         Main main = Main.Companion.getMain();
-        ServerPlayerEntity player = (ServerPlayerEntity) entity;
 
         if (main != null && main.getEventManager().emit(new PlayerChatEvent(player, text1)).getCancel()) {
             cir.setReturnValue(0);

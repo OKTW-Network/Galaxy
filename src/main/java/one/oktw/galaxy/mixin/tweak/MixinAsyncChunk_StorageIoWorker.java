@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -55,7 +55,7 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
     protected abstract void writeRemainingResults();
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void parallelExecutor(File directory, boolean dsync, String name, CallbackInfo ci) {
+    private void parallelExecutor(Path directory, boolean dsync, String name, CallbackInfo ci) {
         results = new ConcurrentHashMap<>();
         executor = new KotlinCoroutineTaskExecutor<>(new TaskQueue.Prioritized(4 /* FOREGROUND,BACKGROUND,WRITE_DONE,SHUTDOWN */), "IOWorker-" + name);
     }

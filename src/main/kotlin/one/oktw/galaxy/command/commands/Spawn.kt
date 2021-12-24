@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -52,7 +52,7 @@ class Spawn : Command {
         lock += player.uuid
 
         GlobalScope.launch {
-            val world = player.serverWorld
+            val world = player.getWorld()
 
             for (i in 0..4) {
                 player.sendMessage(TranslatableText("Respond.commandCountdown", 5 - i).styled { it.withColor(Formatting.GREEN) }, true)

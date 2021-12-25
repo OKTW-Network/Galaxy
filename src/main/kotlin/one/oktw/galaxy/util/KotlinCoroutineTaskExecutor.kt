@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,11 +23,15 @@ import net.minecraft.util.Util
 import net.minecraft.util.thread.TaskExecutor
 import net.minecraft.util.thread.TaskQueue
 
-class KotlinCoroutineTaskExecutor<T>(private val queue: TaskQueue<in T, out Runnable>, name: String) :
-    TaskExecutor<T>(queue, null, name), CoroutineScope {
+class KotlinCoroutineTaskExecutor<T>(private val queue: TaskQueue<in T, out Runnable>, name: String) : TaskExecutor<T>(queue, null, name), CoroutineScope {
+    companion object {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        private val dispatcher = Dispatchers.IO.limitedParallelism(16)
+    }
+
     private val job = SupervisorJob()
 
-    override val coroutineContext = Dispatchers.IO + job
+    override val coroutineContext = dispatcher + job
 
     override fun send(message: T) {
         queue.add(message)

@@ -19,15 +19,21 @@
 package one.oktw.galaxy.util
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.scheduling.ExperimentalCoroutineDispatcher
 import net.minecraft.util.Util
 import net.minecraft.util.thread.TaskExecutor
 import net.minecraft.util.thread.TaskQueue
 
 class KotlinCoroutineTaskExecutor<T>(private val queue: TaskQueue<in T, out Runnable>, name: String) :
     TaskExecutor<T>(queue, null, name), CoroutineScope {
+    companion object {
+        @OptIn(InternalCoroutinesApi::class)
+        private val dispatcher = (Dispatchers.Default as ExperimentalCoroutineDispatcher).blocking(16)
+    }
+
     private val job = SupervisorJob()
 
-    override val coroutineContext = Dispatchers.IO + job
+    override val coroutineContext = dispatcher + job
 
     override fun send(message: T) {
         queue.add(message)

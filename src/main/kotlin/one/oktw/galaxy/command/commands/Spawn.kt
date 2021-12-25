@@ -61,11 +61,20 @@ class Spawn : Command {
             player.sendMessage(TranslatableText("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
 
             withContext(main!!.server.asCoroutineDispatcher()) {
+                val oldPos = player.pos
+
                 player.stopRiding()
                 if (player.isSleeping) {
                     player.wakeUp(true, true)
                 }
+
                 (player as ServerPlayerEntityFunctionAccessor).moveToWorldSpawn(world)
+                // force teleport when player pos does not change at all
+                if (oldPos.distanceTo(player.pos) == 0.0) {
+                    val spawnPosition = world.spawnPos
+                    player.refreshPositionAndAngles(spawnPosition, 0.0f, 0.0f)
+                }
+
                 while (!world.isSpaceEmpty(player) && player.y < world.topY) {
                     player.updatePosition(player.x, player.y + 1, player.z)
                 }

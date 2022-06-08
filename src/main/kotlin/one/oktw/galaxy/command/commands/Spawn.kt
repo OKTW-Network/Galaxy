@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,7 +22,7 @@ import com.mojang.brigadier.CommandDispatcher
 import kotlinx.coroutines.*
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.text.TranslatableText
+import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
@@ -55,10 +55,10 @@ class Spawn : Command {
             val world = player.getWorld()
 
             for (i in 0..4) {
-                player.sendMessage(TranslatableText("Respond.commandCountdown", 5 - i).styled { it.withColor(Formatting.GREEN) }, true)
+                player.sendMessage(Text.translatable("Respond.commandCountdown", 5 - i).styled { it.withColor(Formatting.GREEN) }, true)
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
-            player.sendMessage(TranslatableText("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
+            player.sendMessage(Text.translatable("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
 
             withContext(main!!.server.asCoroutineDispatcher()) {
                 player.stopRiding()

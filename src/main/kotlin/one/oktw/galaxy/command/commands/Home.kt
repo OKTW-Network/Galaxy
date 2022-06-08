@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -26,7 +26,7 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.TranslatableText
+import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import one.oktw.galaxy.command.Command
 import java.util.*
@@ -55,7 +55,7 @@ class Home : Command {
 
         val spawnPointPosition = player.spawnPointPosition
         if (spawnPointPosition == null) {
-            player.sendMessage(TranslatableText("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
+            player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
             lock -= player.uuid
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
@@ -70,7 +70,7 @@ class Home : Command {
             player.notInAnyWorld
         )
         if (!spawnPoint.isPresent) {
-            player.sendMessage(TranslatableText("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
+            player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
             lock -= player.uuid
         } else {
             GlobalScope.launch {
@@ -88,10 +88,10 @@ class Home : Command {
                 }
 
                 for (i in 0..4) {
-                    player.sendMessage(TranslatableText("Respond.commandCountdown", 5 - i).styled { it.withColor(Formatting.GREEN) }, true)
+                    player.sendMessage(Text.translatable("Respond.commandCountdown", 5 - i).styled { it.withColor(Formatting.GREEN) }, true)
                     delay(TimeUnit.SECONDS.toMillis(1))
                 }
-                player.sendMessage(TranslatableText("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
+                player.sendMessage(Text.translatable("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
 
                 withContext(player.server.asCoroutineDispatcher()) {
                     // Check Again
@@ -103,7 +103,7 @@ class Home : Command {
                         player.notInAnyWorld
                     )
                     if (!checkAgain.isPresent) {
-                        player.sendMessage(TranslatableText("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
+                        player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
                         lock -= player.uuid
                         return@withContext
                     }

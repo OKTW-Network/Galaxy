@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,12 +18,8 @@
 
 package one.oktw.galaxy
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.fabricmc.api.DedicatedServerModInitializer
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
@@ -44,7 +40,6 @@ import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.proxy.api.ProxyAPI
 import one.oktw.galaxy.recipe.RecipeRegistry
-import one.oktw.galaxy.resourcepack.ResourcePack
 import java.util.*
 
 @Suppress("unused")
@@ -70,7 +65,7 @@ class Main : DedicatedServerModInitializer {
     override fun onInitializeServer() {
         main = this
 
-        CommandRegistrationCallback.EVENT.register(CommandRegistrationCallback { dispatcher, _ ->
+        CommandRegistrationCallback.EVENT.register(CommandRegistrationCallback { dispatcher, _, _ ->
             listOf(Join(), Admin(), Home(), Spawn()).forEach { dispatcher.let(it::register) }
         })
 
@@ -84,15 +79,16 @@ class Main : DedicatedServerModInitializer {
             server = it as MinecraftDedicatedServer
             eventManager = EventManager(server)
 
-            val resourcePackUrl: String? = System.getenv("resourcePack")
-            if (!resourcePackUrl.isNullOrBlank()) {
-                GlobalScope.launch {
-                    val resourcePack = ResourcePack.new(resourcePackUrl)
-                    withContext(server.asCoroutineDispatcher()) {
-                        server.setResourcePack(resourcePack.uri.toString(), resourcePack.hash)
-                    }
-                }
-            }
+            // TODO fix resourcePack
+//            val resourcePackUrl: String? = System.getenv("resourcePack")
+//            if (!resourcePackUrl.isNullOrBlank()) {
+//                GlobalScope.launch {
+//                    val resourcePack = ResourcePack.new(resourcePackUrl)
+//                    withContext(server.asCoroutineDispatcher()) {
+//                        server.setResourcePack(resourcePack.uri.toString(), resourcePack.hash)
+//                    }
+//                }
+//            }
 
             // Register Proxy packet receiver
             ServerPlayNetworking.registerGlobalReceiver(PROXY_IDENTIFIER) { _, player, _, buf, _ ->

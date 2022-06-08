@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,13 +18,14 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.network.MessageType;
+import net.minecraft.network.message.MessageType;
+import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
+import net.minecraft.server.filter.FilteredMessage;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.BaseText;
-import net.minecraft.text.Text;
+import net.minecraft.util.registry.RegistryKey;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
 import org.spongepowered.asm.mixin.Final;
@@ -32,9 +33,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import java.util.UUID;
-import java.util.function.Function;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class MixinPlayerChat_NetworkHandler {
@@ -45,14 +43,15 @@ public class MixinPlayerChat_NetworkHandler {
     @Final
     private MinecraftServer server;
 
-    @Redirect(method = "handleMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Ljava/util/function/Function;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"))
-    private void onChat(PlayerManager playerManager, Text serverMessage, Function<ServerPlayerEntity, Text> playerMessageFactory, MessageType playerMessageType, UUID sender) {
+    @Redirect(method = "handleDecoratedMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/server/filter/FilteredMessage;Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/util/registry/RegistryKey;)V"))
+    private void onChat(PlayerManager playerManager, FilteredMessage<SignedMessage> message, ServerPlayerEntity sender, RegistryKey<MessageType> typeKey) {
         Main main = Main.Companion.getMain();
 
-        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, serverMessage)).getCancel()) {
-            playerManager.broadcast(serverMessage, playerMessageType, sender);
+        // TODO sync SignedMessage
+        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, message.raw().getContent())).getCancel()) {
+            playerManager.broadcast(message, sender, typeKey);
         } else {
-            server.sendSystemMessage(((BaseText) serverMessage).append(" (Canceled)"), sender);
+            server.logChatMessage(sender.asMessageSender(), message.raw().getContent().copy().append(" (Canceled)"));
         }
     }
 }

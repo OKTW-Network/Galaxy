@@ -9,6 +9,7 @@ plugins {
 val version = "0.0.1"
 val group = "one.oktw"
 
+val fabricVersion = "0.55.3+1.19"
 val galaxyLibVersion = "a145ac99"
 
 repositories {
@@ -44,7 +45,10 @@ dependencies {
     modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.14.6")
 
     // fabric api
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.55.2+1.19")
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = fabricVersion) {
+        val gametest = fabricApi.module("fabric-gametest-api-v1", fabricVersion) // Unused and cause client Registry remapping failed.
+        exclude(gametest.group, gametest.name)
+    }
 
     // galaxy api
     implementation(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion)

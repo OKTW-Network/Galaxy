@@ -21,31 +21,28 @@ package one.oktw.galaxy.recipe.tools
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.inventory.CraftingInventory
-import net.minecraft.item.Items.*
+import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import one.oktw.galaxy.item.Tool
+import one.oktw.galaxy.recipe.utils.Ingredient
+import one.oktw.galaxy.recipe.utils.RecipeUtils
 
 class Wrench : CraftingRecipe {
     private val item = Tool.WRENCH.createItemStack()
+
+    private val air = Ingredient(items = listOf(Items.AIR))
+    private val ironIngot = Ingredient(items = listOf(Items.IRON_INGOT))
+    private val stick = Ingredient(items = listOf(Items.STICK))
     private val list = listOf(
-        IRON_INGOT, AIR, IRON_INGOT,
-        AIR, STICK, AIR,
-        AIR, IRON_INGOT, AIR
+        ironIngot, air, ironIngot,
+        air, stick, air,
+        air, ironIngot, air
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean {
-        for (x in 0 until inv.width) {
-            for (y in 0 until inv.height) {
-                val index = x + y * inv.width
-                if (inv.getStack(index).item != list[index]) return false
-            }
-        }
-
-        return true
-    }
+    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list = list)
 
     override fun craft(inv: CraftingInventory) = Tool.WRENCH.createItemStack()
 

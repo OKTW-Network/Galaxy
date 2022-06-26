@@ -34,7 +34,7 @@ class Sign {
         val player = event.player
 
         if (player.isSneaking && player.mainHandStack.isEmpty && player.offHandStack.isEmpty) {
-            val entity = player.serverWorld.getBlockEntity(event.packet.blockHitResult.blockPos) as? SignBlockEntity ?: return
+            val entity = player.getWorld().getBlockEntity(event.packet.blockHitResult.blockPos) as? SignBlockEntity ?: return
             if (entity.editor == null) player.openEditSignScreen(entity)
         }
     }

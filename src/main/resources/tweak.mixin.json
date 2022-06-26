@@ -3,8 +3,13 @@
   "package": "one.oktw.galaxy.mixin.tweak",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "MixinAsyncChunk_ChunkSerializer",
+    "MixinAsyncChunk_RegionBasedStorage",
+    "MixinAsyncChunk_RegionFile",
+    "MixinAsyncChunk_StorageIoWorker",
     "MixinAsyncChunk_ThreadedAnvilChunkStorage",
     "MixinCustomBlockEntity_BarrierBlock",
+    "MixinCustomBlockEntity_Clone",
     "MixinCustomBlockEntity_Structure",
     "MixinFixBeacon_BeaconBlockEntity",
     "MixinMapExistingChunk_FilledMapItem",

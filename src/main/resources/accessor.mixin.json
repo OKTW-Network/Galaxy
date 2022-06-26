@@ -6,6 +6,7 @@
     "AsyncChunk_VersionedChunkStorage",
     "BeaconLevelAccessor",
     "PlayerAbilitiesAccessor",
+    "SerializingRegionBasedStorageAccessor",
     "ServerPlayerEntityFunctionAccessor",
     "StorageIoWorkerAccessor"
   ],

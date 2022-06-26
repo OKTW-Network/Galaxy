@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -60,13 +60,13 @@ class Home : Command {
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
 
-        val world = source.minecraftServer.getWorld(player.spawnPointDimension)
+        val world = source.server.getWorld(player.spawnPointDimension)
 
         val spawnPoint = PlayerEntity.findRespawnPosition(
             world,
             spawnPointPosition,
             player.spawnAngle,
-            player.isSpawnPointSet,
+            player.isSpawnForced,
             player.notInAnyWorld
         )
         if (!spawnPoint.isPresent) {
@@ -99,7 +99,7 @@ class Home : Command {
                         world,
                         spawnPointPosition,
                         player.spawnAngle,
-                        player.isSpawnPointSet,
+                        player.isSpawnForced,
                         player.notInAnyWorld
                     )
                     if (!checkAgain.isPresent) {
@@ -108,7 +108,7 @@ class Home : Command {
                         return@withContext
                     }
 
-                    val world2 = if (world != null && checkAgain.isPresent) world else source.minecraftServer.overworld
+                    val world2 = if (world != null && checkAgain.isPresent) world else source.server.overworld
                     val position = checkAgain.get()
                     player.teleport(
                         world2,

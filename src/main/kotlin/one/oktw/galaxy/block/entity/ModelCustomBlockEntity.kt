@@ -33,7 +33,7 @@ import java.util.*
 open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, private val modelItem: ItemStack) : CustomBlockEntity(type, pos),
     CustomBlockTickListener {
     companion object {
-        private val armorStandTag = NbtCompound().apply {
+        private val armorStandNbt = NbtCompound().apply {
             putString("id", "minecraft:armor_stand")
             putBoolean("Invisible", true)
             putBoolean("Invulnerable", true)
@@ -56,15 +56,14 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         }
     }
 
-    override fun readNbt(tag: NbtCompound) {
-        super.readNbt(tag)
-        entityUUID = (tag.get("GalaxyData") as? NbtCompound)?.getUuid("ModelEntity") ?: return
+    override fun readNbt(nbt: NbtCompound) {
+        super.readNbt(nbt)
+        entityUUID = (nbt.get("GalaxyData") as? NbtCompound)?.getUuid("ModelEntity") ?: return
     }
 
-    override fun writeNbt(tag: NbtCompound): NbtCompound {
-        super.writeNbt(tag)
-        entityUUID?.let { tag.put("GalaxyData", NbtCompound().apply { putUuid("ModelEntity", it) }) }
-        return tag
+    override fun writeNbt(nbt: NbtCompound) {
+        super.writeNbt(nbt)
+        entityUUID?.let { nbt.put("GalaxyData", NbtCompound().apply { putUuid("ModelEntity", it) }) }
     }
 
     override fun markRemoved() {
@@ -73,7 +72,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
     }
 
     private fun spawnEntity() {
-        val entity: ArmorStandEntity = EntityType.getEntityFromNbt(armorStandTag, world).get() as ArmorStandEntity
+        val entity: ArmorStandEntity = EntityType.getEntityFromNbt(armorStandNbt, world).get() as ArmorStandEntity
         entity.refreshPositionAndAngles(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, 0.0F, 0.0F)
         entity.equipStack(EquipmentSlot.HEAD, modelItem)
         entity.addScoreboardTag("BLOCK")

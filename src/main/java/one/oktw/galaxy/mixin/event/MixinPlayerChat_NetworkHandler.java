@@ -25,6 +25,7 @@ import net.minecraft.server.PlayerManager;
 import net.minecraft.server.filter.FilteredMessage;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.registry.RegistryKey;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
@@ -48,7 +49,7 @@ public class MixinPlayerChat_NetworkHandler {
         Main main = Main.Companion.getMain();
 
         // TODO sync SignedMessage
-        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, message.raw().getContent())).getCancel()) {
+        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, Text.translatable("chat.type.text", player.getDisplayName(), message.raw().getContent()))).getCancel()) {
             playerManager.broadcast(message, sender, typeKey);
         } else {
             server.logChatMessage(sender.asMessageSender(), message.raw().getContent().copy().append(" (Canceled)"));

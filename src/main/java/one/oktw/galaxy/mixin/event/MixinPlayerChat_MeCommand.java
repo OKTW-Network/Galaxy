@@ -25,6 +25,7 @@ import net.minecraft.server.command.MeCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.filter.FilteredMessage;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.registry.RegistryKey;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
@@ -44,7 +45,7 @@ public class MixinPlayerChat_MeCommand {
         ServerPlayerEntity player = source.getPlayer();
 
         // TODO sync SignedMessage
-        if (main == null || player == null || !main.getEventManager().emit(new PlayerChatEvent(player, message.raw().getContent())).getCancel()) {
+        if (main == null || player == null || !main.getEventManager().emit(new PlayerChatEvent(player, Text.translatable("chat.type.emote", player.getDisplayName(), message.raw().getContent()))).getCancel()) {
             playerManager.broadcast(message, source, typeKey);
         } else {
             player.server.logChatMessage(source.getChatMessageSender(), message.raw().getContent().copy().append(" (Canceled)"));

@@ -24,6 +24,7 @@ import net.minecraft.server.command.SayCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.filter.FilteredMessage;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -51,7 +52,7 @@ public class MixinPlayerChat_SayCommand {
         // TODO sync SignedMessage
         if (main != null) {
             assert player != null;
-            if (main.getEventManager().emit(new PlayerChatEvent(player, decoratedMessage.raw().getContent())).getCancel()) {
+            if (main.getEventManager().emit(new PlayerChatEvent(player, Text.translatable("chat.type.announcement", player.getDisplayName(), decoratedMessage.raw().getContent()))).getCancel()) {
                 ci.cancel();
                 player.server.logChatMessage(player.asMessageSender(), decoratedMessage.raw().getContent().copy().append(" (Canceled)"));
             }

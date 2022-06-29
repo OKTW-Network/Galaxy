@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,8 +21,8 @@ package one.oktw.galaxy.mixin.tweak;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.storage.RegionFile;
 import one.oktw.galaxy.mixin.interfaces.RegionFileInputStream;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

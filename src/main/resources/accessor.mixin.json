@@ -7,8 +7,7 @@
     "BeaconLevelAccessor",
     "PlayerAbilitiesAccessor",
     "SerializingRegionBasedStorageAccessor",
-    "ServerPlayerEntityFunctionAccessor",
-    "StorageIoWorkerAccessor"
+    "ServerPlayerEntityFunctionAccessor"
   ],
   "client": [],
   "injectors": {

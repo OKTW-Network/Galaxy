@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,42 +18,44 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.entity.Entity;
+import net.minecraft.network.message.SignedMessage;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.SayCommand;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.filter.FilteredMessage;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import one.oktw.galaxy.Main;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SayCommand.class)
 public class MixinPlayerChat_SayCommand {
     @Inject(
-        method = "method_13563",
+        method = "method_43657",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V",
+            target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/server/filter/FilteredMessage;Lnet/minecraft/server/command/ServerCommandSource;Lnet/minecraft/util/registry/RegistryKey;)V",
             ordinal = 0
         ),
-        cancellable = true,
-        locals = LocalCapture.CAPTURE_FAILSOFT
+        cancellable = true
     )
-    private static void onCommand(CommandContext<ServerCommandSource> context, CallbackInfoReturnable<Integer> cir, Text text, Text text1, Entity entity) {
-        if (!(entity instanceof ServerPlayerEntity player)) return;
+    private static void onCommand(PlayerManager playerManager, ServerCommandSource serverCommandSource, FilteredMessage<SignedMessage> decoratedMessage, CallbackInfo ci) {
+        if (!serverCommandSource.isExecutedByPlayer()) return;
 
         Main main = Main.Companion.getMain();
+        ServerPlayerEntity player = serverCommandSource.getPlayer();
 
-        if (main != null && main.getEventManager().emit(new PlayerChatEvent(player, text1)).getCancel()) {
-            cir.setReturnValue(0);
-            cir.cancel();
-            player.server.sendSystemMessage(((TranslatableText) text1).append(" (Canceled)"), entity.getUuid());
+        // TODO sync SignedMessage
+        if (main != null) {
+            assert player != null;
+            if (main.getEventManager().emit(new PlayerChatEvent(player, Text.translatable("chat.type.announcement", player.getDisplayName(), decoratedMessage.raw().getContent()))).getCancel()) {
+                ci.cancel();
+                player.server.logChatMessage(player.asMessageSender(), decoratedMessage.raw().getContent().copy().append(" (Canceled)"));
+            }
         }
     }
 }

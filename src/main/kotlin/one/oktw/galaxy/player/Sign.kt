@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,7 +19,7 @@
 package one.oktw.galaxy.player
 
 import net.minecraft.block.entity.SignBlockEntity
-import net.minecraft.text.LiteralText
+import net.minecraft.text.Text
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerUpdateSignEvent
@@ -42,7 +42,7 @@ class Sign {
     @EventListener(sync = true)
     fun onPlayerUpdateSign(event: PlayerUpdateSignEvent) {
         for (i in 0..3) {
-            event.blockEntity.setTextOnRow(i, LiteralText(regex.replace(event.packet.text[i], "§")))
+            event.blockEntity.setTextOnRow(i, Text.of(regex.replace(event.packet.text[i], "§")))
         }
 
         event.blockEntity.editor = null

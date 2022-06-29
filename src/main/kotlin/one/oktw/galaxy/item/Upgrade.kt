@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,7 +20,7 @@ package one.oktw.galaxy.item
 
 import net.minecraft.item.Items.COMMAND_BLOCK
 import net.minecraft.text.Text
-import net.minecraft.text.TranslatableText
+import net.minecraft.text.Text.translatable
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
@@ -65,7 +65,7 @@ class Upgrade private constructor(id: String, modelData: Int, private val name: 
         val FIRE_RESISTANCE_LV5 = registry.register(Upgrade("fire_resistance_lv5", 5010704, "item.Upgrade.HEAT", 5))
     }
 
-    override fun getName(): Text = TranslatableText("item.Upgrade.Item", TranslatableText(name))
+    override fun getName(): Text = translatable("item.Upgrade.Item", translatable(name))
         .also { if (level > 0) it.append(" Lv.${level}") }
         .styled { it.withColor(Formatting.WHITE).withItalic(false) }
 }

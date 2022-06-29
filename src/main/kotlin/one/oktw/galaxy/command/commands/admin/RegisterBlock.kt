@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,8 +24,7 @@ import net.minecraft.command.argument.BlockPosArgumentType
 import net.minecraft.command.argument.IdentifierArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.text.LiteralText
-import net.minecraft.text.TranslatableText
+import net.minecraft.text.Text
 import one.oktw.galaxy.block.CustomBlock
 
 class RegisterBlock {
@@ -52,7 +51,7 @@ class RegisterBlock {
                 val block = CustomBlock.registry.get(identifier)
 
                 if (block == null) {
-                    it.source.sendError(TranslatableText("argument.block.id.invalid", identifier))
+                    it.source.sendError(Text.translatable("argument.block.id.invalid", identifier))
                     return@executes 0
                 }
 
@@ -60,7 +59,7 @@ class RegisterBlock {
 
                 it.source.world.removeBlockEntity(blockPos)
                 it.source.world.addBlockEntity(block.createBlockEntity(blockPos))
-                it.source.sendFeedback(LiteralText("Registered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z} to ${block.identifier}"), true)
+                it.source.sendFeedback(Text.of("Registered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z} to ${block.identifier}"), true)
 
                 return@executes Command.SINGLE_SUCCESS
             }

@@ -2,14 +2,15 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     //    "maven-publish"
-    kotlin("jvm") version "1.6.0"
-    id("fabric-loom") version "0.10-SNAPSHOT"
+    kotlin("jvm") version "1.7.0"
+    id("fabric-loom") version "0.12-SNAPSHOT"
 }
 
 val version = "0.0.1"
 val group = "one.oktw"
 
-val galaxyLibVersion = "098fa7f6"
+val fabricVersion = "0.56.3+1.19"
+val galaxyLibVersion = "7fb749bc"
 
 repositories {
     mavenCentral()
@@ -27,8 +28,8 @@ java {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        apiVersion = "1.6"
-        languageVersion = "1.6"
+        apiVersion = "1.7"
+        languageVersion = "1.7"
         jvmTarget = "17"
     }
 }
@@ -39,12 +40,15 @@ loom {
 
 dependencies {
     // Core
-    minecraft(group = "com.mojang", name = "minecraft", version = "1.18.1")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.18.1+build.1", classifier = "v2")
-    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.12.9")
+    minecraft(group = "com.mojang", name = "minecraft", version = "1.19")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.19+build.4", classifier = "v2")
+    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.14.8")
 
     // fabric api
-    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = "0.44.0+1.18")
+    modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = fabricVersion) {
+        val gametest = fabricApi.module("fabric-gametest-api-v1", fabricVersion) // Unused and cause client Registry remapping failed.
+        exclude(gametest.group, gametest.name)
+    }
 
     // galaxy api
     implementation(group = "one.oktw", name = "galaxy-lib", version = galaxyLibVersion)

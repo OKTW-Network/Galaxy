@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -40,7 +40,7 @@ import java.util.function.Predicate;
 @Mixin(CloneCommand.class)
 public class MixinCustomBlockEntity_Clone {
     @Inject(method = "execute", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z", ordinal = 3), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private static void hackClone(ServerCommandSource source, BlockPos begin, BlockPos end, BlockPos destination, Predicate<CachedBlockPosition> filter, CloneCommand.Mode mode, CallbackInfoReturnable<Integer> cir, BlockBox blockBox, BlockPos blockPos, BlockBox blockBox2, ServerWorld serverWorld, List<CloneCommand.BlockInfo> list, List<CloneCommand.BlockInfo> list2, List<CloneCommand.BlockInfo> list3, Deque<BlockPos> deque, BlockPos blockPos2, List<CloneCommand.BlockInfo> list4, List<CloneCommand.BlockInfo> list5, int m, Iterator<CloneCommand.BlockInfo> var19, CloneCommand.BlockInfo blockInfo) {
+    private static void hackClone(ServerCommandSource source, BlockPos begin, BlockPos end, BlockPos destination, Predicate<CachedBlockPosition> filter, CloneCommand.Mode mode, CallbackInfoReturnable<Integer> cir, BlockBox blockBox, BlockPos blockPos, BlockBox blockBox2, int i, ServerWorld serverWorld, List<CloneCommand.BlockInfo> list, List<CloneCommand.BlockInfo> list2, List<CloneCommand.BlockInfo> list3, Deque<BlockPos> deque, BlockPos blockPos2, List<CloneCommand.BlockInfo> list4, List<CloneCommand.BlockInfo> list5, int l, Iterator<CloneCommand.BlockInfo> var19, CloneCommand.BlockInfo blockInfo) {
         // Workaround clone override custom block NBT
         if (blockInfo.state.getBlock() == Blocks.BARRIER) {
             serverWorld.setBlockState(blockInfo.pos, Blocks.AIR.getDefaultState(), Block.NO_REDRAW | Block.FORCE_STATE);

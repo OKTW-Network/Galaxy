@@ -26,11 +26,10 @@
     "accessor.mixin.json",
     "recipe.mixin.json"
   ],
-  "accessWidener": "galaxy.accesswidener",
   "depends": {
-    "minecraft": "1.18.x",
-    "fabricloader": ">=0.11.7",
-    "fabric": ">=0.40.4"
+    "minecraft": "1.19.x",
+    "fabricloader": ">=0.14.6",
+    "fabric": ">=0.55.2"
   },
   "suggests": {}
 }

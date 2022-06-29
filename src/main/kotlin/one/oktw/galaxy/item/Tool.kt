@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,7 +21,7 @@ package one.oktw.galaxy.item
 import net.minecraft.item.Items.COMMAND_BLOCK
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.text.Text
-import net.minecraft.text.TranslatableText
+import net.minecraft.text.Text.translatable
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
@@ -34,7 +34,7 @@ class Tool private constructor(id: String, modelData: Int, private val name: Str
         val WRENCH = registry.register(Tool("wrench", 2010100, "item.Tool.WRENCH"))
     }
 
-    override fun getName(): Text = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
+    override fun getName(): Text = translatable(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
 
     override fun writeCustomNbt(nbt: NbtCompound) {
         super.writeCustomNbt(nbt)

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -25,9 +25,8 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.TranslatableText
-import one.oktw.galaxy.item.*
-import java.util.*
+import net.minecraft.text.Text
+import one.oktw.galaxy.item.CustomItem
 
 class GetItem {
     val command: LiteralArgumentBuilder<ServerCommandSource> = CommandManager.literal("getItem")
@@ -46,12 +45,12 @@ class GetItem {
                     val item = CustomItem.registry.get(identifier)
 
                     if (item == null) {
-                        it.source.sendError(TranslatableText("argument.item.id.invalid", identifier))
+                        it.source.sendError(Text.translatable("argument.item.id.invalid", identifier))
                         return@executes 0
                     }
 
                     val itemStack = item.createItemStack()
-                    val player = it.source.player
+                    val player = it.source.playerOrThrow
                     if (player.inventory.insertStack(itemStack)) {
                         itemStack.count = 1
                         val itemEntity = player.dropItem(itemStack, false)
@@ -74,7 +73,7 @@ class GetItem {
                             owner = player.uuid
                         }
                     }
-                    it.source.sendFeedback(TranslatableText("commands.give.success.single", 1, itemStack.toHoverableText(), it.source.displayName), true)
+                    it.source.sendFeedback(Text.translatable("commands.give.success.single", 1, itemStack.toHoverableText(), it.source.displayName), true)
 
                     return@executes Command.SINGLE_SUCCESS
                 }

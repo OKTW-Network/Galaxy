@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,7 +30,7 @@ import net.minecraft.network.PacketByteBuf
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.text.LiteralText
+import net.minecraft.text.Text
 import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
@@ -49,21 +49,22 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
             CommandManager.literal("join")
-                .executes { context -> execute(context.source, listOf(context.source.player.gameProfile)) }
+                .executes { context -> execute(context.source, listOf(context.source.playerOrThrow.gameProfile)) }
                 .then(
                     CommandManager.argument("player", GameProfileArgumentType.gameProfile())
                         .suggests { commandContext, suggestionsBuilder ->
                             val future = CompletableFuture<Suggestions>()
+                            val player = commandContext.source.playerOrThrow
 
                             ServerPlayNetworking.send(
-                                commandContext.source.player,
+                                player,
                                 PROXY_IDENTIFIER,
                                 PacketByteBuf(wrappedBuffer(encode(SearchPlayer(suggestionsBuilder.remaining, 10))))
                             )
 
                             val listeners = fun(event: ProxyResponseEvent) {
                                 val result = event.packet as? SearchPlayer.Result ?: return
-                                if (event.player.uuid != commandContext.source.player.uuid) return
+                                if (event.player.uuid != player.uuid) return
 
                                 result.players.forEach(suggestionsBuilder::suggest)
                                 future.complete(suggestionsBuilder.build())
@@ -84,18 +85,18 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
     }
 
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {
-        if (!lock.getOrPut(source.player, { Mutex() }).tryLock()) {
-            source.sendFeedback(LiteralText("請稍後..."), false)
+        val sourcePlayer = source.playerOrThrow
+        if (!lock.getOrPut(sourcePlayer) { Mutex() }.tryLock()) {
+            source.sendFeedback(Text.of("請稍後..."), false)
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
 
         val targetPlayer = collection.first()
 
-        ServerPlayNetworking.send(source.player, PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(targetPlayer.id)))))
-        source.sendFeedback(LiteralText(if (source.player.gameProfile == targetPlayer) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系"), false)
+        ServerPlayNetworking.send(sourcePlayer, PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(targetPlayer.id)))))
+        source.sendFeedback(Text.of(if (sourcePlayer.gameProfile == targetPlayer) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系"), false)
 
         launch {
-            val sourcePlayer = source.player
 
             val listener = fun(event: ProxyResponseEvent) {
                 if (event.player.gameProfile != sourcePlayer.gameProfile) return
@@ -105,16 +106,16 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                 if (data.uuid != targetPlayer.id) return
 
                 when (data.stage) {
-                    Queue -> sourcePlayer.sendMessage(LiteralText("正在等待星系載入"), false)
-                    Creating -> sourcePlayer.sendMessage(LiteralText("星系載入中..."), false)
-                    Starting -> sourcePlayer.sendMessage(LiteralText("星系正在啟動請稍後..."), false)
+                    Queue -> sourcePlayer.sendMessage(Text.of("正在等待星系載入"), false)
+                    Creating -> sourcePlayer.sendMessage(Text.of("星系載入中..."), false)
+                    Starting -> sourcePlayer.sendMessage(Text.of("星系正在啟動請稍後..."), false)
                     Started -> {
-                        sourcePlayer.sendMessage(LiteralText("星系已載入！"), false)
+                        sourcePlayer.sendMessage(Text.of("星系已載入！"), false)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }
                     Failed -> {
-                        sourcePlayer.sendMessage(LiteralText("星系載入失敗，請聯絡開發團隊！"), false)
+                        sourcePlayer.sendMessage(Text.of("星系載入失敗，請聯絡開發團隊！"), false)
                         lock[source.player]?.unlock()
                         lock.remove(sourcePlayer)
                     }

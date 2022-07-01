@@ -35,18 +35,19 @@ import net.minecraft.text.Text
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.gui.utils.InventoryEditor
 import one.oktw.galaxy.gui.utils.InventoryUtils
+import org.apache.logging.log4j.LogManager
 import java.util.concurrent.ConcurrentHashMap
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val title: Text) : NamedScreenHandlerFactory {
+class GUI private constructor(private val type: ScreenHandlerType<out ScreenHandler>, private val title: Text, private val slotBindings: HashMap<Int, Slot>) :
+    NamedScreenHandlerFactory {
     private val inventory = when (type) {
-        GENERIC_9X1 -> SimpleInventory(9)
+        GENERIC_9X1, GENERIC_3X3 -> SimpleInventory(9)
         GENERIC_9X2 -> SimpleInventory(9 * 2)
         GENERIC_9X3 -> SimpleInventory(9 * 3)
         GENERIC_9X4 -> SimpleInventory(9 * 4)
         GENERIC_9X5 -> SimpleInventory(9 * 5)
         GENERIC_9X6 -> SimpleInventory(9 * 6)
-        GENERIC_3X3 -> SimpleInventory(9)
         HOPPER -> SimpleInventory(5)
         else -> throw IllegalArgumentException("Unsupported container type: $type")
     }
@@ -57,7 +58,6 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
     private val inventoryUtils = InventoryUtils(type)
     private val openListener = ConcurrentHashMap.newKeySet<(PlayerEntity) -> Any>()
     private val closeListener = ConcurrentHashMap.newKeySet<(PlayerEntity) -> Any>()
-    private var allowUseSlot = ConcurrentHashMap.newKeySet<Int>()
 
     override fun getDisplayName() = title
 
@@ -72,22 +72,6 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
 
         return inventory.getStack(index)
     }
-
-    fun setAllowUse(index: Int, canUse: Boolean) {
-        if (index !in 0 until inventory.size()) throw IndexOutOfBoundsException("Allow use index out of inventory range")
-
-        if (canUse) allowUseSlot.add(index) else allowUseSlot.remove(index)
-    }
-
-    fun setAllowUse(x: Int, y: Int, canUse: Boolean) {
-        if (!checkRange(x, y)) throw IndexOutOfBoundsException("Allow use index out of inventory range")
-
-        if (canUse) allowUseSlot.add(inventoryUtils.xyToIndex(x, y)) else allowUseSlot.remove(inventoryUtils.xyToIndex(x, y))
-    }
-
-    fun isAllowUse(index: Int) = allowUseSlot.contains(index)
-
-    fun isAllowUse(x: Int, y: Int) = isAllowUse(inventoryUtils.xyToIndex(x, y))
 
     fun addBinding(index: Int, function: GUIClickEvent.() -> Any) {
         if (index !in 0 until inventory.size()) throw IndexOutOfBoundsException("Binding index out of inventory range")
@@ -132,15 +116,39 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
 
     private fun checkRange(x: Int, y: Int) = inventoryUtils.xyToIndex(x, y) in 0 until inventory.size()
 
+    class Builder(private val type: ScreenHandlerType<out ScreenHandler>) {
+        private val logger = LogManager.getLogger()
+        private val inventoryUtils = InventoryUtils(type)
+        private var title: Text = Text.empty()
+        private val slotBindings = HashMap<Int, Slot>()
+        fun setTitle(title: Text): Builder {
+            this.title = title
+            return this
+        }
+
+        fun addSlot(index: Int, slot: Slot): Builder {
+            if (slotBindings.contains(index)) {
+                logger.warn("Adding duplicated slot index to GUI. type=$type, index=$index, slot=$slot")
+            }
+            slotBindings[index] = slot
+            return this
+        }
+
+        fun addSlot(x: Int, y: Int, slot: Slot) = this.addSlot(inventoryUtils.xyToIndex(x, y), slot)
+
+        fun build(): GUI {
+            return GUI(type, title, slotBindings)
+        }
+    }
+
     private inner class GuiContainer(syncId: Int, playerInventory: PlayerInventory) : ScreenHandler(type, syncId) {
         init {
             inventory.onOpen(playerInventory.player)
 
             // Add slot
-            // TODO custom slot
             // GUI Inventory slot
             for (i in 0 until inventory.size()) {
-                addSlot(Slot(inventory, i, 0, 0)) // xy only use on client side, ignore it.
+                addSlot(slotBindings.getOrElse(i) { Slot(inventory, i, 0, 0) }) // xy only use on client side, ignore it.
             }
             // Player inventory
             // Index 0..8 is HotBar, 9..35 is Inventory
@@ -162,17 +170,21 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
         }
 
         override fun onSlotClick(slot: Int, button: Int, action: SlotActionType, player: PlayerEntity) {
-            // Trigger binding TODO allow binding cancel player change
+            // Trigger binding
             if (slot in 0 until inventory.size()) {
                 inventoryUtils.indexToXY(slot).let { (x, y) ->
-                    bindings[slot]?.invoke(GUIClickEvent(x, y, action, inventory.getStack(slot)))
-                    rangeBindings.filterKeys { (xRange, yRange) -> x in xRange && y in yRange }.values
-                        .forEach { it.invoke(GUIClickEvent(x, y, action, inventory.getStack(slot))) }
+                    val event = GUIClickEvent(x, y, action, inventory.getStack(slot))
+                    bindings[slot]?.invoke(event)
+                    rangeBindings.filterKeys { (xRange, yRange) -> x in xRange && y in yRange }.values.forEach { it.invoke(event) }
+                    if (event.cancel) {
+                        if (action == QUICK_CRAFT) endQuickCraft()
+                        return
+                    }
                 }
             }
 
             // Cancel player change inventory
-            if (slot < inventory.size() && slot != -999 && slot !in allowUseSlot) {
+            if (slot < inventory.size() && slot != -999 && !slotBindings.contains(slot)) {
                 if (action == QUICK_CRAFT) endQuickCraft()
                 return
             }
@@ -180,19 +192,18 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
             return when (action) {
                 PICKUP, SWAP, CLONE, THROW, QUICK_CRAFT -> super.onSlotClick(slot, button, action, player)
                 QUICK_MOVE -> {
-                    if (slot in 0 until inventory.size() && slot !in allowUseSlot) return
+                    if (slot in 0 until inventory.size() && !slotBindings.contains(slot)) return
 
                     val inventorySlot = slots[slot]
 
                     if (inventorySlot.hasStack()) {
                         val slotItemStack = inventorySlot.stack
 
-                        // TODO move item to canUse slot
-                        if (slot in playerInventoryRange) {
-                            if (!insertItem(slotItemStack, playerHotBarRange.first, playerHotBarRange.last, false)) return
-                        } else if (slot in playerHotBarRange) {
-                            if (!insertItem(slotItemStack, playerInventoryRange.first, playerInventoryRange.last, false)) return
-                        }
+                        // Move item from GUI to player inventory
+                        if (slot < inventory.size() && !insertItem(slotItemStack, playerInventoryRange.first, playerHotBarRange.last, true)) return
+
+                        // Move item from player inventory to GUI
+                        if (slot >= inventory.size() && !insertItemToBinding(slotItemStack, false)) return
 
                         // clean up empty slot
                         if (slotItemStack.isEmpty) {
@@ -209,30 +220,24 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
 
                     val cursorItemStack = player.currentScreenHandler.cursorStack
                     val clickSlot = slots[slot]
-                    if (!cursorItemStack.isEmpty && (!clickSlot.hasStack() || !clickSlot.canTakeItems(player))) {
-                        var takeFullStack = false
-
-                        loop@ while (!takeFullStack) { // First time only take not full stack items
-                            takeFullStack = true
-                            for (index in allowUseSlot + (inventory.size() until slots.size)) {
+                    if (!(cursorItemStack.isEmpty || clickSlot.hasStack() && clickSlot.canTakeItems(player))) {
+                        loop@ for (tryTime in 0..1) { // First time only take not full stack items
+                            val list = (slotBindings.keys.sorted() + (inventory.size() until slots.size)).let { if (button == 0) it else it.reversed() }
+                            for (index in list) {
                                 if (cursorItemStack.count >= cursorItemStack.maxCount) break@loop
 
                                 val scanSlot = slots[index]
-                                if (scanSlot.hasStack()
-                                    && canInsertItemIntoSlot(scanSlot, cursorItemStack, true)
-                                    && scanSlot.canTakeItems(player)
-                                    && canInsertIntoSlot(cursorItemStack, scanSlot)
+                                // Check slot item
+                                if (scanSlot.hasStack() &&
+                                    canInsertItemIntoSlot(scanSlot, cursorItemStack, true) &&
+                                    scanSlot.canTakeItems(player) &&
+                                    canInsertIntoSlot(cursorItemStack, scanSlot)
                                 ) {
                                     val selectItemStack = scanSlot.stack
-                                    if (takeFullStack || selectItemStack.count != selectItemStack.maxCount) {
-                                        val takeCount = (cursorItemStack.maxCount - cursorItemStack.count).coerceAtMost(selectItemStack.count)
-                                        val selectItemStack2 = scanSlot.takeStack(takeCount)
-                                        cursorItemStack.increment(takeCount)
-                                        if (selectItemStack2.isEmpty) {
-                                            scanSlot.stack = ItemStack.EMPTY
-                                        }
-
-                                        scanSlot.onTakeItem(player, selectItemStack2)
+                                    // Only take not full stack in first turn
+                                    if (tryTime != 0 || selectItemStack.count != selectItemStack.maxCount) {
+                                        val takeItem = scanSlot.takeStackRange(selectItemStack.count, cursorItemStack.maxCount - cursorItemStack.count, player)
+                                        cursorItemStack.increment(takeItem.count)
                                     }
                                 }
                             }
@@ -252,6 +257,55 @@ class GUI(private val type: ScreenHandlerType<out ScreenHandler>, private val ti
         override fun canUse(player: PlayerEntity): Boolean {
             // TODO close GUI
             return true
+        }
+
+        fun insertItemToBinding(item: ItemStack, fromLast: Boolean): Boolean {
+            val slots = slotBindings.keys.let { if (fromLast) it.sortedDescending() else it.sorted() }
+            var inserted = false
+
+            // Merge same item
+            if (item.isStackable) {
+                for (index in slots) {
+                    val slot = slotBindings[index]!!
+                    val originItem = slot.stack
+                    if (!originItem.isEmpty && ItemStack.canCombine(item, originItem)) {
+                        val count = originItem.count + item.count
+                        if (count <= item.maxCount) {
+                            item.count = 0
+                            originItem.count = count
+                            slot.markDirty()
+                            inserted = true
+                        } else if (originItem.count < item.maxCount) {
+                            item.decrement(item.maxCount - originItem.count)
+                            originItem.count = item.maxCount
+                            slot.markDirty()
+                            inserted = true
+                        }
+                    }
+
+                    if (item.isEmpty) break
+                }
+            }
+
+            // Insert to first empty slot
+            if (!item.isEmpty) {
+                for (index in slots) {
+                    val slot = slotBindings[index]!!
+                    val originItem = slot.stack
+                    if (originItem.isEmpty && slot.canInsert(item)) {
+                        if (item.count > slot.maxItemCount) {
+                            slot.stack = item.split(slot.maxItemCount)
+                        } else {
+                            slot.stack = item.split(item.count)
+                        }
+                        slot.markDirty()
+                        inserted = true
+                        break
+                    }
+                }
+            }
+
+            return inserted
         }
     }
 }

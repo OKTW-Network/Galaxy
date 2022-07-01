@@ -22,8 +22,10 @@ import com.mojang.brigadier.Command.SINGLE_SUCCESS
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import kotlinx.coroutines.*
+import net.minecraft.inventory.SimpleInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.screen.ScreenHandlerType
+import net.minecraft.screen.slot.Slot
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
@@ -50,25 +52,29 @@ class TestGUI : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + 
                         }
                         .executes {
                             val row = IntegerArgumentType.getInteger(it, "row")
-                            val gui = when (row) {
-                                1 -> GUI(ScreenHandlerType.GENERIC_9X1, Text.empty())
-                                2 -> GUI(ScreenHandlerType.GENERIC_9X2, Text.empty())
-                                3 -> GUI(ScreenHandlerType.GENERIC_9X3, Text.empty())
-                                4 -> GUI(ScreenHandlerType.GENERIC_9X4, Text.empty())
-                                5 -> GUI(ScreenHandlerType.GENERIC_9X5, Text.empty())
-                                6 -> GUI(ScreenHandlerType.GENERIC_9X6, Text.empty())
-                                33 -> GUI(ScreenHandlerType.GENERIC_3X3, Text.empty())
-                                51 -> GUI(ScreenHandlerType.HOPPER, Text.empty())
+                            val type = when (row) {
+                                1 -> ScreenHandlerType.GENERIC_9X1
+                                2 -> ScreenHandlerType.GENERIC_9X2
+                                3 -> ScreenHandlerType.GENERIC_9X3
+                                4 -> ScreenHandlerType.GENERIC_9X4
+                                5 -> ScreenHandlerType.GENERIC_9X5
+                                6 -> ScreenHandlerType.GENERIC_9X6
+                                33 -> ScreenHandlerType.GENERIC_3X3
+                                51 -> ScreenHandlerType.HOPPER
                                 else -> return@executes SINGLE_SUCCESS
                             }
+                            val inventory = SimpleInventory(9 * 6)
 
+                            val builder = GUI.Builder(type)
+
+                            var i = 0
                             when (row) {
-                                in 1..6 -> for (x in 0..8) for (y in 0 until row) gui.setAllowUse(x, y, true)
-                                33 -> for (x in 0..2) for (y in 0..2) gui.setAllowUse(x, y, true)
-                                51 -> for (i in 0..4) gui.setAllowUse(i, 0, true)
+                                in 1..6 -> for (x in 0..8) for (y in 0 until row) builder.addSlot(x, y, Slot(inventory, i++, 0, 0))
+                                33 -> for (x in 0..2) for (y in 0..2) builder.addSlot(x, y, Slot(inventory, i++, 0, 0))
+                                51 -> for (j in 0..4) builder.addSlot(0, j, Slot(inventory, i++, 0, 0))
                             }
 
-                            GUISBackStackManager.openGUI(it.source.playerOrThrow, gui)
+                            GUISBackStackManager.openGUI(it.source.playerOrThrow, builder.build())
 
                             return@executes SINGLE_SUCCESS
                         }
@@ -78,8 +84,15 @@ class TestGUI : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + 
 
     private fun execute(source: ServerCommandSource): Int {
         val player = source.playerOrThrow
-        val gui = GUI(ScreenHandlerType.GENERIC_9X6, Text.of("Test"))
-        val gui2 = GUI(ScreenHandlerType.GENERIC_9X1, Text.empty())
+        val inventory = SimpleInventory(7 * 4)
+        val gui = GUI.Builder(ScreenHandlerType.GENERIC_9X6).setTitle(Text.of("TEST")).apply {
+            var i = 0
+            for (x in 1..7) for (y in 1..4) {
+                if (x == 1 && y == 1) continue
+                addSlot(x, y, Slot(inventory, i++, 0, 0))
+            }
+        }.build()
+        val gui2 = GUI.Builder(ScreenHandlerType.GENERIC_9X1).build()
 
         gui2.editInventory {
             fillAll(Gui.BLANK.createItemStack())
@@ -93,9 +106,6 @@ class TestGUI : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + 
             }
         }
 
-        for (x in 1..7) for (y in 1..4) gui.setAllowUse(x, y, true)
-
-        gui.setAllowUse(1, 1, false)
         gui.addBinding(1, 1) {
             GUISBackStackManager.openGUI(player, gui2)
         }

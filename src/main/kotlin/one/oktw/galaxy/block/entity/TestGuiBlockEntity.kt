@@ -36,6 +36,7 @@ import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
+import one.oktw.galaxy.item.Button
 import one.oktw.galaxy.item.Gui
 
 class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : ModelCustomBlockEntity(type, pos, modelItem),
@@ -43,8 +44,29 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     private val inventory = DefaultedList.ofSize(3 * 9, ItemStack.EMPTY)
     private val gui = GUI.Builder(ScreenHandlerType.GENERIC_9X6).setTitle(Text.of("Test GUI")).apply {
         var i = 0
-        for (y in 3 until 6) for (x in 0 until 9) addSlot(x, y, Slot(this@TestGuiBlockEntity, i++, 0, 0))
-    }.build().apply { editInventory { fill(0 until 9, 0 until 3, Gui.EXTEND.createItemStack()) } }
+        for (x in 0 until 9) addSlot(x, 0, Slot(this@TestGuiBlockEntity, i++, 0, 0))
+        for (y in 4 until 6) for (x in 0 until 9) addSlot(x, y, Slot(this@TestGuiBlockEntity, i++, 0, 0))
+    }.build().apply {
+        editInventory {
+            fill(0 until 9, 1 until 4, Gui.EXTEND.createItemStack())
+            set(4, 2, Gui.INFO.createItemStack())
+        }
+        addBinding(4, 2) {
+            GUISBackStackManager.openGUI(player, gui2)
+        }
+    }
+    private val gui2 = GUI.Builder(ScreenHandlerType.GENERIC_9X4).setTitle(Text.of("Test GUI2")).apply {
+        var i = 0
+        for (y in 0 until 3) for (x in 0 until 9) addSlot(x, y, Slot(this@TestGuiBlockEntity, i++, 0, 0))
+    }.build().apply {
+        editInventory {
+            fill(0 until 9, 3..3, Gui.EXTEND.createItemStack())
+            set(4, 3, Button.NO.createItemStack().setCustomName(Text.of("CLOSE ALL")))
+        }
+        addBinding(4, 3) {
+            GUISBackStackManager.closeAll(player)
+        }
+    }
 
     override fun readCopyableData(nbt: NbtCompound) {
         Inventories.readNbt(nbt, inventory)

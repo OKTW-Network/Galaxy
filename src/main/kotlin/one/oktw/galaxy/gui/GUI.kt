@@ -31,6 +31,7 @@ import net.minecraft.screen.ScreenHandlerType.*
 import net.minecraft.screen.slot.Slot
 import net.minecraft.screen.slot.SlotActionType
 import net.minecraft.screen.slot.SlotActionType.*
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.gui.utils.InventoryEditor
@@ -173,7 +174,7 @@ class GUI private constructor(private val type: ScreenHandlerType<out ScreenHand
             // Trigger binding
             if (slot in 0 until inventory.size()) {
                 inventoryUtils.indexToXY(slot).let { (x, y) ->
-                    val event = GUIClickEvent(x, y, action, inventory.getStack(slot))
+                    val event = GUIClickEvent(player as ServerPlayerEntity, x, y, action, inventory.getStack(slot))
                     bindings[slot]?.invoke(event)
                     rangeBindings.filterKeys { (xRange, yRange) -> x in xRange && y in yRange }.values.forEach { it.invoke(event) }
                     if (event.cancel) {

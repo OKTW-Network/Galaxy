@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,5 +20,6 @@ package one.oktw.galaxy.gui
 
 import net.minecraft.item.ItemStack
 import net.minecraft.screen.slot.SlotActionType
+import net.minecraft.server.network.ServerPlayerEntity
 
-data class GUIClickEvent(val x: Int, val y: Int, val action: SlotActionType, val item: ItemStack, var cancel: Boolean = false)
+data class GUIClickEvent(val player: ServerPlayerEntity, val x: Int, val y: Int, val action: SlotActionType, val item: ItemStack, var cancel: Boolean = false)

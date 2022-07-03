@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,6 +24,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import one.oktw.galaxy.block.CustomBlockHelper
 import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
+import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
@@ -47,19 +48,16 @@ class BlockEvents {
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
         val packet = event.packet
-        val hand = packet.hand
         val player = event.player
-        if (eventLock.contains(packet) || usedLock.contains(player)) {
+        if (usedLock.contains(player)) {
             event.cancel = true
             return
         }
-        eventLock.add(packet)
-        // TODO GUI
-//        if (tryOpenGUI(event)) {
-//            player.swingHand(hand, true)
-//            usedLock.add(player)
-//            event.cancel = true
-//        }
+
+        // CustomBlockClickListener
+        if (player.getWorld().getBlockEntity(packet.blockHitResult.blockPos) is CustomBlockClickListener) {
+            usedLock.add(player)
+        }
     }
 
     @EventListener(true)
@@ -89,27 +87,4 @@ class BlockEvents {
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
         if (usedLock.contains(event.player)) event.cancel = true
     }
-
-    // TODO GUI
-//    private fun tryOpenGUI(event: PlayerInteractBlockEvent): Boolean {
-//        val packet = event.packet
-//        val position = packet.blockHitResult.blockPos
-//        val hand = packet.hand
-//        val player = event.player
-//        val world = player.serverWorld
-//        if (!player.shouldCancelInteraction()) {
-//            val entity = CustomBlockUtil.getCustomBlockEntity(world, position) ?: return false
-//            val blockType = CustomBlockUtil.getTypeFromCustomBlockEntity(entity) ?: return false
-//            if (blockType.hasGUI && hand == Hand.MAIN_HAND) when (blockType) { // TODO activate GUI
-//                BlockType.CONTROL_PANEL -> player.sendMessage(LiteralText("Control Panel"), false)
-//                BlockType.PLANET_TERMINAL -> player.sendMessage(LiteralText("Planet Terminal"), false)
-//                BlockType.HT_CRAFTING_TABLE -> player.sendMessage(LiteralText("HTCT"), false)
-//                BlockType.TELEPORTER_CORE_BASIC -> player.sendMessage(LiteralText("Basic Teleporter"), false)
-//                BlockType.TELEPORTER_CORE_ADVANCE -> player.sendMessage(LiteralText("Advanced Teleporter"), false)
-//                else -> Unit
-//            }
-//            return blockType.hasGUI
-//        }
-//        return false
-//    }
 }

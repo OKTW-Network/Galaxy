@@ -20,7 +20,6 @@ package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.item.ItemPlacementContext
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import one.oktw.galaxy.block.CustomBlockHelper
 import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
@@ -33,13 +32,11 @@ import one.oktw.galaxy.item.CustomItemHelper
 import one.oktw.galaxy.item.Tool
 
 class BlockEvents {
-    private val eventLock = HashSet<PlayerInteractBlockC2SPacket>()
     private val usedLock = HashSet<ServerPlayerEntity>()
 
     init {
         ServerTickEvents.END_WORLD_TICK.register(
             ServerTickEvents.EndWorldTick {
-                eventLock.clear()
                 usedLock.clear()
             }
         )
@@ -55,7 +52,7 @@ class BlockEvents {
         }
 
         // CustomBlockClickListener
-        if (player.getWorld().getBlockEntity(packet.blockHitResult.blockPos) is CustomBlockClickListener) {
+        if (!player.isSneaking && player.getWorld().getBlockEntity(packet.blockHitResult.blockPos) is CustomBlockClickListener) {
             usedLock.add(player)
         }
     }

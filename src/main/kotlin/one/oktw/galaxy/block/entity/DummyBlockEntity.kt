@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,8 +30,12 @@ class DummyBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : CustomBlockEnt
         nbt.getString("id")?.let(Identifier::tryParse)?.let(CustomBlock.registry::get)?.let {
             if (it != CustomBlock.DUMMY) {
                 world?.removeBlockEntity(pos)
-                world?.addBlockEntity(it.createBlockEntity(pos))
+                world?.addBlockEntity(it.createBlockEntity(pos).apply { readCopyableData(nbt) })
             }
         }
+    }
+
+    override fun writeNbt(nbt: NbtCompound) {
+        // I'm dummy.
     }
 }

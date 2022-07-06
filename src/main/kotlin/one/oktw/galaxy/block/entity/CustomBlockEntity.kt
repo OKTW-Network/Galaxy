@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,9 +21,27 @@ package one.oktw.galaxy.block.entity
 import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.entity.BlockEntityType
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.util.math.BlockPos
 
 // BlockEntity need extend
 open class CustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : BlockEntity(type, pos, Blocks.BARRIER.defaultState) {
     fun getId() = BlockEntityType.getId(type)!!
+
+    override fun readNbt(nbt: NbtCompound) {
+        super.readNbt(nbt)
+        readCopyableData(nbt)
+    }
+
+    override fun writeNbt(nbt: NbtCompound) {
+        super.writeNbt(nbt)
+        nbt.putString("id", getId().toString()) // We need ID to mapping block entity, always write it.
+    }
+
+    /**
+     * Read custom data from NBT, it will use on block clone.
+     *
+     * Also call by [readNbt].
+     */
+    open fun readCopyableData(nbt: NbtCompound) = Unit
 }

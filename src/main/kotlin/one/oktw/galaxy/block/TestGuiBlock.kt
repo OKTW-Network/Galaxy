@@ -18,21 +18,13 @@
 
 package one.oktw.galaxy.block
 
-import net.minecraft.block.Blocks.BARRIER
-import net.minecraft.item.ItemStack
-import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.entity.CustomBlockEntity
-import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
+import one.oktw.galaxy.block.entity.TestGuiBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
-import one.oktw.galaxy.item.CustomItemHelper
 
-open class ModelCustomBlock(identifier: Identifier, protected val modelItem: ItemStack) : CustomBlock(identifier, BARRIER) {
-    constructor(id: String, modelItem: ItemStack) : this(Identifier("galaxy", "block/$id"), modelItem)
-
-    override fun toItem() = modelItem.let { CustomItemHelper.getItem(it) as? CustomBlockItem }
-
+class TestGuiBlock : ModelCustomBlock("test_gui", CustomBlockItem.TEST_GUI.createItemStack()) {
     override fun createBlockEntity(pos: BlockPos): CustomBlockEntity {
-        return ModelCustomBlockEntity(blockEntityType, pos, modelItem)
+        return TestGuiBlockEntity(blockEntityType, pos, modelItem)
     }
 }

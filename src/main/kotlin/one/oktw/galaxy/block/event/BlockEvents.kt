@@ -30,14 +30,15 @@ import one.oktw.galaxy.event.type.PlayerInteractItemEvent
 import one.oktw.galaxy.event.type.PlayerUseItemOnBlock
 import one.oktw.galaxy.item.CustomItemHelper
 import one.oktw.galaxy.item.Tool
+import java.util.*
 
 class BlockEvents {
-    private val usedLock = HashSet<ServerPlayerEntity>()
+    private val usedLock = WeakHashMap<ServerPlayerEntity, Int>()
 
     init {
         ServerTickEvents.END_WORLD_TICK.register(
             ServerTickEvents.EndWorldTick {
-                usedLock.clear()
+                usedLock.entries.removeIf { (_, v) -> v + 3 < it.server.ticks } // Packet task max delay 3 tick
             }
         )
     }
@@ -53,7 +54,7 @@ class BlockEvents {
 
         // CustomBlockClickListener
         if (!player.isSneaking && player.getWorld().getBlockEntity(packet.blockHitResult.blockPos) is CustomBlockClickListener) {
-            usedLock.add(player)
+            usedLock[player] = player.server.ticks
         }
     }
 
@@ -65,7 +66,7 @@ class BlockEvents {
         // Place custom block
         if (CustomBlockHelper.place(ItemPlacementContext(event.context))) {
             event.swing = true
-            usedLock.add(player)
+            usedLock[player] = player.server.ticks
             return
         }
 
@@ -76,12 +77,15 @@ class BlockEvents {
             if (world.getBlockEntity(blockPos) !is ModelCustomBlockEntity) return // Check is custom block
             CustomBlockHelper.destroyAndDrop(world, blockPos)
             event.swing = true
-            usedLock.add(player)
+            usedLock[player] = player.server.ticks
         }
     }
 
     @EventListener(true)
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
-        if (usedLock.contains(event.player)) event.cancel = true
+        if (usedLock.contains(event.player)) {
+            event.cancel = true
+            usedLock.remove(event.player) // Interact item is the last interactive event
+        }
     }
 }

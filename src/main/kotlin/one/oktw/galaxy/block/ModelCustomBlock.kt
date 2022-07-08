@@ -27,7 +27,7 @@ import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.CustomItemHelper
 
-open class ModelCustomBlock(identifier: Identifier, protected val modelItem: ItemStack) : CustomBlock(identifier, BARRIER) {
+open class ModelCustomBlock(identifier: Identifier, protected open val modelItem: ItemStack) : CustomBlock(identifier, BARRIER) {
     constructor(id: String, modelItem: ItemStack) : this(Identifier("galaxy", "block/$id"), modelItem)
 
     override fun toItem() = modelItem.let { CustomItemHelper.getItem(it) as? CustomBlockItem }

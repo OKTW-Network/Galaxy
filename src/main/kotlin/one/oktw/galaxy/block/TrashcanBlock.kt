@@ -26,7 +26,7 @@ import one.oktw.galaxy.block.entity.TrashcanBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.CustomItemHelper
 
-class TrashcanBlock(identifier: Identifier, private val modelItem: ItemStack) : ModelCustomBlock(identifier, modelItem) {
+class TrashcanBlock(identifier: Identifier, override val modelItem: ItemStack) : ModelCustomBlock(identifier, modelItem) {
     constructor(id: String, modelItem: ItemStack) : this(Identifier("galaxy", "block/$id"), modelItem)
 
     override fun toItem() = modelItem.let { CustomItemHelper.getItem(it) as? CustomBlockItem }

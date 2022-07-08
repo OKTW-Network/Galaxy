@@ -23,13 +23,8 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.block.entity.TrashcanBlockEntity
-import one.oktw.galaxy.item.CustomBlockItem
-import one.oktw.galaxy.item.CustomItemHelper
 
-class TrashcanBlock(id: String, modelItem: ItemStack) :
-    ModelCustomBlock(Identifier("galaxy", "block/$id"), modelItem) {
-    override fun toItem() = modelItem.let { CustomItemHelper.getItem(it) as? CustomBlockItem }
-
+class TrashcanBlock(id: String, modelItem: ItemStack) : ModelCustomBlock(Identifier("galaxy", "block/$id"), modelItem) {
     override fun createBlockEntity(pos: BlockPos): CustomBlockEntity {
         return TrashcanBlockEntity(blockEntityType, pos, modelItem)
     }

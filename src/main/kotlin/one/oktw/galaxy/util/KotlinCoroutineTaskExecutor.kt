@@ -26,7 +26,7 @@ import net.minecraft.util.thread.TaskQueue
 class KotlinCoroutineTaskExecutor<T>(private val queue: TaskQueue<in T, out Runnable>, name: String) : TaskExecutor<T>(queue, null, name), CoroutineScope {
     companion object {
         @OptIn(ExperimentalCoroutinesApi::class)
-        private val dispatcher = Dispatchers.IO.limitedParallelism(16)
+        private val dispatcher = Dispatchers.IO.limitedParallelism(8)
     }
 
     private val job = SupervisorJob()

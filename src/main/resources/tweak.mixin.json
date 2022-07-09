@@ -6,6 +6,7 @@
     "MixinAsyncChunk_RegionBasedStorage",
     "MixinAsyncChunk_RegionFile",
     "MixinAsyncChunk_StorageIoWorker",
+    "MixinAsyncChunk_ThreadedAnvilChunkStorage",
     "MixinCustomBlockEntity_BarrierBlock",
     "MixinCustomBlockEntity_Structure",
     "MixinFixBeacon_BeaconBlockEntity",

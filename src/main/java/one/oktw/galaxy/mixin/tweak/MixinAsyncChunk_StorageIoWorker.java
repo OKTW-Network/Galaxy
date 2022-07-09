@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -75,9 +75,11 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
         }
     }
 
-    @Inject(method = "write", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/storage/RegionBasedStorage;write(Lnet/minecraft/util/math/ChunkPos;Lnet/minecraft/nbt/NbtCompound;)V"))
+    @Inject(method = "write", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/storage/RegionBasedStorage;write(Lnet/minecraft/util/math/ChunkPos;Lnet/minecraft/nbt/NbtCompound;)V"), cancellable = true)
     private void removeResults(ChunkPos pos, StorageIoWorker.Result result, CallbackInfo ci) {
-        this.results.remove(pos, result);
+        if (!this.results.remove(pos, result)) { // Only write once
+            ci.cancel();
+        }
     }
 
     @SuppressWarnings("UnresolvedMixinReference")

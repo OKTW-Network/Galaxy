@@ -79,17 +79,6 @@ class Main : DedicatedServerModInitializer {
             server = it as MinecraftDedicatedServer
             eventManager = EventManager(server)
 
-            // TODO fix resourcePack
-//            val resourcePackUrl: String? = System.getenv("resourcePack")
-//            if (!resourcePackUrl.isNullOrBlank()) {
-//                GlobalScope.launch {
-//                    val resourcePack = ResourcePack.new(resourcePackUrl)
-//                    withContext(server.asCoroutineDispatcher()) {
-//                        server.setResourcePack(resourcePack.uri.toString(), resourcePack.hash)
-//                    }
-//                }
-//            }
-
             // Register Proxy packet receiver
             ServerPlayNetworking.registerGlobalReceiver(PROXY_IDENTIFIER) { _, player, _, buf, _ ->
                 eventManager.emit(ProxyResponseEvent(player, ProxyAPI.decode(buf.nioBuffer())))

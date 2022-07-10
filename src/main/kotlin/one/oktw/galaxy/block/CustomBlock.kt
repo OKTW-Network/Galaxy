@@ -48,6 +48,7 @@ open class CustomBlock(final override val identifier: Identifier, val baseBlock:
         val HT_CRAFTING_TABLE = registry.register(ModelCustomBlock("ht_crafting_table", CustomBlockItem.HT_CRAFTING_TABLE.createItemStack()))
         val ELEVATOR = registry.register(ModelCustomBlock("elevator", CustomBlockItem.ELEVATOR.createItemStack()))
         val ANGEL_BLOCK = registry.register(ModelCustomBlock("angel_block", CustomBlockItem.ANGEL_BLOCK.createItemStack()))
+        val TRASHCAN = registry.register(TrashcanBlock("trashcan", CustomBlockItem.TRASHCAN.createItemStack()))
         val TELEPORTER_CORE_BASIC = registry.register(ModelCustomBlock("teleporter_core_basic", CustomBlockItem.TELEPORTER_CORE_BASIC.createItemStack()))
         val TELEPORTER_CORE_ADVANCE = registry.register(ModelCustomBlock("teleporter_core_advance", CustomBlockItem.TELEPORTER_CORE_ADVANCE.createItemStack()))
         val TELEPORTER_FRAME = registry.register(ModelCustomBlock("teleporter_frame", CustomBlockItem.TELEPORTER_FRAME.createItemStack()))

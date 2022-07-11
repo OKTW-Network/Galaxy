@@ -5,6 +5,7 @@
   "mixins": [
     "MixinAsyncChunk_RegionBasedStorage",
     "MixinAsyncChunk_RegionFile",
+    "MixinAsyncChunk_ServerPlayNetworkHandler",
     "MixinAsyncChunk_StorageIoWorker",
     "MixinAsyncChunk_ThreadedAnvilChunkStorage",
     "MixinCustomBlockEntity_BarrierBlock",

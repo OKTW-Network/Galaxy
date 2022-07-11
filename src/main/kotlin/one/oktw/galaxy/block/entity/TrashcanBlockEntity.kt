@@ -22,9 +22,27 @@ import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventory
 import net.minecraft.item.ItemStack
+import net.minecraft.screen.ScreenHandlerType
+import net.minecraft.screen.slot.Slot
+import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.text.Text
+import net.minecraft.util.ActionResult
+import net.minecraft.util.Hand
+import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
+import one.oktw.galaxy.block.listener.CustomBlockClickListener
+import one.oktw.galaxy.gui.GUI
+import one.oktw.galaxy.gui.GUISBackStackManager
 
-class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : Inventory, ModelCustomBlockEntity(type, pos, modelItem) {
+class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : Inventory, ModelCustomBlockEntity(type, pos, modelItem),
+    CustomBlockClickListener {
+    private val gui = GUI.Builder(ScreenHandlerType.GENERIC_9X4)
+        .setTitle(Text.of("Trashcan"))
+        .apply {
+            for (y in 0 until 4) for (x in 0 until 9) addSlot(x, 0, Slot(this@TrashcanBlockEntity, x, 0, 0))
+        }
+        .build()
+
     override fun clear() {}
 
     override fun size(): Int = 1
@@ -39,5 +57,14 @@ class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: It
 
     override fun setStack(slot: Int, stack: ItemStack?) {}
 
-    override fun canPlayerUse(player: PlayerEntity?): Boolean = false
+    override fun canPlayerUse(player: PlayerEntity): Boolean {
+        return if (world!!.getBlockEntity(pos) !== this) {
+            false
+        } else player.squaredDistanceTo(pos.x.toDouble() + 0.5, pos.y.toDouble() + 0.5, pos.z.toDouble() + 0.5) <= 64.0
+    }
+
+    override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {
+        GUISBackStackManager.openGUI(player as ServerPlayerEntity, gui)
+        return ActionResult.SUCCESS
+    }
 }

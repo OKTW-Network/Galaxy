@@ -41,11 +41,14 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Mixin(ThreadedAnvilChunkStorage.class)
 public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage {
+    private final HashMap<ChunkPos, CompletableFuture<Void>> poiFutures = new HashMap<>();
+
     @Shadow
     @Final
     private static Logger LOGGER;
@@ -94,12 +97,18 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage {
         var poiFuture = CompletableFuture.<Void>completedFuture(null);
         //noinspection OptionalAssignedToNull
         if (poiData == null || poiData.isEmpty()) {
-            poiFuture = ((SerializingRegionBasedStorageAccessor) pointOfInterestStorage).callLoadNbt(pos).thenAcceptAsync(nbt -> {
-                RegistryOps<NbtElement> registryOps = RegistryOps.of(NbtOps.INSTANCE, world.getRegistryManager());
-                poiStorage.callUpdate(pos, registryOps, nbt.orElse(null));
-            }, this.mainThreadExecutor);
+            if (poiFutures.containsKey(pos)) {
+                poiFuture = poiFutures.get(pos);
+            } else {
+                poiFuture = ((SerializingRegionBasedStorageAccessor) pointOfInterestStorage).callLoadNbt(pos).thenAcceptAsync(nbt -> {
+                    RegistryOps<NbtElement> registryOps = RegistryOps.of(NbtOps.INSTANCE, world.getRegistryManager());
+                    poiStorage.callUpdate(pos, registryOps, nbt.orElse(null));
+                }, this.mainThreadExecutor);
+                poiFutures.put(pos, poiFuture);
+            }
         }
         return CompletableFuture.allOf(chunkNbtFuture, poiFuture).thenApplyAsync(unused -> {
+            poiFutures.remove(pos);
             var nbt = chunkNbtFuture.join();
             this.world.getProfiler().visit("chunkLoad");
             if (nbt.isPresent()) {

@@ -62,7 +62,9 @@ class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: It
         val gui = GUI.Builder(ScreenHandlerType.GENERIC_9X4)
             .setTitle(Text.of("Trashcan"))
             .apply {
-                for (y in 0 until 4) for (x in 0 until 9) addSlot(x, y, Slot(FakeInventory(9 * 4), x, 0, 0))
+                var i = 0
+                val inv = FakeInventory(9 * 4)
+                for (y in 0 until 4) for (x in 0 until 9) addSlot(x, y, Slot(inv, i++, 0, 0))
             }
             .build()
 

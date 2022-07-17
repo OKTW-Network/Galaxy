@@ -41,6 +41,13 @@ class ItemLoreBuilder(val item: ItemStack) {
         return this
     }
 
+    fun addText(texts: ArrayList<Text>): ItemLoreBuilder {
+        for (text in texts) {
+            addText(text)
+        }
+        return this
+    }
+
     fun clear(): ItemLoreBuilder {
         this.list.clear()
         return this

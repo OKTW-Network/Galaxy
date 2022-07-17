@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,6 +24,7 @@ import net.minecraft.server.command.ServerCommandSource
 import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.command.commands.admin.FlySpeed
 import one.oktw.galaxy.command.commands.admin.GetItem
+import one.oktw.galaxy.command.commands.admin.GetWeapon
 import one.oktw.galaxy.command.commands.admin.RegisterBlock
 
 class Admin : Command {
@@ -32,6 +33,7 @@ class Admin : Command {
             CommandManager.literal("admin")
                 .requires { source -> source.hasPermissionLevel(2) }
                 .then(GetItem().command)
+                .then(GetWeapon().command)
                 .then(RegisterBlock.command)
                 .then(FlySpeed().command)
         )

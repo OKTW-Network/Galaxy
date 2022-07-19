@@ -54,34 +54,34 @@ class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: It
     override fun canPlayerUse(player: PlayerEntity): Boolean = false
 
     override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {
-        if (!player.isSpectator) {
-            val gui = GUI
-                .Builder(ScreenHandlerType.GENERIC_9X4)
-                .apply {
-                    setTitle(Text.of("Trashcan"))
-
-                    var i = 0
-//                    val inv = object : SimpleInventory(9 * 4) {
-//                        override fun canPlayerUse(player: PlayerEntity): Boolean {
-//                            val trashcanBlock = this@TrashcanBlockEntity
-//                            if (trashcanBlock.world!!.getBlockEntity(trashcanBlock.pos) != trashcanBlock) {
-//                                return false
-//                            }
-//
-//                            return player.squaredDistanceTo(trashcanBlock.pos.x + 0.5, trashcanBlock.pos.y + 0.5, trashcanBlock.pos.z + 0.5) <= 64
-//                        }
-//                    }
-                    val inv = SimpleInventory(9 * 4)
-
-                    for (y in 0 until 4) for (x in 0 until 9) addSlot(x, y, Slot(inv, i++, 0, 0))
-                }
-                .build()
-
-            GUISBackStackManager.openGUI(player as ServerPlayerEntity, gui)
-
-            return ActionResult.SUCCESS
+        if (player.isSpectator) {
+            return ActionResult.CONSUME
         }
 
-        return ActionResult.CONSUME
+        val gui = GUI
+            .Builder(ScreenHandlerType.GENERIC_9X4)
+            .apply {
+                setTitle(Text.of("Trashcan"))
+
+                var i = 0
+//                val inv = object : SimpleInventory(9 * 4) {
+//                    override fun canPlayerUse(player: PlayerEntity): Boolean {
+//                        val trashcanBlock = this@TrashcanBlockEntity
+//                        if (trashcanBlock.world!!.getBlockEntity(trashcanBlock.pos) != trashcanBlock) {
+//                            return false
+//                        }
+//
+//                        return player.squaredDistanceTo(trashcanBlock.pos.x + 0.5, trashcanBlock.pos.y + 0.5, trashcanBlock.pos.z + 0.5) <= 64
+//                    }
+//                }
+                val inv = SimpleInventory(9 * 4)
+
+                for (y in 0 until 4) for (x in 0 until 9) addSlot(x, y, Slot(inv, i++, 0, 0))
+            }
+            .build()
+
+        GUISBackStackManager.openGUI(player as ServerPlayerEntity, gui)
+
+        return ActionResult.SUCCESS
     }
 }

@@ -21,6 +21,7 @@ package one.oktw.galaxy.block.event
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.util.Hand
 import one.oktw.galaxy.block.CustomBlockHelper
 import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
 import one.oktw.galaxy.block.listener.CustomBlockClickListener
@@ -49,6 +50,7 @@ class BlockEvents {
         val player = event.player
         if (usedLock.contains(player)) {
             event.cancel = true
+            if (event.packet.hand == Hand.OFF_HAND && player.offHandStack.isEmpty) usedLock.remove(player) // Interact block using off_hand is the last event when off_hand is empty.
             return
         }
 
@@ -84,9 +86,10 @@ class BlockEvents {
 
     @EventListener(true)
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
-        if (usedLock.contains(event.player)) {
+        val player = event.player
+        if (usedLock.contains(player)) {
             event.cancel = true
-            usedLock.remove(event.player) // Interact item is the last interactive event
+            if (event.packet.hand == Hand.OFF_HAND) usedLock.remove(player) // Interact item is the last interactive event
         }
     }
 }

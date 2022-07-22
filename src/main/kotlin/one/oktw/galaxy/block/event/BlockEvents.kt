@@ -19,6 +19,7 @@
 package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+import net.minecraft.advancement.criterion.Criteria
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.Hand
@@ -46,7 +47,6 @@ class BlockEvents {
 
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
-        val packet = event.packet
         val player = event.player
         if (usedLock.contains(player)) {
             event.cancel = true
@@ -55,9 +55,16 @@ class BlockEvents {
         }
 
         // CustomBlockClickListener
-        val canInteract = !player.shouldCancelInteraction() || player.mainHandStack.isEmpty && player.offHandStack.isEmpty
-        if (canInteract && player.getWorld().getBlockEntity(packet.blockHitResult.blockPos) is CustomBlockClickListener) {
-            usedLock[player] = player.server.ticks
+        if (!player.shouldCancelInteraction() || player.mainHandStack.isEmpty && player.offHandStack.isEmpty) {
+            val packet = event.packet
+            val hitResult = packet.blockHitResult
+            val blockEntity = player.getWorld().getBlockEntity(hitResult.blockPos) as? CustomBlockClickListener ?: return
+            val result = blockEntity.onClick(player, packet.hand, hitResult)
+            if (result.isAccepted) {
+                Criteria.ITEM_USED_ON_BLOCK.trigger(player, hitResult.blockPos, player.getStackInHand(packet.hand))
+                event.swing = result.shouldSwingHand()
+                usedLock[player] = player.server.ticks
+            }
         }
     }
 

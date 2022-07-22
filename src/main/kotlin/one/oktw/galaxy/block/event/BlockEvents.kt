@@ -53,7 +53,8 @@ class BlockEvents {
         }
 
         // CustomBlockClickListener
-        if (!player.isSneaking && player.getWorld().getBlockEntity(packet.blockHitResult.blockPos) is CustomBlockClickListener) {
+        val canInteract = !player.shouldCancelInteraction() || player.mainHandStack.isEmpty && player.offHandStack.isEmpty
+        if (canInteract && player.getWorld().getBlockEntity(packet.blockHitResult.blockPos) is CustomBlockClickListener) {
             usedLock[player] = player.server.ticks
         }
     }

@@ -21,21 +21,39 @@ package one.oktw.galaxy.recipe.utils
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.tag.TagKey
+import net.minecraft.util.registry.Registry
+import one.oktw.galaxy.item.CustomItem
+import one.oktw.galaxy.item.CustomItemHelper
 
 class Ingredient(
+    private val previewItem: ItemStack? = null,
     private val tag: TagKey<Item>? = null,
-    private val items: List<Item>? = null
+    private val items: List<Item>? = null,
+    private val customItem: List<CustomItem>? = null
 ) {
     init {
-        if (tag == null && items == null) throw IllegalArgumentException("No input provided.")
-        if (tag != null && items != null) throw IllegalArgumentException("Only one input is allowed.")
+        if (tag == null && items == null && customItem == null) throw IllegalArgumentException("No input provided.")
+        if (tag != null && items != null || customItem != null && items != null || tag != null && customItem != null) {
+            throw IllegalArgumentException("Only one input is allowed.")
+        }
     }
 
     fun matches(input: ItemStack): Boolean {
         return when {
             tag != null -> input.isIn(tag)
             items != null -> items.contains(input.item)
+            customItem != null -> customItem.contains(CustomItemHelper.getItem(input))
             else -> false
+        }
+    }
+
+    fun genPreviewItem(): ItemStack {
+        return when {
+            previewItem != null -> previewItem
+            tag != null -> ItemStack(Registry.ITEM.iterateEntries(tag).first())
+            items != null -> items.first().defaultStack
+            customItem != null -> customItem.first().createItemStack()
+            else -> throw IllegalArgumentException("No input provided.")
         }
     }
 }

@@ -42,7 +42,7 @@ class Sword(id: String, modelData: Int, name: String) : Weapon(id, modelData, na
         val SWORD_NANOSABER_SCABBARD = registry.register(Sword("sword_nanosaber_scabbard", 3020702, "item.Weapon.NANOSABER.SCABARD"))
     }
 
-    override val weaponData = SwordData.default
+    override val weaponData = SwordData()
 
     override fun readCustomNbt(nbt: NbtCompound): CustomItem {
         val nbtData = nbt.getCompound("WeaponData")

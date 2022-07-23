@@ -23,17 +23,13 @@ import net.minecraft.text.Text
 import one.oktw.galaxy.item.type.WeaponType
 
 data class GunData(
-    var heat: Int,
-    var maxTemp: Int,
-    var cooling: Double,
-    var damage: Double,
-    var range: Double,
-    var through: Int
+    var heat: Int = 1,
+    var maxTemp: Int = 1,
+    var cooling: Double = 1.0,
+    var damage: Double = 1.0,
+    var range: Double = 1.0,
+    var through: Int = 1
 ) : WeaponData(WeaponType.GUN) {
-    companion object {
-        val default = GunData(1, 1, 1.0, 1.0, 1.0, 1)
-    }
-
     override fun toLoreText() = arrayListOf(
         loreText(Text.of("傷害"), damage.toString()),
         loreText(Text.of("射程"), range.toString(), "B"),

@@ -23,12 +23,8 @@ import net.minecraft.text.Text
 import one.oktw.galaxy.item.type.WeaponType
 
 data class SwordData(
-    var damage: Double
+    var damage: Double = 1.0
 ) : WeaponData(WeaponType.SWORD) {
-    companion object {
-        val default = SwordData(1.0)
-    }
-
     override fun toLoreText() = arrayListOf(
         loreText(Text.of("傷害"), damage.toString())
     )

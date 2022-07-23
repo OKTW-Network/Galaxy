@@ -33,7 +33,12 @@ class Gun(id: String, modelData: Int, name: String) : Weapon(id, modelData, name
         val RAILGUN_AIMING = registry.register(Gun("railgun_aiming", 3010401, "item.Gun.RAILGUN"))
     }
 
-    override val weaponData = GunData.default
+    override val weaponData = GunData()
+
+    fun migrateData(item: Gun) {
+        val oldData = item.weaponData
+        weaponData.applyValue(oldData.heat, oldData.maxTemp, oldData.cooling, oldData.damage, oldData.range, oldData.through)
+    }
 
     override fun readCustomNbt(nbt: NbtCompound): CustomItem {
         val nbtData = nbt.getCompound("WeaponData")

@@ -19,7 +19,8 @@
 package one.oktw.galaxy.command.commands
 
 import com.mojang.brigadier.CommandDispatcher
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.block.RespawnAnchorBlock
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.command.CommandManager
@@ -28,14 +29,13 @@ import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 class Home : Command {
-
-    private val lock = ConcurrentHashMap.newKeySet<UUID>()
+    private val lock = HashSet<UUID>()
 
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
@@ -73,17 +73,15 @@ class Home : Command {
             player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
             lock -= player.uuid
         } else {
-            GlobalScope.launch {
+            main?.launch {
                 // Add back charge in countdown stage
                 if (world != null) {
-                    withContext(player.server.asCoroutineDispatcher()) {
-                        val blockState = world.getBlockState(spawnPointPosition)
-                        if (blockState.block is RespawnAnchorBlock) {
-                            world.setBlockState(
-                                spawnPointPosition, blockState.with(RespawnAnchorBlock.CHARGES, blockState[RespawnAnchorBlock.CHARGES] + 1)
-                            )
-                            world.updateNeighbors(spawnPointPosition, blockState.block)
-                        }
+                    val blockState = world.getBlockState(spawnPointPosition)
+                    if (blockState.block is RespawnAnchorBlock) {
+                        world.setBlockState(
+                            spawnPointPosition, blockState.with(RespawnAnchorBlock.CHARGES, blockState[RespawnAnchorBlock.CHARGES] + 1)
+                        )
+                        world.updateNeighbors(spawnPointPosition, blockState.block)
                     }
                 }
 
@@ -93,39 +91,38 @@ class Home : Command {
                 }
                 player.sendMessage(Text.translatable("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
 
-                withContext(player.server.asCoroutineDispatcher()) {
-                    // Check Again
-                    val checkAgain = PlayerEntity.findRespawnPosition(
-                        world,
-                        spawnPointPosition,
-                        player.spawnAngle,
-                        player.isSpawnForced,
-                        player.notInAnyWorld
-                    )
-                    if (!checkAgain.isPresent) {
-                        player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
-                        lock -= player.uuid
-                        return@withContext
-                    }
-
-                    val world2 = if (world != null && checkAgain.isPresent) world else source.server.overworld
-                    val position = checkAgain.get()
-                    player.teleport(
-                        world2,
-                        position.x,
-                        position.y,
-                        position.z,
-                        player.yaw,
-                        player.pitch
-                    )
-
-                    val blockState = world2.getBlockState(spawnPointPosition)
-                    if (!player.notInAnyWorld && blockState.block is RespawnAnchorBlock) {
-                        world2.playSound(
-                            null, spawnPointPosition, SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.BLOCKS, 1.0F, 1.0F
-                        )
-                    }
+                // Check Again
+                val checkAgain = PlayerEntity.findRespawnPosition(
+                    world,
+                    spawnPointPosition,
+                    player.spawnAngle,
+                    player.isSpawnForced,
+                    player.notInAnyWorld
+                )
+                if (!checkAgain.isPresent) {
+                    player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
+                    lock -= player.uuid
+                    return@launch
                 }
+
+                val world2 = if (world != null && checkAgain.isPresent) world else source.server.overworld
+                val position = checkAgain.get()
+                player.teleport(
+                    world2,
+                    position.x,
+                    position.y,
+                    position.z,
+                    player.yaw,
+                    player.pitch
+                )
+
+                val blockState = world2.getBlockState(spawnPointPosition)
+                if (!player.notInAnyWorld && blockState.block is RespawnAnchorBlock) {
+                    world2.playSound(
+                        null, spawnPointPosition, SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.BLOCKS, 1.0F, 1.0F
+                    )
+                }
+
                 lock -= player.uuid
             }
         }

@@ -31,29 +31,39 @@ import net.minecraft.text.Text
 import net.minecraft.text.Texts
 import net.minecraft.util.Formatting.DARK_PURPLE
 
-class ItemLoreBuilder(val item: ItemStack) {
-    private val list = getOrCreateList()
+class LoreEditor private constructor(val item: ItemStack) {
+    companion object {
+        // Edit ItemStack Lore
+        fun ItemStack.loreEditor(block: LoreEditor.() -> Unit) {
+            val builder = LoreEditor(this) // Receiver
+            builder.block() // Run lambda block
+            this.apply { builder.apply() } // Return Item
+        }
 
-    private fun getOrCreateList(): NbtList = item.nbt?.getCompound(DISPLAY_KEY)?.getList(LORE_KEY, NbtElement.STRING_TYPE.toInt()) ?: NbtList()
+        // Get ItemStack Lore
+        fun ItemStack.getLoreTexts() = LoreEditor(this).getLoreList()
+    }
 
-    fun addText(text: Text): ItemLoreBuilder {
+    private val list = item.nbt?.getCompound(DISPLAY_KEY)?.getList(LORE_KEY, NbtElement.STRING_TYPE.toInt()) ?: NbtList()
+
+    fun addText(text: Text): LoreEditor {
         this.list.add(NbtString.of(Text.Serializer.toJson(text)))
         return this
     }
 
-    fun addText(texts: ArrayList<Text>): ItemLoreBuilder {
+    fun addText(texts: ArrayList<Text>): LoreEditor {
         for (text in texts) {
             addText(text)
         }
         return this
     }
 
-    fun clear(): ItemLoreBuilder {
+    fun clear(): LoreEditor {
         this.list.clear()
         return this
     }
 
-    fun getLoreList(): List<Text> {
+    private fun getLoreList(): List<Text> {
         val textList = ArrayList<Text>()
         for (i in 0 until list.size) {
             val string = list.getString(i) ?: continue
@@ -67,5 +77,5 @@ class ItemLoreBuilder(val item: ItemStack) {
         return textList
     }
 
-    fun apply(): ItemStack = item.apply { orCreateNbt.apply { getCompound(DISPLAY_KEY).apply { put(LORE_KEY, list) } } }
+    private fun apply(): ItemStack = item.apply { orCreateNbt.apply { getCompound(DISPLAY_KEY).apply { put(LORE_KEY, list) } } }
 }

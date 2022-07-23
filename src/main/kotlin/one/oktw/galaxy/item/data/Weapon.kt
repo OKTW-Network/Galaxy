@@ -90,7 +90,7 @@ data class Weapon(
             }
         }
         loreEditor {
-            addText(loreText(Text.of("傷害"), damage.toString()))
+            addText(loreText(Text.of("傷害"), this@Weapon.damage.toString()))
             addText(loreText(Text.of("射程"), range.toString(), "B"))
             addText(loreText(Text.of("穿透"), through.toString(), ""))
             addText(loreText(Text.of("積熱"), heat.toString(), "K/shot"))

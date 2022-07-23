@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,7 +21,7 @@ package one.oktw.galaxy.mixin.event;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import one.oktw.galaxy.Main;
+import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerJumpEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -40,8 +40,6 @@ public class MixinPlayerJump_NetworkHandler {
     )
     )
     private void onPlayerJump(PlayerMoveC2SPacket packet, CallbackInfo ci) {
-        Main main = Main.Companion.getMain();
-        if (main == null) return;
-        main.getEventManager().emit(new PlayerJumpEvent(packet, player));
+        EventManager.safeEmit(new PlayerJumpEvent(packet, player));
     }
 }

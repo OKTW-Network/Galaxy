@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -26,7 +26,7 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import one.oktw.galaxy.Main;
+import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerUpdateSignEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -47,9 +47,7 @@ public class MixinPlayerUpdateSign_NetworkHandler {
         cancellable = true,
         locals = LocalCapture.CAPTURE_FAILSOFT)
     private void onSignUpdate(UpdateSignC2SPacket updateSignC2SPacket, List<String> list, CallbackInfo ci, ServerWorld serverWorld, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity, SignBlockEntity signBlockEntity) {
-        Main main = Main.Companion.getMain();
-        if (main == null) return;
-        if (main.getEventManager().emit(new PlayerUpdateSignEvent(updateSignC2SPacket, player, signBlockEntity)).getCancel()) {
+        if (EventManager.safeEmit(new PlayerUpdateSignEvent(updateSignC2SPacket, player, signBlockEntity)).getCancel()) {
             ci.cancel();
 
             signBlockEntity.markDirty();

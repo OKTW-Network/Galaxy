@@ -34,7 +34,7 @@ import net.minecraft.util.math.Vec3d
 import one.oktw.galaxy.item.CustomItemHelper
 import one.oktw.galaxy.item.Weapon
 import one.oktw.galaxy.sound.GalaxySound
-import one.oktw.galaxy.util.ItemLoreBuilder
+import one.oktw.galaxy.util.LoreEditor.Companion.loreEditor
 import java.lang.Math.random
 import java.util.*
 import kotlin.math.abs
@@ -77,33 +77,26 @@ data class Weapon(
         fun default(item: Weapon) = Weapon(item, 1, 1, 1.0, 1.0, 1.0, 1, MathHelper.randomUuid())
     }
 
-    private fun applyLore(item: ItemStack): ItemStack {
-        return ItemLoreBuilder(item) // TODO Localize
-            .addText(loreText(Text.of("傷害"), damage.toString()))
-            .addText(loreText(Text.of("射程"), range.toString(), "B"))
-            .addText(loreText(Text.of("穿透"), through.toString(), ""))
-            .addText(loreText(Text.of("積熱"), heat.toString(), "K/shot"))
-            .addText(loreText(Text.of("耐熱"), maxTemp.toString(), "K"))
-            .addText(loreText(Text.of("冷卻"), cooling.toString(), "K/t"))
-            .apply()
-    }
-
-    fun toItemStack(): ItemStack {
-        val outPutItem = item.createItemStack().apply {
-            orCreateNbt.apply {
-                getCompound("CustomWeaponData").apply {
-                    putInt("heat", heat)
-                    putInt("maxTemp", maxTemp)
-                    putDouble("cooling", cooling)
-                    putDouble("damage", this@Weapon.damage)
-                    putDouble("range", range)
-                    putInt("through", through)
-                    putUuid("gunUUID", uuid)
-                }
+    fun toItemStack() = item.createItemStack().apply {
+        orCreateNbt.apply {
+            getCompound("CustomWeaponData").apply {
+                putInt("heat", heat)
+                putInt("maxTemp", maxTemp)
+                putDouble("cooling", cooling)
+                putDouble("damage", this@Weapon.damage)
+                putDouble("range", range)
+                putInt("through", through)
+                putUuid("gunUUID", uuid)
             }
         }
-
-        return applyLore(outPutItem)
+        loreEditor {
+            addText(loreText(Text.of("傷害"), damage.toString()))
+            addText(loreText(Text.of("射程"), range.toString(), "B"))
+            addText(loreText(Text.of("穿透"), through.toString(), ""))
+            addText(loreText(Text.of("積熱"), heat.toString(), "K/shot"))
+            addText(loreText(Text.of("耐熱"), maxTemp.toString(), "K"))
+            addText(loreText(Text.of("冷卻"), cooling.toString(), "K/t"))
+        }
     }
 
     private fun loreText(key: Text, value: String, unit: String = ""): Text =

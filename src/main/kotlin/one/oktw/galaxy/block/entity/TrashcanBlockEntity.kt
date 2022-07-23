@@ -21,10 +21,22 @@ package one.oktw.galaxy.block.entity
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventory
+import net.minecraft.inventory.SimpleInventory
 import net.minecraft.item.ItemStack
+import net.minecraft.screen.ScreenHandlerType
+import net.minecraft.screen.slot.Slot
+import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.text.Text
+import net.minecraft.util.ActionResult
+import net.minecraft.util.Hand
+import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
+import one.oktw.galaxy.block.listener.CustomBlockClickListener
+import one.oktw.galaxy.gui.GUI
+import one.oktw.galaxy.gui.GUISBackStackManager
 
-class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : Inventory, ModelCustomBlockEntity(type, pos, modelItem) {
+class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : Inventory, ModelCustomBlockEntity(type, pos, modelItem),
+    CustomBlockClickListener {
     override fun clear() {}
 
     override fun size(): Int = 1
@@ -39,5 +51,37 @@ class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: It
 
     override fun setStack(slot: Int, stack: ItemStack?) {}
 
-    override fun canPlayerUse(player: PlayerEntity?): Boolean = false
+    override fun canPlayerUse(player: PlayerEntity): Boolean = false
+
+    override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {
+        if (player.isSpectator) {
+            return ActionResult.CONSUME
+        }
+
+        val gui = GUI
+            .Builder(ScreenHandlerType.GENERIC_9X4)
+            .apply {
+                setTitle(Text.of("Trashcan"))
+
+                var i = 0
+//                val inv = object : SimpleInventory(9 * 4) {
+//                    override fun canPlayerUse(player: PlayerEntity): Boolean {
+//                        val trashcanBlock = this@TrashcanBlockEntity
+//                        if (trashcanBlock.world!!.getBlockEntity(trashcanBlock.pos) != trashcanBlock) {
+//                            return false
+//                        }
+//
+//                        return player.squaredDistanceTo(trashcanBlock.pos.x + 0.5, trashcanBlock.pos.y + 0.5, trashcanBlock.pos.z + 0.5) <= 64
+//                    }
+//                }
+                val inv = SimpleInventory(9 * 4)
+
+                for (y in 0 until 4) for (x in 0 until 9) addSlot(x, y, Slot(inv, i++, 0, 0))
+            }
+            .build()
+
+        GUISBackStackManager.openGUI(player as ServerPlayerEntity, gui)
+
+        return ActionResult.SUCCESS
+    }
 }

@@ -22,6 +22,8 @@ import kotlinx.coroutines.*
 import net.minecraft.util.Util
 import net.minecraft.util.thread.TaskExecutor
 import net.minecraft.util.thread.TaskQueue
+import net.minecraft.util.thread.TaskQueue.PrioritizedTask
+import java.util.concurrent.atomic.AtomicInteger
 
 class KotlinCoroutineTaskExecutor<T>(private val queue: TaskQueue<in T, out Runnable>, name: String) : TaskExecutor<T>(queue, null, name), CoroutineScope {
     companion object {
@@ -30,13 +32,32 @@ class KotlinCoroutineTaskExecutor<T>(private val queue: TaskQueue<in T, out Runn
     }
 
     private val job = SupervisorJob()
+    private val executePriority = AtomicInteger(0)
+    private val executingTask = AtomicInteger(0)
 
     override val coroutineContext = dispatcher + job
 
     override fun send(message: T) {
         queue.add(message)
         launch {
-            while (!queue.isEmpty) queue.poll()?.let { Util.debugRunnable(name, it).run() }
+            while (!queue.isEmpty) {
+                val task = queue.poll() ?: continue
+
+                // Check task priority
+                if (task is PrioritizedTask && executingTask.get() > 0 && task.priority > executePriority.get()) {
+                    // executing task priority higher than next task, wait all task done
+                    @Suppress("UNCHECKED_CAST")
+                    queue.add(task as T)
+                    job.join()
+                    continue
+                }
+
+                // Run task
+                if (task is PrioritizedTask) executePriority.set(task.priority)
+                executingTask.incrementAndGet()
+                Util.debugRunnable(name, task).run()
+                executingTask.decrementAndGet()
+            }
         }
     }
 

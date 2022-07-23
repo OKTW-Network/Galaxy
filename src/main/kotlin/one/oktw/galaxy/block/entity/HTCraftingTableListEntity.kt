@@ -41,12 +41,11 @@ import one.oktw.galaxy.recipe.HTCrafting.Recipes
 
 class HTCraftingTableListEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : ModelCustomBlockEntity(type, pos, modelItem), CustomBlockClickListener, Inventory {
     // Rewrite
-    private val inventory = DefaultedList.ofSize(3 * 9, ItemStack.EMPTY)
     private val gui = GUI.Builder(ScreenHandlerType.GENERIC_9X6).setTitle(Text.translatable("UI.Title.HiTechCraftingTableList")).build().apply {
         editInventory {
             // UI
-            for (y in 2 until 5) set(8, y, Gui.EXTEND.createItemStack())
-            for (x in 0 until 2) set(x, 0, Gui.EXTEND.createItemStack())
+            fill(0..1, 0..0, Gui.EXTEND.createItemStack())
+            fill(8..8, 2..4, Gui.EXTEND.createItemStack())
             set(2, 0, Button.ALL.createItemStack().setCustomName(Text.translatable("recipe.catalog.ALL").styled { it.withColor(Formatting.WHITE).withItalic(false) }))
             set(3, 0, CustomBlockItem.ELEVATOR.createItemStack().setCustomName(Text.translatable("recipe.catalog.MACHINE").styled { it.withColor(Formatting.WHITE).withItalic(false) }))
             set(4, 0, Tool.WRENCH.createItemStack().setCustomName(Text.translatable("recipe.catalog.TOOL").styled { it.withColor(Formatting.WHITE).withItalic(false) }))
@@ -84,47 +83,28 @@ class HTCraftingTableListEntity(type: BlockEntityType<*>, pos: BlockPos, modelIt
         }
     }
 
-    override fun readCopyableData(nbt: NbtCompound) {
-        Inventories.readNbt(nbt, inventory)
-    }
+    override fun readCopyableData(nbt: NbtCompound) {}
 
-    override fun writeNbt(nbt: NbtCompound) {
-        super.writeNbt(nbt)
-        Inventories.writeNbt(nbt, inventory)
-    }
+    override fun writeNbt(nbt: NbtCompound) {}
 
     override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {
         GUISBackStackManager.openGUI(player as ServerPlayerEntity, gui)
         return ActionResult.SUCCESS
     }
 
-    override fun clear() {
-        inventory.clear()
-    }
+    override fun clear() {}
 
-    override fun size() = inventory.size
+    override fun size(): Int = -1
 
-    override fun isEmpty() = inventory.isEmpty()
+    override fun isEmpty(): Boolean = true
 
-    override fun getStack(slot: Int) = inventory[slot]
+    override fun getStack(slot: Int): ItemStack = ItemStack.EMPTY
 
-    override fun removeStack(slot: Int, amount: Int): ItemStack {
-        val itemStack = Inventories.splitStack(inventory, slot, amount)
-        if (!itemStack.isEmpty) {
-            this.markDirty()
-        }
-        return itemStack
-    }
+    override fun removeStack(slot: Int, amount: Int): ItemStack = ItemStack.EMPTY
 
-    override fun removeStack(slot: Int): ItemStack = Inventories.removeStack(inventory, slot)
+    override fun removeStack(slot: Int): ItemStack = ItemStack.EMPTY
 
-    override fun setStack(slot: Int, stack: ItemStack) {
-        inventory[slot] = stack
-        if (stack.count > this.maxCountPerStack) {
-            stack.count = this.maxCountPerStack
-        }
-        this.markDirty()
-    }
+    override fun setStack(slot: Int, stack: ItemStack) {}
 
     override fun canPlayerUse(player: PlayerEntity): Boolean {
         return if (world!!.getBlockEntity(pos) !== this) {

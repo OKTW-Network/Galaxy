@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,7 +19,6 @@
 package one.oktw.galaxy.item
 
 import net.minecraft.item.Items.DIAMOND_HOE
-import net.minecraft.text.LiteralText
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
@@ -78,5 +77,5 @@ class Button private constructor(id: String, modelData: Int) : CustomItem(Identi
         val MEMBER_SETTING = registry.register(Button("member_setting", 2014004))
     }
 
-    override fun getName(): Text = LiteralText("").styled { it.withItalic(false) }
+    override fun getName(): Text = Text.literal("").styled { it.withItalic(false) }
 }

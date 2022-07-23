@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,8 +21,8 @@ package one.oktw.galaxy.mixin.tweak;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.storage.RegionFile;
 import one.oktw.galaxy.mixin.interfaces.RegionFileInputStream;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -121,43 +121,36 @@ public abstract class MixinAsyncChunk_RegionFile implements RegionFileInputStrea
     @Override
     public DataInputStream getChunkInputStreamNoSync(ChunkPos pos) throws IOException {
         int i = getSectorData(pos);
-        if (i == 0) {
+        if (i == 0) return null;
+        int start = getOffset(i);
+        int count = getSize(i);
+        int length = count * 4096;
+        ByteBuffer byteBuffer = ByteBuffer.allocate(length);
+        channel.read(byteBuffer, start * 4096L);
+        byteBuffer.flip();
+        if (byteBuffer.remaining() < 5) {
+            LOGGER.error("Chunk {} header is truncated: expected {} but read {}", pos, length, byteBuffer.remaining());
             return null;
-        } else {
-            int start = getOffset(i);
-            int count = getSize(i);
-            int length = count * 4096;
-            ByteBuffer byteBuffer = ByteBuffer.allocate(length);
-            channel.read(byteBuffer, start * 4096L);
-            byteBuffer.flip();
-            if (byteBuffer.remaining() < 5) {
-                LOGGER.error("Chunk {} header is truncated: expected {} but read {}", pos, length, byteBuffer.remaining());
-                return null;
-            } else {
-                int m = byteBuffer.getInt();
-                byte b = byteBuffer.get();
-                if (m == 0) {
-                    LOGGER.warn("Chunk {} is allocated, but stream is missing", pos);
-                    return null;
-                } else {
-                    int n = m - 1;
-                    if (hasChunkStreamVersionId(b)) {
-                        if (n != 0) {
-                            LOGGER.warn("Chunk has both internal and external streams");
-                        }
-
-                        return method_22408(pos, getChunkStreamVersionId(b));
-                    } else if (n > byteBuffer.remaining()) {
-                        LOGGER.error("Chunk {} stream is truncated: expected {} but read {}", pos, n, byteBuffer.remaining());
-                        return null;
-                    } else if (n < 0) {
-                        LOGGER.error("Declared size {} of chunk {} is negative", m, pos);
-                        return null;
-                    } else {
-                        return method_22409(pos, b, getInputStream(byteBuffer, n));
-                    }
-                }
-            }
         }
+        int m = byteBuffer.getInt();
+        byte b = byteBuffer.get();
+        if (m == 0) {
+            LOGGER.warn("Chunk {} is allocated, but stream is missing", pos);
+            return null;
+        }
+        int n = m - 1;
+        if (hasChunkStreamVersionId(b)) {
+            if (n != 0) LOGGER.warn("Chunk has both internal and external streams");
+            return method_22408(pos, getChunkStreamVersionId(b));
+        }
+        if (n > byteBuffer.remaining()) {
+            LOGGER.error("Chunk {} stream is truncated: expected {} but read {}", pos, n, byteBuffer.remaining());
+            return null;
+        }
+        if (n < 0) {
+            LOGGER.error("Declared size {} of chunk {} is negative", m, pos);
+            return null;
+        }
+        return method_22409(pos, b, getInputStream(byteBuffer, n));
     }
 }

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,29 +19,25 @@
 package one.oktw.galaxy.mixin.accessor;
 
 import com.mojang.serialization.DynamicOps;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.poi.PointOfInterestSet;
 import net.minecraft.world.storage.SerializingRegionBasedStorage;
-import net.minecraft.world.storage.StorageIoWorker;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Mixin(SerializingRegionBasedStorage.class)
 public interface SerializingRegionBasedStorageAccessor {
-    @Accessor
-    StorageIoWorker getWorker();
-
-    @Accessor
-    HeightLimitView getWorld();
-
     @Invoker
     @Nullable
     Optional<PointOfInterestSet> callGetIfLoaded(long pos);
+
+    @Invoker
+    CompletableFuture<Optional<NbtCompound>> callLoadNbt(ChunkPos pos);
 
     @Invoker
     <T> void callUpdate(ChunkPos pos, DynamicOps<T> dynamicOps, @Nullable T data);

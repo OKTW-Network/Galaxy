@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,111 +18,105 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
-import net.minecraft.util.Util;
-import net.minecraft.util.crash.CrashException;
+import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.thread.ThreadExecutor;
 import net.minecraft.world.ChunkSerializer;
-import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.ProtoChunk;
-import net.minecraft.world.chunk.UpgradeData;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.poi.PointOfInterestSet;
 import net.minecraft.world.poi.PointOfInterestStorage;
-import net.minecraft.world.storage.VersionedChunkStorage;
-import one.oktw.galaxy.mixin.accessor.AsyncChunk_VersionedChunkStorage;
-import one.oktw.galaxy.mixin.accessor.StorageIoWorkerAccessor;
-import org.apache.logging.log4j.Logger;
+import one.oktw.galaxy.mixin.accessor.SerializingRegionBasedStorageAccessor;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-import java.io.IOException;
-import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 @Mixin(ThreadedAnvilChunkStorage.class)
-public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage extends VersionedChunkStorage {
+public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage {
+    private final HashMap<ChunkPos, CompletableFuture<Void>> poiFutures = new HashMap<>();
+
     @Shadow
     @Final
     private static Logger LOGGER;
     @Shadow
     @Final
-    private ThreadExecutor<Runnable> mainThreadExecutor;
-    @Shadow
-    @Final
     ServerWorld world;
-    @Shadow
-    @Final
-    private Supplier<PersistentStateManager> persistentStateManagerFactory;
     @Shadow
     @Final
     private PointOfInterestStorage pointOfInterestStorage;
     @Shadow
-    private ChunkGenerator chunkGenerator;
+    @Final
+    private ThreadExecutor<Runnable> mainThreadExecutor;
+
+    @Shadow
+    private static boolean containsStatus(NbtCompound nbt) {
+        return false;
+    }
+
+    @Shadow
+    protected abstract CompletableFuture<Optional<NbtCompound>> getUpdatedChunkNbt(ChunkPos chunkPos);
+
+    @Shadow
+    protected abstract Chunk getProtoChunk(ChunkPos chunkPos);
 
     @Shadow
     protected abstract byte mark(ChunkPos pos, ChunkStatus.ChunkType type);
 
     @Shadow
-    protected abstract void markAsProtoChunk(ChunkPos pos);
-
-    public MixinAsyncChunk_ThreadedAnvilChunkStorage(Path directory, DataFixer dataFixer, boolean dsync) {
-        super(directory, dataFixer, dsync);
-    }
+    protected abstract Either<Chunk, ChunkHolder.Unloaded> recoverFromException(Throwable throwable, ChunkPos chunkPos);
 
     /**
      * @author James58899
-     * @reason Async chunk load
+     * @reason Async POI loading
      */
     @Overwrite
     private CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> loadChunk(ChunkPos pos) {
-        world.getProfiler().visit("chunkLoad");
-        return getUpdatedChunkNbtAsync(pos).handleAsync((nbt, t) -> {
-            try {
-                if (t != null) {
-                    throw (Exception) t;
-                }
-
-                if (nbt != null) {
-                    boolean bl = nbt.contains("Status", 8);
-                    if (bl) {
-                        Chunk chunk = ChunkSerializer.deserialize(world, pointOfInterestStorage, pos, nbt);
-                        mark(pos, chunk.getStatus().getChunkType());
-                        return Either.left(chunk);
-                    }
-
-                    LOGGER.error("Chunk file at {} is missing level data, skipping", pos);
-                }
-            } catch (CrashException e) {
-                Throwable throwable = e.getCause();
-                if (throwable instanceof IOException) {
-                    LOGGER.error("Couldn't load chunk {}", pos, throwable);
-                }
-                this.markAsProtoChunk(pos);
-                throw e;
-            } catch (Exception e) {
-                LOGGER.error("Couldn't load chunk {}", pos, e);
+        CompletableFuture<Optional<NbtCompound>> chunkNbtFuture = this.getUpdatedChunkNbt(pos).thenApply(nbt -> nbt.filter(nbt2 -> {
+            boolean bl = containsStatus(nbt2);
+            if (!bl) {
+                LOGGER.error("Chunk file at {} is missing level data, skipping", pos);
             }
-
-            markAsProtoChunk(pos);
-            return Either.left(new ProtoChunk(pos, UpgradeData.NO_UPGRADE_DATA, world, world.getRegistryManager().get(Registry.BIOME_KEY), null));
-        }, mainThreadExecutor);
-    }
-
-    private CompletableFuture<NbtCompound> getUpdatedChunkNbtAsync(ChunkPos pos) {
-        return ((StorageIoWorkerAccessor) ((AsyncChunk_VersionedChunkStorage) this).getWorker()).callReadChunkData(pos)
-            .thenApplyAsync(nbt -> nbt == null ? null : updateChunkNbt(world.getRegistryKey(), persistentStateManagerFactory, nbt, chunkGenerator.getCodecKey()),
-                Util.getMainWorkerExecutor());
+            return bl;
+        }));
+        SerializingRegionBasedStorageAccessor poiStorage = ((SerializingRegionBasedStorageAccessor) pointOfInterestStorage);
+        Optional<PointOfInterestSet> poiData = poiStorage.callGetIfLoaded(pos.toLong());
+        var poiFuture = CompletableFuture.<Void>completedFuture(null);
+        //noinspection OptionalAssignedToNull
+        if (poiData == null || poiData.isEmpty()) {
+            if (poiFutures.containsKey(pos)) {
+                poiFuture = poiFutures.get(pos);
+            } else {
+                poiFuture = ((SerializingRegionBasedStorageAccessor) pointOfInterestStorage).callLoadNbt(pos).thenAcceptAsync(nbt -> {
+                    RegistryOps<NbtElement> registryOps = RegistryOps.of(NbtOps.INSTANCE, world.getRegistryManager());
+                    poiStorage.callUpdate(pos, registryOps, nbt.orElse(null));
+                }, this.mainThreadExecutor);
+                poiFutures.put(pos, poiFuture);
+            }
+        }
+        return CompletableFuture.allOf(chunkNbtFuture, poiFuture).thenApplyAsync(unused -> {
+            poiFutures.remove(pos);
+            var nbt = chunkNbtFuture.join();
+            this.world.getProfiler().visit("chunkLoad");
+            if (nbt.isPresent()) {
+                ProtoChunk chunk = ChunkSerializer.deserialize(this.world, this.pointOfInterestStorage, pos, nbt.get());
+                this.mark(pos, ((Chunk) chunk).getStatus().getChunkType());
+                return Either.<Chunk, ChunkHolder.Unloaded>left(chunk);
+            }
+            return Either.<Chunk, ChunkHolder.Unloaded>left(this.getProtoChunk(pos));
+        }, this.mainThreadExecutor).exceptionallyAsync(throwable -> this.recoverFromException(throwable, pos), this.mainThreadExecutor);
     }
 }

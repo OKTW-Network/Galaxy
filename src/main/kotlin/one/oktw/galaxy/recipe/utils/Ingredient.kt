@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,21 +20,20 @@ package one.oktw.galaxy.recipe.utils
 
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.tag.Tag
-import java.security.InvalidParameterException
+import net.minecraft.tag.TagKey
 
 class Ingredient(
-    private val tag: Tag.Identified<Item>? = null,
+    private val tag: TagKey<Item>? = null,
     private val items: List<Item>? = null
 ) {
     init {
-        if (tag == null && items == null) throw InvalidParameterException("No input provided.")
-        if (tag != null && items != null) throw InvalidParameterException("Only one input is allowed.")
+        if (tag == null && items == null) throw IllegalArgumentException("No input provided.")
+        if (tag != null && items != null) throw IllegalArgumentException("Only one input is allowed.")
     }
 
     fun matches(input: ItemStack): Boolean {
         return when {
-            tag != null -> tag.contains(input.item)
+            tag != null -> input.isIn(tag)
             items != null -> items.contains(input.item)
             else -> false
         }

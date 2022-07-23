@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,18 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.accessor;
+package one.oktw.galaxy.block.listener
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.storage.StorageIoWorker;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Invoker;
+import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.util.ActionResult
+import net.minecraft.util.Hand
+import net.minecraft.util.hit.BlockHitResult
 
-import java.util.concurrent.CompletableFuture;
-
-@Mixin(StorageIoWorker.class)
-public interface StorageIoWorkerAccessor {
-    @Invoker
-    CompletableFuture<NbtCompound> callReadChunkData(ChunkPos chunkPos);
+interface CustomBlockClickListener {
+    fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult
 }

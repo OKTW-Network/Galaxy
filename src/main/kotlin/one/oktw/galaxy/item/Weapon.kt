@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,7 +21,7 @@ package one.oktw.galaxy.item
 import net.minecraft.item.Items.COMMAND_BLOCK
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.text.Text
-import net.minecraft.text.TranslatableText
+import net.minecraft.text.Text.translatable
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
@@ -57,7 +57,7 @@ class Weapon private constructor(id: String, modelData: Int, private val name: S
         val SWORD_NANOSABER_SCABBARD = registry.register(Weapon("sword_nanosaber_scabbard", 3020702, "item.Weapon.NANOSABER.SCABARD"))
     }
 
-    override fun getName(): Text = TranslatableText(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
+    override fun getName(): Text = translatable(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
 
     override fun writeCustomNbt(nbt: NbtCompound) {
         super.writeCustomNbt(nbt)

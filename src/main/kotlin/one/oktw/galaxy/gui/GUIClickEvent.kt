@@ -16,20 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.tweak;
+package one.oktw.galaxy.gui
 
-import net.minecraft.server.rcon.RconBase;
-import org.slf4j.Logger;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import net.minecraft.item.ItemStack
+import net.minecraft.screen.slot.SlotActionType
+import net.minecraft.server.network.ServerPlayerEntity
 
-@Mixin(RconBase.class)
-public class MixinRCON_RconBase {
-    boolean isLocal = false;
-
-    @Redirect(method = "start", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
-    private void noLocalLog(Logger logger, String message, Object description) {
-        if (!isLocal) logger.info(message, description);
-    }
-}
+data class GUIClickEvent(val player: ServerPlayerEntity, val x: Int, val y: Int, val action: SlotActionType, val item: ItemStack, var cancel: Boolean = false)

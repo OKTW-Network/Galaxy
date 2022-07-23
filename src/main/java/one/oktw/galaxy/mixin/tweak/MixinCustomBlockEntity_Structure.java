@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,10 +24,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructurePlacementData;
+import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.ServerWorldAccess;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,13 +38,12 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
-@Mixin(Structure.class)
+@Mixin(StructureTemplate.class)
 public class MixinCustomBlockEntity_Structure {
-    @Inject(method = "place(Lnet/minecraft/world/ServerWorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/structure/StructurePlacementData;Ljava/util/Random;I)Z",
+    @Inject(method = "place",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/world/ServerWorldAccess;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z", ordinal = 1), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void hackPlace(ServerWorldAccess world, BlockPos pos, BlockPos blockPos, StructurePlacementData placementData, Random random, int i, CallbackInfoReturnable<Boolean> cir, List<Structure.StructureBlockInfo> list, BlockBox blockBox, List<BlockPos> list2, List<BlockPos> list3, List<Pair<BlockPos, NbtCompound>> list4, int j, int k, int l, int m, int n, int o, List<Structure.StructureBlockInfo> list5, Iterator<Structure.StructureBlockInfo> var19, Structure.StructureBlockInfo structureBlockInfo, BlockPos blockPos2, FluidState fluidState, BlockState blockState) {
+    private void hackPlace(ServerWorldAccess world, BlockPos pos, BlockPos pivot, StructurePlacementData placementData, Random random, int flags, CallbackInfoReturnable<Boolean> cir, List<StructureTemplate.StructureBlockInfo> list, BlockBox blockBox, List<BlockPos> list2, List<BlockPos> list3, List<Pair<BlockPos, NbtCompound>> list4, int j, int k, int l, int m, int n, int o, List<StructureTemplate.StructureBlockInfo> list5, Iterator<StructureTemplate.StructureBlockInfo> var19, StructureTemplate.StructureBlockInfo structureBlockInfo, BlockPos blockPos2, FluidState fluidState, BlockState blockState) {
         // Workaround structure barrier bug
         if (structureBlockInfo.state.getBlock() == Blocks.BARRIER) {
             world.setBlockState(blockPos2, Blocks.AIR.getDefaultState(), Block.NO_REDRAW | Block.FORCE_STATE);

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,9 +19,12 @@
 package one.oktw.galaxy.mixin.tweak;
 
 import net.minecraft.item.FilledMapItem;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,9 +35,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MixinMapExistingChunk_FilledMapItem {
     @Redirect(method = "updateColors", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getWorldChunk(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/world/chunk/WorldChunk;"))
     private WorldChunk getExistingChunk(World world, BlockPos pos) {
+        ServerWorld serverWorld = (ServerWorld) world;
         ChunkPos chunkPos = new ChunkPos(pos);
-        WorldChunk chunk = (WorldChunk) world.getChunkAsView(chunkPos.x, chunkPos.z);
-        if (chunk == null) chunk = new EmptyChunk(world, chunkPos);
-        return chunk;
+        if (serverWorld.getChunkManager().isTickingFutureReady(chunkPos.toLong())) {
+            WorldChunk chunk = (WorldChunk) world.getChunkAsView(chunkPos.x, chunkPos.z);
+            if (chunk != null) return chunk;
+        }
+        return new EmptyChunk(world, chunkPos, world.getRegistryManager().get(Registry.BIOME_KEY).entryOf(BiomeKeys.PLAINS));
     }
 }

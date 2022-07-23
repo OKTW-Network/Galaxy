@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,31 +18,27 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import one.oktw.galaxy.Main;
-import one.oktw.galaxy.event.type.HotBarSlotUpdateEvent;
+import one.oktw.galaxy.event.type.SwapItemInHandEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(targets = {"net/minecraft/server/network/ServerPlayerEntity$2"})
-public class MixinHotBarSlotUpdate_ScreenHandlerListener {
-    @Shadow(aliases = {"field_29183"})
-    private ServerPlayerEntity player;
+@Mixin(ServerPlayNetworkHandler.class)
+public class MixinSwapItemInHand_ServerPlayNetworkHandler {
+    @Shadow
+    public ServerPlayerEntity player;
 
-    @Inject(
-        method = "onSlotUpdate(Lnet/minecraft/screen/ScreenHandler;ILnet/minecraft/item/ItemStack;)V",
-        at = @At(value = "RETURN")
-    )
-    private void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stack, CallbackInfo ci) {
+    @Inject(method = "onPlayerAction", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;clearActiveItem()V", shift = At.Shift.AFTER))
+    private void onPlayerAction(PlayerActionC2SPacket packet, CallbackInfo ci) {
         Main main = Main.Companion.getMain();
         if (main == null) return;
-        if (slotId >= 36 && slotId <= 45) {
-            main.getEventManager().emit(new HotBarSlotUpdateEvent(player, handler, slotId, stack));
-        }
+        main.getEventManager().emit(new SwapItemInHandEvent(player));
     }
+
 }

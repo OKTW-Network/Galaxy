@@ -22,6 +22,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.text.Text
 import one.oktw.galaxy.item.*
+import one.oktw.galaxy.recipe.utils.HTCraftingBuilder
 import one.oktw.galaxy.recipe.utils.HTCraftingRecipe
 import one.oktw.galaxy.recipe.utils.Ingredient
 
@@ -38,7 +39,7 @@ class Recipes {
         private val materials: List<HTCraftingRecipe> = ArrayList<HTCraftingRecipe>().apply {
             // part raw base
             add(
-                HTCraftingRecipe.builder()
+                HTCraftingBuilder()
                     .add(Ingredient(items = listOf(Items.CLAY)), 8)
                     .add(Ingredient(items = listOf(Items.OBSIDIAN)), 8)
                     .cost(20)
@@ -48,7 +49,7 @@ class Recipes {
 
             // cpu
             add(
-                HTCraftingRecipe.builder()
+                HTCraftingBuilder()
                     .add(Ingredient(items = listOf(Items.REDSTONE)), 20)
                     .add(Ingredient(items = listOf(Items.GOLD_INGOT)), 8)
                     .add(Ingredient(items = listOf(Items.QUARTZ)), 4)
@@ -60,7 +61,7 @@ class Recipes {
 
             // cooling
 //            add(
-//                HTCraftingRecipe.builder()
+//                HTCraftingBuilder()
 //                    .add(of(Upgrade(UpgradeType.COOLING, 1).createItemStack()), 1)
 //                    .add(Ingredient(items = listOf(Items.BLUE_DYE)), 27)
 //                    .add(Ingredient(items = listOf(Items.IRON_INGOT)), 6)
@@ -72,7 +73,7 @@ class Recipes {
 
             // Upgrade base
             add(
-                HTCraftingRecipe.builder()
+                HTCraftingBuilder()
                     .add(Ingredient(items = listOf(Items.REDSTONE)), 4)
                     .add(Ingredient(items = listOf(Items.QUARTZ)), 2)
                     .add(Ingredient(items = listOf(Items.GOLD_INGOT)), 2)
@@ -84,7 +85,7 @@ class Recipes {
 
             // Cooling upgrade
 //            add(
-//                HTCraftingRecipe.builder()
+//                HTCraftingBuilder()
 //                    .add(Upgrade(UpgradeType.BASE), 1)
 //                    .add(Ingredient.builder().with { it.type == ItemTypes.POTION && !it[Keys.POTION_EFFECTS].isPresent }
 //                        .withDisplay(ItemStack.Ingredient(items = listOf(Items.POTION, 1).apply {
@@ -103,7 +104,7 @@ class Recipes {
         }
 
         private val creativeMaterials: List<HTCraftingRecipe> = ArrayList<HTCraftingRecipe>().apply {
-            add(HTCraftingRecipe.builder()
+            add(HTCraftingBuilder()
                 .cost(0)
                 .result(Material.BASE_PLATE.createItemStack())
                 .build()
@@ -111,7 +112,7 @@ class Recipes {
 
             // laser
             add(
-                HTCraftingRecipe.builder()
+                HTCraftingBuilder()
                     .add(Ingredient(items = listOf(Items.REDSTONE_LAMP)), 1)
                     .add(Ingredient(items = listOf(Items.EMERALD)), 1)
                     .add(Ingredient(items = listOf(Items.GOLD_INGOT)), 1)
@@ -124,7 +125,7 @@ class Recipes {
 
             // Battery
             add(
-                HTCraftingRecipe.builder()
+                HTCraftingBuilder()
                     .add(Ingredient(items = listOf(Items.REDSTONE)), 36)
                     .add(Ingredient(items = listOf(Items.IRON_INGOT)), 4)
                     .add(Ingredient(items = listOf(Items.OBSIDIAN)), 8)
@@ -136,7 +137,7 @@ class Recipes {
 
             // Scope
 //            add(
-//                HTCraftingRecipe.builder()
+//                HTCraftingBuilder()
 //                    .add(Ingredient(items = listOf(Items.IRON_INGOT)), 4)
 //                    .add(Ingredient(items = listOf(Items.OBSIDIAN)), 1)
 //                    .add(Ingredient(items = listOf(Items.GLASS_PANE)), 1)
@@ -149,7 +150,7 @@ class Recipes {
 
             // barrel
             add(
-                HTCraftingRecipe.builder()
+                HTCraftingBuilder()
                     .add(Ingredient(items = listOf(Items.IRON_INGOT)), 18)
                     .add(Ingredient(items = listOf(Items.GOLD_INGOT)), 4)
                     .add(Ingredient(items = listOf(Items.OBSIDIAN)), 1)
@@ -160,7 +161,7 @@ class Recipes {
 
             // handle
 //            add(
-//                HTCraftingRecipe.builder()
+//                HTCraftingBuilder()
 //                    .add(Ingredient(items = listOf(Items.IRON_INGOT)), 18)
 //                    .add(Ingredient(items = listOf(Items.GOLD_INGOT)), 4)
 //                    .add(Ingredient.builder().with { it.type == ItemTypes.WOOL }
@@ -172,7 +173,7 @@ class Recipes {
 
             // trigger
             add(
-                HTCraftingRecipe.builder()
+                HTCraftingBuilder()
                     .add(Ingredient(items = listOf(Items.IRON_INGOT)), 4)
                     .add(Ingredient(items = listOf(Items.GOLD_INGOT)), 4)
                     .add(Ingredient(items = listOf(Items.REDSTONE)), 2)
@@ -183,7 +184,7 @@ class Recipes {
         }.plus(materials)
 
         private val tools: List<HTCraftingRecipe> = listOf(
-            HTCraftingRecipe.builder()
+            HTCraftingBuilder()
                 .add(Ingredient(items = listOf(Items.IRON_INGOT)), 3)
                 .add(Ingredient(items = listOf(Items.STICK)), 1)
                 .cost(0)
@@ -194,14 +195,14 @@ class Recipes {
         private val creativeTools = tools
 
         private val machines: List<HTCraftingRecipe> = listOf(
-            HTCraftingRecipe.builder()
+            HTCraftingBuilder()
                 .add(Ingredient(items = listOf(Items.IRON_INGOT)), 9)
                 .add(Ingredient(items = listOf(Items.ENDER_PEARL)), 1)
                 .cost(0)
                 .result(CustomBlockItem.ELEVATOR.createItemStack())
                 .build(),
 
-            HTCraftingRecipe.builder()
+            HTCraftingBuilder()
                 .add(Ingredient(items = listOf(Items.REDSTONE)), 2)
                 .add(Ingredient(items = listOf(Items.BLUE_DYE)), 2)
                 .add(Ingredient(items = listOf(Items.IRON_INGOT)), 2)
@@ -212,7 +213,7 @@ class Recipes {
                 .result(CustomBlockItem.HT_CRAFTING_TABLE.createItemStack())
                 .build(),
 
-            HTCraftingRecipe.builder()
+            HTCraftingBuilder()
                 .add(Ingredient(customItem = listOf(CustomBlockItem.ELEVATOR)), 1)
                 .add(Ingredient(customItem = listOf(Material.CPU)), 1)
                 .add(Ingredient(customItem = listOf(Material.COOLANT)), 1)
@@ -223,7 +224,7 @@ class Recipes {
                 .result(CustomBlockItem.TELEPORTER_CORE_BASIC.createItemStack())
                 .build(),
 
-            HTCraftingRecipe.builder()
+            HTCraftingBuilder()
                 .add(Ingredient(customItem = listOf(CustomBlockItem.TELEPORTER_CORE_BASIC)), 2)
                 .add(Ingredient(customItem = listOf(Material.CPU)), 1)
                 .add(Ingredient(customItem = listOf(Material.COOLANT)), 1)
@@ -235,7 +236,7 @@ class Recipes {
                 .result(CustomBlockItem.TELEPORTER_CORE_ADVANCE.createItemStack())
                 .build(),
 
-            HTCraftingRecipe.builder()
+            HTCraftingBuilder()
                 .add(Ingredient(items = listOf(Items.IRON_INGOT)), 6)
                 .add(Ingredient(items = listOf(Items.GOLD_INGOT)), 4)
                 .add(Ingredient(items = listOf(Items.GLASS)), 1)
@@ -251,7 +252,7 @@ class Recipes {
         private val creativeWeapons = ArrayList<HTCraftingRecipe>().apply {
             // gun
             add(
-                HTCraftingRecipe.builder()
+                HTCraftingBuilder()
                     .add(Ingredient(customItem = listOf(Material.BARREL)), 1)
                     .add(Ingredient(customItem = listOf(Material.HANDLE)), 1)
                     .add(Ingredient(customItem = listOf(Material.TRIGGER)), 1)

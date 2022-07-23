@@ -27,50 +27,13 @@ import one.oktw.galaxy.item.CustomItem
 import one.oktw.galaxy.util.ItemLoreBuilder
 
 class HTCraftingRecipe {
-    companion object {
-        class Builder {
-            private val recipe = HTCraftingRecipe()
-
-            fun add(item: Ingredient, count: Int): Builder {
-                recipe.add(item, count)
-                return this
-            }
-
-            fun cost(price: Int): Builder {
-                recipe.price(price)
-                return this
-            }
-
-            fun result(newResult: Item): Builder {
-                recipe.setResult(newResult)
-                return this
-            }
-
-            fun result(newResult: ItemStack): Builder {
-                recipe.setResult(newResult)
-                return this
-            }
-
-            fun customItemResult(newResult: CustomItem): Builder {
-                recipe.setCustomResult(newResult)
-                return this
-            }
-
-            fun build(): HTCraftingRecipe {
-                return recipe
-            }
-        }
-
-        fun builder() = Builder()
-    }
-
     private val ingredientList: ArrayList<Ingredient> = ArrayList()
     private val toMatch: HashMap<Ingredient, Int> = HashMap()
     private var cost: Int = 0
     private var result: ItemStack = ItemStack.EMPTY
     private var customItemResult: CustomItem? = null
 
-    private fun add(item: Ingredient, count: Int) {
+    fun add(item: Ingredient, count: Int) {
         if (!ingredientList.contains(item)) {
             ingredientList.add(item)
         }
@@ -78,19 +41,19 @@ class HTCraftingRecipe {
         toMatch[item] = toMatch[item] ?: (0 + count)
     }
 
-    private fun price(price: Int) {
+    fun price(price: Int) {
         cost = price
     }
 
-    private fun setResult(newResult: Item) {
+    fun setResult(newResult: Item) {
         setResult(newResult.defaultStack)
     }
 
-    private fun setResult(newResult: ItemStack) {
+    fun setResult(newResult: ItemStack) {
         result = newResult
     }
 
-    private fun setCustomResult(newResult: CustomItem) {
+    fun setCustomResult(newResult: CustomItem) {
         customItemResult = newResult
     }
 

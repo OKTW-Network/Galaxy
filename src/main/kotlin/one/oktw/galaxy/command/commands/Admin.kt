@@ -23,8 +23,8 @@ import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.command.commands.admin.FlySpeed
+import one.oktw.galaxy.command.commands.admin.GetGun
 import one.oktw.galaxy.command.commands.admin.GetItem
-import one.oktw.galaxy.command.commands.admin.GetWeapon
 import one.oktw.galaxy.command.commands.admin.RegisterBlock
 
 class Admin : Command {
@@ -33,7 +33,7 @@ class Admin : Command {
             CommandManager.literal("admin")
                 .requires { source -> source.hasPermissionLevel(2) }
                 .then(GetItem().command)
-                .then(GetWeapon().command)
+                .then(GetGun().command)
                 .then(RegisterBlock.command)
                 .then(FlySpeed().command)
         )

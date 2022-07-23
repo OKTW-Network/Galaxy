@@ -19,25 +19,22 @@
 package one.oktw.galaxy.item.event
 
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.Hand
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.*
-import one.oktw.galaxy.item.data.Weapon
 
 class Weapon {
     @EventListener(true)
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
-        var hand = Hand.MAIN_HAND
-        var weapon = Weapon.fromItem(event.player.getStackInHand(hand))
-        if (event.packet.hand == Hand.OFF_HAND) {
-            if (weapon == null) {
-                hand = Hand.OFF_HAND
-                weapon = Weapon.fromItem(event.player.getStackInHand(hand))
-            }
-        }
-        if (weapon == null) return
-        weapon.shoot(event.player, event.player.world as ServerWorld)
+//        var hand = Hand.MAIN_HAND
+//        var weapon = WeaponData.fromItem(event.player.getStackInHand(hand))
+//        if (event.packet.hand == Hand.OFF_HAND) {
+//            if (weapon == null) {
+//                hand = Hand.OFF_HAND
+//                weapon = WeaponData.fromItem(event.player.getStackInHand(hand))
+//            }
+//        }
+//        if (weapon == null) return
+//        weapon.shoot(event.player, event.player.world as ServerWorld)
     }
 
     @EventListener(true)
@@ -55,17 +52,17 @@ class Weapon {
     private fun updateInventory(player: ServerPlayerEntity) = switchAiming(player, player.shouldCancelInteraction())
 
     private fun switchAiming(player: ServerPlayerEntity, aiming: Boolean) {
-        var hand = Hand.MAIN_HAND
-        var weapon = Weapon.fromItem(player.getStackInHand(hand))
-        if (weapon == null) {
-            hand = Hand.OFF_HAND
-            weapon = Weapon.fromItem(player.getStackInHand(hand)) ?: return
-        } else {
-            val offWeapon = Weapon.fromItem(player.getStackInHand(Hand.OFF_HAND))
-            if (offWeapon != null) { // turn off offhand aim
-                player.setStackInHand(Hand.OFF_HAND, offWeapon.switchAiming(false))
-            }
-        }
-        player.setStackInHand(hand, weapon.switchAiming(aiming))
+//        var hand = Hand.MAIN_HAND
+//        var weapon = WeaponData.fromItem(player.getStackInHand(hand))
+//        if (weapon == null) {
+//            hand = Hand.OFF_HAND
+//            weapon = WeaponData.fromItem(player.getStackInHand(hand)) ?: return
+//        } else {
+//            val offWeapon = WeaponData.fromItem(player.getStackInHand(Hand.OFF_HAND))
+//            if (offWeapon != null) { // turn off offhand aim
+//                player.setStackInHand(Hand.OFF_HAND, offWeapon.switchAiming(false))
+//            }
+//        }
+//        player.setStackInHand(hand, weapon.switchAiming(aiming))
     }
 }

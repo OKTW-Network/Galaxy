@@ -30,32 +30,31 @@ import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
-import net.minecraft.util.math.MathHelper
 import one.oktw.galaxy.item.CustomItem
-import one.oktw.galaxy.item.Weapon
+import one.oktw.galaxy.item.Gun
 
-class GetWeapon {
-    // /admin getWeapon <item> [<heat>] <maxTemp> <cooling> <damage> <range> <through>
+class GetGun {
+    // /admin getGun <item> [<heat>] <maxTemp> <cooling> <damage> <range> <through>
     private val throughArgument = CommandManager.argument("through", IntegerArgumentType.integer())
         .executes {
             val identifier = IdentifierArgumentType.getIdentifier(it, "item")
-            val item = CustomItem.registry.get(identifier) as Weapon?
+            val item = CustomItem.registry.get(identifier) as Gun?
 
             if (item == null) {
                 it.source.sendError(Text.translatable("argument.item.id.invalid", identifier))
                 return@executes 0
             }
 
-            val itemStack = one.oktw.galaxy.item.data.Weapon(
-                item,
-                IntegerArgumentType.getInteger(it, "heat"),
-                IntegerArgumentType.getInteger(it, "maxTemp"),
-                DoubleArgumentType.getDouble(it, "cooling"),
-                DoubleArgumentType.getDouble(it, "damage"),
-                DoubleArgumentType.getDouble(it, "range"),
-                IntegerArgumentType.getInteger(it, "through"),
-                MathHelper.randomUuid()
-            ).toItemStack()
+            val itemStack = item.apply {
+                weaponData.applyValue(
+                    IntegerArgumentType.getInteger(it, "heat"),
+                    IntegerArgumentType.getInteger(it, "maxTemp"),
+                    DoubleArgumentType.getDouble(it, "cooling"),
+                    DoubleArgumentType.getDouble(it, "damage"),
+                    DoubleArgumentType.getDouble(it, "range"),
+                    IntegerArgumentType.getInteger(it, "through")
+                )
+            }.createItemStack()
             return@executes sendItemToSource(it, itemStack)
         }
 
@@ -70,12 +69,12 @@ class GetWeapon {
     private val heatArgument = CommandManager.argument("heat", IntegerArgumentType.integer())
         .then(maxTempArgument)
 
-    val command: LiteralArgumentBuilder<ServerCommandSource> = CommandManager.literal("getWeapon")
+    val command: LiteralArgumentBuilder<ServerCommandSource> = CommandManager.literal("getGun")
         .then(
             CommandManager.argument("item", IdentifierArgumentType.identifier())
                 .suggests { _, builder ->
                     CustomItem.registry.getAll().keys.forEach { identifier ->
-                        if (CustomItem.registry.get(identifier) !is Weapon) return@forEach
+                        if (CustomItem.registry.get(identifier) !is Gun) return@forEach
                         if (identifier.toString().contains(builder.remaining, ignoreCase = true)) {
                             builder.suggest(identifier.toString())
                         }
@@ -84,15 +83,14 @@ class GetWeapon {
                 }
                 .executes {
                     val identifier = IdentifierArgumentType.getIdentifier(it, "item")
-                    val item = CustomItem.registry.get(identifier) as Weapon?
+                    val item = CustomItem.registry.get(identifier) as Gun?
 
                     if (item == null) {
                         it.source.sendError(Text.translatable("argument.item.id.invalid", identifier))
                         return@executes 0
                     }
 
-                    val itemStack = one.oktw.galaxy.item.data.Weapon.default(item).toItemStack()
-                    return@executes sendItemToSource(it, itemStack)
+                    return@executes sendItemToSource(it, item.createItemStack())
                 }
                 .then(heatArgument)
         )

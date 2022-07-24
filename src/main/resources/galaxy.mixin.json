@@ -11,9 +11,9 @@
     "MixinPlayerInteractItem_NetworkHandler",
     "MixinPlayerJump_NetworkHandler",
     "MixinPlayerSneak_NetworkHandler",
+    "MixinPlayerSwapItemInHand_NetworkHandler",
     "MixinPlayerUpdateSign_NetworkHandler",
     "MixinPlayerUseItemOnBlock_ItemStack",
-    "MixinSwapItemInHand_ServerPlayNetworkHandler",
     "MixinUpdateSelectedSlot_NetworkHandler"
   ],
   "client": [],

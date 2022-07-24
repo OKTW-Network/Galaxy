@@ -55,7 +55,7 @@ class Gun {
     fun onUpdateSelectedSlot(event: UpdateSelectedSlotEvent) = switchAiming(event.player, event.player.shouldCancelInteraction())
 
     @EventListener(true)
-    fun onSwapItem(event: SwapItemInHandEvent) = switchAiming(event.player, event.player.shouldCancelInteraction())
+    fun onSwapItem(event: PlayerSwapItemInHandEvent) = switchAiming(event.player, event.player.shouldCancelInteraction())
 
     private fun getWeaponsFromHands(player: ServerPlayerEntity): Map<Hand, Gun?> = mapOf(
         Hand.MAIN_HAND to CustomItemHelper.getItem(player.getStackInHand(Hand.MAIN_HAND)) as? Gun,

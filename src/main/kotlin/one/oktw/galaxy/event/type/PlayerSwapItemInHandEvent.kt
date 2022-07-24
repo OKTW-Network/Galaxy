@@ -20,4 +20,4 @@ package one.oktw.galaxy.event.type
 
 import net.minecraft.server.network.ServerPlayerEntity
 
-class SwapItemInHandEvent(val player: ServerPlayerEntity) : Event
+class PlayerSwapItemInHandEvent(val player: ServerPlayerEntity) : Event

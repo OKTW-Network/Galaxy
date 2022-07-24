@@ -11,6 +11,7 @@
     "MixinPlayerInteractBlock_NetworkHandler",
     "MixinPlayerInteractItem_NetworkHandler",
     "MixinPlayerJump_NetworkHandler",
+    "MixinPlayerPickupItem_ItemEntity",
     "MixinPlayerSneak_NetworkHandler",
     "MixinPlayerSwapItemInHand_NetworkHandler",
     "MixinPlayerUpdateSign_NetworkHandler",

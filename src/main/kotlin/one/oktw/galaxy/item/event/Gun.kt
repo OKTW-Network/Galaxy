@@ -61,6 +61,9 @@ class Gun {
     @EventListener(true)
     fun onDropItem(event: PlayerDropItemEvent) = switchAiming(event.player, false)
 
+    @EventListener(true)
+    fun onPickupItem(event: PlayerPickupItemEvent) = switchAiming(event.player, event.player.shouldCancelInteraction())
+
     private fun getWeaponsFromHands(player: ServerPlayerEntity): Map<Hand, Gun?> = mapOf(
         Hand.MAIN_HAND to CustomItemHelper.getItem(player.getStackInHand(Hand.MAIN_HAND)) as? Gun,
         Hand.OFF_HAND to CustomItemHelper.getItem(player.getStackInHand(Hand.OFF_HAND)) as? Gun

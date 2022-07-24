@@ -7,6 +7,7 @@
     "MixinPlayerChat_MeCommand",
     "MixinPlayerChat_NetworkHandler",
     "MixinPlayerChat_SayCommand",
+    "MixinPlayerDropItem_NetworkHandler",
     "MixinPlayerInteractBlock_NetworkHandler",
     "MixinPlayerInteractItem_NetworkHandler",
     "MixinPlayerJump_NetworkHandler",

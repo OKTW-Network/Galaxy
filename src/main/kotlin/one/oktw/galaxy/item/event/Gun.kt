@@ -39,11 +39,10 @@ import kotlin.math.roundToInt
 
 class Gun {
     @EventListener(true)
-    fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
-        val items = getWeaponsFromHands(event.player)
-        val gun = items[Hand.MAIN_HAND] ?: items[Hand.OFF_HAND] ?: return
-        shoot(gun, event.player, event.player.world as ServerWorld)
-    }
+    fun onPlayerInteractItem(event: PlayerInteractItemEvent) = shoot(event.player)
+
+    @EventListener(true)
+    fun onPlayerUseItemOnBlock(event: PlayerUseItemOnBlock) = shoot(event.context.player as ServerPlayerEntity)
 
     @EventListener(true)
     fun onPlayerSneak(event: PlayerSneakEvent) = switchAiming(event.player, true)
@@ -63,6 +62,12 @@ class Gun {
 
     @EventListener(true)
     fun onPickupItem(event: PlayerPickupItemEvent) = switchAiming(event.player, event.player.shouldCancelInteraction())
+
+    private fun shoot(player: ServerPlayerEntity) {
+        val items = getWeaponsFromHands(player)
+        val gun = items[Hand.MAIN_HAND] ?: items[Hand.OFF_HAND] ?: return
+        shoot(gun, player, player.world as ServerWorld)
+    }
 
     private fun getWeaponsFromHands(player: ServerPlayerEntity): Map<Hand, Gun?> = mapOf(
         Hand.MAIN_HAND to CustomItemHelper.getItem(player.getStackInHand(Hand.MAIN_HAND)) as? Gun,

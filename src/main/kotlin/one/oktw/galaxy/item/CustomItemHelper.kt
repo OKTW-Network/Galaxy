@@ -23,7 +23,7 @@ import net.minecraft.util.Identifier
 
 object CustomItemHelper {
     fun getItem(itemStack: ItemStack): CustomItem? {
-        if (itemStack.count == 0) return null
+        if (itemStack.isEmpty) return null
         val customNbt = itemStack.getSubNbt("GalaxyData")
 
         return customNbt?.getString("CustomItemIdentifier")?.let(Identifier::tryParse)

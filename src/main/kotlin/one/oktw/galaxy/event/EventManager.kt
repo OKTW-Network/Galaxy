@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,6 +20,7 @@ package one.oktw.galaxy.event
 
 import kotlinx.coroutines.*
 import net.minecraft.util.thread.ThreadExecutor
+import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.Event
 import java.util.concurrent.ConcurrentHashMap
@@ -36,6 +37,14 @@ import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.jvm.jvmName
 
 class EventManager(private val serverThread: ThreadExecutor<*>) : CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
+    companion object {
+        /**
+         * Emit event if [EventManager] was initialized.
+         */
+        @JvmStatic
+        fun <T : Event> safeEmit(event: T) = main?.eventManager?.emit(event) ?: event
+    }
+
     private val asyncEventListeners = ConcurrentHashMap<KClass<*>, ConcurrentHashMap<Any, CopyOnWriteArrayList<KFunction<*>>>>()
     private val asyncEventCallback = ConcurrentHashMap<KClass<*>, CopyOnWriteArrayList<Function1<Event, Unit>>>()
     private val syncEventListeners = HashMap<KClass<*>, HashMap<Any, ArrayList<KFunction<*>>>>()
@@ -43,17 +52,17 @@ class EventManager(private val serverThread: ThreadExecutor<*>) : CoroutineScope
 
     fun <T : Event> emit(event: T): T {
         launch {
-            asyncEventListeners[event::class]?.forEach { obj, listeners -> listeners.forEach { it.javaMethod?.invoke(obj, event) } }
+            asyncEventListeners[event::class]?.forEach { (obj, listeners) -> listeners.forEach { it.javaMethod?.invoke(obj, event) } }
             asyncEventCallback[event::class]?.forEach { it(event) }
         }
 
         if (!serverThread.isOnThread) {
             runBlocking(serverThread.asCoroutineDispatcher()) {
-                syncEventListeners[event::class]?.forEach { obj, listeners -> listeners.forEach { it.javaMethod?.invoke(obj, event) } }
+                syncEventListeners[event::class]?.forEach { (obj, listeners) -> listeners.forEach { it.javaMethod?.invoke(obj, event) } }
                 syncEventCallback[Event::class]?.forEach { it(event) }
             }
         } else {
-            syncEventListeners[event::class]?.forEach { obj, listeners -> listeners.forEach { it.javaMethod?.invoke(obj, event) } }
+            syncEventListeners[event::class]?.forEach { (obj, listeners) -> listeners.forEach { it.javaMethod?.invoke(obj, event) } }
             syncEventCallback[Event::class]?.forEach { it(event) }
         }
         return event

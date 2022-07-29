@@ -27,7 +27,7 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.registry.RegistryKey;
-import one.oktw.galaxy.Main;
+import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -46,10 +46,8 @@ public class MixinPlayerChat_NetworkHandler {
 
     @Redirect(method = "handleDecoratedMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/server/filter/FilteredMessage;Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/util/registry/RegistryKey;)V"))
     private void onChat(PlayerManager playerManager, FilteredMessage<SignedMessage> message, ServerPlayerEntity sender, RegistryKey<MessageType> typeKey) {
-        Main main = Main.Companion.getMain();
-
         // TODO sync SignedMessage
-        if (main == null || !main.getEventManager().emit(new PlayerChatEvent(player, Text.translatable("chat.type.text", player.getDisplayName(), message.raw().getContent()))).getCancel()) {
+        if (!EventManager.safeEmit(new PlayerChatEvent(player, Text.translatable("chat.type.text", player.getDisplayName(), message.raw().getContent()))).getCancel()) {
             playerManager.broadcast(message, sender, typeKey);
         } else {
             server.logChatMessage(sender.asMessageSender(), message.raw().getContent().copy().append(" (Canceled)"));

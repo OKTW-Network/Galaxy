@@ -18,11 +18,11 @@
 
 package one.oktw.galaxy.mixin.event;
 
+import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.SayCommand;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.filter.FilteredMessage;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import one.oktw.galaxy.event.EventManager;
@@ -38,21 +38,21 @@ public class MixinPlayerChat_SayCommand {
         method = "method_43657",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/server/filter/FilteredMessage;Lnet/minecraft/server/command/ServerCommandSource;Lnet/minecraft/util/registry/RegistryKey;)V",
+            target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/network/message/SignedMessage;Lnet/minecraft/server/command/ServerCommandSource;Lnet/minecraft/network/message/MessageType$Parameters;)V",
             ordinal = 0
         ),
         cancellable = true
     )
-    private static void onCommand(PlayerManager playerManager, ServerCommandSource serverCommandSource, FilteredMessage<SignedMessage> decoratedMessage, CallbackInfo ci) {
+    private static void onCommand(PlayerManager playerManager, ServerCommandSource serverCommandSource, SignedMessage message, CallbackInfo ci) {
         if (!serverCommandSource.isExecutedByPlayer()) return;
 
         ServerPlayerEntity player = serverCommandSource.getPlayer();
 
         // TODO sync SignedMessage
         assert player != null;
-        if (EventManager.safeEmit(new PlayerChatEvent(player, Text.translatable("chat.type.announcement", player.getDisplayName(), decoratedMessage.raw().getContent()))).getCancel()) {
+        if (EventManager.safeEmit(new PlayerChatEvent(player, Text.translatable("chat.type.announcement", player.getDisplayName(), message.getContent()))).getCancel()) {
             ci.cancel();
-            player.server.logChatMessage(player.asMessageSender(), decoratedMessage.raw().getContent().copy().append(" (Canceled)"));
+            player.server.logChatMessage(message.getContent(), MessageType.params(MessageType.SAY_COMMAND, serverCommandSource), "Canceled");
         }
     }
 }

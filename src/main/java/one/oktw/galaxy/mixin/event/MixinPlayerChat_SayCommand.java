@@ -25,7 +25,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.filter.FilteredMessage;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import one.oktw.galaxy.Main;
+import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -46,16 +46,13 @@ public class MixinPlayerChat_SayCommand {
     private static void onCommand(PlayerManager playerManager, ServerCommandSource serverCommandSource, FilteredMessage<SignedMessage> decoratedMessage, CallbackInfo ci) {
         if (!serverCommandSource.isExecutedByPlayer()) return;
 
-        Main main = Main.Companion.getMain();
         ServerPlayerEntity player = serverCommandSource.getPlayer();
 
         // TODO sync SignedMessage
-        if (main != null) {
-            assert player != null;
-            if (main.getEventManager().emit(new PlayerChatEvent(player, Text.translatable("chat.type.announcement", player.getDisplayName(), decoratedMessage.raw().getContent()))).getCancel()) {
-                ci.cancel();
-                player.server.logChatMessage(player.asMessageSender(), decoratedMessage.raw().getContent().copy().append(" (Canceled)"));
-            }
+        assert player != null;
+        if (EventManager.safeEmit(new PlayerChatEvent(player, Text.translatable("chat.type.announcement", player.getDisplayName(), decoratedMessage.raw().getContent()))).getCancel()) {
+            ci.cancel();
+            player.server.logChatMessage(player.asMessageSender(), decoratedMessage.raw().getContent().copy().append(" (Canceled)"));
         }
     }
 }

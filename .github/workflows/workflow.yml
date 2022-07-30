@@ -63,20 +63,15 @@ jobs:
           login-server: harbor.k8s.oktw.one
           username: ${{ secrets.OKTW_HARBOR_USERNAME }}
           password: ${{ secrets.OKTW_HARBOR_PASSWORD }}
-      - name: pull cache
-        if: env.USERNAME != '' && env.PASSWORD != ''
-        run: |
-          docker pull $REGISTRY_IMAGE:build-cache || true
-          docker pull $REGISTRY_IMAGE:latest || true
       - name: build cache
         if: github.ref == 'refs/heads/master' && env.USERNAME != '' && env.PASSWORD != ''
         working-directory: ./docker
         run: |
-          docker build --pull --cache-from $REGISTRY_IMAGE:build-cache -t $REGISTRY_IMAGE:build-cache --target builder .
+          docker build --build-arg BUILDKIT_INLINE_CACHE=1 --pull --cache-from $REGISTRY_IMAGE:build-cache -t $REGISTRY_IMAGE:build-cache --target builder .
           docker push $REGISTRY_IMAGE:build-cache
       - name: build
         working-directory: ./docker
-        run: docker build --cache-from $REGISTRY_IMAGE:build-cache --cache-from $REGISTRY_IMAGE:latest -t $REGISTRY_IMAGE:$IMAGE_TAG .
+        run: docker build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from $REGISTRY_IMAGE:build-cache --cache-from $REGISTRY_IMAGE:latest -t $REGISTRY_IMAGE:$IMAGE_TAG .
       - name: push
         if: env.USERNAME != '' && env.PASSWORD != ''
         run: docker push $REGISTRY_IMAGE:$IMAGE_TAG

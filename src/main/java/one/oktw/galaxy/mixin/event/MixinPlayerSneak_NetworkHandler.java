@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,7 +21,7 @@ package one.oktw.galaxy.mixin.event;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import one.oktw.galaxy.Main;
+import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerSneakEvent;
 import one.oktw.galaxy.event.type.PlayerSneakReleaseEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,11 +40,9 @@ public class MixinPlayerSneak_NetworkHandler {
         target = "Lnet/minecraft/server/network/ServerPlayerEntity;setSneaking(Z)V"
     ))
     private void playerInput(ClientCommandC2SPacket packet, CallbackInfo ci) {
-        Main main = Main.Companion.getMain();
-        if (main == null) return;
         switch (packet.getMode()) {
-            case PRESS_SHIFT_KEY -> main.getEventManager().emit(new PlayerSneakEvent(player));
-            case RELEASE_SHIFT_KEY -> main.getEventManager().emit(new PlayerSneakReleaseEvent(player));
+            case PRESS_SHIFT_KEY -> EventManager.safeEmit(new PlayerSneakEvent(player));
+            case RELEASE_SHIFT_KEY -> EventManager.safeEmit(new PlayerSneakReleaseEvent(player));
         }
     }
 }

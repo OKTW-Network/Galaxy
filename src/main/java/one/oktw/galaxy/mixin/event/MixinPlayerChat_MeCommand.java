@@ -27,7 +27,7 @@ import net.minecraft.server.filter.FilteredMessage;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.registry.RegistryKey;
-import one.oktw.galaxy.Main;
+import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,11 +41,10 @@ public class MixinPlayerChat_MeCommand {
         ordinal = 0
     ))
     private static void onCommand(PlayerManager playerManager, FilteredMessage<SignedMessage> message, ServerCommandSource source, RegistryKey<MessageType> typeKey) {
-        Main main = Main.Companion.getMain();
         ServerPlayerEntity player = source.getPlayer();
 
         // TODO sync SignedMessage
-        if (main == null || player == null || !main.getEventManager().emit(new PlayerChatEvent(player, Text.translatable("chat.type.emote", player.getDisplayName(), message.raw().getContent()))).getCancel()) {
+        if (player == null || !EventManager.safeEmit(new PlayerChatEvent(player, Text.translatable("chat.type.emote", player.getDisplayName(), message.raw().getContent()))).getCancel()) {
             playerManager.broadcast(message, source, typeKey);
         } else {
             player.server.logChatMessage(source.getChatMessageSender(), message.raw().getContent().copy().append(" (Canceled)"));

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,7 +21,7 @@ package one.oktw.galaxy.mixin.event;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;
-import one.oktw.galaxy.Main;
+import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerUseItemOnBlock;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,10 +32,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinPlayerUseItemOnBlock_ItemStack {
     @Inject(method = "useOnBlock", at = @At(value = "HEAD"), cancellable = true)
     private void useItemOnBlock(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
-        Main main = Main.Companion.getMain();
-        if (main == null || context.getPlayer() == null) return;
+        if (context.getPlayer() == null) return;
 
-        PlayerUseItemOnBlock event = main.getEventManager().emit(new PlayerUseItemOnBlock(context));
+        PlayerUseItemOnBlock event = EventManager.safeEmit(new PlayerUseItemOnBlock(context));
         if (event.getCancel()) {
             cir.setReturnValue(event.getSwing() ? ActionResult.SUCCESS : ActionResult.CONSUME);
             cir.cancel();

@@ -19,8 +19,10 @@
 package one.oktw.galaxy.mixin.tweak;
 
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Vec3d;
@@ -29,6 +31,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Set;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public abstract class MixinAsyncChunk_ServerPlayNetworkHandler {
@@ -54,5 +58,12 @@ public abstract class MixinAsyncChunk_ServerPlayNetworkHandler {
             requestTeleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYaw(), this.player.getPitch());
             ci.cancel();
         }
+    }
+
+    @Inject(method = "requestTeleport(DDDFFLjava/util/Set;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;updatePositionAndAngles(DDDFF)V", shift = At.Shift.AFTER))
+    private void onTeleport(double x, double y, double z, float yaw, float pitch, Set<PlayerPositionLookS2CPacket.Flag> flags, boolean shouldDismount, CallbackInfo ci) {
+        ServerWorld world = player.getWorld();
+        if (!world.getPlayers().contains(player)) return;
+        world.getChunkManager().updatePosition(this.player);
     }
 }

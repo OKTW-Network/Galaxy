@@ -18,8 +18,9 @@
 
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.PlayerInventory
 import net.minecraft.inventory.SimpleInventory
@@ -94,14 +95,9 @@ class GUI private constructor(private val type: ScreenHandlerType<out ScreenHand
         rangeBindings[Pair(xRange, yRange)] = function
     }
 
-    fun editInventory(block: InventoryEditor.() -> Unit) {
-        val server = main?.server
-        if (server != null && !server.isOnThread) {
-            runBlocking(server.asCoroutineDispatcher()) {
-                block.invoke(InventoryEditor(type, inventory))
-                inventory.markDirty()
-            }
-        } else {
+    fun editInventory(block: suspend InventoryEditor.() -> Unit) {
+        val server = main!!.server
+        main!!.launch(server.asCoroutineDispatcher(), if (server.isOnThread) CoroutineStart.UNDISPATCHED else CoroutineStart.DEFAULT) {
             block.invoke(InventoryEditor(type, inventory))
             inventory.markDirty()
         }

@@ -18,6 +18,9 @@
 
 package one.oktw.galaxy
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
 import net.fabricmc.api.DedicatedServerModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
@@ -41,13 +44,17 @@ import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.proxy.api.ProxyAPI
 import one.oktw.galaxy.recipe.RecipeRegistry
 import java.util.*
+import kotlin.coroutines.CoroutineContext
 
 @Suppress("unused")
-class Main : DedicatedServerModInitializer {
+class Main : DedicatedServerModInitializer, CoroutineScope {
+    private val job = SupervisorJob()
     lateinit var server: MinecraftDedicatedServer
         private set
     lateinit var eventManager: EventManager
         private set
+    override val coroutineContext: CoroutineContext
+        get() = job + server.asCoroutineDispatcher()
 
     companion object {
         val PROXY_IDENTIFIER = Identifier("galaxy", "proxy")
@@ -94,6 +101,10 @@ class Main : DedicatedServerModInitializer {
             eventManager.register(AngelBlock())
             eventManager.register(CustomItemEventHandler())
         })
+
+        ServerLifecycleEvents.SERVER_STOPPING.register {
+            job.complete()
+        }
 
         // server.log("current server id is $selfUID
         println("current server id is $selfUUID")

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,7 +23,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import one.oktw.galaxy.Main;
+import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -44,9 +44,7 @@ public abstract class MixinPlayerInteractItem_NetworkHandler {
         target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;interactItem(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;"
     ), cancellable = true)
     private void onPlayerInteractItem(PlayerInteractItemC2SPacket packet, CallbackInfo info) {
-        Main main = Main.Companion.getMain();
-        if (main == null) return;
-        PlayerInteractItemEvent event = main.getEventManager().emit(new PlayerInteractItemEvent(packet, player));
+        PlayerInteractItemEvent event = EventManager.safeEmit(new PlayerInteractItemEvent(packet, player));
         if (event.getCancel()) {
             info.cancel();
             sendPacket(new EntityStatusS2CPacket(player, (byte) 9));

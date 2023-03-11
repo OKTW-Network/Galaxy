@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,7 +19,7 @@
 package one.oktw.galaxy.mixin.tweak;
 
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -60,8 +60,8 @@ public abstract class MixinAsyncChunk_ServerPlayNetworkHandler {
         }
     }
 
-    @Inject(method = "requestTeleport(DDDFFLjava/util/Set;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;updatePositionAndAngles(DDDFF)V", shift = At.Shift.AFTER))
-    private void onTeleport(double x, double y, double z, float yaw, float pitch, Set<PlayerPositionLookS2CPacket.Flag> flags, boolean shouldDismount, CallbackInfo ci) {
+    @Inject(method = "requestTeleport(DDDFFLjava/util/Set;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;updatePositionAndAngles(DDDFF)V", shift = At.Shift.AFTER))
+    private void onTeleport(double x, double y, double z, float yaw, float pitch, Set<PositionFlag> set, CallbackInfo ci) {
         ServerWorld world = player.getWorld();
         if (!world.getPlayers().contains(player)) return;
         world.getChunkManager().updatePosition(this.player);

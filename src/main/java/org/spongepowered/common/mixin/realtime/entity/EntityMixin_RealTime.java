@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -86,7 +86,7 @@ public abstract class EntityMixin_RealTime {
         this.ridingCooldown = Math.max(0, this.ridingCooldown - ticks);
     }
 
-    @Redirect(method = "tickNetherPortal",
+    @Redirect(method = "tickPortal",
         at = @At(
             value = "FIELD",
             target = "Lnet/minecraft/entity/Entity;netherPortalTime:I",
@@ -94,7 +94,7 @@ public abstract class EntityMixin_RealTime {
         ),
         slice = @Slice(
             from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getMaxNetherPortalTime()I"),
-            to = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;resetNetherPortalCooldown()V")
+            to = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;resetPortalCooldown()V")
         )
     )
     private void realTimeImpl$adjustForRealTimePortalCounter(final Entity self, final int modifier) {

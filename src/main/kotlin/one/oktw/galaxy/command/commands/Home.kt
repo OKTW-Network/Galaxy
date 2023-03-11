@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,6 +23,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.block.RespawnAnchorBlock
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.sound.SoundCategory
@@ -118,8 +119,17 @@ class Home : Command {
 
                 val blockState = world2.getBlockState(spawnPointPosition)
                 if (!player.notInAnyWorld && blockState.block is RespawnAnchorBlock) {
-                    world2.playSound(
-                        null, spawnPointPosition, SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.BLOCKS, 1.0F, 1.0F
+                    player.networkHandler.sendPacket(
+                        PlaySoundS2CPacket(
+                                SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE,
+                                SoundCategory.BLOCKS,
+                                spawnPointPosition.x.toDouble(),
+                                spawnPointPosition.y.toDouble(),
+                                spawnPointPosition.z.toDouble(),
+                                1.0f,
+                                1.0f,
+                                world2.getRandom().nextLong()
+                            )
                     )
                 }
 

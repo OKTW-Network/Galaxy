@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -161,8 +161,8 @@ class GUI private constructor(private val type: ScreenHandlerType<out ScreenHand
             openListener.forEach { it.invoke(playerInventory.player) }
         }
 
-        override fun close(player: PlayerEntity) {
-            super.close(player)
+        override fun onClosed(player: PlayerEntity) {
+            super.onClosed(player)
             closeListener.forEach { it.invoke(player) }
         }
 
@@ -246,7 +246,7 @@ class GUI private constructor(private val type: ScreenHandlerType<out ScreenHand
             }
         }
 
-        override fun transferSlot(player: PlayerEntity, index: Int): ItemStack {
+        override fun quickMove(player: PlayerEntity, index: Int): ItemStack {
             // Not in used, logic override in onSlotClick
             return ItemStack.EMPTY
         }

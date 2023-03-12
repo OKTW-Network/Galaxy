@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,7 +20,7 @@ package one.oktw.galaxy.recipe.utils
 
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.tag.TagKey
+import net.minecraft.registry.tag.TagKey
 
 class Ingredient(
     private val tag: TagKey<Item>? = null,

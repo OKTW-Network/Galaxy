@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,10 +22,10 @@ import com.mojang.datafixers.util.Either;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
-import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.thread.ThreadExecutor;
 import net.minecraft.world.ChunkSerializer;

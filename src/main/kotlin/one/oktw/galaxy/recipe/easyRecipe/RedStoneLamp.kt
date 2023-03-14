@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,6 +24,8 @@ import net.minecraft.inventory.CraftingInventory
 import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
+import net.minecraft.recipe.book.CraftingRecipeCategory
+import net.minecraft.registry.DynamicRegistryManager
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
@@ -43,18 +45,20 @@ class RedStoneLamp : CraftingRecipe {
 
     override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
 
-    override fun craft(inv: CraftingInventory) = item.copy()
+    override fun craft(inv: CraftingInventory, registryManager: DynamicRegistryManager) = item.copy()
 
     @Environment(EnvType.CLIENT)
     override fun fits(width: Int, height: Int): Boolean {
         throw NotImplementedError()
     }
 
-    override fun getOutput() = item
+    override fun getOutput(registryManager: DynamicRegistryManager) = item
 
     override fun getId() = Identifier("galaxy", "easy_recipe/redstone_lamp")
 
     override fun getSerializer(): RecipeSerializer<*> {
         TODO("Not yet implemented, support client mod.")
     }
+
+    override fun getCategory() = CraftingRecipeCategory.BUILDING
 }

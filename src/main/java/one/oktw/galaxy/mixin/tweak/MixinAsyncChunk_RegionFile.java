@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -81,18 +81,18 @@ public abstract class MixinAsyncChunk_RegionFile implements RegionFileInputStrea
 
     @Shadow
     @Nullable
-    protected abstract DataInputStream method_22408(ChunkPos chunkPos, byte b) throws IOException;
+    protected abstract DataInputStream getInputStream(ChunkPos chunkPos, byte b) throws IOException;
 
     @Shadow
     @Nullable
-    protected abstract DataInputStream method_22409(ChunkPos chunkPos, byte b, InputStream inputStream) throws IOException;
+    protected abstract DataInputStream decompress(ChunkPos chunkPos, byte b, InputStream inputStream) throws IOException;
 
-    @Inject(method = "method_31740", at = @At("HEAD"))
+    @Inject(method = "delete", at = @At("HEAD"))
     private void method_31740Lock(ChunkPos chunkPos, CallbackInfo ci) {
         lock.lock();
     }
 
-    @Inject(method = "method_31740", at = @At("RETURN"))
+    @Inject(method = "delete", at = @At("RETURN"))
     private void method_31740Unlock(ChunkPos chunkPos, CallbackInfo ci) {
         lock.unlock();
     }
@@ -141,7 +141,7 @@ public abstract class MixinAsyncChunk_RegionFile implements RegionFileInputStrea
         int n = m - 1;
         if (hasChunkStreamVersionId(b)) {
             if (n != 0) LOGGER.warn("Chunk has both internal and external streams");
-            return method_22408(pos, getChunkStreamVersionId(b));
+            return getInputStream(pos, getChunkStreamVersionId(b));
         }
         if (n > byteBuffer.remaining()) {
             LOGGER.error("Chunk {} stream is truncated: expected {} but read {}", pos, n, byteBuffer.remaining());
@@ -151,6 +151,6 @@ public abstract class MixinAsyncChunk_RegionFile implements RegionFileInputStrea
             LOGGER.error("Declared size {} of chunk {} is negative", m, pos);
             return null;
         }
-        return method_22409(pos, b, getInputStream(byteBuffer, n));
+        return decompress(pos, b, getInputStream(byteBuffer, n));
     }
 }

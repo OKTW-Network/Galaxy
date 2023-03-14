@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -54,7 +54,7 @@ class Elevator {
     fun onJump(event: PlayerJumpEvent) {
         val player = event.player
         val playerWorld = player.getWorld()
-        val blockPos = BlockPos(player.pos)
+        val blockPos = BlockPos.ofFloored(player.pos)
 
         if (isElevator(playerWorld, blockPos.down()) && isSafe(playerWorld, blockPos)) {
             for (i in 1..7) {
@@ -71,7 +71,7 @@ class Elevator {
     fun onSneak(event: PlayerSneakEvent) {
         val player = event.player
         val playerWorld = player.getWorld()
-        val blockPos = BlockPos(player.pos)
+        val blockPos = BlockPos.ofFloored(player.pos)
 
         if (isElevator(playerWorld, blockPos.down()) && isSafe(playerWorld, blockPos)) {
             for (i in 3..9) {

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -25,6 +25,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
+import net.minecraft.recipe.book.CraftingRecipeCategory
+import net.minecraft.registry.DynamicRegistryManager
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
@@ -55,7 +57,7 @@ class Minecart : CraftingRecipe {
         return match
     }
 
-    override fun craft(inv: CraftingInventory): ItemStack {
+    override fun craft(inv: CraftingInventory, registryManager: DynamicRegistryManager): ItemStack {
         var item = ItemStack.EMPTY
         minecartType.forEach { (recipeItem, result) ->
             val ironIngot = Ingredient(items = listOf(Items.IRON_INGOT))
@@ -77,11 +79,13 @@ class Minecart : CraftingRecipe {
         throw NotImplementedError()
     }
 
-    override fun getOutput() = Items.MINECART.defaultStack
+    override fun getOutput(registryManager: DynamicRegistryManager) = Items.MINECART.defaultStack
 
     override fun getId() = Identifier("galaxy", "easy_recipe/minecart")
 
     override fun getSerializer(): RecipeSerializer<*> {
         TODO("Not yet implemented, support client mod.")
     }
+
+    override fun getCategory() = CraftingRecipeCategory.MISC
 }

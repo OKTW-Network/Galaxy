@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,9 +22,10 @@ import net.minecraft.block.Block
 import net.minecraft.block.Blocks.*
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.block.entity.BlockEntityType.Builder
+import net.minecraft.registry.Registries
+import net.minecraft.registry.Registry
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.registry.Registry
 import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.util.CustomRegistry
@@ -34,7 +35,7 @@ open class CustomBlock(final override val identifier: Identifier, val baseBlock:
     constructor(id: String, baseBlock: Block = BARRIER) : this(Identifier("galaxy", "block/$id"), baseBlock)
 
     protected val blockEntityType: BlockEntityType<CustomBlockEntity> = Registry.register(
-        Registry.BLOCK_ENTITY_TYPE,
+        Registries.BLOCK_ENTITY_TYPE,
         identifier,
         Builder.create({ pos, _ -> createBlockEntity(pos) }, BARRIER).build(null)
     )

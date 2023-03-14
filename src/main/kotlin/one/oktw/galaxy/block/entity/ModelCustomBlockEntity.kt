@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -50,7 +50,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
     override fun tick() {
         if (entityUUID == null || (world as ServerWorld).getEntity(entityUUID) == null) {
             // Kill leak entities
-            (world as ServerWorld).getEntitiesByType(EntityType.ARMOR_STAND) { it.blockPos == pos && it.scoreboardTags.contains("BLOCK") }.forEach(Entity::kill)
+            (world as ServerWorld).getEntitiesByType(EntityType.ARMOR_STAND) { it.blockPos == pos && it.commandTags.contains("BLOCK") }.forEach(Entity::kill)
 
             spawnEntity()
         }
@@ -75,8 +75,8 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         val entity: ArmorStandEntity = EntityType.getEntityFromNbt(armorStandNbt, world).get() as ArmorStandEntity
         entity.refreshPositionAndAngles(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, 0.0F, 0.0F)
         entity.equipStack(EquipmentSlot.HEAD, modelItem)
-        entity.addScoreboardTag("BLOCK")
-        entity.addScoreboardTag(getId().toString())
+        entity.addCommandTag("BLOCK")
+        entity.addCommandTag(getId().toString())
         if (world!!.spawnEntity(entity)) entityUUID = entity.uuid
     }
 }

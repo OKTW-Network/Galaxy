@@ -38,12 +38,12 @@ class Crowbar : CraftingRecipe {
     private val air = Ingredient(items = listOf(Items.AIR))
     private val ironIngot = Ingredient(items = listOf(Items.IRON_INGOT))
     private val list = listOf(
-        ironIngot, ironIngot, air,
-        air, ironIngot, air,
-        air, ironIngot, air
+        ironIngot, ironIngot,
+        air, ironIngot,
+        air, ironIngot,
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list = list)
+    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 2, 3, list = list)
 
     override fun craft(inv: CraftingInventory, registryManager: DynamicRegistryManager) = Tool.CROWBAR.createItemStack()
 

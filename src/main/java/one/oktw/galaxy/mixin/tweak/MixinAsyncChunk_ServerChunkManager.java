@@ -23,10 +23,13 @@ import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import one.oktw.galaxy.mixin.accessor.ThreadedAnvilChunkStorageAccessor;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -35,10 +38,26 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Mixin(ServerChunkManager.class)
-public class MixinAsyncChunk_ServerChunkManager {
+public abstract class MixinAsyncChunk_ServerChunkManager {
     @Shadow
     @Final
     ServerWorld world;
+
+    @Shadow
+    @Nullable
+    protected abstract ChunkHolder getChunkHolder(long pos);
+
+    @Shadow
+    protected abstract boolean isMissingForLevel(@Nullable ChunkHolder holder, int maxLevel);
+
+    /**
+     * @author James58899
+     * @reason Use static ChunkPos.toLong
+     */
+    @Overwrite
+    public boolean isChunkLoaded(int x, int z) {
+        return !this.isMissingForLevel(this.getChunkHolder(ChunkPos.toLong(x, z)), 33 + ChunkStatus.getDistanceFromFull(ChunkStatus.FULL));
+    }
 
     @Redirect(method = "tickChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ThreadedAnvilChunkStorage;entryIterator()Ljava/lang/Iterable;"))
     private Iterable<ChunkHolder> earlyCheckChunkShouldTick(ThreadedAnvilChunkStorage instance) {

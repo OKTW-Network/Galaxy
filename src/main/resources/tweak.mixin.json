@@ -3,6 +3,7 @@
   "package": "one.oktw.galaxy.mixin.tweak",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "MixinAsyncChunk_ChunkPosDistanceLevelPropagator",
     "MixinAsyncChunk_RegionBasedStorage",
     "MixinAsyncChunk_RegionFile",
     "MixinAsyncChunk_ServerChunkManager",

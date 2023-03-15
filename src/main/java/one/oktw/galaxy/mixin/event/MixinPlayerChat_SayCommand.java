@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,14 +18,14 @@
 
 package one.oktw.galaxy.mixin.event;
 
+import com.mojang.brigadier.context.CommandContext;
+import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SignedMessage;
-import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.SayCommand;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.filter.FilteredMessage;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import one.oktw.galaxy.Main;
+import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,24 +38,22 @@ public class MixinPlayerChat_SayCommand {
         method = "method_43657",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/server/filter/FilteredMessage;Lnet/minecraft/server/command/ServerCommandSource;Lnet/minecraft/util/registry/RegistryKey;)V",
+            target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/network/message/SignedMessage;Lnet/minecraft/server/command/ServerCommandSource;Lnet/minecraft/network/message/MessageType$Parameters;)V",
             ordinal = 0
         ),
         cancellable = true
     )
-    private static void onCommand(PlayerManager playerManager, ServerCommandSource serverCommandSource, FilteredMessage<SignedMessage> decoratedMessage, CallbackInfo ci) {
+    private static void onCommand(CommandContext<ServerCommandSource> context, SignedMessage message, CallbackInfo ci) {
+        ServerCommandSource serverCommandSource = context.getSource();
         if (!serverCommandSource.isExecutedByPlayer()) return;
 
-        Main main = Main.Companion.getMain();
         ServerPlayerEntity player = serverCommandSource.getPlayer();
 
         // TODO sync SignedMessage
-        if (main != null) {
-            assert player != null;
-            if (main.getEventManager().emit(new PlayerChatEvent(player, Text.translatable("chat.type.announcement", player.getDisplayName(), decoratedMessage.raw().getContent()))).getCancel()) {
-                ci.cancel();
-                player.server.logChatMessage(player.asMessageSender(), decoratedMessage.raw().getContent().copy().append(" (Canceled)"));
-            }
+        assert player != null;
+        if (EventManager.safeEmit(new PlayerChatEvent(player, Text.translatable("chat.type.announcement", player.getDisplayName(), message.getContent()))).getCancel()) {
+            ci.cancel();
+            player.server.logChatMessage(message.getContent(), MessageType.params(MessageType.SAY_COMMAND, serverCommandSource), "Canceled");
         }
     }
 }

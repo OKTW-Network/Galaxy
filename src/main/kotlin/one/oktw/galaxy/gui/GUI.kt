@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,8 +18,9 @@
 
 package one.oktw.galaxy.gui
 
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.PlayerInventory
 import net.minecraft.inventory.SimpleInventory
@@ -94,14 +95,9 @@ class GUI private constructor(private val type: ScreenHandlerType<out ScreenHand
         rangeBindings[Pair(xRange, yRange)] = function
     }
 
-    fun editInventory(block: InventoryEditor.() -> Unit) {
-        val server = main?.server
-        if (server != null && !server.isOnThread) {
-            runBlocking(server.asCoroutineDispatcher()) {
-                block.invoke(InventoryEditor(type, inventory))
-                inventory.markDirty()
-            }
-        } else {
+    fun editInventory(block: suspend InventoryEditor.() -> Unit) {
+        val server = main!!.server
+        main!!.launch(server.asCoroutineDispatcher(), if (server.isOnThread) CoroutineStart.UNDISPATCHED else CoroutineStart.DEFAULT) {
             block.invoke(InventoryEditor(type, inventory))
             inventory.markDirty()
         }
@@ -165,8 +161,8 @@ class GUI private constructor(private val type: ScreenHandlerType<out ScreenHand
             openListener.forEach { it.invoke(playerInventory.player) }
         }
 
-        override fun close(player: PlayerEntity) {
-            super.close(player)
+        override fun onClosed(player: PlayerEntity) {
+            super.onClosed(player)
             closeListener.forEach { it.invoke(player) }
         }
 
@@ -250,7 +246,7 @@ class GUI private constructor(private val type: ScreenHandlerType<out ScreenHand
             }
         }
 
-        override fun transferSlot(player: PlayerEntity, index: Int): ItemStack {
+        override fun quickMove(player: PlayerEntity, index: Int): ItemStack {
             // Not in used, logic override in onSlotClick
             return ItemStack.EMPTY
         }

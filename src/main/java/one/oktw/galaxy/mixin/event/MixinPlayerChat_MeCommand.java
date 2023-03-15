@@ -23,11 +23,9 @@ import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.MeCommand;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.filter.FilteredMessage;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.registry.RegistryKey;
-import one.oktw.galaxy.Main;
+import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,18 +35,17 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class MixinPlayerChat_MeCommand {
     @Redirect(method = "method_43645", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/server/filter/FilteredMessage;Lnet/minecraft/server/command/ServerCommandSource;Lnet/minecraft/util/registry/RegistryKey;)V",
+        target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/network/message/SignedMessage;Lnet/minecraft/server/command/ServerCommandSource;Lnet/minecraft/network/message/MessageType$Parameters;)V",
         ordinal = 0
     ))
-    private static void onCommand(PlayerManager playerManager, FilteredMessage<SignedMessage> message, ServerCommandSource source, RegistryKey<MessageType> typeKey) {
-        Main main = Main.Companion.getMain();
+    private static void onCommand(PlayerManager playerManager, SignedMessage message, ServerCommandSource source, MessageType.Parameters messageType) {
         ServerPlayerEntity player = source.getPlayer();
 
         // TODO sync SignedMessage
-        if (main == null || player == null || !main.getEventManager().emit(new PlayerChatEvent(player, Text.translatable("chat.type.emote", player.getDisplayName(), message.raw().getContent()))).getCancel()) {
-            playerManager.broadcast(message, source, typeKey);
+        if (player == null || !EventManager.safeEmit(new PlayerChatEvent(player, Text.translatable("chat.type.emote", player.getDisplayName(), message.getContent()))).getCancel()) {
+            playerManager.broadcast(message, source, messageType);
         } else {
-            player.server.logChatMessage(source.getChatMessageSender(), message.raw().getContent().copy().append(" (Canceled)"));
+            player.server.logChatMessage(message.getContent(), messageType, "Canceled");
         }
     }
 }

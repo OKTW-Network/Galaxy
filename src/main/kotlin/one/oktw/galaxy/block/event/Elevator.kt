@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,9 +18,6 @@
 
 package one.oktw.galaxy.block.event
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.launch
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
@@ -42,24 +39,22 @@ class Elevator {
     }
 
     private fun doTeleport(player: ServerPlayerEntity, pos: BlockPos) {
-        GlobalScope.launch(player.server.asCoroutineDispatcher()) {
-            player.requestTeleport(player.pos.x, pos.y.toDouble(), player.pos.z)
-            player.world.playSound(
-                null,
-                BlockPos(pos),
-                SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
-                SoundCategory.BLOCKS,
-                1.0f,
-                1.0f
-            )
-        }
+        player.requestTeleport(player.pos.x, pos.y.toDouble(), player.pos.z)
+        player.world.playSound(
+            null,
+            BlockPos(pos),
+            SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
+            SoundCategory.BLOCKS,
+            1.0f,
+            1.0f
+        )
     }
 
     @EventListener(sync = true)
     fun onJump(event: PlayerJumpEvent) {
         val player = event.player
         val playerWorld = player.getWorld()
-        val blockPos = BlockPos(player.pos)
+        val blockPos = BlockPos.ofFloored(player.pos)
 
         if (isElevator(playerWorld, blockPos.down()) && isSafe(playerWorld, blockPos)) {
             for (i in 1..7) {
@@ -76,7 +71,7 @@ class Elevator {
     fun onSneak(event: PlayerSneakEvent) {
         val player = event.player
         val playerWorld = player.getWorld()
-        val blockPos = BlockPos(player.pos)
+        val blockPos = BlockPos.ofFloored(player.pos)
 
         if (isElevator(playerWorld, blockPos.down()) && isSafe(playerWorld, blockPos)) {
             for (i in 3..9) {

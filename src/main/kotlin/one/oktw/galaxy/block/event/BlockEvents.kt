@@ -19,8 +19,10 @@
 package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+import net.minecraft.advancement.criterion.Criteria
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.util.Hand
 import one.oktw.galaxy.block.CustomBlockHelper
 import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
 import one.oktw.galaxy.block.listener.CustomBlockClickListener
@@ -45,17 +47,24 @@ class BlockEvents {
 
     @EventListener(true)
     fun onPlayerInteractBlock(event: PlayerInteractBlockEvent) {
-        val packet = event.packet
         val player = event.player
         if (usedLock.contains(player)) {
             event.cancel = true
+            if (event.packet.hand == Hand.OFF_HAND && player.offHandStack.isEmpty) usedLock.remove(player) // Interact block using off_hand is the last event when off_hand is empty.
             return
         }
 
         // CustomBlockClickListener
-        val canInteract = !player.shouldCancelInteraction() || player.mainHandStack.isEmpty && player.offHandStack.isEmpty
-        if (canInteract && player.getWorld().getBlockEntity(packet.blockHitResult.blockPos) is CustomBlockClickListener) {
-            usedLock[player] = player.server.ticks
+        if (!player.shouldCancelInteraction() || player.mainHandStack.isEmpty && player.offHandStack.isEmpty) {
+            val packet = event.packet
+            val hitResult = packet.blockHitResult
+            val blockEntity = player.getWorld().getBlockEntity(hitResult.blockPos) as? CustomBlockClickListener ?: return
+            val result = blockEntity.onClick(player, packet.hand, hitResult)
+            if (result.isAccepted) {
+                Criteria.ITEM_USED_ON_BLOCK.trigger(player, hitResult.blockPos, player.getStackInHand(packet.hand))
+                event.swing = result.shouldSwingHand()
+                usedLock[player] = player.server.ticks
+            }
         }
     }
 
@@ -84,9 +93,10 @@ class BlockEvents {
 
     @EventListener(true)
     fun onPlayerInteractItem(event: PlayerInteractItemEvent) {
-        if (usedLock.contains(event.player)) {
+        val player = event.player
+        if (usedLock.contains(player)) {
             event.cancel = true
-            usedLock.remove(event.player) // Interact item is the last interactive event
+            if (event.packet.hand == Hand.OFF_HAND) usedLock.remove(player) // Interact item is the last interactive event
         }
     }
 }

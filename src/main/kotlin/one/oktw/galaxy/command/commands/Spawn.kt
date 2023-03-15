@@ -19,7 +19,8 @@
 package one.oktw.galaxy.command.commands
 
 import com.mojang.brigadier.CommandDispatcher
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
@@ -28,11 +29,10 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.mixin.accessor.ServerPlayerEntityFunctionAccessor
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 class Spawn : Command {
-    private val lock = ConcurrentHashMap.newKeySet<UUID>()
+    private val lock = HashSet<UUID>()
 
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
@@ -51,7 +51,7 @@ class Spawn : Command {
 
         lock += player.uuid
 
-        GlobalScope.launch {
+        main?.launch {
             val world = player.getWorld()
 
             for (i in 0..4) {
@@ -60,26 +60,24 @@ class Spawn : Command {
             }
             player.sendMessage(Text.translatable("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
 
-            withContext(main!!.server.asCoroutineDispatcher()) {
-                val oldPos = player.pos
+            val oldPos = player.pos
 
-                player.stopRiding()
-                if (player.isSleeping) {
-                    player.wakeUp(true, true)
-                }
-
-                (player as ServerPlayerEntityFunctionAccessor).moveToWorldSpawn(world)
-                // force teleport when player pos does not change at all
-                if (oldPos.distanceTo(player.pos) == 0.0) {
-                    val spawnPosition = world.spawnPos
-                    player.refreshPositionAndAngles(spawnPosition, 0.0f, 0.0f)
-                }
-
-                while (!world.isSpaceEmpty(player) && player.y < world.topY) {
-                    player.updatePosition(player.x, player.y + 1, player.z)
-                }
-                player.networkHandler.requestTeleport(player.x, player.y, player.z, player.yaw, player.pitch)
+            player.stopRiding()
+            if (player.isSleeping) {
+                player.wakeUp(true, true)
             }
+
+            (player as ServerPlayerEntityFunctionAccessor).moveToWorldSpawn(world)
+            // force teleport when player pos does not change at all
+            if (oldPos.distanceTo(player.pos) == 0.0) {
+                val spawnPosition = world.spawnPos
+                player.refreshPositionAndAngles(spawnPosition, 0.0f, 0.0f)
+            }
+
+            while (!world.isSpaceEmpty(player) && player.y < world.topY) {
+                player.updatePosition(player.x, player.y + 1, player.z)
+            }
+            player.networkHandler.requestTeleport(player.x, player.y, player.z, player.yaw, player.pitch)
             lock -= player.uuid
         }
 

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -80,8 +80,8 @@ class BlockEvents {
             return
         }
 
-        // Wrench
-        if (player.isSneaking && CustomItemHelper.getItem(item) == Tool.WRENCH) {
+        // Crowbar
+        if (player.isSneaking && CustomItemHelper.getItem(item) == Tool.CROWBAR) {
             val world = player.getWorld()
             val blockPos = event.context.blockPos
             if (world.getBlockEntity(blockPos) !is ModelCustomBlockEntity) return // Check is custom block

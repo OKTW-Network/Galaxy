@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -116,7 +116,7 @@ class GetGun {
         } else {
             player.dropItem(itemStack, false)?.apply {
                 resetPickupDelay()
-                owner = player.uuid
+                setOwner(player.uuid)
             }
         }
         it.source.sendFeedback(Text.translatable("commands.give.success.single", 1, itemStack.toHoverableText(), it.source.displayName), true)

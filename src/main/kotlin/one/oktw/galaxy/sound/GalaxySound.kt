@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,10 +19,12 @@
 package one.oktw.galaxy.sound
 
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.network.packet.s2c.play.PlaySoundIdS2CPacket
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
+import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvent
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
@@ -41,6 +43,7 @@ object GalaxySound {
         volume: Float,
         pitch: Float
     ) {
+        val registryEntry = RegistryEntry.of(SoundEvent.of(soundID))
         val seed: Long = world.getRandom().nextLong()
         val vec3d = Vec3d(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())
         server.playerManager.sendToAround(
@@ -50,7 +53,7 @@ object GalaxySound {
             vec3d.z,
             if (volume > 1.0F) (16.0 * volume) else 16.0,
             world.registryKey,
-            PlaySoundIdS2CPacket(soundID, category, vec3d, volume, pitch, seed)
+            PlaySoundS2CPacket(registryEntry, category, vec3d.x, vec3d.y, vec3d.z, volume, pitch, seed)
         )
     }
 }

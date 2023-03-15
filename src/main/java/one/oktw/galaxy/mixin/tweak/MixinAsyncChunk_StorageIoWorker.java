@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.thread.TaskExecutor;
 import net.minecraft.util.thread.TaskQueue;
@@ -30,6 +31,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -61,7 +64,11 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
     @Overwrite
     private void writeResult() {
         if (!this.results.isEmpty()) {
-            results.forEach((chunkPos, result) -> executor.send(new TaskQueue.PrioritizedTask(Priority.FOREGROUND.ordinal(), () -> write(chunkPos, result))));
+            HashMap<Long, ArrayList<Pair<ChunkPos, StorageIoWorker.Result>>> map = new HashMap<>();
+            results.forEach((pos, result) -> map.computeIfAbsent(ChunkPos.toLong(pos.getRegionX(), pos.getRegionZ()), k -> new ArrayList<>()).add(new Pair<>(pos, result)));
+            map.values().forEach(list ->
+                executor.send(new TaskQueue.PrioritizedTask(Priority.FOREGROUND.ordinal(), () -> list.forEach(pair -> write(pair.getLeft(), pair.getRight()))))
+            );
             this.executor.send(new TaskQueue.PrioritizedTask(Priority.BACKGROUND.ordinal(), this::writeResult));
         }
     }

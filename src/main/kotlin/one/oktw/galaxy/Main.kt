@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -39,6 +39,7 @@ import one.oktw.galaxy.command.commands.Spawn
 import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.event.type.ProxyResponseEvent
 import one.oktw.galaxy.item.event.CustomItemEventHandler
+import one.oktw.galaxy.item.event.Wrench
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.proxy.api.ProxyAPI
@@ -96,7 +97,7 @@ class Main : DedicatedServerModInitializer, CoroutineScope {
             eventManager.register(Harvest())
             eventManager.register(BlockEvents())
             eventManager.register(Sign())
-            eventManager.register(one.oktw.galaxy.item.event.Wrench())
+            eventManager.register(Wrench())
             eventManager.register(Elevator())
             eventManager.register(AngelBlock())
             eventManager.register(CustomItemEventHandler())

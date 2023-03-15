@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,12 +24,14 @@ import one.oktw.galaxy.recipe.blocks.Elevator
 import one.oktw.galaxy.recipe.blocks.HTCraftingTable
 import one.oktw.galaxy.recipe.easyRecipe.*
 import one.oktw.galaxy.recipe.materials.CeramicPlate
+import one.oktw.galaxy.recipe.tools.Crowbar
 import one.oktw.galaxy.recipe.tools.Wrench
 
 object RecipeRegistry {
     fun register() {
         // Recipe
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Wrench())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Crowbar())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Elevator())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, HTCraftingTable())
         CustomRecipeManager.addRecipe(RecipeType.SMELTING, CeramicPlate())

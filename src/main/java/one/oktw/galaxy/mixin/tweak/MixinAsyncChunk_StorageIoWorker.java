@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,23 +18,29 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.thread.TaskExecutor;
 import net.minecraft.util.thread.TaskQueue;
 import net.minecraft.world.storage.StorageIoWorker;
-import net.minecraft.world.storage.StorageIoWorker.Priority;
 import one.oktw.galaxy.util.KotlinCoroutineTaskExecutor;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(StorageIoWorker.class)
 public abstract class MixinAsyncChunk_StorageIoWorker {
+    private final AtomicBoolean writeLock = new AtomicBoolean(false);
+
     @Mutable
     @Shadow
     @Final
@@ -51,7 +57,7 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void parallelExecutor(Path directory, boolean dsync, String name, CallbackInfo ci) {
         results = new ConcurrentHashMap<>();
-        executor = new KotlinCoroutineTaskExecutor<>(new TaskQueue.Prioritized(Priority.values().length), "IOWorker-" + name);
+        executor = new KotlinCoroutineTaskExecutor<>(new TaskQueue.Prioritized(4 /* FOREGROUND,BACKGROUND,WRITE_DONE,SHUTDOWN */), "IOWorker-" + name);
     }
 
     /**
@@ -60,9 +66,16 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
      */
     @Overwrite
     private void writeResult() {
-        if (!this.results.isEmpty()) {
-            results.forEach((chunkPos, result) -> executor.send(new TaskQueue.PrioritizedTask(Priority.FOREGROUND.ordinal(), () -> write(chunkPos, result))));
-            this.executor.send(new TaskQueue.PrioritizedTask(Priority.BACKGROUND.ordinal(), this::writeResult));
+        if (!this.results.isEmpty() && !writeLock.getAndSet(true)) {
+            HashMap<Long, ArrayList<Pair<ChunkPos, StorageIoWorker.Result>>> map = new HashMap<>();
+            results.forEach((pos, result) -> map.computeIfAbsent(ChunkPos.toLong(pos.getRegionX(), pos.getRegionZ()), k -> new ArrayList<>()).add(new Pair<>(pos, result)));
+            map.values().forEach(list ->
+                executor.send(new TaskQueue.PrioritizedTask(1 /* BACKGROUND */, () -> list.forEach(pair -> write(pair.getLeft(), pair.getRight()))))
+            );
+            this.executor.send(new TaskQueue.PrioritizedTask(2 /* WRITE_DONE */, () -> {
+                writeLock.set(false);
+                writeResult();
+            }));
         }
     }
 
@@ -71,5 +84,11 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
         if (!this.results.remove(pos, result)) { // Only write once
             ci.cancel();
         }
+    }
+
+    @SuppressWarnings("UnresolvedMixinReference")
+    @Redirect(method = "method_27938", at = @At(value = "NEW", target = "net/minecraft/util/thread/TaskQueue$PrioritizedTask"))
+    private static TaskQueue.PrioritizedTask changeShutdownPriority(int priority, Runnable runnable) {
+        return new TaskQueue.PrioritizedTask(3 /* SHUTDOWN */, runnable);
     }
 }

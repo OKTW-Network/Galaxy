@@ -88,12 +88,12 @@ public abstract class MixinAsyncChunk_RegionFile implements RegionFileInputStrea
     protected abstract DataInputStream decompress(ChunkPos chunkPos, byte b, InputStream inputStream) throws IOException;
 
     @Inject(method = "delete", at = @At("HEAD"))
-    private void method_31740Lock(ChunkPos chunkPos, CallbackInfo ci) {
+    private void deleteLock(ChunkPos chunkPos, CallbackInfo ci) {
         lock.lock();
     }
 
     @Inject(method = "delete", at = @At("RETURN"))
-    private void method_31740Unlock(ChunkPos chunkPos, CallbackInfo ci) {
+    private void deleteUnlock(ChunkPos chunkPos, CallbackInfo ci) {
         lock.unlock();
     }
 

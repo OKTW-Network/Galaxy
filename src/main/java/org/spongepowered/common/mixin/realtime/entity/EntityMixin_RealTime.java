@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -55,13 +55,14 @@ import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 @Mixin(Entity.class)
 public abstract class EntityMixin_RealTime {
     @Shadow
-    public World world;
-    @Shadow
     public int timeUntilRegen;
     @Shadow
     protected int ridingCooldown;
     @Shadow
     protected int netherPortalTime;
+
+    @Shadow
+    public abstract World getWorld();
 
     @Redirect(method = "baseTick",
         at = @At(
@@ -82,7 +83,7 @@ public abstract class EntityMixin_RealTime {
         )
     )
     private void realTimeImpl$adjustForRealTimeEntityCooldown(final Entity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) this.world).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) this.getWorld()).realTimeBridge$getRealTimeTicks();
         this.ridingCooldown = Math.max(0, this.ridingCooldown - ticks);
     }
 
@@ -98,7 +99,7 @@ public abstract class EntityMixin_RealTime {
         )
     )
     private void realTimeImpl$adjustForRealTimePortalCounter(final Entity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) this.world).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) this.getWorld()).realTimeBridge$getRealTimeTicks();
         this.netherPortalTime += ticks;
     }
 }

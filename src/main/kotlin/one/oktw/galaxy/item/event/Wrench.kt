@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -195,7 +195,7 @@ class Wrench {
         }
 
         world.setBlockState(blockPos, newState)
-        newState.neighborUpdate(world, blockPos, newState.block, blockPos, true)
+        world.updateNeighbor(newState, blockPos, newState.block, blockPos, true)
         Block.postProcessState(newState, world, blockPos).let { if (!it.isAir) world.setBlockState(blockPos, it, 2) }
 
         return true

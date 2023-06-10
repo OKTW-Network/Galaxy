@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -59,7 +59,7 @@ class RegisterBlock {
 
                 it.source.world.removeBlockEntity(blockPos)
                 it.source.world.addBlockEntity(block.createBlockEntity(blockPos))
-                it.source.sendFeedback(Text.of("Registered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z} to ${block.identifier}"), true)
+                it.source.sendFeedback({ Text.of("Registered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z} to ${block.identifier}") }, true)
 
                 return@executes Command.SINGLE_SUCCESS
             }

@@ -20,7 +20,7 @@ package one.oktw.galaxy.recipe.easyRecipe
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.inventory.CraftingInventory
+import net.minecraft.inventory.RecipeInputInventory
 import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
@@ -44,9 +44,9 @@ class Hopper : CraftingRecipe {
         air, ironIngot, air
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
+    override fun matches(inv: RecipeInputInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
 
-    override fun craft(inv: CraftingInventory, registryManager: DynamicRegistryManager) = item.copy()
+    override fun craft(inv: RecipeInputInventory, registryManager: DynamicRegistryManager) = item.copy()
 
     @Environment(EnvType.CLIENT)
     override fun fits(width: Int, height: Int): Boolean {

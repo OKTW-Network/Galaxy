@@ -20,7 +20,7 @@ package one.oktw.galaxy.recipe.tools
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.inventory.CraftingInventory
+import net.minecraft.inventory.RecipeInputInventory
 import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
@@ -43,9 +43,9 @@ class Crowbar : CraftingRecipe {
         air, ironIngot,
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 2, 3, list = list)
+    override fun matches(inv: RecipeInputInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 2, 3, list = list)
 
-    override fun craft(inv: CraftingInventory, registryManager: DynamicRegistryManager) = Tool.CROWBAR.createItemStack()
+    override fun craft(inv: RecipeInputInventory, registryManager: DynamicRegistryManager) = Tool.CROWBAR.createItemStack()
 
     @Environment(EnvType.CLIENT)
     override fun fits(width: Int, height: Int): Boolean {

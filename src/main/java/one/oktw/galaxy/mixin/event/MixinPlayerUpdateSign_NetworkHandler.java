@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,10 +18,11 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.network.packet.c2s.play.UpdateSignC2SPacket;
+import net.minecraft.server.filter.FilteredMessage;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -43,15 +44,15 @@ public class MixinPlayerUpdateSign_NetworkHandler {
     public ServerPlayerEntity player;
 
     @Inject(method = "onSignUpdate(Lnet/minecraft/network/packet/c2s/play/UpdateSignC2SPacket;Ljava/util/List;)V",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/SignBlockEntity;isEditable()Z"),
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/SignBlockEntity;tryChangeText(Lnet/minecraft/entity/player/PlayerEntity;ZLjava/util/List;)V"),
         cancellable = true,
         locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void onSignUpdate(UpdateSignC2SPacket updateSignC2SPacket, List<String> list, CallbackInfo ci, ServerWorld serverWorld, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity, SignBlockEntity signBlockEntity) {
-        if (EventManager.safeEmit(new PlayerUpdateSignEvent(updateSignC2SPacket, player, signBlockEntity)).getCancel()) {
+    private void onSignUpdate(UpdateSignC2SPacket packet, List<FilteredMessage> signText, CallbackInfo ci, ServerWorld serverWorld, BlockPos blockPos, BlockEntity blockEntity, SignBlockEntity signBlockEntity) {
+        if (EventManager.safeEmit(new PlayerUpdateSignEvent(packet, player, signBlockEntity)).getCancel()) {
             ci.cancel();
 
             signBlockEntity.markDirty();
-            serverWorld.updateListeners(blockPos, blockState, blockState, 3);
+            serverWorld.updateListeners(blockPos, signBlockEntity.getCachedState(), signBlockEntity.getCachedState(), Block.NOTIFY_ALL);
         }
     }
 }

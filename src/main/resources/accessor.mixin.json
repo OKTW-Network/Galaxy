@@ -3,7 +3,6 @@
   "package": "one.oktw.galaxy.mixin.accessor",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "AsyncChunk_VersionedChunkStorage",
     "BeaconLevelAccessor",
     "PlayerAbilitiesAccessor",
     "SerializingRegionBasedStorageAccessor",

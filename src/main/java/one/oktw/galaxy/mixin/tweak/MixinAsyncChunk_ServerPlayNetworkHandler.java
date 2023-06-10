@@ -23,7 +23,6 @@ import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -53,7 +52,7 @@ public abstract class MixinAsyncChunk_ServerPlayNetworkHandler {
 
         int x = ChunkSectionPos.getSectionCoord(clampHorizontal(packet.getX(this.player.getX())));
         int z = ChunkSectionPos.getSectionCoord(clampHorizontal(packet.getZ(this.player.getZ())));
-        if (!player.getWorld().getChunkManager().isTickingFutureReady(ChunkPos.toLong(x, z))) {
+        if (!player.getWorld().getChunkManager().isChunkLoaded(x, z)) {
             player.setVelocity(Vec3d.ZERO);
             requestTeleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYaw(), this.player.getPitch());
             ci.cancel();
@@ -62,7 +61,7 @@ public abstract class MixinAsyncChunk_ServerPlayNetworkHandler {
 
     @Inject(method = "requestTeleport(DDDFFLjava/util/Set;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;updatePositionAndAngles(DDDFF)V", shift = At.Shift.AFTER))
     private void onTeleport(double x, double y, double z, float yaw, float pitch, Set<PositionFlag> set, CallbackInfo ci) {
-        ServerWorld world = player.getWorld();
+        ServerWorld world = player.getServerWorld();
         if (!world.getPlayers().contains(player)) return;
         world.getChunkManager().updatePosition(this.player);
     }

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -34,16 +34,17 @@ class Sign {
         val player = event.player
 
         if (player.isSneaking && player.mainHandStack.isEmpty && player.offHandStack.isEmpty) {
-            val entity = player.getWorld().getBlockEntity(event.packet.blockHitResult.blockPos) as? SignBlockEntity ?: return
-            if (entity.editor == null) player.openEditSignScreen(entity)
+            val entity = player.serverWorld.getBlockEntity(event.packet.blockHitResult.blockPos) as? SignBlockEntity ?: return
+            if (entity.editor == null) player.openEditSignScreen(entity, entity.isPlayerFacingFront(player))
         }
     }
 
     @EventListener(sync = true)
     fun onPlayerUpdateSign(event: PlayerUpdateSignEvent) {
-        for (i in 0..3) {
-            event.blockEntity.setTextOnRow(i, Text.of(regex.replace(event.packet.text[i], "§")))
-        }
+        val front = event.packet.isFront
+        val text = event.blockEntity.getText(front)
+        for (i in 0..3) text.withMessage(i, Text.of(regex.replace(event.packet.text[i], "§")))
+        event.blockEntity.setText(text, front)
 
         event.blockEntity.editor = null
         event.cancel = true

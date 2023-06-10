@@ -9,7 +9,7 @@ plugins {
 val version = "0.0.1"
 val group = "one.oktw"
 
-val fabricVersion = "0.81.0+1.19.4"
+val fabricVersion = "0.83.0+1.20"
 val galaxyLibVersion = "63aec6ee"
 
 repositories {
@@ -40,9 +40,9 @@ loom {
 
 dependencies {
     // Core
-    minecraft(group = "com.mojang", name = "minecraft", version = "1.19.4")
-    mappings(group = "net.fabricmc", name = "yarn", version = "1.19.4+build.2", classifier = "v2")
-    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.14.19")
+    minecraft(group = "com.mojang", name = "minecraft", version = "1.20")
+    mappings(group = "net.fabricmc", name = "yarn", version = "1.20+build.1", classifier = "v2")
+    modImplementation(group = "net.fabricmc", name = "fabric-loader", version = "0.14.21")
 
     // fabric api
     modImplementation(group = "net.fabricmc.fabric-api", name = "fabric-api", version = fabricVersion) {

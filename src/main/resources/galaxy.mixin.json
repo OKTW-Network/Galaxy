@@ -11,7 +11,6 @@
     "MixinPlayerInteractItem_NetworkHandler",
     "MixinPlayerJump_NetworkHandler",
     "MixinPlayerSneak_NetworkHandler",
-    "MixinPlayerUpdateSign_NetworkHandler",
     "MixinPlayerUseItemOnBlock_ItemStack"
   ],
   "client": [],

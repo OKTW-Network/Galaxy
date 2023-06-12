@@ -23,6 +23,7 @@ import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -52,7 +53,7 @@ public abstract class MixinAsyncChunk_ServerPlayNetworkHandler {
 
         int x = ChunkSectionPos.getSectionCoord(clampHorizontal(packet.getX(this.player.getX())));
         int z = ChunkSectionPos.getSectionCoord(clampHorizontal(packet.getZ(this.player.getZ())));
-        if (!player.getWorld().getChunkManager().isChunkLoaded(x, z)) {
+        if (!player.getServerWorld().getChunkManager().isTickingFutureReady(ChunkPos.toLong(x, z))) {
             player.setVelocity(Vec3d.ZERO);
             requestTeleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYaw(), this.player.getPitch());
             ci.cancel();

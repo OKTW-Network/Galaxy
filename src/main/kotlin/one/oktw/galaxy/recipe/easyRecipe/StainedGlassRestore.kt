@@ -20,7 +20,7 @@ package one.oktw.galaxy.recipe.easyRecipe
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.inventory.CraftingInventory
+import net.minecraft.inventory.RecipeInputInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
@@ -52,7 +52,7 @@ class StainedGlassRestore : CraftingRecipe {
         Items.BLACK_STAINED_GLASS
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean {
+    override fun matches(inv: RecipeInputInventory, world: World): Boolean {
         var match = false
         val stainedGlass = Ingredient(items = stainedGlass)
         val waterBucket = Ingredient(items = listOf(Items.WATER_BUCKET))
@@ -75,7 +75,7 @@ class StainedGlassRestore : CraftingRecipe {
         return match
     }
 
-    override fun craft(inv: CraftingInventory, registryManager: DynamicRegistryManager): ItemStack {
+    override fun craft(inv: RecipeInputInventory, registryManager: DynamicRegistryManager): ItemStack {
         var item = ItemStack.EMPTY
         val stainedGlass = Ingredient(items = stainedGlass)
         val waterBucket = Ingredient(items = listOf(Items.WATER_BUCKET))

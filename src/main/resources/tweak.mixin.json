@@ -23,9 +23,11 @@
     "MixinOptimizeContainer_LootableContainerBlockEntity",
     "MixinRCON_RconBase",
     "MixinRCON_RconClient",
+    "MixinSkipSyncRegistry",
     "MixinThrownCountdown_Entity",
     "MixinThrownCountdown_ProjectileEntity",
-    "MixinThrownCountdown_ThrownEntity"
+    "MixinThrownCountdown_ThrownEntity",
+    "SignStyle_NetworkHandler"
   ],
   "client": [],
   "injectors": {

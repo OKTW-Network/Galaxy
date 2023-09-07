@@ -41,7 +41,6 @@ import one.oktw.galaxy.event.type.ProxyResponseEvent
 import one.oktw.galaxy.item.event.CustomItemEventHandler
 import one.oktw.galaxy.item.event.Wrench
 import one.oktw.galaxy.player.Harvest
-import one.oktw.galaxy.player.Sign
 import one.oktw.galaxy.proxy.api.ProxyAPI
 import one.oktw.galaxy.recipe.RecipeRegistry
 import java.util.*
@@ -96,7 +95,6 @@ class Main : DedicatedServerModInitializer, CoroutineScope {
             eventManager.register(Exchange())
             eventManager.register(Harvest())
             eventManager.register(BlockEvents())
-            eventManager.register(Sign())
             eventManager.register(Wrench())
             eventManager.register(Elevator())
             eventManager.register(AngelBlock())

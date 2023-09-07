@@ -20,7 +20,7 @@ package one.oktw.galaxy.recipe.easyRecipe
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.inventory.CraftingInventory
+import net.minecraft.inventory.RecipeInputInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
@@ -40,7 +40,7 @@ class Minecart : CraftingRecipe {
         Items.TNT to Items.TNT_MINECART
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean {
+    override fun matches(inv: RecipeInputInventory, world: World): Boolean {
         var match = false
         minecartType.forEach { (recipeItem, _) ->
             val ironIngot = Ingredient(items = listOf(Items.IRON_INGOT))
@@ -57,7 +57,7 @@ class Minecart : CraftingRecipe {
         return match
     }
 
-    override fun craft(inv: CraftingInventory, registryManager: DynamicRegistryManager): ItemStack {
+    override fun craft(inv: RecipeInputInventory, registryManager: DynamicRegistryManager): ItemStack {
         var item = ItemStack.EMPTY
         minecartType.forEach { (recipeItem, result) ->
             val ironIngot = Ingredient(items = listOf(Items.IRON_INGOT))

@@ -20,7 +20,7 @@ package one.oktw.galaxy.recipe.blocks
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.inventory.CraftingInventory
+import net.minecraft.inventory.RecipeInputInventory
 import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
@@ -37,9 +37,9 @@ class Elevator : CraftingRecipe {
     private val list =
         listOf(Ingredient(items = listOf(Items.ENDER_PEARL)), Ingredient(items = listOf(Items.IRON_BLOCK)))
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean = RecipeUtils.isItemShapelessMatches(inv, list)
+    override fun matches(inv: RecipeInputInventory, world: World): Boolean = RecipeUtils.isItemShapelessMatches(inv, list)
 
-    override fun craft(inv: CraftingInventory, registryManager: DynamicRegistryManager) = item.copy()
+    override fun craft(inv: RecipeInputInventory, registryManager: DynamicRegistryManager) = item.copy()
 
     @Environment(EnvType.CLIENT)
     override fun fits(width: Int, height: Int): Boolean {

@@ -20,7 +20,7 @@ package one.oktw.galaxy.recipe.easyRecipe
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.inventory.CraftingInventory
+import net.minecraft.inventory.RecipeInputInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.recipe.CraftingRecipe
@@ -87,7 +87,7 @@ class SlabRestore : CraftingRecipe {
         Items.POLISHED_BLACKSTONE_BRICK_SLAB to Items.POLISHED_BLACKSTONE_BRICKS
     )
 
-    override fun matches(inv: CraftingInventory, world: World): Boolean {
+    override fun matches(inv: RecipeInputInventory, world: World): Boolean {
         var match = false
         slabs.forEach { (recipeItem, _) ->
             val list = listOf(
@@ -101,7 +101,7 @@ class SlabRestore : CraftingRecipe {
         return match
     }
 
-    override fun craft(inv: CraftingInventory, registryManager: DynamicRegistryManager): ItemStack {
+    override fun craft(inv: RecipeInputInventory, registryManager: DynamicRegistryManager): ItemStack {
         var item = ItemStack.EMPTY
         slabs.forEach { (recipeItem, result) ->
             val list = listOf(

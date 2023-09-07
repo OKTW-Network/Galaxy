@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -87,14 +87,14 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
     private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {
         val sourcePlayer = source.playerOrThrow
         if (!lock.getOrPut(sourcePlayer) { Mutex() }.tryLock()) {
-            source.sendFeedback(Text.of("請稍後..."), false)
+            source.sendFeedback({ Text.of("請稍後...") }, false)
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
 
         val targetPlayer = collection.first()
 
         ServerPlayNetworking.send(sourcePlayer, PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(targetPlayer.id)))))
-        source.sendFeedback(Text.of(if (sourcePlayer.gameProfile == targetPlayer) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系"), false)
+        source.sendFeedback({ Text.of(if (sourcePlayer.gameProfile == targetPlayer) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系") }, false)
 
         launch {
 
@@ -114,6 +114,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }
+
                     Failed -> {
                         sourcePlayer.sendMessage(Text.of("星系載入失敗，請聯絡開發團隊！"), false)
                         lock[source.player]?.unlock()

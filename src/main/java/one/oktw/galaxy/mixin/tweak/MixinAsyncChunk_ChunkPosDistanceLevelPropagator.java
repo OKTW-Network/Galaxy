@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ChunkPosDistanceLevelPropagator.class)
 public abstract class MixinAsyncChunk_ChunkPosDistanceLevelPropagator {
-    @Redirect(method = "propagateLevel", at = @At(value = "NEW", target = "net/minecraft/util/math/ChunkPos"))
+    @Redirect(method = "propagateLevel", at = @At(value = "NEW", target = "(J)Lnet/minecraft/util/math/ChunkPos;"))
     private ChunkPos skipCreateChunkPos(long pos) {
         return ChunkPos.ORIGIN;
     }
@@ -41,7 +41,7 @@ public abstract class MixinAsyncChunk_ChunkPosDistanceLevelPropagator {
         return (int) (pos >> 32);
     }
 
-    @Redirect(method = "recalculateLevel", at = @At(value = "NEW", target = "net/minecraft/util/math/ChunkPos"))
+    @Redirect(method = "recalculateLevel", at = @At(value = "NEW", target = "(J)Lnet/minecraft/util/math/ChunkPos;"))
     private ChunkPos skipCreateChunkPos2(long pos) {
         return ChunkPos.ORIGIN;
     }

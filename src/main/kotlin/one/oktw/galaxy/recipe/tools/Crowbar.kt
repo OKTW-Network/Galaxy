@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.recipe.easyRecipe
+package one.oktw.galaxy.recipe.tools
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
@@ -28,21 +28,24 @@ import net.minecraft.recipe.book.CraftingRecipeCategory
 import net.minecraft.registry.DynamicRegistryManager
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
+import one.oktw.galaxy.item.Tool
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class BookAndQuill : CraftingRecipe {
-    private val item = Items.WRITABLE_BOOK.defaultStack
+class Crowbar : CraftingRecipe {
+    private val item = Tool.CROWBAR.createItemStack()
 
-    private val paper = Ingredient(items = listOf(Items.PAPER))
-    private val leather = Ingredient(items = listOf(Items.LEATHER))
-    private val feather = Ingredient(items = listOf(Items.FEATHER))
-    private val inkSac = Ingredient(items = listOf(Items.INK_SAC))
-    private val list = listOf(paper, paper, paper, leather, feather, inkSac)
+    private val air = Ingredient(items = listOf(Items.AIR))
+    private val ironIngot = Ingredient(items = listOf(Items.IRON_INGOT))
+    private val list = listOf(
+        ironIngot, ironIngot,
+        air, ironIngot,
+        air, ironIngot,
+    )
 
-    override fun matches(inv: RecipeInputInventory, world: World): Boolean = RecipeUtils.isItemShapelessMatches(inv, list)
+    override fun matches(inv: RecipeInputInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 2, 3, list = list)
 
-    override fun craft(inv: RecipeInputInventory, registryManager: DynamicRegistryManager) = item.copy()
+    override fun craft(inv: RecipeInputInventory, registryManager: DynamicRegistryManager) = Tool.CROWBAR.createItemStack()
 
     @Environment(EnvType.CLIENT)
     override fun fits(width: Int, height: Int): Boolean {
@@ -51,11 +54,11 @@ class BookAndQuill : CraftingRecipe {
 
     override fun getOutput(registryManager: DynamicRegistryManager) = item
 
-    override fun getId() = Identifier("galaxy", "easy_recipe/writable_book")
+    override fun getId() = Identifier("galaxy", "item/crowbar")
 
     override fun getSerializer(): RecipeSerializer<*> {
-        TODO("Not yet implemented, support client mod.")
+        TODO("Not yet implemented")
     }
 
-    override fun getCategory() = CraftingRecipeCategory.BUILDING
+    override fun getCategory() = CraftingRecipeCategory.EQUIPMENT
 }

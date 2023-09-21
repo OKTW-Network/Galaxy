@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -58,7 +58,7 @@ public abstract class PassiveEntityMixin_RealTime extends EntityMixin_RealTime {
     @Redirect(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/passive/PassiveEntity;setBreedingAge(I)V"))
     private void realTimeImpl$adjustForRealTimeGrowingUp(final PassiveEntity self, final int age) {
         // Subtract the one the original update method added
-        final int diff = (int) ((RealTimeTrackingBridge) this.world).realTimeBridge$getRealTimeTicks() - 1;
+        final int diff = (int) ((RealTimeTrackingBridge) this.getWorld()).realTimeBridge$getRealTimeTicks() - 1;
         this.setBreedingAge(Math.min(0, age + diff));
     }
 }

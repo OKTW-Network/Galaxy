@@ -14,7 +14,6 @@
     "MixinPlayerPickupItem_ItemEntity",
     "MixinPlayerSneak_NetworkHandler",
     "MixinPlayerSwapItemInHand_NetworkHandler",
-    "MixinPlayerUpdateSign_NetworkHandler",
     "MixinPlayerUseItemOnBlock_ItemStack",
     "MixinUpdateSelectedSlot_NetworkHandler"
   ],

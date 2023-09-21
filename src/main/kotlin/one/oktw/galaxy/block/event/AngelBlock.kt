@@ -56,8 +56,8 @@ class AngelBlock {
             playerPosition.y + playerLookVec.y * 2 + 1.5,
             playerPosition.z + playerLookVec.z * 2
         )
-        if (allowReplaceBlocks.contains(player.getWorld().getBlockState(BlockPos.ofFloored(placePosition)).block)) {
-            CustomBlockHelper.place(player.getWorld(), BlockPos.ofFloored(placePosition), CustomBlock.ANGEL_BLOCK)
+        if (allowReplaceBlocks.contains(player.world.getBlockState(BlockPos.ofFloored(placePosition)).block)) {
+            CustomBlockHelper.place(player.serverWorld, BlockPos.ofFloored(placePosition), CustomBlock.ANGEL_BLOCK)
                 .run {
                     if (!player.isCreative) player.setStackInHand(hand, player.getStackInHand(hand).also { it.decrement(1) })
                 }
@@ -85,11 +85,11 @@ class AngelBlock {
         val player = event.player
         val blockPos = event.packet.pos
         if (event.packet.action == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK &&
-            (player.getWorld().getBlockEntity(blockPos) as? CustomBlockEntity)?.getId() == CustomBlock.ANGEL_BLOCK.identifier &&
+            (player.world.getBlockEntity(blockPos) as? CustomBlockEntity)?.getId() == CustomBlock.ANGEL_BLOCK.identifier &&
             !justBroke.contains(player)
         ) {
-            CustomBlockHelper.destroyAndDrop(player.getWorld(), blockPos)
-            player.getWorld().playSound(null, blockPos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
+            CustomBlockHelper.destroyAndDrop(player.serverWorld, blockPos)
+            player.serverWorld.playSound(null, blockPos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
             justBroke.add(player)
         }
     }

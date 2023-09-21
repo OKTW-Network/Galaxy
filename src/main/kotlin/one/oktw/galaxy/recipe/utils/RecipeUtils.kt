@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,12 +18,12 @@
 
 package one.oktw.galaxy.recipe.utils
 
-import net.minecraft.inventory.CraftingInventory
+import net.minecraft.inventory.RecipeInputInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 
 object RecipeUtils {
-    fun isItemShapedMatches(inv: CraftingInventory, width: Int, height: Int, list: List<Ingredient>): Boolean {
+    fun isItemShapedMatches(inv: RecipeInputInventory, width: Int, height: Int, list: List<Ingredient>): Boolean {
         for (x in 0..(inv.width - width)) {
             for (y in 0..(inv.height - height)) {
                 if (shapeMatchesSmall(inv, width, height, x, y, true, list)) return true
@@ -35,7 +35,7 @@ object RecipeUtils {
     }
 
     private fun shapeMatchesSmall(
-        inv: CraftingInventory,
+        inv: RecipeInputInventory,
         width: Int,
         height: Int,
         offsetX: Int,
@@ -61,7 +61,7 @@ object RecipeUtils {
         return true
     }
 
-    fun isItemShapelessMatches(inv: CraftingInventory, list: List<Ingredient>): Boolean {
+    fun isItemShapelessMatches(inv: RecipeInputInventory, list: List<Ingredient>): Boolean {
         val inputItems = mutableListOf<ItemStack>()
 
         for (i in 0 until inv.size()) {

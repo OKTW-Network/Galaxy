@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,13 +18,17 @@
 
 package one.oktw.galaxy.mixin.accessor;
 
-import net.minecraft.world.storage.StorageIoWorker;
-import net.minecraft.world.storage.VersionedChunkStorage;
+import net.minecraft.server.world.ChunkHolder;
+import net.minecraft.server.world.ThreadedAnvilChunkStorage;
+import net.minecraft.util.math.ChunkPos;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(VersionedChunkStorage.class)
-public interface AsyncChunk_VersionedChunkStorage {
-    @Accessor
-    StorageIoWorker getWorker();
+@Mixin(ThreadedAnvilChunkStorage.class)
+public interface ThreadedAnvilChunkStorageAccessor {
+    @Invoker
+    Iterable<ChunkHolder> callEntryIterator();
+
+    @Invoker
+    boolean callShouldTick(ChunkPos pos);
 }

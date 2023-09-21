@@ -3,8 +3,10 @@
   "package": "one.oktw.galaxy.mixin.tweak",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "MixinAsyncChunk_ChunkPosDistanceLevelPropagator",
     "MixinAsyncChunk_RegionBasedStorage",
     "MixinAsyncChunk_RegionFile",
+    "MixinAsyncChunk_ServerChunkManager",
     "MixinAsyncChunk_ServerPlayNetworkHandler",
     "MixinAsyncChunk_StorageIoWorker",
     "MixinAsyncChunk_ThreadedAnvilChunkStorage",
@@ -21,9 +23,11 @@
     "MixinOptimizeContainer_LootableContainerBlockEntity",
     "MixinRCON_RconBase",
     "MixinRCON_RconClient",
+    "MixinSkipSyncRegistry",
     "MixinThrownCountdown_Entity",
     "MixinThrownCountdown_ProjectileEntity",
-    "MixinThrownCountdown_ThrownEntity"
+    "MixinThrownCountdown_ThrownEntity",
+    "SignStyle_NetworkHandler"
   ],
   "client": [],
   "injectors": {

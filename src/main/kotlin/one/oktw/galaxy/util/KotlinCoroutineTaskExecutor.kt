@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,12 +23,13 @@ import net.minecraft.util.Util
 import net.minecraft.util.thread.TaskExecutor
 import net.minecraft.util.thread.TaskQueue
 import net.minecraft.util.thread.TaskQueue.PrioritizedTask
+import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
 class KotlinCoroutineTaskExecutor<T>(private val queue: TaskQueue<in T, out Runnable>, name: String) : TaskExecutor<T>(queue, null, name), CoroutineScope {
     companion object {
-        @OptIn(ExperimentalCoroutinesApi::class)
-        private val dispatcher = Dispatchers.IO.limitedParallelism(16)
+        private var index = 0
+        private val dispatcher = Executors.newFixedThreadPool(16) { r -> Thread(r, "IO-Kotlin-${index++}").apply { isDaemon = true } }.asCoroutineDispatcher()
     }
 
     private val job = SupervisorJob()
@@ -39,24 +40,27 @@ class KotlinCoroutineTaskExecutor<T>(private val queue: TaskQueue<in T, out Runn
 
     override fun send(message: T) {
         queue.add(message)
-        launch {
-            while (!queue.isEmpty) {
-                val task = queue.poll() ?: continue
+        launch { runTasks() }
+    }
 
-                // Check task priority
-                if (task is PrioritizedTask && executingTask.get() > 0 && task.priority > executePriority.get()) {
-                    // executing task priority higher than next task, wait all task done
-                    @Suppress("UNCHECKED_CAST")
-                    queue.add(task as T)
-                    job.join()
-                    continue
-                }
+    private fun runTasks() {
+        while (!queue.isEmpty) {
+            val task = queue.poll() ?: continue
 
-                // Run task
-                if (task is PrioritizedTask) executePriority.set(task.priority)
-                executingTask.incrementAndGet()
+            // Check task priority
+            if (task is PrioritizedTask && executingTask.get() > 0 && task.priority > executePriority.get()) {
+                // executing task priority higher than next task, wait all task done
+                @Suppress("UNCHECKED_CAST")
+                queue.add(task as T)
+                break
+            }
+
+            // Run task
+            if (task is PrioritizedTask) executePriority.set(task.priority)
+            executingTask.incrementAndGet()
+            launch {
                 Util.debugRunnable(name, task).run()
-                executingTask.decrementAndGet()
+                if (executingTask.decrementAndGet() <= 0) runTasks() // Trigger next write batch
             }
         }
     }

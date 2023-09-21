@@ -119,7 +119,7 @@ class GetGun {
                 setOwner(player.uuid)
             }
         }
-        it.source.sendFeedback(Text.translatable("commands.give.success.single", 1, itemStack.toHoverableText(), it.source.displayName), true)
+        it.source.sendFeedback({ Text.translatable("commands.give.success.single", 1, itemStack.toHoverableText(), it.source.displayName) }, true)
 
         return Command.SINGLE_SUCCESS
     }

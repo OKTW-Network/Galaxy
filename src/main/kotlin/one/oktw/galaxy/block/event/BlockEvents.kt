@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -58,7 +58,7 @@ class BlockEvents {
         if (!player.shouldCancelInteraction() || player.mainHandStack.isEmpty && player.offHandStack.isEmpty) {
             val packet = event.packet
             val hitResult = packet.blockHitResult
-            val blockEntity = player.getWorld().getBlockEntity(hitResult.blockPos) as? CustomBlockClickListener ?: return
+            val blockEntity = player.world.getBlockEntity(hitResult.blockPos) as? CustomBlockClickListener ?: return
             val result = blockEntity.onClick(player, packet.hand, hitResult)
             if (result.isAccepted) {
                 Criteria.ITEM_USED_ON_BLOCK.trigger(player, hitResult.blockPos, player.getStackInHand(packet.hand))
@@ -80,9 +80,9 @@ class BlockEvents {
             return
         }
 
-        // Wrench
-        if (player.isSneaking && CustomItemHelper.getItem(item) == Tool.WRENCH) {
-            val world = player.getWorld()
+        // Crowbar
+        if (player.isSneaking && CustomItemHelper.getItem(item) == Tool.CROWBAR) {
+            val world = player.serverWorld
             val blockPos = event.context.blockPos
             if (world.getBlockEntity(blockPos) !is ModelCustomBlockEntity) return // Check is custom block
             CustomBlockHelper.destroyAndDrop(world, blockPos)

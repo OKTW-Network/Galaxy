@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -32,6 +32,7 @@ class Tool private constructor(id: String, modelData: Int, private val name: Str
 
     companion object {
         val WRENCH = registry.register(Tool("wrench", 2010100, "item.Tool.WRENCH"))
+        val CROWBAR = registry.register(Tool("crowbar", 2010200, "item.Tool.CROWBAR"))
     }
 
     override fun getName(): Text = translatable(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -41,7 +41,7 @@ public class MixinThrownCountdown_ThrownEntity {
         if (hit.getType() == HitResult.Type.MISS && ((IThrownCountdown_Entity) this).getIntoWater() > 10) {
             Vec3d pos = entity.getPos();
             Vec3d velocity = pos.add(entity.getVelocity());
-            BlockHitResult newHit = entity.world.raycast(new RaycastContext(pos, velocity, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.ANY, entity));
+            BlockHitResult newHit = entity.getWorld().raycast(new RaycastContext(pos, velocity, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.ANY, entity));
             if (newHit.getType() != HitResult.Type.MISS) {
                 hit = newHit;
             }

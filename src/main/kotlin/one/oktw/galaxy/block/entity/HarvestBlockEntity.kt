@@ -86,6 +86,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
                 Blocks.BEETROOTS -> BeetrootsBlock.AGE
                 Blocks.COCOA -> CocoaBlock.AGE
                 Blocks.NETHER_WART -> NetherWartBlock.AGE
+                Blocks.PUMPKIN, Blocks.MELON -> null
                 else -> return
             }
             world.breakBlock(blockPos, false)

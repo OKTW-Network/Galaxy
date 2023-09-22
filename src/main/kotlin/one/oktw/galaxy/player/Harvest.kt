@@ -52,6 +52,7 @@ class Harvest {
                 BEETROOTS -> BeetrootsBlock.AGE
                 COCOA -> CocoaBlock.AGE
                 NETHER_WART -> NetherWartBlock.AGE
+                PUMPKIN, MELON -> null
                 else -> return
             }
             player.swingHand(Hand.MAIN_HAND, true)

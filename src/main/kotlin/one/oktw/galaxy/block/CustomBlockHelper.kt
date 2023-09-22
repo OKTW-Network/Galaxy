@@ -27,6 +27,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Direction
 import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.CustomItemHelper
@@ -43,7 +44,7 @@ object CustomBlockHelper {
     fun place(context: ItemPlacementContext): Boolean {
         val item = CustomItemHelper.getItem(context.stack) as? CustomBlockItem ?: return false
         if ((Items.BARRIER as BlockItem).place(context).isAccepted) {
-            postPlace(context.world as ServerWorld, context.blockPos, item.getBlock())
+            postPlace(context.world as ServerWorld, context.blockPos, item.getBlock(), context.placementDirections)
             return true
         }
         return false
@@ -58,8 +59,13 @@ object CustomBlockHelper {
     /**
      * Set BlockEntity and ARMOR_STAND and play sound
      */
-    private fun postPlace(world: ServerWorld, pos: BlockPos, block: CustomBlock) {
-        world.addBlockEntity(block.createBlockEntity(pos))
+    private fun postPlace(world: ServerWorld, pos: BlockPos, block: CustomBlock, direction: Array<Direction>? = null) {
+        val entity = block.createBlockEntity(pos)
+        if (entity is ModelCustomBlockEntity) {
+            val allowed = entity.allowedFacing
+            entity.facing = direction?.firstOrNull { it.opposite in allowed }?.opposite
+        }
+        world.addBlockEntity(entity)
 
         world.playSound(null, pos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
     }

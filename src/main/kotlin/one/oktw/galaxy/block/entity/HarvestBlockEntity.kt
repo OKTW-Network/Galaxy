@@ -22,8 +22,8 @@ import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventories
 import net.minecraft.inventory.SidedInventory
+import net.minecraft.item.HoeItem
 import net.minecraft.item.ItemStack
-import net.minecraft.item.Items.*
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.screen.slot.Slot
@@ -41,8 +41,14 @@ import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
 import one.oktw.galaxy.item.Gui
 
-class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : ModelCustomBlockEntity(type, pos, modelItem),
+class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) :
+    ModelCustomBlockEntity(type, pos, modelItem, facing = Direction.NORTH),
     CustomBlockClickListener, SidedInventory, CustomBlockTickListener {
+    companion object {
+        private val ALL_SLOT = intArrayOf(0, 1, 2, 3)
+    }
+
+    override val allowedFacing = listOf(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST)
     private val inventory = DefaultedList.ofSize(4, ItemStack.EMPTY)
     private val gui = GUI.Builder(ScreenHandlerType.GENERIC_9X3).setTitle(Text.translatable("block.HARVEST")).apply {
         var i = 0
@@ -108,7 +114,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     }
 
     override fun getAvailableSlots(side: Direction): IntArray {
-        return intArrayOf(0, 1, 2, 3) // ALL
+        return ALL_SLOT
     }
 
     override fun canInsert(slot: Int, item: ItemStack, dir: Direction?): Boolean {
@@ -119,10 +125,5 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         return slot in 1..3
     }
 
-    private fun isHoe(item: ItemStack): Boolean {
-        return when (item.item) {
-            WOODEN_HOE, STONE_HOE, IRON_HOE, GOLDEN_HOE, DIAMOND_HOE, NETHERITE_HOE -> true
-            else -> false
-        }
-    }
+    private fun isHoe(item: ItemStack) = item.item is HoeItem
 }

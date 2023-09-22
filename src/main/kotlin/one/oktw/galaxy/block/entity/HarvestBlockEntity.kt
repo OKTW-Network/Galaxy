@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy.block.entity
 
+import net.minecraft.block.*
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventories
@@ -28,6 +29,7 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.screen.slot.Slot
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
@@ -40,6 +42,7 @@ import one.oktw.galaxy.block.listener.CustomBlockTickListener
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
 import one.oktw.galaxy.item.Gui
+import one.oktw.galaxy.util.HarvestUtil
 
 class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) :
     ModelCustomBlockEntity(type, pos, modelItem, facing = Direction.NORTH),
@@ -62,6 +65,54 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         editInventory {
             // Fill empty
             fillAll(Gui.EXTEND.createItemStack())
+        }
+    }
+
+    override fun tick() {
+        super.tick()
+
+        // Only work have hoe and empty slot >= 2
+        val tool = inventory[0]
+        if (!isHoe(tool) || inventory.count { it.isEmpty } < 2) return
+
+        val world = world as? ServerWorld ?: return
+        val blockPos = pos.offset(this.facing)
+        val blockState = world.getBlockState(blockPos)
+
+        if (HarvestUtil.isMature(world, blockPos, world.getBlockState(blockPos))) {
+            val block = blockState.block
+            val ageProperties = when (block) {
+                Blocks.WHEAT, Blocks.CARROTS, Blocks.POTATOES -> CropBlock.AGE
+                Blocks.BEETROOTS -> BeetrootsBlock.AGE
+                Blocks.COCOA -> CocoaBlock.AGE
+                Blocks.NETHER_WART -> NetherWartBlock.AGE
+                else -> return
+            }
+            world.breakBlock(blockPos, false)
+            val drop = Block.getDroppedStacks(blockState, world, blockPos, world.getBlockEntity(blockPos), null, tool)
+            for (item in drop) {
+                for (slot in 1..3) {
+                    val originItem = getStack(slot)
+                    if (originItem.isEmpty) {
+                        setStack(slot, item)
+                        break
+                    } else if (originItem.count < originItem.maxCount && ItemStack.canCombine(originItem, item)) {
+                        val count = item.count.coerceAtMost(originItem.maxCount - originItem.count)
+                        item.decrement(count)
+                        originItem.increment(count)
+                        if (item.isEmpty) break
+                    }
+                }
+            }
+            if (tool.damage(1, world.random, null)) {
+                tool.decrement(1)
+                tool.damage = 0
+            }
+
+            if (block != Blocks.PUMPKIN && block != Blocks.MELON) {
+                world.setBlockState(blockPos, blockState.with(ageProperties, 0))
+                world.updateNeighbors(blockPos, block)
+            }
         }
     }
 

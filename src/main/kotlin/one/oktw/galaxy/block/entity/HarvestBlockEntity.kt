@@ -67,6 +67,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
             fillAll(Gui.EXTEND.createItemStack())
         }
     }
+    private var progress = 0
 
     override fun tick() {
         super.tick()
@@ -76,7 +77,12 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         if (!isHoe(tool) || inventory.count { it.isEmpty } < 2) return
 
         val world = world as? ServerWorld ?: return
-        val blockPos = pos.offset(this.facing)
+
+        val range = 4 // TODO range upgrade
+        val diameter = range * 2 + 1
+        if (progress >= diameter * diameter) progress = 0
+        val blockPos = pos.offset(facing, (progress / diameter) + 1).offset(facing!!.rotateYClockwise(), (progress % diameter) - range)
+        progress++
         val blockState = world.getBlockState(blockPos)
 
         if (HarvestUtil.isMature(world, blockPos, world.getBlockState(blockPos))) {

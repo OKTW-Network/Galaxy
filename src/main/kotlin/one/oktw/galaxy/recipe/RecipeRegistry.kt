@@ -23,6 +23,7 @@ import one.oktw.galaxy.mixin.interfaces.CustomRecipeManager
 import one.oktw.galaxy.recipe.blocks.Elevator
 import one.oktw.galaxy.recipe.blocks.HTCraftingTable
 import one.oktw.galaxy.recipe.blocks.Trashcan
+import one.oktw.galaxy.recipe.blocks.Harvest
 import one.oktw.galaxy.recipe.easyRecipe.*
 import one.oktw.galaxy.recipe.materials.CeramicPlate
 import one.oktw.galaxy.recipe.tools.Crowbar
@@ -35,6 +36,7 @@ object RecipeRegistry {
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Crowbar())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Elevator())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, HTCraftingTable())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Harvest())
         CustomRecipeManager.addRecipe(RecipeType.SMELTING, CeramicPlate())
         CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Trashcan())
         // Easy Recipe

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -35,6 +35,7 @@ class CustomBlockItem private constructor(private val id: String, modelData: Int
         val TELEPORTER_CORE_ADVANCE = registry.register(CustomBlockItem("teleporter_core_advance", 1010301, "block.TELEPORTER_ADVANCED"))
         val TELEPORTER_FRAME = registry.register(CustomBlockItem("teleporter_frame", 1010302, "block.TELEPORTER_FRAME"))
         val TEST_GUI = registry.register(CustomBlockItem("test_gui", 9999999, "block.TEST_GUI"))
+        val HARVEST = registry.register(CustomBlockItem("harvest", 1010700, "block.HARVEST"))
     }
 
     fun getBlock(): CustomBlock {

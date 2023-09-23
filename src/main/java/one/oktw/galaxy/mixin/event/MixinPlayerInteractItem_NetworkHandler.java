@@ -18,9 +18,11 @@
 
 package one.oktw.galaxy.mixin.event;
 
+import net.minecraft.entity.EntityStatuses;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import one.oktw.galaxy.event.EventManager;
@@ -47,7 +49,8 @@ public abstract class MixinPlayerInteractItem_NetworkHandler {
         PlayerInteractItemEvent event = EventManager.safeEmit(new PlayerInteractItemEvent(packet, player));
         if (event.getCancel()) {
             info.cancel();
-            sendPacket(new EntityStatusS2CPacket(player, (byte) 9));
+            sendPacket(new EntityStatusS2CPacket(player, EntityStatuses.CONSUME_ITEM));
+            sendPacket(new HealthUpdateS2CPacket(player.getHealth(), player.getHungerManager().getFoodLevel(), player.getHungerManager().getSaturationLevel()));
             player.currentScreenHandler.syncState();
         }
         if (event.getSwing()) this.player.swingHand(packet.getHand(), true);

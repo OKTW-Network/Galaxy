@@ -265,7 +265,7 @@ class GUI private constructor(private val type: ScreenHandlerType<out ScreenHand
                 for (index in slots) {
                     val slot = slotBindings[index]!!
                     val originItem = slot.stack
-                    if (!originItem.isEmpty && ItemStack.canCombine(item, originItem)) {
+                    if (!originItem.isEmpty && slot.canInsert(item) && ItemStack.canCombine(item, originItem)) {
                         val count = originItem.count + item.count
                         if (count <= item.maxCount) {
                             item.count = 0

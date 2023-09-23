@@ -31,6 +31,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.state.property.Properties.*
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
+import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerSneakReleaseEvent
 import one.oktw.galaxy.event.type.PlayerUseItemOnBlock
@@ -63,6 +64,22 @@ class Wrench {
         val blockState = world.getBlockState(blockPos)
         val block = blockState.block
         val clickSide: Direction = event.context.side
+
+        // Custom block
+        val blockEntity = world.getBlockEntity(blockPos)
+        if (blockEntity is ModelCustomBlockEntity) {
+            val allowedFacing = blockEntity.allowedFacing
+            if (allowedFacing.isEmpty()) return false
+            val next = if (!startDirection.contains(player) && clickSide in allowedFacing && clickSide != blockEntity.facing) {
+                allowedFacing.indexOf(clickSide)
+            } else {
+                allowedFacing.indexOf(blockEntity.facing) + 1
+            }
+            val direction = if (next == -1 || next > allowedFacing.lastIndex) allowedFacing.first() else allowedFacing[next]
+            startDirection[player] = blockPos to direction
+
+            blockEntity.facing = if (next == -1 || next > allowedFacing.lastIndex) allowedFacing.first() else allowedFacing[next]
+        }
 
         // Check destructible
         if (blockState.getHardness(world, blockPos) < 0.0) return false

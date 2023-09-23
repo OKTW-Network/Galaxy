@@ -54,6 +54,7 @@ open class CustomBlock(final override val identifier: Identifier, val baseBlock:
         val TELEPORTER_CORE_ADVANCE = registry.register(ModelCustomBlock("teleporter_core_advance", CustomBlockItem.TELEPORTER_CORE_ADVANCE.createItemStack()))
         val TELEPORTER_FRAME = registry.register(ModelCustomBlock("teleporter_frame", CustomBlockItem.TELEPORTER_FRAME.createItemStack()))
         val TEST_GUI = registry.register(TestGuiBlock())
+        val HARVEST = registry.register(HarvestBlock())
     }
 
     open fun toItem(): CustomBlockItem? = null

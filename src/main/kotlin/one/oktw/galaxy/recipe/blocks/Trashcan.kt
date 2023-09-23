@@ -38,7 +38,7 @@ class Trashcan : CraftingRecipe {
     private val glass = Ingredient(items = listOf(Items.GLASS))
     private val cactus = Ingredient(items = listOf(Items.CACTUS))
     private val terracotta = Ingredient(items = listOf(Items.TERRACOTTA))
-    private val sand = Ingredient(items = listOf(Items.SAND))
+    private val sand = Ingredient(items = listOf(Items.SAND, Items.RED_SAND))
     private val list = listOf(
         glass, glass, glass,
         glass, cactus, glass,

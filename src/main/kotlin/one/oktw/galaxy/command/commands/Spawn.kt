@@ -18,13 +18,16 @@
 
 package one.oktw.galaxy.command.commands
 
+import com.mojang.brigadier.Command.SINGLE_SUCCESS
 import com.mojang.brigadier.CommandDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
+import net.minecraft.world.World
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.mixin.accessor.ServerPlayerEntityFunctionAccessor
@@ -39,32 +42,50 @@ class Spawn : Command {
             CommandManager.literal("spawn")
                 .executes { context ->
                     execute(context.source)
+                    SINGLE_SUCCESS
                 }
 
         )
     }
 
-    private fun execute(source: ServerCommandSource): Int {
-        val player = source.player
+    private fun execute(source: ServerCommandSource) {
+        val originPlayer = source.player
 
-        if (player == null || lock.contains(player.uuid)) return com.mojang.brigadier.Command.SINGLE_SUCCESS
+        if (originPlayer == null || lock.contains(originPlayer.uuid)) return
 
-        lock += player.uuid
+        lock += originPlayer.uuid
 
         main?.launch {
-            val world = player.serverWorld
-
             for (i in 0..4) {
-                player.sendMessage(Text.translatable("Respond.commandCountdown", 5 - i).styled { it.withColor(Formatting.GREEN) }, true)
+                originPlayer.sendMessage(Text.translatable("Respond.commandCountdown", 5 - i).styled { it.withColor(Formatting.GREEN) }, true)
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
+
+            val player = originPlayer.server.playerManager.getPlayer(originPlayer.uuid) ?: return@launch
             player.sendMessage(Text.translatable("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
+
+            val world = player.serverWorld
+            val type = world.registryKey
+
+            if (type == World.NETHER) {
+                player.sendMessage(Text.translatable("Respond.TeleportNothing").styled { it.withColor(Formatting.RED) }, true)
+                lock -= player.uuid
+                return@launch
+            }
 
             val oldPos = player.pos
 
             player.stopRiding()
             if (player.isSleeping) {
                 player.wakeUp(true, true)
+            }
+
+            if (type == World.END) {
+                val pos = ServerWorld.END_SPAWN_POS.toCenterPos()
+                player.networkHandler.requestTeleport(pos.x, pos.y, pos.z, 0.0f, 0.0f)
+                player.networkHandler.syncWithPlayerPosition()
+                lock -= player.uuid
+                return@launch
             }
 
             (player as ServerPlayerEntityFunctionAccessor).moveToWorldSpawn(world)
@@ -80,7 +101,5 @@ class Spawn : Command {
             player.networkHandler.requestTeleport(player.x, player.y, player.z, player.yaw, player.pitch)
             lock -= player.uuid
         }
-
-        return com.mojang.brigadier.Command.SINGLE_SUCCESS
     }
 }

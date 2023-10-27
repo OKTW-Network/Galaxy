@@ -64,7 +64,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     }.build().apply {
         editInventory {
             // Fill empty
-            fillAll(Gui.EXTEND.createItemStack())
+            fillAll(Gui.MAIN_FIELD.createItemStack())
         }
     }
     private var progress = 0

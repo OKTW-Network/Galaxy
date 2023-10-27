@@ -48,8 +48,8 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         for (y in 4 until 6) for (x in 0 until 9) addSlot(x, y, Slot(this@TestGuiBlockEntity, i++, 0, 0))
     }.build().apply {
         editInventory {
-            fill(0 until 9, 1 until 4, Gui.EXTEND.createItemStack())
-            set(4, 2, Gui.INFO.createItemStack())
+            fill(0 until 9, 1 until 4, Gui.MAIN_FIELD.createItemStack())
+            set(4, 2, Button.CHECK_MARK.createItemStack())
         }
         addBinding(4, 2) {
             GUISBackStackManager.openGUI(player, gui2)
@@ -60,8 +60,8 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         for (y in 0 until 3) for (x in 0 until 9) addSlot(x, y, Slot(this@TestGuiBlockEntity, i++, 0, 0))
     }.build().apply {
         editInventory {
-            fill(0 until 9, 3..3, Gui.EXTEND.createItemStack())
-            set(4, 3, Button.NO.createItemStack().setCustomName(Text.of("CLOSE ALL")))
+            fill(0 until 9, 3..3, Gui.MAIN_FIELD.createItemStack())
+            set(4, 3, Button.CROSS_MARK.createItemStack().setCustomName(Text.of("CLOSE ALL")))
         }
         addBinding(4, 3) {
             GUISBackStackManager.closeAll(player)

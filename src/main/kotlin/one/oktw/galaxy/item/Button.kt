@@ -37,7 +37,7 @@ class Button private constructor(id: String, modelData: Int) : CustomItem(Identi
         val CHECK_MARK = registry.register(Button("check_mark", 1300010))
         val MINUS = registry.register(Button("minus", 1300011))
         val PLUS = registry.register(Button("plus", 1300012))
-        val 0_TO_9 = registry.register(Button("0_to_9", 1300013))
+        val ZERO_TO_NINE = registry.register(Button("zero_to_nine", 1300013))
         val A_TO_Z = registry.register(Button("a_to_z", 1300014))
         val POWER_OFF = registry.register(Button("power_off", 1300015))
         val POWER_ON = registry.register(Button("power_on", 1300016))

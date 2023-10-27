@@ -100,8 +100,6 @@ class Button private constructor(id: String, modelData: Int) : CustomItem(Identi
         val DISABLED_ARROW_RIGHT = registry.register(Button("disabled_arrow_right", 1310008))
         val DISABLED_CROSS_MARK = registry.register(Button("disabled_cross_mark", 1310009))
         val DISABLED_CHECK_MARK = registry.register(Button("disabled_check_mark", 1310010))
-        val YES = registry.register(Button("yes", 9999999))
-        val ECO = registry.register(Button("eco", 9999999))
     }
 
     override fun getName(): Text = Text.literal("").styled { it.withItalic(false) }

@@ -125,12 +125,6 @@ class Gui private constructor(id: String, modelData: Int) : CustomItem(Identifie
         val NUMBER_8 = registry.register(Gui("number_8", 1400058))
         val NUMBER_9 = registry.register(Gui("number_9", 1400059))
         val UNDERSCORE = registry.register(Gui("underscore", 1400060))
-        val NUMBER_NONE = registry.register(Gui("num_none", 9999999))
-        val HTCT_TAB_1 = registry.register(Gui("htct_tab_1", 9999999))
-        val HTCT_TAB_2 = registry.register(Gui("htct_tab_2", 9999999))
-        val HTCT_TAB_3 = registry.register(Gui("htct_tab_3", 9999999))
-        val HTCT_TAB_4 = registry.register(Gui("htct_tab_4", 9999999))
-        val HTCT_TAB_5 = registry.register(Gui("htct_tab_5", 9999999))
     }
 
     override fun getName(): Text = Text.literal("").styled { it.withItalic(false) }

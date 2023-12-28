@@ -19,10 +19,13 @@
 package one.oktw.galaxy.mixin.event;
 
 import net.minecraft.entity.EntityStatuses;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ConnectedClientData;
+import net.minecraft.server.network.ServerCommonNetworkHandler;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import one.oktw.galaxy.event.EventManager;
@@ -34,12 +37,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayNetworkHandler.class)
-public abstract class MixinPlayerInteractItem_NetworkHandler {
+public abstract class MixinPlayerInteractItem_NetworkHandler extends ServerCommonNetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Shadow
-    public abstract void sendPacket(Packet<?> packet);
+    public MixinPlayerInteractItem_NetworkHandler(MinecraftServer server, ClientConnection connection, ConnectedClientData clientData) {
+        super(server, connection, clientData);
+    }
 
     @Inject(method = "onPlayerInteractItem", at = @At(
         value = "INVOKE",

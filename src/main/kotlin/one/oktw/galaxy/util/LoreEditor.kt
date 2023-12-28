@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -47,7 +47,7 @@ class LoreEditor private constructor(val item: ItemStack) {
     private val list = item.nbt?.getCompound(DISPLAY_KEY)?.getList(LORE_KEY, NbtElement.STRING_TYPE.toInt()) ?: NbtList()
 
     fun addText(text: Text): LoreEditor {
-        this.list.add(NbtString.of(Text.Serializer.toJson(text)))
+        this.list.add(NbtString.of(Text.Serialization.toJsonString(text)))
         return this
     }
 
@@ -68,7 +68,7 @@ class LoreEditor private constructor(val item: ItemStack) {
         for (i in 0 until list.size) {
             val string = list.getString(i) ?: continue
             try {
-                val text: MutableText = Text.Serializer.fromJson(string) ?: continue
+                val text: MutableText = Text.Serialization.fromJson(string) ?: continue
                 textList.add(Texts.setStyleIfAbsent(text, Style.EMPTY.withColor(DARK_PURPLE).withItalic(true))) // default lore style
             } catch (e: JsonParseException) {
                 continue // skip lore

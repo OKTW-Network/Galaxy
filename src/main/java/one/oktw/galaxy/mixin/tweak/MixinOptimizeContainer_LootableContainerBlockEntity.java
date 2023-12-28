@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,13 +30,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(LootableContainerBlockEntity.class)
 public abstract class MixinOptimizeContainer_LootableContainerBlockEntity {
     @Shadow
-    protected abstract DefaultedList<ItemStack> getInvStackList();
+    protected abstract DefaultedList<ItemStack> method_11282();
 
     @Inject(method = "isEmpty",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/LootableContainerBlockEntity;checkLootInteraction(Lnet/minecraft/entity/player/PlayerEntity;)V", shift = At.Shift.AFTER),
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/LootableContainerBlockEntity;generateLoot(Lnet/minecraft/entity/player/PlayerEntity;)V", shift = At.Shift.AFTER),
         cancellable = true)
     private void replaceStream(CallbackInfoReturnable<Boolean> cir) {
-        for (ItemStack itemStack : getInvStackList()) {
+        for (ItemStack itemStack : method_11282()) {
             if (!itemStack.isEmpty()) {
                 cir.setReturnValue(false);
                 return;

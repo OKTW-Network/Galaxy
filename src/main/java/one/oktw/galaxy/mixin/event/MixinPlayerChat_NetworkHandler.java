@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,29 +18,31 @@
 
 package one.oktw.galaxy.mixin.event;
 
+import net.minecraft.network.ClientConnection;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
+import net.minecraft.server.network.ConnectedClientData;
+import net.minecraft.server.network.ServerCommonNetworkHandler;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ServerPlayNetworkHandler.class)
-public class MixinPlayerChat_NetworkHandler {
+public abstract class MixinPlayerChat_NetworkHandler extends ServerCommonNetworkHandler {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Shadow
-    @Final
-    private MinecraftServer server;
+    public MixinPlayerChat_NetworkHandler(MinecraftServer server, ClientConnection connection, ConnectedClientData clientData) {
+        super(server, connection, clientData);
+    }
 
     @Redirect(method = "handleDecoratedMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/network/message/SignedMessage;Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/network/message/MessageType$Parameters;)V"))
     private void onChat(PlayerManager playerManager, SignedMessage message, ServerPlayerEntity sender, MessageType.Parameters messageType) {

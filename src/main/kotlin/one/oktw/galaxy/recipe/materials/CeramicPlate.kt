@@ -23,14 +23,12 @@ import net.minecraft.recipe.Ingredient
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.recipe.SmeltingRecipe
 import net.minecraft.recipe.book.CookingRecipeCategory
-import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import one.oktw.galaxy.item.CustomItemHelper
 import one.oktw.galaxy.item.Material
 
 class CeramicPlate :
     SmeltingRecipe(
-        Identifier("galaxy", "material/ceramic_plate"),
         "",
         CookingRecipeCategory.MISC,
         Ingredient.ofStacks(Material.RAW_BASE_PLATE.createItemStack()),

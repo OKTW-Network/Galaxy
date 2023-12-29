@@ -20,29 +20,22 @@ package one.oktw.galaxy.recipe.materials
 
 import net.minecraft.inventory.Inventory
 import net.minecraft.recipe.Ingredient
-import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.recipe.SmeltingRecipe
 import net.minecraft.recipe.book.CookingRecipeCategory
 import net.minecraft.world.World
 import one.oktw.galaxy.item.CustomItemHelper
 import one.oktw.galaxy.item.Material
 
-class CeramicPlate :
-    SmeltingRecipe(
-        "",
-        CookingRecipeCategory.MISC,
-        Ingredient.ofStacks(Material.RAW_BASE_PLATE.createItemStack()),
-        Material.BASE_PLATE.createItemStack(),
-        5.0F,
-        200
-    ) {
-
-    override fun matches(inventory: Inventory?, world: World?): Boolean {
-        val input = inventory?.getStack(0) ?: return super.matches(inventory, world)
+class CeramicPlate : SmeltingRecipe(
+    "",
+    CookingRecipeCategory.MISC,
+    Ingredient.ofStacks(Material.RAW_BASE_PLATE.createItemStack()),
+    Material.BASE_PLATE.createItemStack(),
+    5.0F,
+    200
+) {
+    override fun matches(inventory: Inventory, world: World): Boolean {
+        val input = inventory.getStack(0) ?: return false
         return CustomItemHelper.getItem(input) == Material.RAW_BASE_PLATE
-    }
-
-    override fun getSerializer(): RecipeSerializer<*> {
-        TODO("Not yet implemented, support client mod.")
     }
 }

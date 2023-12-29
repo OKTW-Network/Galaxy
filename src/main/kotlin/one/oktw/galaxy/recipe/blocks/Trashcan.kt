@@ -18,46 +18,26 @@
 
 package one.oktw.galaxy.recipe.blocks
 
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
-import net.minecraft.inventory.RecipeInputInventory
 import net.minecraft.item.Items
-import net.minecraft.recipe.CraftingRecipe
-import net.minecraft.recipe.RecipeSerializer
+import net.minecraft.recipe.Ingredient.ofItems
+import net.minecraft.recipe.RawShapedRecipe
+import net.minecraft.recipe.ShapedRecipe
 import net.minecraft.recipe.book.CraftingRecipeCategory
-import net.minecraft.registry.DynamicRegistryManager
-import net.minecraft.world.World
 import one.oktw.galaxy.item.CustomBlockItem
-import one.oktw.galaxy.recipe.utils.Ingredient
-import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class Trashcan : CraftingRecipe {
-    private val item = CustomBlockItem.TRASHCAN.createItemStack()
-
-    private val glass = Ingredient(items = listOf(Items.GLASS))
-    private val cactus = Ingredient(items = listOf(Items.CACTUS))
-    private val terracotta = Ingredient(items = listOf(Items.TERRACOTTA))
-    private val sand = Ingredient(items = listOf(Items.SAND, Items.RED_SAND))
-    private val list = listOf(
-        glass, glass, glass,
-        glass, cactus, glass,
-        terracotta, sand, terracotta
-    )
-
-    override fun matches(inv: RecipeInputInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
-
-    override fun craft(inventory: RecipeInputInventory, registryManager: DynamicRegistryManager) = item.copy()
-
-    @Environment(EnvType.CLIENT)
-    override fun fits(width: Int, height: Int): Boolean {
-        throw NotImplementedError()
-    }
-
-    override fun getResult(registryManager: DynamicRegistryManager) = item
-
-    override fun getSerializer(): RecipeSerializer<*> {
-        TODO("Not yet implemented, support client mod.")
-    }
-
-    override fun getCategory() = CraftingRecipeCategory.MISC
-}
+class Trashcan : ShapedRecipe(
+    "",
+    CraftingRecipeCategory.BUILDING,
+    RawShapedRecipe.create(
+        mapOf(
+            Character.valueOf('g') to ofItems(Items.GLASS),
+            Character.valueOf('c') to ofItems(Items.CACTUS),
+            Character.valueOf('t') to ofItems(Items.TERRACOTTA),
+            Character.valueOf('s') to ofItems(Items.SAND, Items.RED_SAND)
+        ),
+        "ggg",
+        "gcg",
+        "tst"
+    ),
+    CustomBlockItem.TRASHCAN.createItemStack()
+)

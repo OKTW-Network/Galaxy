@@ -18,38 +18,16 @@
 
 package one.oktw.galaxy.recipe.blocks
 
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
-import net.minecraft.inventory.RecipeInputInventory
 import net.minecraft.item.Items
-import net.minecraft.recipe.CraftingRecipe
-import net.minecraft.recipe.RecipeSerializer
+import net.minecraft.recipe.Ingredient
+import net.minecraft.recipe.ShapelessRecipe
 import net.minecraft.recipe.book.CraftingRecipeCategory
-import net.minecraft.registry.DynamicRegistryManager
-import net.minecraft.world.World
+import net.minecraft.util.collection.DefaultedList
 import one.oktw.galaxy.item.CustomBlockItem
-import one.oktw.galaxy.recipe.utils.Ingredient
-import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class Elevator : CraftingRecipe {
-    private val item = CustomBlockItem.ELEVATOR.createItemStack()
-    private val list =
-        listOf(Ingredient(items = listOf(Items.ENDER_PEARL)), Ingredient(items = listOf(Items.IRON_BLOCK)))
-
-    override fun matches(inv: RecipeInputInventory, world: World): Boolean = RecipeUtils.isItemShapelessMatches(inv, list)
-
-    override fun craft(inv: RecipeInputInventory, registryManager: DynamicRegistryManager) = item.copy()
-
-    @Environment(EnvType.CLIENT)
-    override fun fits(width: Int, height: Int): Boolean {
-        throw NotImplementedError()
-    }
-
-    override fun getResult(registryManager: DynamicRegistryManager) = item
-
-    override fun getSerializer(): RecipeSerializer<*> {
-        TODO("Not yet implemented, support client mod.")
-    }
-
-    override fun getCategory() = CraftingRecipeCategory.BUILDING
-}
+class Elevator : ShapelessRecipe(
+    "",
+    CraftingRecipeCategory.EQUIPMENT,
+    CustomBlockItem.ELEVATOR.createItemStack(),
+    DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(Items.ENDER_PEARL), Ingredient.ofItems(Items.IRON_BLOCK))
+)

@@ -4,7 +4,6 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "MixinCustomRecipe_CraftingResultSlot",
-    "MixinCustomRecipe_PlayerManager",
     "MixinCustomRecipe_RecipeManager"
   ],
   "client": [],

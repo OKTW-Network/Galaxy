@@ -31,7 +31,7 @@ class CeramicPlate : SmeltingRecipe(
     CookingRecipeCategory.MISC,
     Ingredient.ofStacks(Material.RAW_BASE_PLATE.createItemStack()),
     Material.BASE_PLATE.createItemStack(),
-    5.0F,
+    0.1F,
     200
 ) {
     override fun matches(inventory: Inventory, world: World): Boolean {

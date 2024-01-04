@@ -13,6 +13,7 @@
     "MixinCustomBlockEntity_BarrierBlock",
     "MixinCustomBlockEntity_Structure",
     "MixinFixBeacon_BeaconBlockEntity",
+    "MixinGlobalDataPack_VanillaDataPackProvider",
     "MixinItemStackEqualAllowNull_ItemStack",
     "MixinMapExistingChunk_FilledMapItem",
     "MixinOneSpawnChunk_MinecraftServer",

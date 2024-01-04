@@ -18,44 +18,24 @@
 
 package one.oktw.galaxy.recipe.tools
 
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
 import net.minecraft.inventory.RecipeInputInventory
 import net.minecraft.item.Items
-import net.minecraft.recipe.CraftingRecipe
-import net.minecraft.recipe.RecipeSerializer
+import net.minecraft.recipe.RawShapedRecipe
+import net.minecraft.recipe.ShapedRecipe
 import net.minecraft.recipe.book.CraftingRecipeCategory
 import net.minecraft.registry.DynamicRegistryManager
-import net.minecraft.world.World
 import one.oktw.galaxy.item.Tool
-import one.oktw.galaxy.recipe.utils.Ingredient
-import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class Crowbar : CraftingRecipe {
-    private val item = Tool.CROWBAR.createItemStack()
-
-    private val air = Ingredient(items = listOf(Items.AIR))
-    private val ironIngot = Ingredient(items = listOf(Items.IRON_INGOT))
-    private val list = listOf(
-        ironIngot, ironIngot,
-        air, ironIngot,
-        air, ironIngot,
-    )
-
-    override fun matches(inv: RecipeInputInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 2, 3, list = list)
-
+class Crowbar : ShapedRecipe(
+    "",
+    CraftingRecipeCategory.EQUIPMENT,
+    RawShapedRecipe.create(
+        mapOf(Character.valueOf('i') to net.minecraft.recipe.Ingredient.ofItems(Items.IRON_INGOT)),
+        "ii",
+        " i",
+        " i"
+    ),
+    Tool.CROWBAR.createItemStack()
+) {
     override fun craft(inv: RecipeInputInventory, registryManager: DynamicRegistryManager) = Tool.CROWBAR.createItemStack()
-
-    @Environment(EnvType.CLIENT)
-    override fun fits(width: Int, height: Int): Boolean {
-        throw NotImplementedError()
-    }
-
-    override fun getResult(registryManager: DynamicRegistryManager) = item
-
-    override fun getSerializer(): RecipeSerializer<*> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getCategory() = CraftingRecipeCategory.EQUIPMENT
 }

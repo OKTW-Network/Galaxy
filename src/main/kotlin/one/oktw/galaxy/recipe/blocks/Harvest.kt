@@ -18,46 +18,25 @@
 
 package one.oktw.galaxy.recipe.blocks
 
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
-import net.minecraft.inventory.RecipeInputInventory
-import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
-import net.minecraft.recipe.CraftingRecipe
-import net.minecraft.recipe.RecipeSerializer
+import net.minecraft.recipe.Ingredient.ofItems
+import net.minecraft.recipe.RawShapedRecipe
+import net.minecraft.recipe.ShapedRecipe
 import net.minecraft.recipe.book.CraftingRecipeCategory
-import net.minecraft.registry.DynamicRegistryManager
-import net.minecraft.world.World
 import one.oktw.galaxy.item.CustomBlockItem
-import one.oktw.galaxy.recipe.utils.Ingredient
-import one.oktw.galaxy.recipe.utils.RecipeUtils
 
-class Harvest : CraftingRecipe {
-    private val item = CustomBlockItem.HARVEST.createItemStack()
-
-    private val copper = Ingredient(items = listOf(Items.COPPER_INGOT))
-    private val observer = Ingredient(items = listOf(Items.OBSERVER))
-    private val dispenser = Ingredient(items = listOf(Items.DISPENSER))
-    private val list = listOf(
-        copper, copper, copper,
-        copper, dispenser, observer,
-        copper, copper, copper
-    )
-
-    override fun matches(inv: RecipeInputInventory, world: World): Boolean = RecipeUtils.isItemShapedMatches(inv, 3, 3, list)
-
-    override fun craft(inventory: RecipeInputInventory, registryManager: DynamicRegistryManager): ItemStack = item.copy()
-
-    @Environment(EnvType.CLIENT)
-    override fun fits(width: Int, height: Int): Boolean {
-        throw NotImplementedError()
-    }
-
-    override fun getResult(registryManager: DynamicRegistryManager) = item
-
-    override fun getSerializer(): RecipeSerializer<*> {
-        TODO("Not implemented client mod")
-    }
-
-    override fun getCategory() = CraftingRecipeCategory.BUILDING
-}
+class Harvest : ShapedRecipe(
+    "",
+    CraftingRecipeCategory.BUILDING,
+    RawShapedRecipe.create(
+        mapOf(
+            Character.valueOf('c') to ofItems(Items.COPPER_INGOT),
+            Character.valueOf('o') to ofItems(Items.OBSERVER),
+            Character.valueOf('d') to ofItems(Items.DISPENSER),
+        ),
+        "ccc",
+        "cdo",
+        "ccc"
+    ),
+    CustomBlockItem.HARVEST.createItemStack()
+)

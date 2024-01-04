@@ -27,7 +27,6 @@ import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.recipe.book.CraftingRecipeCategory
 import net.minecraft.registry.DynamicRegistryManager
-import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.recipe.utils.Ingredient
@@ -54,9 +53,7 @@ class Harvest : CraftingRecipe {
         throw NotImplementedError()
     }
 
-    override fun getOutput(registryManager: DynamicRegistryManager) = item
-
-    override fun getId() = Identifier("galaxy", "block/harvest")
+    override fun getResult(registryManager: DynamicRegistryManager) = item
 
     override fun getSerializer(): RecipeSerializer<*> {
         TODO("Not implemented client mod")

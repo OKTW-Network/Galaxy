@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,15 +19,16 @@
 package one.oktw.galaxy.mixin.interfaces;
 
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
 
 public interface CustomRecipeManager {
-    HashMap<RecipeType<?>, HashMap<Identifier, Recipe<?>>> customRecipes = new HashMap<>();
+    HashMap<RecipeType<?>, HashMap<Identifier, RecipeEntry<?>>> customRecipes = new HashMap<>();
 
-    static void addRecipe(RecipeType<?> type, Recipe<?> recipe) {
-        customRecipes.computeIfAbsent(type, k -> new HashMap<>()).putIfAbsent(recipe.getId(), recipe);
+    static void addRecipe(RecipeType<?> type, Identifier id, Recipe<?> recipe) {
+        customRecipes.computeIfAbsent(type, k -> new HashMap<>()).put(id, new RecipeEntry<Recipe<?>>(id, recipe));
     }
 }

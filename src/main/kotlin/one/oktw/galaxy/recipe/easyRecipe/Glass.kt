@@ -27,7 +27,6 @@ import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.recipe.book.CraftingRecipeCategory
 import net.minecraft.registry.DynamicRegistryManager
-import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
@@ -112,9 +111,7 @@ class Glass : CraftingRecipe {
         throw NotImplementedError()
     }
 
-    override fun getOutput(registryManager: DynamicRegistryManager) = Items.GLASS.defaultStack.apply { this.count = 8 }
-
-    override fun getId() = Identifier("galaxy", "easy_recipe/glass")
+    override fun getResult(registryManager: DynamicRegistryManager) = Items.GLASS.defaultStack.apply { this.count = 8 }
 
     override fun getSerializer(): RecipeSerializer<*> {
         TODO("Not yet implemented, support client mod.")

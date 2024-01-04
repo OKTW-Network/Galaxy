@@ -27,7 +27,6 @@ import net.minecraft.recipe.CraftingRecipe
 import net.minecraft.recipe.RecipeSerializer
 import net.minecraft.recipe.book.CraftingRecipeCategory
 import net.minecraft.registry.DynamicRegistryManager
-import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import one.oktw.galaxy.recipe.utils.Ingredient
 import one.oktw.galaxy.recipe.utils.RecipeUtils
@@ -120,9 +119,7 @@ class SlabRestore : CraftingRecipe {
         throw NotImplementedError()
     }
 
-    override fun getOutput(registryManager: DynamicRegistryManager) = Items.OAK_PLANKS.defaultStack
-
-    override fun getId() = Identifier("galaxy", "easy_recipe/slab_restore")
+    override fun getResult(registryManager: DynamicRegistryManager) = Items.OAK_PLANKS.defaultStack
 
     override fun getSerializer(): RecipeSerializer<*> {
         TODO("Not yet implemented, support client mod.")

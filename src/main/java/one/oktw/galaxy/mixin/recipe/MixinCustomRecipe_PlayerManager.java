@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.mixin.recipe;
 
-import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.server.PlayerManager;
 import one.oktw.galaxy.mixin.interfaces.CustomRecipeManager;
@@ -33,15 +33,15 @@ public class MixinCustomRecipe_PlayerManager {
     // TODO Client mod
 
     @Redirect(method = "onPlayerConnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/recipe/RecipeManager;values()Ljava/util/Collection;"))
-    private Collection<Recipe<?>> skipSendRecipe(RecipeManager recipeManager) {
-        Collection<Recipe<?>> recipes = recipeManager.values();
+    private Collection<RecipeEntry<?>> skipSendRecipe(RecipeManager recipeManager) {
+        Collection<RecipeEntry<?>> recipes = recipeManager.values();
         recipes.removeAll(CustomRecipeManager.customRecipes.values().stream().flatMap(i -> i.values().stream()).toList());
         return recipes;
     }
 
     @Redirect(method = "onDataPacksReloaded", at = @At(value = "INVOKE", target = "Lnet/minecraft/recipe/RecipeManager;values()Ljava/util/Collection;"))
-    private Collection<Recipe<?>> skipSyncRecipe(RecipeManager recipeManager) {
-        Collection<Recipe<?>> recipes = recipeManager.values();
+    private Collection<RecipeEntry<?>> skipSyncRecipe(RecipeManager recipeManager) {
+        Collection<RecipeEntry<?>> recipes = recipeManager.values();
         recipes.removeAll(CustomRecipeManager.customRecipes.values().stream().flatMap(i -> i.values().stream()).toList());
         return recipes;
     }

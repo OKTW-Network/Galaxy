@@ -20,7 +20,7 @@ package one.oktw.galaxy.mixin.recipe;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
-import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.resource.ResourceManager;
@@ -37,8 +37,9 @@ import java.util.Map;
 
 @Mixin(RecipeManager.class)
 public class MixinCustomRecipe_RecipeManager implements CustomRecipeManager {
-    @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V", at = @At(value = "INVOKE", target = "Ljava/util/Map;entrySet()Ljava/util/Set;", ordinal = 1), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void recipeLoad(Map<Identifier, JsonElement> map, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci, Map<RecipeType<?>, ImmutableMap.Builder<Identifier, Recipe<?>>> map2) {
+    @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V", at = @At(value = "INVOKE", target = "Ljava/util/Map;entrySet()Ljava/util/Set;", ordinal = 0), locals = LocalCapture.CAPTURE_FAILSOFT)
+    private void recipeLoad(Map<Identifier, JsonElement> map, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci, Map<RecipeType<?>, ImmutableMap.Builder<Identifier, RecipeEntry<?>>> map2, ImmutableMap.Builder<Identifier, RecipeEntry<?>> builder) {
         customRecipes.forEach((i, v) -> map2.computeIfAbsent(i, k -> ImmutableMap.builder()).putAll(v));
+        customRecipes.forEach((i, v) -> builder.putAll(v));
     }
 }

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,8 +19,8 @@
 package one.oktw.galaxy.chat
 
 import io.netty.buffer.Unpooled
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.createS2CPacket
 import net.minecraft.network.PacketByteBuf
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.Main
@@ -42,13 +42,13 @@ class Exchange {
         event.cancel = true
 
         event.player.networkHandler.sendPacket(
-            CustomPayloadS2CPacket(
+            createS2CPacket(
                 PROXY_CHAT_IDENTIFIER, PacketByteBuf(
                     Unpooled.wrappedBuffer(
                         encode(
                             MessageSend(
                                 sender = event.player.uuid,
-                                message = Text.Serializer.toJson(event.message),
+                                message = Text.Serialization.toJsonString(event.message),
                                 targets = listOf(ProxyAPI.globalChatChannel)
                             )
                         )

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -37,7 +37,8 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
             Material
             Tool
             Upgrade
-            Weapon
+            Gun
+            Sword
             CustomBlockItem
         }
     }

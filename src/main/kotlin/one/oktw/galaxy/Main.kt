@@ -99,6 +99,7 @@ class Main : DedicatedServerModInitializer, CoroutineScope {
             eventManager.register(Elevator())
             eventManager.register(AngelBlock())
             eventManager.register(CustomItemEventHandler())
+//            eventManager.register(Weapon())
         })
 
         ServerLifecycleEvents.SERVER_STOPPING.register {

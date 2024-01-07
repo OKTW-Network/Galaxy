@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2022
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,8 +18,6 @@
 
 package one.oktw.galaxy.event.type
 
-import net.minecraft.item.ItemStack
-import net.minecraft.screen.ScreenHandler
 import net.minecraft.server.network.ServerPlayerEntity
 
-class HotBarSlotUpdateEvent(val player: ServerPlayerEntity, val handler: ScreenHandler, val slotId: Int, val item: ItemStack) : Event
+class PlayerDropItemEvent(val player: ServerPlayerEntity) : CancelableEvent()

@@ -7,11 +7,15 @@
     "MixinPlayerChat_MeCommand",
     "MixinPlayerChat_NetworkHandler",
     "MixinPlayerChat_SayCommand",
+    "MixinPlayerDropItem_NetworkHandler",
     "MixinPlayerInteractBlock_NetworkHandler",
     "MixinPlayerInteractItem_NetworkHandler",
     "MixinPlayerJump_NetworkHandler",
+    "MixinPlayerPickupItem_ItemEntity",
     "MixinPlayerSneak_NetworkHandler",
-    "MixinPlayerUseItemOnBlock_ItemStack"
+    "MixinPlayerSwapItemInHand_NetworkHandler",
+    "MixinPlayerUseItemOnBlock_ItemStack",
+    "MixinUpdateSelectedSlot_NetworkHandler"
   ],
   "client": [],
   "injectors": {

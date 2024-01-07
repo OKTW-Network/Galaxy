@@ -16,18 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item
+package one.oktw.galaxy.item.data
 
-import net.minecraft.item.ItemStack
-import net.minecraft.util.Identifier
+import net.minecraft.nbt.NbtCompound
+import net.minecraft.text.Text
+import one.oktw.galaxy.item.type.WeaponType
 
-object CustomItemHelper {
-    fun getItem(itemStack: ItemStack): CustomItem? {
-        if (itemStack.isEmpty) return null
-        val customNbt = itemStack.getSubNbt("GalaxyData")
+data class SwordData(
+    var damage: Double = 1.0
+) : WeaponData(WeaponType.SWORD) {
+    override fun toLoreText() = arrayListOf(
+        loreText(Text.of("傷害"), damage.toString())
+    )
 
-        return customNbt?.getString("CustomItemIdentifier")?.let(Identifier::tryParse)
-            ?.let(CustomItem.registry::get)
-            ?.run { readCustomNbt(customNbt) }
+    override fun readFromNbt(nbt: NbtCompound) {
+        damage = nbt.getDouble("damage")
     }
+
 }

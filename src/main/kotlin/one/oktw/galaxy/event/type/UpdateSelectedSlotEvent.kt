@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2021
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,18 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item
+package one.oktw.galaxy.event.type
 
-import net.minecraft.item.ItemStack
-import net.minecraft.util.Identifier
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket
+import net.minecraft.server.network.ServerPlayerEntity
 
-object CustomItemHelper {
-    fun getItem(itemStack: ItemStack): CustomItem? {
-        if (itemStack.isEmpty) return null
-        val customNbt = itemStack.getSubNbt("GalaxyData")
-
-        return customNbt?.getString("CustomItemIdentifier")?.let(Identifier::tryParse)
-            ?.let(CustomItem.registry::get)
-            ?.run { readCustomNbt(customNbt) }
-    }
-}
+class UpdateSelectedSlotEvent(val packet: UpdateSelectedSlotC2SPacket, val player: ServerPlayerEntity) : Event

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -47,11 +47,13 @@ public abstract class MixinCustomBlockEntity_BarrierBlock extends Block implemen
         return CustomBlock.Companion.getDUMMY().createBlockEntity(pos);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean hasComparatorOutput(BlockState state) {
         return true;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
@@ -63,6 +65,7 @@ public abstract class MixinCustomBlockEntity_BarrierBlock extends Block implemen
         return new CustomBlockEntityTicker<>();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (!state.isOf(newState.getBlock())) {

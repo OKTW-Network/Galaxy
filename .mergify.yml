@@ -17,7 +17,7 @@ pull_request_rules:
     actions:
       queue:
         name: default
-  - name: Automatic merge on ready lable
+  - name: Automatic merge on ready label
     conditions:
       - base=master
       - check-success=Build

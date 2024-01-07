@@ -3,6 +3,7 @@
   "package": "one.oktw.galaxy.mixin.event",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "MixinHotBarSlotUpdate_ScreenHandlerListener",
     "MixinPlayerAction_NetworkHandler",
     "MixinPlayerChat_MeCommand",
     "MixinPlayerChat_NetworkHandler",
@@ -11,7 +12,8 @@
     "MixinPlayerInteractItem_NetworkHandler",
     "MixinPlayerJump_NetworkHandler",
     "MixinPlayerSneak_NetworkHandler",
-    "MixinPlayerUseItemOnBlock_ItemStack"
+    "MixinPlayerUseItemOnBlock_ItemStack",
+    "MixinUpdateSelectedSlot_NetworkHandler"
   ],
   "client": [],
   "injectors": {

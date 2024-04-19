@@ -16,18 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item
+package one.oktw.galaxy.item.type
 
-import net.minecraft.item.ItemStack
-import net.minecraft.util.Identifier
-
-object CustomItemHelper {
-    fun getItem(itemStack: ItemStack): CustomItem? {
-        if (itemStack.isEmpty) return null
-        val customNbt = itemStack.getSubNbt("GalaxyData")
-
-        return customNbt?.getString("CustomItemIdentifier")?.let(Identifier::tryParse)
-            ?.let(CustomItem.registry::get)
-            ?.run { readCustomNbt(customNbt) }
-    }
+enum class WeaponType(val type: String) {
+    GUN("Gun"),
+    SWORD("Sword")
 }

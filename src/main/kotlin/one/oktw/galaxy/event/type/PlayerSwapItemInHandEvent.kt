@@ -16,18 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item
+package one.oktw.galaxy.event.type
 
-import net.minecraft.item.ItemStack
-import net.minecraft.util.Identifier
+import net.minecraft.server.network.ServerPlayerEntity
 
-object CustomItemHelper {
-    fun getItem(itemStack: ItemStack): CustomItem? {
-        if (itemStack.isEmpty) return null
-        val customNbt = itemStack.getSubNbt("GalaxyData")
-
-        return customNbt?.getString("CustomItemIdentifier")?.let(Identifier::tryParse)
-            ?.let(CustomItem.registry::get)
-            ?.run { readCustomNbt(customNbt) }
-    }
-}
+class PlayerSwapItemInHandEvent(val player: ServerPlayerEntity) : Event

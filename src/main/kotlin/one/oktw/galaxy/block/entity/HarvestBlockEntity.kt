@@ -104,7 +104,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
                     if (originItem.isEmpty) {
                         setStack(slot, item)
                         break
-                    } else if (originItem.count < originItem.maxCount && ItemStack.canCombine(originItem, item)) {
+                    } else if (originItem.count < originItem.maxCount && ItemStack.areItemsAndComponentsEqual(originItem, item)) {
                         val count = item.count.coerceAtMost(originItem.maxCount - originItem.count)
                         item.decrement(count)
                         originItem.increment(count)
@@ -112,7 +112,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
                     }
                 }
             }
-            if (tool.damage(1, world.random, null)) {
+            tool.damage(1, world.random, null) {
                 tool.decrement(1)
                 tool.damage = 0
             }

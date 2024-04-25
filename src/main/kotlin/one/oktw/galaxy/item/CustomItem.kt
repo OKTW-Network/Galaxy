@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,10 +18,13 @@
 
 package one.oktw.galaxy.item
 
+import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.type.AttributeModifiersComponent
+import net.minecraft.component.type.CustomModelDataComponent
+import net.minecraft.component.type.UnbreakableComponent
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtList
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.util.CustomRegistry
@@ -61,13 +64,10 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
         if (cacheable && this::cacheItemStack.isInitialized) return cacheItemStack.copy()
 
         return ItemStack(baseItem).apply {
-            orCreateNbt.apply {
-                putInt("HideFlags", ItemStack.TooltipSection.values().map(ItemStack.TooltipSection::getFlag).reduce { acc, i -> acc or i }) // ALL
-                putInt("CustomModelData", modelData)
-                putBoolean("Unbreakable", true)
-                put("AttributeModifiers", NbtList())
-            }
-            setCustomName(this@CustomItem.getName())
+            set(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelDataComponent(modelData))
+            set(DataComponentTypes.UNBREAKABLE, UnbreakableComponent(false))
+            set(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent(listOf<AttributeModifiersComponent.Entry>(), false))
+            set(DataComponentTypes.CUSTOM_NAME, this@CustomItem.getName())
             writeCustomNbt(getOrCreateSubNbt("GalaxyData"))
         }.also { if (cacheable) cacheItemStack = it.copy() }
     }

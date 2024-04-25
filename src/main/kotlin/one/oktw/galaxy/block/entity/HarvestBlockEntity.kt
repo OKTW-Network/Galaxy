@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -26,6 +26,7 @@ import net.minecraft.inventory.SidedInventory
 import net.minecraft.item.HoeItem
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.registry.RegistryWrapper
 import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.screen.slot.Slot
 import net.minecraft.server.network.ServerPlayerEntity
@@ -123,13 +124,13 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         }
     }
 
-    override fun readCopyableData(nbt: NbtCompound) {
-        Inventories.readNbt(nbt, inventory)
+    override fun readCopyableData(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
+        Inventories.readNbt(nbt, inventory, registryLookup)
     }
 
-    override fun writeNbt(nbt: NbtCompound) {
-        super.writeNbt(nbt)
-        Inventories.writeNbt(nbt, inventory)
+    override fun writeNbt(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
+        super.writeNbt(nbt, registryLookup)
+        Inventories.writeNbt(nbt, inventory, registryLookup)
     }
 
     override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {

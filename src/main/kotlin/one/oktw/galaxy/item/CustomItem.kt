@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy.item
 
+import net.minecraft.component.DataComponentType
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.AttributeModifiersComponent
 import net.minecraft.component.type.CustomModelDataComponent
@@ -28,7 +29,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
-import one.oktw.galaxy.mixin.invoker.DataComponentTypesInvoker
+import one.oktw.galaxy.mixin.accessor.DataComponentTypesAccessor
 import one.oktw.galaxy.util.CustomRegistry
 import one.oktw.galaxy.util.Registrable
 
@@ -36,7 +37,7 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
     companion object {
         val registry = CustomRegistry<CustomItem>()
 
-        val galaxyDataComponent = DataComponentTypesInvoker.invokeRegister("galaxy_data") { builder ->
+        val galaxyDataComponent: DataComponentType<NbtComponent> = DataComponentTypesAccessor.invokeRegister("galaxy_data") { builder ->
             builder.codec(NbtComponent.CODEC)
         }
 

@@ -24,8 +24,7 @@
     "tweak.mixin.json",
     "sponge.realtime.mixin.json",
     "accessor.mixin.json",
-    "recipe.mixin.json",
-    "invoker.mixin.json"
+    "recipe.mixin.json"
   ],
   "depends": {
     "minecraft": "1.20.x",

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.invoker;
+package one.oktw.galaxy.mixin.accessor;
 
 import net.minecraft.component.DataComponentType;
 import net.minecraft.component.DataComponentTypes;
@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 import java.util.function.UnaryOperator;
 
 @Mixin(DataComponentTypes.class)
-public interface DataComponentTypesInvoker {
+public interface DataComponentTypesAccessor {
     @Invoker("register")
     static <T> DataComponentType<T> invokeRegister(String id, UnaryOperator<DataComponentType.Builder<T>> builderOperator) {
         throw new AssertionError();

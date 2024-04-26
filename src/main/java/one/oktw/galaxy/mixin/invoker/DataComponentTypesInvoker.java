@@ -16,24 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item
+package one.oktw.galaxy.mixin.invoker;
 
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.util.Identifier
-import one.oktw.galaxy.item.CustomItem.Companion.galaxyDataComponent
+import net.minecraft.component.DataComponentType;
+import net.minecraft.component.DataComponentTypes;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
-object CustomItemHelper {
-    fun getNbt(itemStack: ItemStack): NbtCompound? {
-        val galaxyData = itemStack.get(galaxyDataComponent)
-        return galaxyData?.copyNbt()
-    }
+import java.util.function.UnaryOperator;
 
-    fun getItem(itemStack: ItemStack): CustomItem? {
-        val customNbt = getNbt(itemStack)
-
-        return customNbt?.getString("CustomItemIdentifier")?.let(Identifier::tryParse)
-            ?.let(CustomItem.registry::get)
-            ?.run { readCustomNbt(customNbt) }
+@Mixin(DataComponentTypes.class)
+public interface DataComponentTypesInvoker {
+    @Invoker("register")
+    static <T> DataComponentType<T> invokeRegister(String id, UnaryOperator<DataComponentType.Builder<T>> builderOperator) {
+        throw new AssertionError();
     }
 }

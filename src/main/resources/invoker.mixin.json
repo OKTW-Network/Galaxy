@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "one.oktw.galaxy.mixin.invoker",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "DataComponentTypesInvoker"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

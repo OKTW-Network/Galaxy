@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,8 +18,9 @@
 
 package one.oktw.galaxy.mixin.accessor;
 
-import com.mojang.serialization.DynamicOps;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.poi.PointOfInterestSet;
 import net.minecraft.world.storage.SerializingRegionBasedStorage;
@@ -40,5 +41,5 @@ public interface SerializingRegionBasedStorageAccessor {
     CompletableFuture<Optional<NbtCompound>> callLoadNbt(ChunkPos pos);
 
     @Invoker
-    <T> void callUpdate(ChunkPos pos, DynamicOps<T> dynamicOps, @Nullable T data);
+    void callUpdate(ChunkPos pos, RegistryOps<NbtElement> ops, @Nullable NbtCompound nbt);
 }

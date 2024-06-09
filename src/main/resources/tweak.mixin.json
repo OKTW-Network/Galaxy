@@ -19,7 +19,6 @@
     "MixinOptimizeArmorStand_ArmorStandEntity",
     "MixinOptimizeContainer_AvailableSlots",
     "MixinOptimizeContainer_HopperBlockEntity",
-    "MixinOptimizeContainer_LootableContainerBlockEntity",
     "MixinRCON_RconBase",
     "MixinRCON_RconClient",
     "MixinSkipSyncRegistry",

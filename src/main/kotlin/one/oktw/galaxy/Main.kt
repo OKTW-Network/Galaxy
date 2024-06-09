@@ -86,7 +86,7 @@ class Main : DedicatedServerModInitializer, CoroutineScope {
             eventManager = EventManager(server)
 
             // Register Proxy packet receiver
-            PayloadTypeRegistry.playS2C().register(ProxyAPIPayload.ID, ProxyAPIPayload.CODEC)
+            PayloadTypeRegistry.playC2S().register(ProxyAPIPayload.ID, ProxyAPIPayload.CODEC)
             ServerPlayNetworking.registerGlobalReceiver(ProxyAPIPayload.ID) { payload, context ->
                 eventManager.emit(ProxyResponseEvent(context.player(), payload.packet))
             }

@@ -18,7 +18,6 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.component.DataComponentType
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.AttributeModifiersComponent
 import net.minecraft.component.type.CustomModelDataComponent
@@ -29,17 +28,12 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
-import one.oktw.galaxy.mixin.accessor.DataComponentTypesAccessor
 import one.oktw.galaxy.util.CustomRegistry
 import one.oktw.galaxy.util.Registrable
 
 abstract class CustomItem(override val identifier: Identifier, private val baseItem: Item, private val modelData: Int) : Registrable {
     companion object {
         val registry = CustomRegistry<CustomItem>()
-
-        val galaxyDataComponent: DataComponentType<NbtComponent> = DataComponentTypesAccessor.invokeRegister("galaxy_data") { builder ->
-            builder.codec(NbtComponent.CODEC)
-        }
 
         init {
             Button
@@ -77,9 +71,13 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
             set(DataComponentTypes.ITEM_NAME, this@CustomItem.getName())
 
             // Galaxy Data
-            val galaxyNbt = CustomItemHelper.getNbt(this) ?: NbtComponent.DEFAULT.copyNbt()
+            val galaxyNbt = CustomItemHelper.getNbt(this)
             writeCustomNbt(galaxyNbt)
-            set(galaxyDataComponent, NbtComponent.of(galaxyNbt))
+            apply(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT) { component ->
+                component.apply { nbt ->
+                    nbt.put("GalaxyData", galaxyNbt)
+                }
+            }
         }.also { if (cacheable) cacheItemStack = it.copy() }
     }
 }

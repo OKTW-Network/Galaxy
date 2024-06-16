@@ -27,13 +27,13 @@ import net.minecraft.util.Identifier
 object CustomItemHelper {
     fun getNbt(itemStack: ItemStack): NbtCompound {
         val galaxyData = (itemStack.get(DataComponentTypes.CUSTOM_DATA) ?: NbtComponent.DEFAULT).copyNbt()
-        return galaxyData.getCompound("galaxy_data")
+        return galaxyData.getCompound("GalaxyData")
     }
 
     fun getItem(itemStack: ItemStack): CustomItem? {
         val customNbt = getNbt(itemStack)
 
-        return customNbt.getString("custom_item_identifier")?.let(Identifier::tryParse)
+        return customNbt.getString("CustomItemIdentifier")?.let(Identifier::tryParse)
             ?.let(CustomItem.registry::get)
             ?.run { readCustomNbt(customNbt) }
     }

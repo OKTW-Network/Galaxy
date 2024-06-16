@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2023
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -39,6 +39,6 @@ class Tool private constructor(id: String, modelData: Int, private val name: Str
 
     override fun writeCustomNbt(nbt: NbtCompound) {
         super.writeCustomNbt(nbt)
-        nbt.put("tool_data", NbtCompound().apply { putUuid("id", MathHelper.randomUuid()) })
+        nbt.put("ToolData", NbtCompound().apply { putUuid("id", MathHelper.randomUuid()) })
     }
 }

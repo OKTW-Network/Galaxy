@@ -52,11 +52,11 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
     abstract fun getName(): Text?
 
     open fun writeCustomNbt(nbt: NbtCompound) {
-        nbt.putString("custom_item_identifier", identifier.toString())
+        nbt.putString("CustomItemIdentifier", identifier.toString())
     }
 
     open fun readCustomNbt(nbt: NbtCompound): CustomItem {
-        require(nbt.getString("custom_item_identifier") == identifier.toString())
+        require(nbt.getString("CustomItemIdentifier") == identifier.toString())
 
         return this
     }
@@ -75,7 +75,7 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
             writeCustomNbt(galaxyNbt)
             apply(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT) { component ->
                 component.apply { nbt ->
-                    nbt.put("galaxy_data", galaxyNbt)
+                    nbt.put("GalaxyData", galaxyNbt)
                 }
             }
         }.also { if (cacheable) cacheItemStack = it.copy() }

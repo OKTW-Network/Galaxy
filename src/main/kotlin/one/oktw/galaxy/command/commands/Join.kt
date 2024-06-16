@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,21 +21,18 @@ package one.oktw.galaxy.command.commands
 import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.suggestion.Suggestions
-import io.netty.buffer.Unpooled.wrappedBuffer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.command.argument.GameProfileArgumentType
-import net.minecraft.network.PacketByteBuf
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
-import one.oktw.galaxy.Main.Companion.PROXY_IDENTIFIER
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.event.type.ProxyResponseEvent
-import one.oktw.galaxy.proxy.api.ProxyAPI.encode
+import one.oktw.galaxy.network.ProxyAPIPayload
 import one.oktw.galaxy.proxy.api.packet.CreateGalaxy
 import one.oktw.galaxy.proxy.api.packet.ProgressStage.*
 import one.oktw.galaxy.proxy.api.packet.SearchPlayer
@@ -56,11 +53,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                             val future = CompletableFuture<Suggestions>()
                             val player = commandContext.source.playerOrThrow
 
-                            ServerPlayNetworking.send(
-                                player,
-                                PROXY_IDENTIFIER,
-                                PacketByteBuf(wrappedBuffer(encode(SearchPlayer(suggestionsBuilder.remaining, 10))))
-                            )
+                            ServerPlayNetworking.send(player, ProxyAPIPayload(SearchPlayer(suggestionsBuilder.remaining, 10)))
 
                             val listeners = fun(event: ProxyResponseEvent) {
                                 val result = event.packet as? SearchPlayer.Result ?: return
@@ -93,7 +86,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
 
         val targetPlayer = collection.first()
 
-        ServerPlayNetworking.send(sourcePlayer, PROXY_IDENTIFIER, PacketByteBuf(wrappedBuffer(encode(CreateGalaxy(targetPlayer.id)))))
+        ServerPlayNetworking.send(sourcePlayer, ProxyAPIPayload(CreateGalaxy(targetPlayer.id)))
         source.sendFeedback({ Text.of(if (sourcePlayer.gameProfile == targetPlayer) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系") }, false)
 
         launch {

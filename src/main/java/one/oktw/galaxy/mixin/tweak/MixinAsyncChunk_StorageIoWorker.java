@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -25,6 +25,7 @@ import net.minecraft.util.thread.TaskExecutor;
 import net.minecraft.util.thread.TaskQueue;
 import net.minecraft.world.storage.StorageIoWorker;
 import net.minecraft.world.storage.StorageIoWorker.Priority;
+import net.minecraft.world.storage.StorageKey;
 import one.oktw.galaxy.util.KotlinCoroutineTaskExecutor;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
@@ -60,9 +61,9 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
     protected abstract void write(ChunkPos pos, StorageIoWorker.Result result);
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void parallelExecutor(Path directory, boolean dsync, String name, CallbackInfo ci) {
+    private void parallelExecutor(StorageKey storageKey, Path directory, boolean dsync, CallbackInfo ci) {
         results = new ConcurrentHashMap<>();
-        executor = new KotlinCoroutineTaskExecutor<>(new TaskQueue.Prioritized(4 /* FOREGROUND,BACKGROUND,WRITE_DONE,SHUTDOWN */), "IOWorker-" + name);
+        executor = new KotlinCoroutineTaskExecutor<>(new TaskQueue.Prioritized(4 /* FOREGROUND,BACKGROUND,WRITE_DONE,SHUTDOWN */), "IOWorker-" + storageKey.type());
     }
 
     /**

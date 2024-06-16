@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,19 +22,20 @@ import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.registry.RegistryWrapper
 import net.minecraft.util.math.BlockPos
 
 // BlockEntity need extend
 open class CustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : BlockEntity(type, pos, Blocks.BARRIER.defaultState) {
     fun getId() = BlockEntityType.getId(type)!!
 
-    override fun readNbt(nbt: NbtCompound) {
-        super.readNbt(nbt)
-        readCopyableData(nbt)
+    override fun readNbt(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
+        super.readNbt(nbt, registryLookup)
+        readCopyableData(nbt, registryLookup)
     }
 
-    override fun writeNbt(nbt: NbtCompound) {
-        super.writeNbt(nbt)
+    override fun writeNbt(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
+        super.writeNbt(nbt, registryLookup)
         nbt.putString("id", getId().toString()) // We need ID to mapping block entity, always write it.
     }
 
@@ -43,5 +44,5 @@ open class CustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : BlockEnt
      *
      * Also call by [readNbt].
      */
-    open fun readCopyableData(nbt: NbtCompound) = Unit
+    open fun readCopyableData(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) = Unit
 }

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -265,7 +265,7 @@ class GUI private constructor(private val type: ScreenHandlerType<out ScreenHand
                 for (index in slots) {
                     val slot = slotBindings[index]!!
                     val originItem = slot.stack
-                    if (!originItem.isEmpty && slot.canInsert(item) && ItemStack.canCombine(item, originItem)) {
+                    if (!originItem.isEmpty && slot.canInsert(item) && ItemStack.areItemsAndComponentsEqual(item, originItem)) {
                         val count = originItem.count + item.count
                         if (count <= item.maxCount) {
                             item.count = 0

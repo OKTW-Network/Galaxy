@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,7 +24,7 @@ import net.minecraft.recipe.Ingredient
 import net.minecraft.recipe.RawShapedRecipe
 import net.minecraft.recipe.ShapedRecipe
 import net.minecraft.recipe.book.CraftingRecipeCategory
-import net.minecraft.registry.DynamicRegistryManager
+import net.minecraft.registry.RegistryWrapper
 import one.oktw.galaxy.item.Tool
 
 class Wrench : ShapedRecipe(
@@ -38,5 +38,5 @@ class Wrench : ShapedRecipe(
     ),
     Tool.WRENCH.createItemStack()
 ) {
-    override fun craft(inv: RecipeInputInventory, registryManager: DynamicRegistryManager) = Tool.WRENCH.createItemStack()
+    override fun craft(inv: RecipeInputInventory, wrapperLookup: RegistryWrapper.WrapperLookup) = Tool.WRENCH.createItemStack()
 }

@@ -85,8 +85,11 @@ class Main : DedicatedServerModInitializer, CoroutineScope {
             server = it as MinecraftDedicatedServer
             eventManager = EventManager(server)
 
-            // Register Proxy packet receiver
+            // Register Custom Payload
+            // Register Proxy Packet (C2S: Send, S2C: Receive)
             PayloadTypeRegistry.playC2S().register(ProxyAPIPayload.ID, ProxyAPIPayload.CODEC)
+            PayloadTypeRegistry.playS2C().register(ProxyAPIPayload.ID, ProxyAPIPayload.CODEC)
+            // Register Event
             ServerPlayNetworking.registerGlobalReceiver(ProxyAPIPayload.ID) { payload, context ->
                 eventManager.emit(ProxyResponseEvent(context.player(), payload.packet))
             }

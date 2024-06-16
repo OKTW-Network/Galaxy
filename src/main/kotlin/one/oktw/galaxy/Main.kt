@@ -41,6 +41,7 @@ import one.oktw.galaxy.event.type.ProxyResponseEvent
 import one.oktw.galaxy.item.event.CustomItemEventHandler
 import one.oktw.galaxy.item.event.Wrench
 import one.oktw.galaxy.network.ProxyAPIPayload
+import one.oktw.galaxy.network.ProxyChatPayload
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.proxy.api.ProxyAPI
 import one.oktw.galaxy.recipe.RecipeRegistry
@@ -93,6 +94,8 @@ class Main : DedicatedServerModInitializer, CoroutineScope {
             ServerPlayNetworking.registerGlobalReceiver(ProxyAPIPayload.ID) { payload, context ->
                 eventManager.emit(ProxyResponseEvent(context.player(), payload.packet))
             }
+            // Register Proxy Chat Packet
+            PayloadTypeRegistry.playS2C().register(ProxyChatPayload.ID, ProxyChatPayload.CODEC)
 
             //Events
             eventManager.register(Exchange())

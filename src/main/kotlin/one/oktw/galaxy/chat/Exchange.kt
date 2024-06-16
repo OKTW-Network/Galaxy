@@ -30,12 +30,6 @@ import one.oktw.galaxy.proxy.api.ProxyAPI
 import one.oktw.galaxy.proxy.api.packet.MessageSend
 
 class Exchange {
-    companion object {
-        init {
-            PayloadTypeRegistry.playS2C().register(ProxyChatPayload.ID, ProxyChatPayload.CODEC)
-        }
-    }
-
     @EventListener(true)
     fun handleChat(event: PlayerChatEvent) {
         if (Main.selfUUID == ProxyAPI.dummyUUID) return

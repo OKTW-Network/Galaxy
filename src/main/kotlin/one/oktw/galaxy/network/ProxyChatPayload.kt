@@ -34,7 +34,7 @@ data class ProxyChatPayload(val packet: Packet) : CustomPayload {
         val ID = CustomPayload.Id<ProxyChatPayload>(PROXY_CHAT_IDENTIFIER)
         val CODEC: PacketCodec<PacketByteBuf, ProxyChatPayload> = PacketCodec.of(
             { value, buf -> buf.writeBytes(wrappedBuffer(encode(value.packet))) },
-            { buf -> ProxyAPI.decode(buf.nioBuffer()) })
+            { buf -> ProxyChatPayload(ProxyAPI.decode(buf.nioBuffer())) })
     }
 
     override fun getId(): CustomPayload.Id<out CustomPayload> {

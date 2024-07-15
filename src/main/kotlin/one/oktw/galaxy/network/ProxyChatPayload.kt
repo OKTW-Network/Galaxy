@@ -34,7 +34,12 @@ data class ProxyChatPayload(val packet: Packet) : CustomPayload {
         val ID = CustomPayload.Id<ProxyChatPayload>(PROXY_CHAT_IDENTIFIER)
         val CODEC: PacketCodec<PacketByteBuf, ProxyChatPayload> = PacketCodec.of(
             { value, buf -> buf.writeBytes(wrappedBuffer(encode(value.packet))) },
-            { buf -> ProxyChatPayload(ProxyAPI.decode(buf.nioBuffer())) })
+            { buf ->
+                val packet = ProxyChatPayload(ProxyAPI.decode(buf.nioBuffer()))
+                // FIXME: Workaround force clear buffer to suppress "Packet was larger than I expected" error
+                buf.clear()
+                return@of packet
+            })
     }
 
     override fun getId(): CustomPayload.Id<out CustomPayload> {

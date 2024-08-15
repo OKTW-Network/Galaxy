@@ -1,8 +1,10 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     //    "maven-publish"
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "2.0.10"
     id("fabric-loom") version "1.7-SNAPSHOT"
 }
 
@@ -26,11 +28,11 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        apiVersion = "1.7"
-        languageVersion = "1.7"
-        jvmTarget = "21"
+tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        apiVersion = KotlinVersion.KOTLIN_2_0
+        languageVersion = KotlinVersion.KOTLIN_2_0
+        jvmTarget = JvmTarget.JVM_21
     }
 }
 

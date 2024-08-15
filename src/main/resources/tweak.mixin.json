@@ -11,6 +11,7 @@
     "MixinAsyncChunk_StorageIoWorker",
     "MixinAsyncChunk_ThreadedAnvilChunkStorage",
     "MixinCustomBlockEntity_BarrierBlock",
+    "MixinCustomBLockEntity_ChunkData",
     "MixinCustomBlockEntity_Structure",
     "MixinFixBeacon_BeaconBlockEntity",
     "MixinGlobalDataPack_VanillaDataPackProvider",

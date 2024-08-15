@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,9 +24,9 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import net.fabricmc.api.DedicatedServerModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.server.dedicated.MinecraftDedicatedServer
-import net.minecraft.util.Identifier
 import one.oktw.galaxy.block.CustomBlock
 import one.oktw.galaxy.block.event.AngelBlock
 import one.oktw.galaxy.block.event.BlockEvents
@@ -40,6 +40,8 @@ import one.oktw.galaxy.event.EventManager
 import one.oktw.galaxy.event.type.ProxyResponseEvent
 import one.oktw.galaxy.item.event.CustomItemEventHandler
 import one.oktw.galaxy.item.event.Wrench
+import one.oktw.galaxy.network.ProxyAPIPayload
+import one.oktw.galaxy.network.ProxyChatPayload
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.proxy.api.ProxyAPI
 import one.oktw.galaxy.recipe.RecipeRegistry
@@ -56,7 +58,6 @@ class Main : DedicatedServerModInitializer, CoroutineScope {
         get() = job + server.asCoroutineDispatcher()
 
     companion object {
-        val PROXY_IDENTIFIER = Identifier("galaxy", "proxy")
         var main: Main? = null
             private set
         val selfUUID by lazy {
@@ -85,10 +86,16 @@ class Main : DedicatedServerModInitializer, CoroutineScope {
             server = it as MinecraftDedicatedServer
             eventManager = EventManager(server)
 
-            // Register Proxy packet receiver
-            ServerPlayNetworking.registerGlobalReceiver(PROXY_IDENTIFIER) { _, player, _, buf, _ ->
-                eventManager.emit(ProxyResponseEvent(player, ProxyAPI.decode(buf.nioBuffer())))
+            // Register Custom Payload
+            // Register Proxy Packet (C2S: Send, S2C: Receive)
+            PayloadTypeRegistry.playC2S().register(ProxyAPIPayload.ID, ProxyAPIPayload.CODEC)
+            PayloadTypeRegistry.playS2C().register(ProxyAPIPayload.ID, ProxyAPIPayload.CODEC)
+            // Register Event
+            ServerPlayNetworking.registerGlobalReceiver(ProxyAPIPayload.ID) { payload, context ->
+                eventManager.emit(ProxyResponseEvent(context.player(), payload.packet))
             }
+            // Register Proxy Chat Packet
+            PayloadTypeRegistry.playS2C().register(ProxyChatPayload.ID, ProxyChatPayload.CODEC)
 
             //Events
             eventManager.register(Exchange())

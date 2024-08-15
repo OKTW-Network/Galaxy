@@ -20,7 +20,8 @@
     "server.MinecraftServerMixin_RealTime",
     "server.network.ServerPlayerInteractionManagerMixin_RealTime",
     "server.network.ServerPlayNetworkHandlerMixin_RealTime",
-    "world.WorldMixin_RealTime"
+    "world.WorldMixin_RealTime",
+    "world.dimension.PortalManagerMixin_RealTime"
   ],
   "server": [
   ],

@@ -46,7 +46,6 @@ import one.oktw.galaxy.recipe.RecipeRegistry
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
-@Suppress("unused")
 class Main : DedicatedServerModInitializer, CoroutineScope {
     private val job = SupervisorJob()
     lateinit var server: MinecraftDedicatedServer

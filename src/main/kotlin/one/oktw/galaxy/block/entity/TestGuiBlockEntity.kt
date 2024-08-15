@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,11 +19,13 @@
 package one.oktw.galaxy.block.entity
 
 import net.minecraft.block.entity.BlockEntityType
+import net.minecraft.component.DataComponentTypes
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventories
 import net.minecraft.inventory.Inventory
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.registry.RegistryWrapper
 import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.screen.slot.Slot
 import net.minecraft.server.network.ServerPlayerEntity
@@ -61,20 +63,20 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     }.build().apply {
         editInventory {
             fill(0 until 9, 3..3, Gui.MAIN_FIELD.createItemStack())
-            set(4, 3, Button.CROSS_MARK.createItemStack().setCustomName(Text.of("CLOSE ALL")))
+            set(4, 3, Button.CROSS_MARK.createItemStack().apply { this.set(DataComponentTypes.CUSTOM_NAME, Text.of("CLOSE ALL")) })
         }
         addBinding(4, 3) {
             GUISBackStackManager.closeAll(player)
         }
     }
 
-    override fun readCopyableData(nbt: NbtCompound) {
-        Inventories.readNbt(nbt, inventory)
+    override fun readCopyableData(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
+        Inventories.readNbt(nbt, inventory, registryLookup)
     }
 
-    override fun writeNbt(nbt: NbtCompound) {
-        super.writeNbt(nbt)
-        Inventories.writeNbt(nbt, inventory)
+    override fun writeNbt(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
+        super.writeNbt(nbt, registryLookup)
+        Inventories.writeNbt(nbt, inventory, registryLookup)
     }
 
     override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {

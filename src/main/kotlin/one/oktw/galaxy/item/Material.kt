@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -25,7 +25,7 @@ import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
 class Material private constructor(id: String, modelData: Int, private val name: String) :
-    CustomItem(Identifier("galaxy", "item/material/$id"), COMMAND_BLOCK, modelData) {
+    CustomItem(Identifier.of("galaxy", "item/material/$id"), COMMAND_BLOCK, modelData) {
     companion object {
         val RAW_BASE_PLATE = registry.register(Material("raw_base_plate", 4010100, "item.Material.PART_RAW_BASE"))
         val BASE_PLATE = registry.register(Material("base_plate", 4010101, "item.Material.PART_BASE"))

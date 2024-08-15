@@ -6,8 +6,7 @@
     "BeaconLevelAccessor",
     "PlayerAbilitiesAccessor",
     "SerializingRegionBasedStorageAccessor",
-    "ServerPlayerEntityFunctionAccessor",
-    "ThreadedAnvilChunkStorageAccessor"
+    "ServerChunkLoadingManagerAccessor"
   ],
   "client": [],
   "injectors": {

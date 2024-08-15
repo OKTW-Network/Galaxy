@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -25,7 +25,7 @@ import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
 class Upgrade private constructor(id: String, modelData: Int, private val name: String, private val level: Int) :
-    CustomItem(Identifier("galaxy", "item/upgrade/$id"), COMMAND_BLOCK, modelData) {
+    CustomItem(Identifier.of("galaxy", "item/upgrade/$id"), COMMAND_BLOCK, modelData) {
     companion object {
         val BASE = registry.register(Upgrade("base", 5000100, "item.Upgrade.BASE", 0))
         val COOLING_LV1 = registry.register(Upgrade("cooling_lv1", 5010100, "item.Upgrade.COOLING", 1))

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,13 +18,17 @@
 
 package one.oktw.galaxy.mixin.accessor;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.world.ChunkHolder;
+import net.minecraft.server.world.ServerChunkLoadingManager;
+import net.minecraft.util.math.ChunkPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(ServerPlayerEntity.class)
-public interface ServerPlayerEntityFunctionAccessor {
-    @Invoker(value = "moveToSpawn")
-    void moveToWorldSpawn(ServerWorld world);
+@Mixin(ServerChunkLoadingManager.class)
+public interface ServerChunkLoadingManagerAccessor {
+    @Invoker
+    Iterable<ChunkHolder> callEntryIterator();
+
+    @Invoker
+    boolean callShouldTick(ChunkPos pos);
 }

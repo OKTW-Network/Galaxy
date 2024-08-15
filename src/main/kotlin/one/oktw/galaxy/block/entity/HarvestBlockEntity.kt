@@ -112,7 +112,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
                     }
                 }
             }
-            tool.damage(1, world.random, null) {
+            tool.damage(1, world, null) {
                 tool.decrement(1)
                 tool.damage = 0
             }

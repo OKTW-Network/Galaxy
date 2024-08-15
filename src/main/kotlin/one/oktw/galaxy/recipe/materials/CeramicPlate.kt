@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,10 +18,10 @@
 
 package one.oktw.galaxy.recipe.materials
 
-import net.minecraft.inventory.Inventory
 import net.minecraft.recipe.Ingredient
 import net.minecraft.recipe.SmeltingRecipe
 import net.minecraft.recipe.book.CookingRecipeCategory
+import net.minecraft.recipe.input.SingleStackRecipeInput
 import net.minecraft.world.World
 import one.oktw.galaxy.item.CustomItemHelper
 import one.oktw.galaxy.item.Material
@@ -34,8 +34,8 @@ class CeramicPlate : SmeltingRecipe(
     0.1F,
     200
 ) {
-    override fun matches(inventory: Inventory, world: World): Boolean {
-        val input = inventory.getStack(0) ?: return false
+    override fun matches(singleStackRecipeInput: SingleStackRecipeInput?, world: World?): Boolean {
+        val input = singleStackRecipeInput?.getStackInSlot(0) ?: return false
         return CustomItemHelper.getItem(input) == Material.RAW_BASE_PLATE
     }
 }

@@ -18,11 +18,11 @@
 
 package one.oktw.galaxy.recipe.tools
 
-import net.minecraft.inventory.RecipeInputInventory
 import net.minecraft.item.Items
 import net.minecraft.recipe.RawShapedRecipe
 import net.minecraft.recipe.ShapedRecipe
 import net.minecraft.recipe.book.CraftingRecipeCategory
+import net.minecraft.recipe.input.CraftingRecipeInput
 import net.minecraft.registry.RegistryWrapper
 import one.oktw.galaxy.item.Tool
 
@@ -37,5 +37,5 @@ class Crowbar : ShapedRecipe(
     ),
     Tool.CROWBAR.createItemStack()
 ) {
-    override fun craft(inv: RecipeInputInventory, wrapperLookup: RegistryWrapper.WrapperLookup) = Tool.CROWBAR.createItemStack()
+    override fun craft(craftingRecipeInput: CraftingRecipeInput?, wrapperLookup: RegistryWrapper.WrapperLookup?) = Tool.CROWBAR.createItemStack()
 }

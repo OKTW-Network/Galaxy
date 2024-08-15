@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -27,7 +27,7 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
 
 class Weapon private constructor(id: String, modelData: Int, private val name: String) :
-    CustomItem(Identifier("galaxy", "item/weapon/$id"), COMMAND_BLOCK, modelData) {
+    CustomItem(Identifier.of("galaxy", "item/weapon/$id"), COMMAND_BLOCK, modelData) {
     override val cacheable = false
 
     companion object {

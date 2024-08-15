@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -32,7 +32,7 @@ import one.oktw.galaxy.util.CustomRegistry
 import one.oktw.galaxy.util.Registrable
 
 open class CustomBlock(final override val identifier: Identifier, val baseBlock: Block = BARRIER) : Registrable {
-    constructor(id: String, baseBlock: Block = BARRIER) : this(Identifier("galaxy", "block/$id"), baseBlock)
+    constructor(id: String, baseBlock: Block = BARRIER) : this(Identifier.of("galaxy", "block/$id"), baseBlock)
 
     protected val blockEntityType: BlockEntityType<CustomBlockEntity> = Registry.register(
         Registries.BLOCK_ENTITY_TYPE,

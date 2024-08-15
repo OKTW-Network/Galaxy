@@ -30,7 +30,7 @@ import one.oktw.galaxy.proxy.api.packet.Packet
 @JvmRecord
 data class ProxyAPIPayload(val packet: Packet) : CustomPayload {
     companion object {
-        private val PROXY_IDENTIFIER = Identifier("galaxy", "proxy")
+        private val PROXY_IDENTIFIER = Identifier.of("galaxy", "proxy")
         val ID = CustomPayload.Id<ProxyAPIPayload>(PROXY_IDENTIFIER)
         val CODEC: PacketCodec<PacketByteBuf, ProxyAPIPayload> = PacketCodec.of(
             { value, buf -> buf.writeBytes(wrappedBuffer(encode(value.packet))) },

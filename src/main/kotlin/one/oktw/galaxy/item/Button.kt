@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,7 +22,7 @@ import net.minecraft.item.Items.DIAMOND_HOE
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
-class Button private constructor(id: String, modelData: Int) : CustomItem(Identifier("galaxy", "item/gui/button/$id"), DIAMOND_HOE, modelData) {
+class Button private constructor(id: String, modelData: Int) : CustomItem(Identifier.of("galaxy", "item/gui/button/$id"), DIAMOND_HOE, modelData) {
     companion object {
         val BLANK = registry.register(Button("blank", 1300000))
         val ARROWHEAD_UP = registry.register(Button("arrowhead_up", 1300001))

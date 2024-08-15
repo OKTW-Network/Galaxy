@@ -34,7 +34,12 @@ data class ProxyAPIPayload(val packet: Packet) : CustomPayload {
         val ID = CustomPayload.Id<ProxyAPIPayload>(PROXY_IDENTIFIER)
         val CODEC: PacketCodec<PacketByteBuf, ProxyAPIPayload> = PacketCodec.of(
             { value, buf -> buf.writeBytes(wrappedBuffer(encode(value.packet))) },
-            { buf -> ProxyAPIPayload(ProxyAPI.decode(buf.nioBuffer())) })
+            { buf ->
+                val packet = ProxyAPIPayload(ProxyAPI.decode(buf.nioBuffer()))
+                // FIXME: Workaround force clear buffer to suppress "Packet was larger than I expected" error
+                buf.clear()
+                return@of packet
+            })
     }
 
     override fun getId(): CustomPayload.Id<out CustomPayload> {

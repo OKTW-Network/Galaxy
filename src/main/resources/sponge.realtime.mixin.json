@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "org.spongepowered.common.mixin.realtime",
-  "compatibilityLevel": "JAVA_16",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "accessor.AbstractFurnaceBlockEntityAccessor",
     "accessor.BrewingStandBlockEntityAccessor",

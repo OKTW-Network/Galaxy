@@ -18,8 +18,6 @@
     "MixinItemStackEqualAllowNull_ItemStack",
     "MixinMapExistingChunk_FilledMapItem",
     "MixinOptimizeArmorStand_ArmorStandEntity",
-    "MixinOptimizeContainer_AvailableSlots",
-    "MixinOptimizeContainer_HopperBlockEntity",
     "MixinRCON_RconBase",
     "MixinRCON_RconClient",
     "MixinSkipSyncRegistry",

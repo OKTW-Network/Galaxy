@@ -22,6 +22,7 @@ import net.minecraft.block.*
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventories
+import net.minecraft.inventory.Inventory
 import net.minecraft.inventory.SidedInventory
 import net.minecraft.item.HoeItem
 import net.minecraft.item.ItemStack
@@ -167,9 +168,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     }
 
     override fun canPlayerUse(player: PlayerEntity): Boolean {
-        return if (world!!.getBlockEntity(pos) !== this) {
-            false
-        } else player.squaredDistanceTo(pos.x.toDouble() + 0.5, pos.y.toDouble() + 0.5, pos.z.toDouble() + 0.5) <= 64.0
+        return Inventory.canPlayerUse(this, player)
     }
 
     override fun getAvailableSlots(side: Direction): IntArray {

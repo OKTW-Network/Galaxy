@@ -71,7 +71,7 @@ class GUI private constructor(
     override fun getDisplayName() = title
 
     override fun createMenu(syncId: Int, playerInventory: PlayerInventory, player: PlayerEntity): ScreenHandler? {
-        if (blockEntity?.isRemoved == true) return null
+        if ((blockEntity as? Inventory)?.canPlayerUse(player) == false) return null
         return GuiContainer(syncId, playerInventory)
     }
 

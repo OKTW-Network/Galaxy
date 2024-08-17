@@ -113,8 +113,6 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     }
 
     override fun canPlayerUse(player: PlayerEntity): Boolean {
-        return if (world!!.getBlockEntity(pos) !== this) {
-            false
-        } else player.squaredDistanceTo(pos.x.toDouble() + 0.5, pos.y.toDouble() + 0.5, pos.z.toDouble() + 0.5) <= 64.0
+        return Inventory.canPlayerUse(this, player)
     }
 }

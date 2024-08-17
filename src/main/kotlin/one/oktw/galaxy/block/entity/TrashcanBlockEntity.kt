@@ -51,7 +51,9 @@ class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: It
 
     override fun setStack(slot: Int, stack: ItemStack?) {}
 
-    override fun canPlayerUse(player: PlayerEntity): Boolean = false
+    override fun canPlayerUse(player: PlayerEntity): Boolean {
+        return Inventory.canPlayerUse(this, player)
+    }
 
     override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {
         if (player.isSpectator) {

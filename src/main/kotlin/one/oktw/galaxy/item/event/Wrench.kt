@@ -214,7 +214,8 @@ class Wrench {
 
         world.setBlockState(blockPos, newState)
         world.updateNeighbor(newState, blockPos, newState.block, blockPos, true)
-        Block.postProcessState(newState, world, blockPos).let { if (!it.isAir) world.setBlockState(blockPos, it, 2) }
+        // Workaround disable state update for bell
+        Block.postProcessState(newState, world, blockPos).let { if (!it.isAir && it.block != BELL) world.setBlockState(blockPos, it, 2) }
 
         return true
     }

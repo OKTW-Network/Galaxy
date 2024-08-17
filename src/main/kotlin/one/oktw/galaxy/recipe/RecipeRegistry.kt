@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -32,12 +32,12 @@ import one.oktw.galaxy.recipe.tools.Wrench
 object RecipeRegistry {
     fun register() {
         // Recipe
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Identifier("galaxy", "item/wrench"), Wrench())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Identifier("galaxy", "item/crowbar"), Crowbar())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Identifier("galaxy", "block/elevator"), Elevator())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Identifier("galaxy", "block/htct"), HTCraftingTable())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Identifier("galaxy", "block/harvest"), Harvest())
-        CustomRecipeManager.addRecipe(RecipeType.SMELTING, Identifier("galaxy", "material/ceramic_plate"), CeramicPlate())
-        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Identifier("galaxy", "block/trashcan"), Trashcan())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Identifier.of("galaxy", "item/wrench"), Wrench())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Identifier.of("galaxy", "item/crowbar"), Crowbar())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Identifier.of("galaxy", "block/elevator"), Elevator())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Identifier.of("galaxy", "block/htct"), HTCraftingTable())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Identifier.of("galaxy", "block/harvest"), Harvest())
+        CustomRecipeManager.addRecipe(RecipeType.SMELTING, Identifier.of("galaxy", "material/ceramic_plate"), CeramicPlate())
+        CustomRecipeManager.addRecipe(RecipeType.CRAFTING, Identifier.of("galaxy", "block/trashcan"), Trashcan())
     }
 }

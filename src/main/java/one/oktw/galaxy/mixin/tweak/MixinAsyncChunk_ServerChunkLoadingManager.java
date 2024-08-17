@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,22 +18,23 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import com.mojang.datafixers.util.Either;
+import com.mojang.datafixers.DataFixer;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryOps;
-import net.minecraft.server.world.ChunkHolder;
+import net.minecraft.server.world.ServerChunkLoadingManager;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.thread.ThreadExecutor;
 import net.minecraft.world.ChunkSerializer;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.ChunkType;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.poi.PointOfInterestSet;
 import net.minecraft.world.poi.PointOfInterestStorage;
+import net.minecraft.world.storage.StorageKey;
+import net.minecraft.world.storage.VersionedChunkStorage;
 import one.oktw.galaxy.mixin.accessor.SerializingRegionBasedStorageAccessor;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
@@ -41,12 +42,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-@Mixin(ThreadedAnvilChunkStorage.class)
-public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage {
+@Mixin(ServerChunkLoadingManager.class)
+public abstract class MixinAsyncChunk_ServerChunkLoadingManager extends VersionedChunkStorage {
     private final HashMap<ChunkPos, CompletableFuture<Void>> poiFutures = new HashMap<>();
 
     @Shadow
@@ -62,6 +64,10 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage {
     @Final
     private ThreadExecutor<Runnable> mainThreadExecutor;
 
+    public MixinAsyncChunk_ServerChunkLoadingManager(StorageKey storageKey, Path directory, DataFixer dataFixer, boolean dsync) {
+        super(storageKey, directory, dataFixer, dsync);
+    }
+
     @Shadow
     private static boolean containsStatus(NbtCompound nbt) {
         return false;
@@ -74,17 +80,17 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage {
     protected abstract Chunk getProtoChunk(ChunkPos chunkPos);
 
     @Shadow
-    protected abstract byte mark(ChunkPos pos, ChunkStatus.ChunkType type);
+    protected abstract byte mark(ChunkPos pos, ChunkType type);
 
     @Shadow
-    protected abstract Either<Chunk, ChunkHolder.Unloaded> recoverFromException(Throwable throwable, ChunkPos chunkPos);
+    protected abstract Chunk recoverFromException(Throwable throwable, ChunkPos chunkPos);
 
     /**
      * @author James58899
      * @reason Async POI loading
      */
     @Overwrite
-    private CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> loadChunk(ChunkPos pos) {
+    private CompletableFuture<Chunk> loadChunk(ChunkPos pos) {
         CompletableFuture<Optional<NbtCompound>> chunkNbtFuture = this.getUpdatedChunkNbt(pos).thenApply(nbt -> nbt.filter(nbt2 -> {
             boolean bl = containsStatus(nbt2);
             if (!bl) {
@@ -112,11 +118,11 @@ public abstract class MixinAsyncChunk_ThreadedAnvilChunkStorage {
             var nbt = chunkNbtFuture.join();
             this.world.getProfiler().visit("chunkLoad");
             if (nbt.isPresent()) {
-                ProtoChunk chunk = ChunkSerializer.deserialize(this.world, this.pointOfInterestStorage, pos, nbt.get());
+                ProtoChunk chunk = ChunkSerializer.deserialize(this.world, this.pointOfInterestStorage, this.getStorageKey(), pos, nbt.get());
                 this.mark(pos, ((Chunk) chunk).getStatus().getChunkType());
-                return Either.<Chunk, ChunkHolder.Unloaded>left(chunk);
+                return chunk;
             }
-            return Either.<Chunk, ChunkHolder.Unloaded>left(this.getProtoChunk(pos));
+            return this.getProtoChunk(pos);
         }, this.mainThreadExecutor).exceptionallyAsync(throwable -> this.recoverFromException(throwable, pos), this.mainThreadExecutor);
     }
 }

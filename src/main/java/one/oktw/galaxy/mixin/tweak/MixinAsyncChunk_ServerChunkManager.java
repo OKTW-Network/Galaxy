@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,14 +18,11 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.server.world.ChunkHolder;
-import net.minecraft.server.world.ServerChunkManager;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.world.ThreadedAnvilChunkStorage;
+import net.minecraft.server.world.*;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
-import one.oktw.galaxy.mixin.accessor.ThreadedAnvilChunkStorageAccessor;
+import one.oktw.galaxy.mixin.accessor.ServerChunkLoadingManagerAccessor;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -56,12 +53,12 @@ public abstract class MixinAsyncChunk_ServerChunkManager {
      */
     @Overwrite
     public boolean isChunkLoaded(int x, int z) {
-        return !this.isMissingForLevel(this.getChunkHolder(ChunkPos.toLong(x, z)), 33 + ChunkStatus.getDistanceFromFull(ChunkStatus.FULL));
+        return !this.isMissingForLevel(this.getChunkHolder(ChunkPos.toLong(x, z)), ChunkLevels.getLevelFromStatus(ChunkStatus.FULL));
     }
 
-    @Redirect(method = "tickChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ThreadedAnvilChunkStorage;entryIterator()Ljava/lang/Iterable;"))
-    private Iterable<ChunkHolder> earlyCheckChunkShouldTick(ThreadedAnvilChunkStorage instance) {
-        ThreadedAnvilChunkStorageAccessor accessor = (ThreadedAnvilChunkStorageAccessor) instance;
+    @Redirect(method = "tickChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerChunkLoadingManager;entryIterator()Ljava/lang/Iterable;"))
+    private Iterable<ChunkHolder> earlyCheckChunkShouldTick(ServerChunkLoadingManager instance) {
+        ServerChunkLoadingManagerAccessor accessor = (ServerChunkLoadingManagerAccessor) instance;
         var stream = StreamSupport.stream(accessor.callEntryIterator().spliterator(), false);
         return stream.filter(chunkHolder -> {
             WorldChunk chunk = chunkHolder.getWorldChunk();
@@ -76,8 +73,8 @@ public abstract class MixinAsyncChunk_ServerChunkManager {
         return true;
     }
 
-    @Redirect(method = "tickChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ThreadedAnvilChunkStorage;shouldTick(Lnet/minecraft/util/math/ChunkPos;)Z"))
-    private boolean skipDupTickCheck(ThreadedAnvilChunkStorage instance, ChunkPos pos) {
+    @Redirect(method = "tickChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerChunkLoadingManager;shouldTick(Lnet/minecraft/util/math/ChunkPos;)Z"))
+    private boolean skipDupTickCheck(ServerChunkLoadingManager instance, ChunkPos pos) {
         return true;
     }
 }

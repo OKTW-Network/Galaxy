@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,7 +22,7 @@ import net.minecraft.item.Items.DIAMOND_HOE
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
-class Gui private constructor(id: String, modelData: Int) : CustomItem(Identifier("galaxy", "item/gui/base/$id"), DIAMOND_HOE, modelData) {
+class Gui private constructor(id: String, modelData: Int) : CustomItem(Identifier.of("galaxy", "item/gui/base/$id"), DIAMOND_HOE, modelData) {
     companion object {
         val BLANK = registry.register(Gui("blank", 1000000))
         val MAIN_FIELD = registry.register(Gui("main_field", 1010000))

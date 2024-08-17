@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,7 +30,6 @@ import net.minecraft.util.Formatting
 import net.minecraft.world.World
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
-import one.oktw.galaxy.mixin.accessor.ServerPlayerEntityFunctionAccessor
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -88,7 +87,7 @@ class Spawn : Command {
                 return@launch
             }
 
-            (player as ServerPlayerEntityFunctionAccessor).moveToWorldSpawn(world)
+            player.refreshPositionAndAngles(player.getWorldSpawnPos(world, world.spawnPos).toBottomCenterPos(), 0.0f, 0.0f)
             // force teleport when player pos does not change at all
             if (oldPos.distanceTo(player.pos) == 0.0) {
                 val spawnPosition = world.spawnPos

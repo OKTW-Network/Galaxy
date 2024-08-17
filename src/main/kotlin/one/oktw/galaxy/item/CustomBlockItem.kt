@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -25,7 +25,7 @@ import net.minecraft.util.Identifier
 import one.oktw.galaxy.block.CustomBlock
 
 class CustomBlockItem private constructor(private val id: String, modelData: Int, private val name: String?) :
-    CustomItem(Identifier("galaxy", "item/block/$id"), COMMAND_BLOCK, modelData) {
+    CustomItem(Identifier.of("galaxy", "item/block/$id"), COMMAND_BLOCK, modelData) {
     companion object {
         val HT_CRAFTING_TABLE = registry.register(CustomBlockItem("ht_crafting_table", 1010100, "block.HT_CRAFTING_TABLE"))
         val ELEVATOR = registry.register(CustomBlockItem("elevator", 1010200, "block.ELEVATOR"))
@@ -39,7 +39,7 @@ class CustomBlockItem private constructor(private val id: String, modelData: Int
     }
 
     fun getBlock(): CustomBlock {
-        return CustomBlock.registry.get(Identifier("galaxy", "block/$id"))!!
+        return CustomBlock.registry.get(Identifier.of("galaxy", "block/$id"))!!
     }
 
     override fun getName(): Text? = name?.let(Text::translatable)?.styled { it.withColor(Formatting.WHITE).withItalic(false) }

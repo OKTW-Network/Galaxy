@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,10 +19,12 @@
 package one.oktw.galaxy.mixin.recipe;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.gson.JsonElement;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
@@ -38,8 +40,8 @@ import java.util.Map;
 @Mixin(RecipeManager.class)
 public class MixinCustomRecipe_RecipeManager implements CustomRecipeManager {
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V", at = @At(value = "INVOKE", target = "Ljava/util/Map;entrySet()Ljava/util/Set;", ordinal = 0), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void recipeLoad(Map<Identifier, JsonElement> map, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci, Map<RecipeType<?>, ImmutableMap.Builder<Identifier, RecipeEntry<?>>> map2, ImmutableMap.Builder<Identifier, RecipeEntry<?>> builder) {
-        customRecipes.forEach((i, v) -> map2.computeIfAbsent(i, k -> ImmutableMap.builder()).putAll(v));
-        customRecipes.forEach((i, v) -> builder.putAll(v));
+    private void recipeLoad(Map<Identifier, JsonElement> map, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci, ImmutableMultimap.Builder<RecipeType<?>, RecipeEntry<?>> builder, ImmutableMap.Builder<Identifier, RecipeEntry<?>> builder2, RegistryOps<JsonElement> registryOps) {
+        customRecipes.forEach((type, recipeEntryHashMap) -> builder.putAll(type, recipeEntryHashMap.values()));
+        customRecipes.forEach((type, recipeEntryHashMap) -> builder2.putAll(recipeEntryHashMap));
     }
 }

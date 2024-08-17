@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,7 +22,6 @@ import com.mojang.brigadier.CommandDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.block.RespawnAnchorBlock
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
@@ -30,6 +29,7 @@ import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
+import net.minecraft.world.TeleportTarget
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import java.util.*
@@ -63,14 +63,8 @@ class Home : Command {
 
         val world = source.server.getWorld(player.spawnPointDimension)
 
-        val spawnPoint = PlayerEntity.findRespawnPosition(
-            world,
-            spawnPointPosition,
-            player.spawnAngle,
-            player.isSpawnForced,
-            player.notInAnyWorld
-        )
-        if (!spawnPoint.isPresent) {
+        val teleportTarget = player.getRespawnTarget(player.notInAnyWorld, TeleportTarget.NO_OP)
+        if (teleportTarget.missingRespawnBlock()) {
             player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
             lock -= player.uuid
         } else {
@@ -93,21 +87,16 @@ class Home : Command {
                 player.sendMessage(Text.translatable("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
 
                 // Check Again
-                val checkAgain = PlayerEntity.findRespawnPosition(
-                    world,
-                    spawnPointPosition,
-                    player.spawnAngle,
-                    player.isSpawnForced,
-                    player.notInAnyWorld
-                )
-                if (!checkAgain.isPresent) {
+                val teleportTargetDoubleCheck = player.getRespawnTarget(player.notInAnyWorld, TeleportTarget.NO_OP)
+
+                if (teleportTargetDoubleCheck.missingRespawnBlock()) {
                     player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
                     lock -= player.uuid
                     return@launch
                 }
 
-                val world2 = if (world != null && checkAgain.isPresent) world else source.server.overworld
-                val position = checkAgain.get()
+                val world2 = if (world != null && !teleportTargetDoubleCheck.missingRespawnBlock()) world else source.server.overworld
+                val position = teleportTarget.pos()
                 player.teleport(
                     world2,
                     position.x,

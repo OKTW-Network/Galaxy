@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -28,7 +28,7 @@ import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.CustomItemHelper
 
 open class ModelCustomBlock(identifier: Identifier, protected open val modelItem: ItemStack) : CustomBlock(identifier, BARRIER) {
-    constructor(id: String, modelItem: ItemStack) : this(Identifier("galaxy", "block/$id"), modelItem)
+    constructor(id: String, modelItem: ItemStack) : this(Identifier.of("galaxy", "block/$id"), modelItem)
 
     override fun toItem() = modelItem.let { CustomItemHelper.getItem(it) as? CustomBlockItem }
 

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -58,8 +58,6 @@ public abstract class EntityMixin_RealTime {
     public int timeUntilRegen;
     @Shadow
     protected int ridingCooldown;
-    @Shadow
-    protected int netherPortalTime;
 
     @Shadow
     public abstract World getWorld();
@@ -85,21 +83,5 @@ public abstract class EntityMixin_RealTime {
     private void realTimeImpl$adjustForRealTimeEntityCooldown(final Entity self, final int modifier) {
         final int ticks = (int) ((RealTimeTrackingBridge) this.getWorld()).realTimeBridge$getRealTimeTicks();
         this.ridingCooldown = Math.max(0, this.ridingCooldown - ticks);
-    }
-
-    @Redirect(method = "tickPortal",
-        at = @At(
-            value = "FIELD",
-            target = "Lnet/minecraft/entity/Entity;netherPortalTime:I",
-            opcode = Opcodes.PUTFIELD, ordinal = 0
-        ),
-        slice = @Slice(
-            from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getMaxNetherPortalTime()I"),
-            to = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;resetPortalCooldown()V")
-        )
-    )
-    private void realTimeImpl$adjustForRealTimePortalCounter(final Entity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) this.getWorld()).realTimeBridge$getRealTimeTicks();
-        this.netherPortalTime += ticks;
     }
 }

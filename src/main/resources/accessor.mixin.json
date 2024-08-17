@@ -1,13 +1,12 @@
 {
   "required": true,
   "package": "one.oktw.galaxy.mixin.accessor",
-  "compatibilityLevel": "JAVA_16",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "BeaconLevelAccessor",
     "PlayerAbilitiesAccessor",
     "SerializingRegionBasedStorageAccessor",
-    "ServerPlayerEntityFunctionAccessor",
-    "ThreadedAnvilChunkStorageAccessor"
+    "ServerChunkLoadingManagerAccessor"
   ],
   "client": [],
   "injectors": {

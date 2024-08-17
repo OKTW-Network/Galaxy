@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,27 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.tweak;
+package one.oktw.galaxy.mixin.accessor;
 
-import net.minecraft.block.entity.LootableContainerBlockEntity;
-import net.minecraft.inventory.Inventory;
-import one.oktw.galaxy.mixin.interfaces.InventoryAvailableSlots;
+import net.minecraft.server.world.ChunkHolder;
+import net.minecraft.server.world.ServerChunkLoadingManager;
+import net.minecraft.util.math.ChunkPos;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
-import java.util.Arrays;
+@Mixin(ServerChunkLoadingManager.class)
+public interface ServerChunkLoadingManagerAccessor {
+    @Invoker
+    Iterable<ChunkHolder> callEntryIterator();
 
-@Mixin(LootableContainerBlockEntity.class)
-public abstract class MixinOptimizeContainer_AvailableSlots implements InventoryAvailableSlots, Inventory {
-    private int[] availableSlots;
-
-    @Override
-    public int[] getAvailableSlots() {
-        if (availableSlots == null) {
-            int[] array = new int[size()];
-            Arrays.setAll(array, i -> i);
-            availableSlots = array;
-        }
-
-        return availableSlots;
-    }
+    @Invoker
+    boolean callShouldTick(ChunkPos pos);
 }

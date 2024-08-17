@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,14 +18,22 @@
 
 package one.oktw.galaxy.item
 
+import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.type.NbtComponent
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.util.Identifier
 
 object CustomItemHelper {
-    fun getItem(itemStack: ItemStack): CustomItem? {
-        val customNbt = itemStack.getSubNbt("GalaxyData")
+    fun getNbt(itemStack: ItemStack): NbtCompound {
+        val galaxyData = (itemStack.get(DataComponentTypes.CUSTOM_DATA) ?: NbtComponent.DEFAULT).copyNbt()
+        return galaxyData.getCompound("GalaxyData")
+    }
 
-        return customNbt?.getString("CustomItemIdentifier")?.let(Identifier::tryParse)
+    fun getItem(itemStack: ItemStack): CustomItem? {
+        val customNbt = getNbt(itemStack)
+
+        return customNbt.getString("CustomItemIdentifier")?.let(Identifier::tryParse)
             ?.let(CustomItem.registry::get)
             ?.run { readCustomNbt(customNbt) }
     }

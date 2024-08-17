@@ -63,7 +63,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     }.build().apply {
         editInventory {
             fill(0 until 9, 3..3, Gui.MAIN_FIELD.createItemStack())
-            set(4, 3, Button.CROSS_MARK.createItemStack().apply { this.set(DataComponentTypes.CUSTOM_NAME, Text.of("CLOSE ALL")) })
+            set(4, 3, Button.CROSS_MARK.createItemStack().apply { this.set(DataComponentTypes.ITEM_NAME, Text.of("CLOSE ALL")) })
         }
         addBinding(4, 3) {
             GUISBackStackManager.closeAll(player)

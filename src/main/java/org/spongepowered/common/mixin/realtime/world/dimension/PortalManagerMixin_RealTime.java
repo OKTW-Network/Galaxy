@@ -18,10 +18,10 @@
 
 package org.spongepowered.common.mixin.realtime.world.dimension;
 
-import net.minecraft.block.Portal;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.dimension.PortalManager;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,19 +32,19 @@ import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 @Mixin(PortalManager.class)
 public abstract class PortalManagerMixin_RealTime {
     @Shadow
-    private Portal portal;
-    @Shadow
     private int ticksInPortal;
-    @Shadow
-    private boolean inPortal;
 
-    @Inject(method = "tick", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/dimension/PortalManager;ticksInPortal:I", opcode = Opcodes.GETFIELD))
     private void realTimeImpl$adjustForRealTimePortalCounter(ServerWorld world, Entity entity, boolean canUsePortals, CallbackInfoReturnable<Boolean> cir) {
-        if (this.inPortal) {
-            final int ticks = (int) ((RealTimeTrackingBridge) world).realTimeBridge$getRealTimeTicks();
-            this.ticksInPortal += ticks;
-            // FIXME: Does this still need to this.ticksInPortal++ ?
-            cir.setReturnValue(canUsePortals && this.ticksInPortal >= this.portal.getPortalDelay(world, entity));
+        final int ticks = (int) ((RealTimeTrackingBridge) world).realTimeBridge$getRealTimeTicks() - 1;
+        this.ticksInPortal += Math.max(0, ticks);
+    }
+
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/dimension/PortalManager;decayTicksInPortal()V"))
+    private void realTimeImpl$PortalDecayCounter(ServerWorld world, Entity entity, boolean canUsePortals, CallbackInfoReturnable<Boolean> cir) {
+        final int ticks = (int) ((RealTimeTrackingBridge) world).realTimeBridge$getRealTimeTicks() - 1;
+        if (ticks > 0) {
+            this.ticksInPortal = Math.max(0, this.ticksInPortal - ticks * 4);
         }
     }
 }

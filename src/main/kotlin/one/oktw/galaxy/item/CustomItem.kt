@@ -67,7 +67,7 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
         return ItemStack(baseItem).apply {
             set(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelDataComponent(modelData))
             set(DataComponentTypes.UNBREAKABLE, UnbreakableComponent(false))
-            set(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent(listOf<AttributeModifiersComponent.Entry>(), false))
+            set(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent(emptyList(), false))
             set(DataComponentTypes.ITEM_NAME, this@CustomItem.getName())
 
             // Galaxy Data

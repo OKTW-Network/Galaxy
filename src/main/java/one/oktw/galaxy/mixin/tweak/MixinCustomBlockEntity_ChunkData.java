@@ -31,7 +31,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mixin(ChunkData.class)
-public class MixinCustomBLockEntity_ChunkData {
+public class MixinCustomBlockEntity_ChunkData {
     @Redirect(method = "<init>(Lnet/minecraft/world/chunk/WorldChunk;)V", at = @At(value = "INVOKE", target = "Ljava/util/Map;entrySet()Ljava/util/Set;"))
     private Set<Map.Entry<BlockPos, BlockEntity>> removeCustomBlock(Map<BlockPos, BlockEntity> instance) {
         return instance.entrySet().stream().filter(e -> !(e.getValue() instanceof CustomBlockEntity)).collect(Collectors.toSet());

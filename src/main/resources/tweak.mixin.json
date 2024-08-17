@@ -11,7 +11,7 @@
     "MixinAsyncChunk_ServerPlayNetworkHandler",
     "MixinAsyncChunk_StorageIoWorker",
     "MixinCustomBlockEntity_BarrierBlock",
-    "MixinCustomBLockEntity_ChunkData",
+    "MixinCustomBlockEntity_ChunkData",
     "MixinCustomBlockEntity_Structure",
     "MixinFixBeacon_BeaconBlockEntity",
     "MixinGlobalDataPack_VanillaDataPackProvider",

@@ -34,8 +34,8 @@ class CeramicPlate : SmeltingRecipe(
     0.1F,
     200
 ) {
-    override fun matches(singleStackRecipeInput: SingleStackRecipeInput?, world: World?): Boolean {
-        val input = singleStackRecipeInput?.getStackInSlot(0) ?: return false
+    override fun matches(singleStackRecipeInput: SingleStackRecipeInput, world: World): Boolean {
+        val input = singleStackRecipeInput.getStackInSlot(0) ?: return false
         return CustomItemHelper.getItem(input) == Material.RAW_BASE_PLATE
     }
 }

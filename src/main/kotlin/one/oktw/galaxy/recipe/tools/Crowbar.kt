@@ -37,5 +37,5 @@ class Crowbar : ShapedRecipe(
     ),
     Tool.CROWBAR.createItemStack()
 ) {
-    override fun craft(craftingRecipeInput: CraftingRecipeInput?, wrapperLookup: RegistryWrapper.WrapperLookup?) = Tool.CROWBAR.createItemStack()
+    override fun craft(craftingRecipeInput: CraftingRecipeInput, wrapperLookup: RegistryWrapper.WrapperLookup) = Tool.CROWBAR.createItemStack()
 }

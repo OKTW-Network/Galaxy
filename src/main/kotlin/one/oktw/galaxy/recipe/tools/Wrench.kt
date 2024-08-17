@@ -38,5 +38,5 @@ class Wrench : ShapedRecipe(
     ),
     Tool.WRENCH.createItemStack()
 ) {
-    override fun craft(craftingRecipeInput: CraftingRecipeInput?, wrapperLookup: RegistryWrapper.WrapperLookup?) = Tool.WRENCH.createItemStack()
+    override fun craft(craftingRecipeInput: CraftingRecipeInput, wrapperLookup: RegistryWrapper.WrapperLookup) = Tool.WRENCH.createItemStack()
 }

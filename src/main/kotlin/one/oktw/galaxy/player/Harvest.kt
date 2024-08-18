@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -44,7 +44,11 @@ class Harvest {
         val blockPos = event.packet.blockHitResult.blockPos
         val blockState = world.getBlockState(blockPos)
 
-        if (event.packet.hand == Hand.MAIN_HAND && !player.isSneaking && isMature(world, blockPos, blockState)) {
+        if (
+            event.packet.hand == Hand.MAIN_HAND &&
+            (!player.isSneaking || (player.mainHandStack.isEmpty && player.offHandStack.isEmpty)) &&
+            isMature(world, blockPos, blockState)
+        ) {
             event.cancel = true
             val block = blockState.block
             val ageProperties = when (block) {

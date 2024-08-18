@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -79,6 +79,7 @@ class Wrench {
             startDirection[player] = blockPos to direction
 
             blockEntity.facing = if (next == -1 || next > allowedFacing.lastIndex) allowedFacing.first() else allowedFacing[next]
+            return true
         }
 
         // Check destructible
@@ -213,7 +214,8 @@ class Wrench {
 
         world.setBlockState(blockPos, newState)
         world.updateNeighbor(newState, blockPos, newState.block, blockPos, true)
-        Block.postProcessState(newState, world, blockPos).let { if (!it.isAir) world.setBlockState(blockPos, it, 2) }
+        // Workaround disable state update for bell
+        Block.postProcessState(newState, world, blockPos).let { if (!it.isAir && it.block != BELL) world.setBlockState(blockPos, it, 2) }
 
         return true
     }

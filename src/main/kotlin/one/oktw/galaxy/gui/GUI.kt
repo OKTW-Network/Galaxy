@@ -21,8 +21,10 @@ package one.oktw.galaxy.gui
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
+import net.minecraft.block.entity.BlockEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.PlayerInventory
+import net.minecraft.inventory.Inventory
 import net.minecraft.inventory.SimpleInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.screen.NamedScreenHandlerFactory
@@ -41,7 +43,12 @@ import org.apache.logging.log4j.LogManager
 import java.util.concurrent.ConcurrentHashMap
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class GUI private constructor(private val type: ScreenHandlerType<out ScreenHandler>, private val title: Text, private val slotBindings: HashMap<Int, Slot>) :
+class GUI private constructor(
+    private val type: ScreenHandlerType<out ScreenHandler>,
+    private val title: Text,
+    private val slotBindings: HashMap<Int, Slot>,
+    private val blockEntity: BlockEntity? = null
+) :
     NamedScreenHandlerFactory {
     private val inventory = when (type) {
         GENERIC_9X1, GENERIC_3X3 -> SimpleInventory(9)
@@ -63,7 +70,8 @@ class GUI private constructor(private val type: ScreenHandlerType<out ScreenHand
 
     override fun getDisplayName() = title
 
-    override fun createMenu(syncId: Int, playerInventory: PlayerInventory, player: PlayerEntity): ScreenHandler {
+    override fun createMenu(syncId: Int, playerInventory: PlayerInventory, player: PlayerEntity): ScreenHandler? {
+        if ((blockEntity as? Inventory)?.canPlayerUse(player) == false) return null
         return GuiContainer(syncId, playerInventory)
     }
 
@@ -118,6 +126,8 @@ class GUI private constructor(private val type: ScreenHandlerType<out ScreenHand
         private val inventoryUtils = InventoryUtils(type)
         private var title: Text = Text.empty()
         private val slotBindings = HashMap<Int, Slot>()
+        private var blockEntity: BlockEntity? = null
+
         fun setTitle(title: Text): Builder {
             this.title = title
             return this
@@ -133,8 +143,13 @@ class GUI private constructor(private val type: ScreenHandlerType<out ScreenHand
 
         fun addSlot(x: Int, y: Int, slot: Slot) = this.addSlot(inventoryUtils.xyToIndex(x, y), slot)
 
+        fun blockEntity(entity: BlockEntity): Builder {
+            this.blockEntity = entity
+            return this
+        }
+
         fun build(): GUI {
-            return GUI(type, title, slotBindings)
+            return GUI(type, title, slotBindings, blockEntity)
         }
     }
 
@@ -212,6 +227,7 @@ class GUI private constructor(private val type: ScreenHandlerType<out ScreenHand
 
                     return
                 }
+
                 PICKUP_ALL -> { // Rewrite PICKUP_ALL only take from allow use slot & player inventory.
                     if (slot < 0) return
 
@@ -252,8 +268,7 @@ class GUI private constructor(private val type: ScreenHandlerType<out ScreenHand
         }
 
         override fun canUse(player: PlayerEntity): Boolean {
-            // TODO close GUI
-            return true
+            return (blockEntity as? Inventory)?.canPlayerUse(player) ?: true
         }
 
         fun insertItemToBinding(item: ItemStack, fromLast: Boolean): Boolean {

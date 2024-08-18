@@ -22,6 +22,7 @@ import net.minecraft.block.*
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventories
+import net.minecraft.inventory.Inventory
 import net.minecraft.inventory.SidedInventory
 import net.minecraft.item.HoeItem
 import net.minecraft.item.ItemStack
@@ -54,7 +55,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
 
     override val allowedFacing = listOf(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST)
     private val inventory = DefaultedList.ofSize(4, ItemStack.EMPTY)
-    private val gui = GUI.Builder(ScreenHandlerType.GENERIC_9X3).setTitle(Text.translatable("block.HARVEST")).apply {
+    private val gui = GUI.Builder(ScreenHandlerType.GENERIC_9X3).setTitle(Text.translatable("block.HARVEST")).blockEntity(this).apply {
         var i = 0
         addSlot(4, 0, object : Slot(this@HarvestBlockEntity, i++, 0, 0) { // Tool
             override fun canInsert(item: ItemStack) = isHoe(item)
@@ -167,9 +168,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     }
 
     override fun canPlayerUse(player: PlayerEntity): Boolean {
-        return if (world!!.getBlockEntity(pos) !== this) {
-            false
-        } else player.squaredDistanceTo(pos.x.toDouble() + 0.5, pos.y.toDouble() + 0.5, pos.z.toDouble() + 0.5) <= 64.0
+        return Inventory.canPlayerUse(this, player)
     }
 
     override fun getAvailableSlots(side: Direction): IntArray {

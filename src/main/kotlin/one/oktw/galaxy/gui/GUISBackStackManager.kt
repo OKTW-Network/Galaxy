@@ -59,7 +59,12 @@ class GUISBackStackManager(private val player: ServerPlayerEntity) : CoroutineSc
             stack.pollLast() // Remove closed
 
             // Delay 1 tick to workaround open GUI on close callback
-            launch { stack.lastOrNull()?.let(player::openHandledScreen) } // Open previous
+            launch {
+                while (stack.isNotEmpty()) {
+                    if (stack.last().let(player::openHandledScreen).isPresent) break // Try open previous
+                    stack.pollLast() // Open fail, remove it
+                }
+            }
         }
     }
 }

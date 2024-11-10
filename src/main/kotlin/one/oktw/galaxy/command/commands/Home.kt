@@ -21,6 +21,7 @@ package one.oktw.galaxy.command.commands
 import com.mojang.brigadier.CommandDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.minecraft.block.Blocks
 import net.minecraft.block.RespawnAnchorBlock
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
 import net.minecraft.server.command.CommandManager
@@ -54,14 +55,13 @@ class Home : Command {
 
         lock += player.uuid
 
+        // Check Stage
         val spawnPointPosition = player.spawnPointPosition
         if (spawnPointPosition == null) {
             player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
             lock -= player.uuid
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
-
-        val world = source.server.getWorld(player.spawnPointDimension)
 
         val teleportTarget = player.getRespawnTarget(player.notInAnyWorld, TeleportTarget.NO_OP)
         if (teleportTarget.missingRespawnBlock()) {
@@ -70,6 +70,7 @@ class Home : Command {
         } else {
             main?.launch {
                 // Add back charge in countdown stage
+                val world = source.server.getWorld(player.spawnPointDimension)
                 if (world != null) {
                     val blockState = world.getBlockState(spawnPointPosition)
                     if (blockState.block is RespawnAnchorBlock) {
@@ -86,43 +87,37 @@ class Home : Command {
                 }
                 player.sendMessage(Text.translatable("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
 
-                // Check Again
-                val teleportTargetDoubleCheck = player.getRespawnTarget(player.notInAnyWorld, TeleportTarget.NO_OP)
-
-                if (teleportTargetDoubleCheck.missingRespawnBlock()) {
+                // Check Again (Actual Teleport Stage)
+                val realTeleportTarget = player.getRespawnTarget(player.notInAnyWorld, TeleportTarget.NO_OP)
+                if (realTeleportTarget.missingRespawnBlock()) {
                     player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
                     lock -= player.uuid
                     return@launch
                 }
 
-                val world2 = if (world != null && !teleportTargetDoubleCheck.missingRespawnBlock()) world else source.server.overworld
-                val position = teleportTarget.pos()
-                player.teleport(
-                    world2,
-                    position.x,
-                    position.y,
-                    position.z,
-                    player.yaw,
-                    player.pitch
-                )
+                player.teleportTo(realTeleportTarget)
 
-                val blockState = world2.getBlockState(spawnPointPosition)
-                if (!player.notInAnyWorld && blockState.block is RespawnAnchorBlock) {
-                    player.networkHandler.sendPacket(
-                        PlaySoundS2CPacket(
+                val realSpawnPointPosition = player.spawnPointPosition
+                val realWorld = source.server.getWorld(player.spawnPointDimension)
+                if (realWorld != null && realSpawnPointPosition != null) {
+                    val blockState = realWorld.getBlockState(realSpawnPointPosition)
+                    if (!player.notInAnyWorld && blockState.isOf(Blocks.RESPAWN_ANCHOR)) {
+                        player.networkHandler.sendPacket(
+                            PlaySoundS2CPacket(
                                 SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE,
                                 SoundCategory.BLOCKS,
-                                spawnPointPosition.x.toDouble(),
-                                spawnPointPosition.y.toDouble(),
-                                spawnPointPosition.z.toDouble(),
+                                realSpawnPointPosition.x.toDouble(),
+                                realSpawnPointPosition.y.toDouble(),
+                                realSpawnPointPosition.z.toDouble(),
                                 1.0f,
                                 1.0f,
-                                world2.getRandom().nextLong()
+                                realWorld.getRandom().nextLong()
                             )
-                    )
-                }
+                        )
+                    }
 
-                lock -= player.uuid
+                    lock -= player.uuid
+                }
             }
         }
         return com.mojang.brigadier.Command.SINGLE_SUCCESS

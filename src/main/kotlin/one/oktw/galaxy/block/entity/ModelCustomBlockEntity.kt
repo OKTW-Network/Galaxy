@@ -19,9 +19,9 @@
 package one.oktw.galaxy.block.entity
 
 import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.EquipmentSlot
+import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
@@ -61,7 +61,9 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
     override fun tick() {
         if (entityUUID == null || (world as ServerWorld).getEntity(entityUUID) == null) {
             // Kill leak entities
-            (world as ServerWorld).getEntitiesByType(EntityType.ARMOR_STAND) { it.blockPos == pos && it.commandTags.contains("BLOCK") }.forEach(Entity::kill)
+            (world as ServerWorld).getEntitiesByType(EntityType.ARMOR_STAND) { it.blockPos == pos && it.commandTags.contains("BLOCK") }.forEach {
+                it.kill(world as ServerWorld)
+            }
 
             spawnEntity()
         }
@@ -78,7 +80,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         super.writeNbt(nbt, registryLookup)
         val data = NbtCompound()
         entityUUID?.let { data.putUuid("ModelEntity", it) }
-        facing?.let { data.putString("Facing", it.getName()) }
+        facing?.let { data.putString("Facing", it.name) }
         if (!data.isEmpty) {
             nbt.put("GalaxyData", data)
         }
@@ -86,11 +88,11 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
 
     override fun markRemoved() {
         super.markRemoved()
-        (world as ServerWorld).getEntity(entityUUID)?.kill()
+        (world as ServerWorld).getEntity(entityUUID)?.kill(world as ServerWorld)
     }
 
     private fun spawnEntity() {
-        val entity: ArmorStandEntity = EntityType.getEntityFromNbt(armorStandNbt, world).get() as ArmorStandEntity
+        val entity: ArmorStandEntity = EntityType.getEntityFromNbt(armorStandNbt, world, SpawnReason.COMMAND).get() as ArmorStandEntity
         entity.refreshPositionAndAngles(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, facing?.asRotation() ?: 0.0F, 0.0F)
         entity.equipStack(EquipmentSlot.HEAD, modelItem)
         entity.addCommandTag("BLOCK")

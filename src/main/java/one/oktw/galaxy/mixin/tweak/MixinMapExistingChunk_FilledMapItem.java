@@ -40,6 +40,6 @@ public abstract class MixinMapExistingChunk_FilledMapItem {
             WorldChunk chunk = (WorldChunk) world.getChunkAsView(chunkPos.x, chunkPos.z);
             if (chunk != null) return chunk;
         }
-        return new EmptyChunk(world, new ChunkPos(x, z), world.getRegistryManager().get(RegistryKeys.BIOME).entryOf(BiomeKeys.PLAINS));
+        return new EmptyChunk(world, new ChunkPos(x, z), world.getRegistryManager().getOrThrow(RegistryKeys.BIOME).getOrThrow(BiomeKeys.PLAINS));
     }
 }

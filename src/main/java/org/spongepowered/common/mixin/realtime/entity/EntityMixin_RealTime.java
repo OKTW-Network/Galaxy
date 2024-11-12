@@ -74,9 +74,8 @@ public abstract class EntityMixin_RealTime {
                 target = "Lnet/minecraft/entity/Entity;stopRiding()V"
             ),
             to = @At(
-                value = "FIELD",
-                target = "Lnet/minecraft/entity/Entity;horizontalSpeed:F",
-                opcode = Opcodes.GETFIELD
+                value = "INVOKE",
+                target = "Lnet/minecraft/entity/Entity;tickPortalTeleportation()V"
             )
         )
     )

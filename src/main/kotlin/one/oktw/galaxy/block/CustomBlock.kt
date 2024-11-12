@@ -18,10 +18,10 @@
 
 package one.oktw.galaxy.block
 
+import net.fabricmc.fabric.api.`object`.builder.v1.block.entity.FabricBlockEntityTypeBuilder
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks.*
 import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.block.entity.BlockEntityType.Builder
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.util.Identifier
@@ -37,7 +37,7 @@ open class CustomBlock(final override val identifier: Identifier, val baseBlock:
     protected val blockEntityType: BlockEntityType<CustomBlockEntity> = Registry.register(
         Registries.BLOCK_ENTITY_TYPE,
         identifier,
-        Builder.create({ pos, _ -> createBlockEntity(pos) }, BARRIER).build(null)
+        FabricBlockEntityTypeBuilder.create({ pos, _ -> createBlockEntity(pos) }, BARRIER).build(null)
     )
 
     companion object {

@@ -11,7 +11,7 @@ plugins {
 val version = "0.0.1"
 val group = "one.oktw"
 
-val fabricVersion = "0.107.3+1.21.3"
+val fabricVersion = "0.108.0+1.21.3"
 val galaxyLibVersion = "c328418"
 
 repositories {

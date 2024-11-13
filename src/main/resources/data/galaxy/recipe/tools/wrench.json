@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "I I",
+    " S ",
+    " I "
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "minecraft:command_block",
+    "count": 1,
+    "components": {
+      "max_stack_size": 1,
+      "unbreakable": {
+        "show_in_tooltip": false
+      },
+      "attribute_modifiers": {
+        "modifiers": [],
+        "show_in_tooltip": false
+      },
+      "item_name": "{\"translate\": \"item.Tool.WRENCH\", \"color\": \"white\", \"italic\": false}",
+      "custom_model_data": 2010100,
+      "custom_data": {
+        "GalaxyData": {
+          "CustomItemIdentifier": "galaxy:item/tool/wrench"
+        }
+      }
+    }
+  }
+}

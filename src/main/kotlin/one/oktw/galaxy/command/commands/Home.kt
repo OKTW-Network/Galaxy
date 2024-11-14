@@ -69,18 +69,6 @@ class Home : Command {
             lock -= player.uuid
         } else {
             main?.launch {
-                // Add back charge in countdown stage
-                val world = source.server.getWorld(player.spawnPointDimension)
-                if (world != null) {
-                    val blockState = world.getBlockState(spawnPointPosition)
-                    if (blockState.block is RespawnAnchorBlock) {
-                        world.setBlockState(
-                            spawnPointPosition, blockState.with(RespawnAnchorBlock.CHARGES, blockState[RespawnAnchorBlock.CHARGES] + 1)
-                        )
-                        world.updateNeighbors(spawnPointPosition, blockState.block)
-                    }
-                }
-
                 for (i in 0..4) {
                     player.sendMessage(Text.translatable("Respond.commandCountdown", 5 - i).styled { it.withColor(Formatting.GREEN) }, true)
                     delay(TimeUnit.SECONDS.toMillis(1))
@@ -102,6 +90,12 @@ class Home : Command {
                 if (realWorld != null && realSpawnPointPosition != null) {
                     val blockState = realWorld.getBlockState(realSpawnPointPosition)
                     if (!player.notInAnyWorld && blockState.isOf(Blocks.RESPAWN_ANCHOR)) {
+                        // Consume Respawn Anchor Charge
+                        realWorld.setBlockState(
+                            realSpawnPointPosition, blockState.with(RespawnAnchorBlock.CHARGES, blockState[RespawnAnchorBlock.CHARGES] - 1)
+                        )
+                        realWorld.updateNeighbors(realSpawnPointPosition, blockState.block)
+
                         player.networkHandler.sendPacket(
                             PlaySoundS2CPacket(
                                 SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE,

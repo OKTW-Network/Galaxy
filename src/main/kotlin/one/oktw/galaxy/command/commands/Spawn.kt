@@ -94,7 +94,7 @@ class Spawn : Command {
                 player.refreshPositionAndAngles(spawnPosition, 0.0f, 0.0f)
             }
 
-            while (!world.isSpaceEmpty(player) && player.y < world.topY) {
+            while (!world.isSpaceEmpty(player) && player.y < world.topYInclusive) {
                 player.updatePosition(player.x, player.y + 1, player.z)
             }
             player.networkHandler.requestTeleport(player.x, player.y, player.z, player.yaw, player.pitch)

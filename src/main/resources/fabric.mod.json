@@ -23,8 +23,7 @@
     "galaxy.mixin.json",
     "tweak.mixin.json",
     "sponge.realtime.mixin.json",
-    "accessor.mixin.json",
-    "recipe.mixin.json"
+    "accessor.mixin.json"
   ],
   "depends": {
     "minecraft": "1.21.x",

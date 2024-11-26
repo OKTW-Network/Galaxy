@@ -44,7 +44,6 @@ import one.oktw.galaxy.network.ProxyAPIPayload
 import one.oktw.galaxy.network.ProxyChatPayload
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.proxy.api.ProxyAPI
-import one.oktw.galaxy.recipe.RecipeRegistry
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
@@ -78,9 +77,6 @@ class Main : DedicatedServerModInitializer, CoroutineScope {
 
         // Register CustomBlockEntity
         CustomBlock
-
-        // Recipe
-        RecipeRegistry.register()
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
             server = it as MinecraftDedicatedServer

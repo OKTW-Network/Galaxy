@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "CCC",
+    "CDO",
+    "CCC"
+  ],
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "D": "minecraft:dispenser",
+    "O": "minecraft:observer"
+  },
+  "result": {
+    "id": "minecraft:command_block",
+    "count": 1,
+    "components": {
+      "unbreakable": {
+        "show_in_tooltip": false
+      },
+      "attribute_modifiers": {
+        "modifiers": [],
+        "show_in_tooltip": false
+      },
+      "item_name": "{\"translate\": \"block.HARVEST\", \"color\": \"white\", \"italic\": false}",
+      "custom_model_data": 1010700,
+      "custom_data": {
+        "GalaxyData": {
+          "CustomItemIdentifier": "galaxy:item/block/harvest"
+        }
+      }
+    }
+  }
+}

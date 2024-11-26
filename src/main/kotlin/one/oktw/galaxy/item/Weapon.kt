@@ -19,15 +19,13 @@
 package one.oktw.galaxy.item
 
 import net.minecraft.item.Items.COMMAND_BLOCK
-import net.minecraft.nbt.NbtCompound
 import net.minecraft.text.Text
 import net.minecraft.text.Text.translatable
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
-import net.minecraft.util.math.MathHelper
 
 class Weapon private constructor(id: String, modelData: Int, private val name: String) :
-    CustomItem(Identifier.of("galaxy", "item/weapon/$id"), COMMAND_BLOCK, modelData) {
+    CustomItem(Identifier.of("galaxy", "item/weapon/$id"), COMMAND_BLOCK, modelData, 1) {
     override val cacheable = false
 
     companion object {
@@ -58,9 +56,4 @@ class Weapon private constructor(id: String, modelData: Int, private val name: S
     }
 
     override fun getName(): Text = translatable(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
-
-    override fun writeCustomNbt(nbt: NbtCompound) {
-        super.writeCustomNbt(nbt)
-        nbt.put("WeaponData", NbtCompound().apply { putUuid("id", MathHelper.randomUuid()) })
-    }
 }

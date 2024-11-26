@@ -31,7 +31,12 @@ import net.minecraft.util.Identifier
 import one.oktw.galaxy.util.CustomRegistry
 import one.oktw.galaxy.util.Registrable
 
-abstract class CustomItem(override val identifier: Identifier, private val baseItem: Item, private val modelData: Int) : Registrable {
+abstract class CustomItem(
+    override val identifier: Identifier,
+    private val baseItem: Item,
+    private val modelData: Int,
+    private val maxStackSize: Int = 64
+) : Registrable {
     companion object {
         val registry = CustomRegistry<CustomItem>()
 
@@ -69,6 +74,7 @@ abstract class CustomItem(override val identifier: Identifier, private val baseI
             set(DataComponentTypes.UNBREAKABLE, UnbreakableComponent(false))
             set(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent(emptyList(), false))
             set(DataComponentTypes.ITEM_NAME, this@CustomItem.getName())
+            set(DataComponentTypes.MAX_STACK_SIZE, maxStackSize)
 
             // Galaxy Data
             val galaxyNbt = CustomItemHelper.getNbt(this)

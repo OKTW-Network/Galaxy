@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "RDL",
+    "ICI",
+    "LOR"
+  ],
+  "key": {
+    "R": "minecraft:redstone",
+    "D": "minecraft:diamond",
+    "L": "minecraft:lapis_lazuli",
+    "I": "minecraft:iron_ingot",
+    "C": "minecraft:crafting_table",
+    "O": "minecraft:obsidian"
+  },
+  "result": {
+    "id": "minecraft:command_block",
+    "count": 1,
+    "components": {
+      "unbreakable": {
+        "show_in_tooltip": false
+      },
+      "attribute_modifiers": {
+        "modifiers": [],
+        "show_in_tooltip": false
+      },
+      "item_name": "{\"translate\": \"block.HT_CRAFTING_TABLE\", \"color\": \"white\", \"italic\": false}",
+      "custom_model_data": 1010100,
+      "custom_data": {
+        "GalaxyData": {
+          "CustomItemIdentifier": "galaxy:item/block/ht_crafting_table"
+        }
+      }
+    }
+  }
+}

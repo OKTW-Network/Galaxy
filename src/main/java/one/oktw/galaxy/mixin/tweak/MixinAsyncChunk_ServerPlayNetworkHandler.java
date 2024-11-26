@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
+import net.minecraft.entity.player.PlayerPosition;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -60,8 +61,8 @@ public abstract class MixinAsyncChunk_ServerPlayNetworkHandler {
         }
     }
 
-    @Inject(method = "requestTeleport(DDDFFLjava/util/Set;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;updatePositionAndAngles(DDDFF)V", shift = At.Shift.AFTER))
-    private void onTeleport(double x, double y, double z, float yaw, float pitch, Set<PositionFlag> set, CallbackInfo ci) {
+    @Inject(method = "requestTeleport(Lnet/minecraft/entity/player/PlayerPosition;Ljava/util/Set;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;setPosition(Lnet/minecraft/entity/player/PlayerPosition;Ljava/util/Set;)V", shift = At.Shift.AFTER))
+    private void onTeleport(PlayerPosition pos, Set<PositionFlag> flags, CallbackInfo ci) {
         ServerWorld world = player.getServerWorld();
         if (!world.getPlayers().contains(player)) return;
         world.getChunkManager().updatePosition(this.player);

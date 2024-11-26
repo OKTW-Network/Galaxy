@@ -1,0 +1,35 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "GGG",
+    "GCG",
+    "TST"
+  ],
+  "key": {
+    "G": "minecraft:glass",
+    "C": "minecraft:cactus",
+    "T": "minecraft:terracotta",
+    "S": "#minecraft:sand"
+  },
+  "result": {
+    "id": "minecraft:command_block",
+    "count": 1,
+    "components": {
+      "unbreakable": {
+        "show_in_tooltip": false
+      },
+      "attribute_modifiers": {
+        "modifiers": [],
+        "show_in_tooltip": false
+      },
+      "item_name": "{\"translate\": \"block.TRASHCAN\", \"color\": \"white\", \"italic\": false}",
+      "custom_model_data": 1010700,
+      "custom_data": {
+        "GalaxyData": {
+          "CustomItemIdentifier": "galaxy:item/block/trashcan"
+        }
+      }
+    }
+  }
+}

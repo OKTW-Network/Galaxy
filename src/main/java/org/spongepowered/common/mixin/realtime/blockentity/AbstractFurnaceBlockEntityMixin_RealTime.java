@@ -98,7 +98,7 @@ public abstract class AbstractFurnaceBlockEntityMixin_RealTime {
             ),
             to = @At(
                 value = "INVOKE",
-                target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z"
+                target = "Lnet/minecraft/server/world/ServerWorld;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z"
             )
         )
     )

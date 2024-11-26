@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,6 +22,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.advancement.criterion.Criteria
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
 import one.oktw.galaxy.block.CustomBlockHelper
 import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
@@ -62,7 +63,7 @@ class BlockEvents {
             val result = blockEntity.onClick(player, packet.hand, hitResult)
             if (result.isAccepted) {
                 Criteria.ITEM_USED_ON_BLOCK.trigger(player, hitResult.blockPos, player.getStackInHand(packet.hand))
-                event.swing = result.shouldSwingHand()
+                event.swing = (result as? ActionResult.Success)?.swingSource() == ActionResult.SwingSource.SERVER
                 usedLock[player] = player.server.ticks
             }
         }

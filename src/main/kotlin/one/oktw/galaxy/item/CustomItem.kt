@@ -20,7 +20,6 @@ package one.oktw.galaxy.item
 
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.AttributeModifiersComponent
-import net.minecraft.component.type.CustomModelDataComponent
 import net.minecraft.component.type.NbtComponent
 import net.minecraft.component.type.UnbreakableComponent
 import net.minecraft.item.Item
@@ -70,7 +69,8 @@ abstract class CustomItem(
         if (cacheable && this::cacheItemStack.isInitialized) return cacheItemStack.copy()
 
         return ItemStack(baseItem).apply {
-            set(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelDataComponent(modelData))
+            // FIXME: Change to new item model
+            // set(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelDataComponent(modelData))
             set(DataComponentTypes.UNBREAKABLE, UnbreakableComponent(false))
             set(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent(emptyList(), false))
             set(DataComponentTypes.ITEM_NAME, this@CustomItem.getName())

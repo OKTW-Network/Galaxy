@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2024
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -25,17 +25,17 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(AbstractFurnaceBlockEntity.class)
 public interface AbstractFurnaceBlockEntityAccessor {
     @Accessor
-    int getBurnTime();
+    int getLitTimeRemaining();
 
     @Accessor
-    void setBurnTime(int i);
+    void setLitTimeRemaining(int i);
 
     @Accessor
-    int getCookTime();
+    int getCookingTimeSpent();
 
     @Accessor
-    void setCookTime(int i);
+    void setCookingTimeSpent(int i);
 
     @Accessor
-    int getCookTimeTotal();
+    int getCookingTotalTime();
 }

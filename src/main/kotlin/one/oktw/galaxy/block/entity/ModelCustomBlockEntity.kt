@@ -53,7 +53,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         set(direction) {
             if (facing != null && direction != null && direction in allowedFacing) {
                 field = direction
-                (world as? ServerWorld)?.getEntity(entityUUID)?.yaw = direction.asRotation()
+                (world as? ServerWorld)?.getEntity(entityUUID)?.yaw = direction.positiveHorizontalDegrees
             }
         }
     open val allowedFacing: List<Direction> = emptyList()
@@ -93,7 +93,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
 
     private fun spawnEntity() {
         val entity: ArmorStandEntity = EntityType.getEntityFromNbt(armorStandNbt, world, SpawnReason.COMMAND).get() as ArmorStandEntity
-        entity.refreshPositionAndAngles(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, facing?.asRotation() ?: 0.0F, 0.0F)
+        entity.refreshPositionAndAngles(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, facing?.positiveHorizontalDegrees ?: 0.0F, 0.0F)
         entity.equipStack(EquipmentSlot.HEAD, modelItem)
         entity.addCommandTag("BLOCK")
         entity.addCommandTag(getId().toString())

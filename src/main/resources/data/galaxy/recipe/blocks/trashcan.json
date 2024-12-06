@@ -24,7 +24,7 @@
         "show_in_tooltip": false
       },
       "item_name": "{\"translate\": \"block.TRASHCAN\", \"color\": \"white\", \"italic\": false}",
-      "custom_model_data": 1010700,
+      "item_model": "galaxy:item/block/trashcan",
       "custom_data": {
         "GalaxyData": {
           "CustomItemIdentifier": "galaxy:item/block/trashcan"

@@ -17,7 +17,7 @@
         "show_in_tooltip": false
       },
       "item_name": "{\"translate\": \"block.ELEVATOR\", \"color\": \"white\", \"italic\": false}",
-      "custom_model_data": 1010200,
+      "item_model": "galaxy:item/block/elevator",
       "custom_data": {
         "GalaxyData": {
           "CustomItemIdentifier": "galaxy:item/block/elevator"

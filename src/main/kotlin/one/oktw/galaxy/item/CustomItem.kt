@@ -20,6 +20,7 @@ package one.oktw.galaxy.item
 
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.AttributeModifiersComponent
+import net.minecraft.component.type.CustomModelDataComponent
 import net.minecraft.component.type.NbtComponent
 import net.minecraft.component.type.UnbreakableComponent
 import net.minecraft.item.Item
@@ -33,7 +34,8 @@ import one.oktw.galaxy.util.Registrable
 abstract class CustomItem(
     override val identifier: Identifier,
     private val baseItem: Item,
-    private val modelData: Int,
+    private val itemModel: Identifier = identifier,
+    private val customModelData: CustomModelDataComponent? = null,
     private val maxStackSize: Int = 64
 ) : Registrable {
     companion object {
@@ -69,12 +71,14 @@ abstract class CustomItem(
         if (cacheable && this::cacheItemStack.isInitialized) return cacheItemStack.copy()
 
         return ItemStack(baseItem).apply {
-            // FIXME: Change to new item model
-            // set(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelDataComponent(modelData))
+            set(DataComponentTypes.ITEM_MODEL, itemModel)
             set(DataComponentTypes.UNBREAKABLE, UnbreakableComponent(false))
             set(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent(emptyList(), false))
             set(DataComponentTypes.ITEM_NAME, this@CustomItem.getName())
             set(DataComponentTypes.MAX_STACK_SIZE, maxStackSize)
+            if (customModelData != null) {
+                set(DataComponentTypes.CUSTOM_MODEL_DATA, customModelData)
+            }
 
             // Galaxy Data
             val galaxyNbt = CustomItemHelper.getNbt(this)

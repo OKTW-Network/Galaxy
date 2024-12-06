@@ -23,7 +23,7 @@
         "show_in_tooltip": false
       },
       "item_name": "{\"translate\": \"block.HARVEST\", \"color\": \"white\", \"italic\": false}",
-      "custom_model_data": 1010700,
+      "item_model": "galaxy:item/block/harvest",
       "custom_data": {
         "GalaxyData": {
           "CustomItemIdentifier": "galaxy:item/block/harvest"

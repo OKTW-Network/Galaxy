@@ -22,7 +22,7 @@
         "show_in_tooltip": false
       },
       "item_name": "{\"translate\": \"item.Tool.CROWBAR\", \"color\": \"white\", \"italic\": false}",
-      "custom_model_data": 2010200,
+      "item_model": "galaxy:item/tool/crowbar",
       "custom_data": {
         "GalaxyData": {
           "CustomItemIdentifier": "galaxy:item/tool/crowbar"

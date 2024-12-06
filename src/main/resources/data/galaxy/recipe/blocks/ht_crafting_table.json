@@ -26,7 +26,7 @@
         "show_in_tooltip": false
       },
       "item_name": "{\"translate\": \"block.HT_CRAFTING_TABLE\", \"color\": \"white\", \"italic\": false}",
-      "custom_model_data": 1010100,
+      "item_model": "galaxy:item/block/ht_crafting_table",
       "custom_data": {
         "GalaxyData": {
           "CustomItemIdentifier": "galaxy:item/block/ht_crafting_table"

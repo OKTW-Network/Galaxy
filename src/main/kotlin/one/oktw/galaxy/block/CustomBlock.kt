@@ -37,7 +37,7 @@ open class CustomBlock(final override val identifier: Identifier, val baseBlock:
     protected val blockEntityType: BlockEntityType<CustomBlockEntity> = Registry.register(
         Registries.BLOCK_ENTITY_TYPE,
         identifier,
-        FabricBlockEntityTypeBuilder.create({ pos, _ -> createBlockEntity(pos) }, BARRIER).build(null)
+        FabricBlockEntityTypeBuilder.create({ pos, _ -> createBlockEntity(pos) }, BARRIER).build()
     )
 
     companion object {

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,7 +22,6 @@ import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.AttributeModifiersComponent
 import net.minecraft.component.type.CustomModelDataComponent
 import net.minecraft.component.type.NbtComponent
-import net.minecraft.component.type.UnbreakableComponent
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
@@ -62,7 +61,7 @@ abstract class CustomItem(
     }
 
     open fun readCustomNbt(nbt: NbtCompound): CustomItem {
-        require(nbt.getString("CustomItemIdentifier") == identifier.toString())
+        require(nbt.getString("CustomItemIdentifier", "") == identifier.toString())
 
         return this
     }
@@ -72,8 +71,8 @@ abstract class CustomItem(
 
         return ItemStack(baseItem).apply {
             set(DataComponentTypes.ITEM_MODEL, itemModel)
-            set(DataComponentTypes.UNBREAKABLE, UnbreakableComponent(false))
-            set(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent(emptyList(), false))
+            set(DataComponentTypes.UNBREAKABLE, net.minecraft.util.Unit.INSTANCE)
+            set(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent(emptyList()))
             set(DataComponentTypes.ITEM_NAME, this@CustomItem.getName())
             set(DataComponentTypes.MAX_STACK_SIZE, maxStackSize)
             if (customModelData != null) {

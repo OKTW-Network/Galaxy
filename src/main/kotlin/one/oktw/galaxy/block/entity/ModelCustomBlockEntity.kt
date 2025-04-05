@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,6 +30,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import one.oktw.galaxy.block.listener.CustomBlockTickListener
+import one.oktw.galaxy.util.NbtUuidHelper
 import java.util.*
 
 open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, private val modelItem: ItemStack, facing: Direction? = null) :
@@ -72,15 +73,15 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
     override fun readNbt(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
         super.readNbt(nbt, registryLookup)
         val data = nbt.get("GalaxyData") as? NbtCompound ?: return
-        data.getUuid("ModelEntity")?.let { entityUUID = it }
-        data.getString("Facing")?.let { facing = Direction.byName(it) }
+        data.get("ModelEntity")?.let { entityUUID = NbtUuidHelper.toUuid(it) }
+        data.getString("Facing", "")?.let { facing = Direction.byId(it) }
     }
 
     override fun writeNbt(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
         super.writeNbt(nbt, registryLookup)
         val data = NbtCompound()
-        entityUUID?.let { data.putUuid("ModelEntity", it) }
-        facing?.let { data.putString("Facing", it.name) }
+        entityUUID?.let { data.put("ModelEntity", NbtUuidHelper.fromUuid(it)) }
+        facing?.let { data.putString("Facing", it.id) }
         if (!data.isEmpty) {
             nbt.put("GalaxyData", data)
         }

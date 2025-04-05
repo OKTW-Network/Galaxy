@@ -1,5 +1,5 @@
 name: Galaxy Actions
-on: [ push, pull_request, workflow_dispatch ]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   Build:
@@ -20,10 +20,10 @@ jobs:
       - name: JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '21'
+          distribution: "temurin"
+          java-version: "21"
       - name: Gradle
-        uses: gradle/actions/wrapper-validation@v3
+        uses: gradle/actions/wrapper-validation@v4
       - name: Build
         run: ./gradlew --no-daemon build
       - name: Upload-Artifact

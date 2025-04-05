@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,7 +21,6 @@ package one.oktw.galaxy.item
 import net.minecraft.item.Items.COMMAND_BLOCK
 import net.minecraft.text.Text
 import net.minecraft.text.Text.translatable
-import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
 class Upgrade private constructor(id: String, private val name: String, private val level: Int) :
@@ -67,5 +66,4 @@ class Upgrade private constructor(id: String, private val name: String, private 
 
     override fun getName(): Text = translatable("item.Upgrade.Item", translatable(name))
         .also { if (level > 0) it.append(" Lv.${level}") }
-        .styled { it.withColor(Formatting.WHITE).withItalic(false) }
 }

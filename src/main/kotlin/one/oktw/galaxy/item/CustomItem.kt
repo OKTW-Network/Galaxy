@@ -18,15 +18,18 @@
 
 package one.oktw.galaxy.item
 
+import it.unimi.dsi.fastutil.objects.ReferenceSortedSets
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.AttributeModifiersComponent
 import net.minecraft.component.type.CustomModelDataComponent
 import net.minecraft.component.type.NbtComponent
+import net.minecraft.component.type.TooltipDisplayComponent
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import net.minecraft.util.Rarity
 import one.oktw.galaxy.util.CustomRegistry
 import one.oktw.galaxy.util.Registrable
 
@@ -35,7 +38,8 @@ abstract class CustomItem(
     private val baseItem: Item,
     private val itemModel: Identifier = identifier,
     private val customModelData: CustomModelDataComponent? = null,
-    private val maxStackSize: Int = 64
+    private val maxStackSize: Int = 64,
+    private val hideTooltip: Boolean = false,
 ) : Registrable {
     companion object {
         val registry = CustomRegistry<CustomItem>()
@@ -74,7 +78,16 @@ abstract class CustomItem(
             set(DataComponentTypes.UNBREAKABLE, net.minecraft.util.Unit.INSTANCE)
             set(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent(emptyList()))
             set(DataComponentTypes.ITEM_NAME, this@CustomItem.getName())
+            set(DataComponentTypes.RARITY, Rarity.COMMON)
             set(DataComponentTypes.MAX_STACK_SIZE, maxStackSize)
+            set(DataComponentTypes.RARITY, Rarity.COMMON)
+            set(
+                DataComponentTypes.TOOLTIP_DISPLAY,
+                TooltipDisplayComponent(hideTooltip, ReferenceSortedSets.emptySet())
+                    .with(DataComponentTypes.ATTRIBUTE_MODIFIERS, true)
+                    .with(DataComponentTypes.UNBREAKABLE, true)
+                    .with(DataComponentTypes.ENCHANTMENTS, true)
+            )
             if (customModelData != null) {
                 set(DataComponentTypes.CUSTOM_MODEL_DATA, customModelData)
             }

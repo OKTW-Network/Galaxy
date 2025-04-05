@@ -14,14 +14,19 @@
     "count": 1,
     "components": {
       "max_stack_size": 1,
-      "unbreakable": {
-        "show_in_tooltip": false
+      "rarity": "common",
+      "unbreakable": {},
+      "attribute_modifiers": [],
+      "tooltip_display": {
+        "hidden_components": [
+          "minecraft:attribute_modifiers",
+          "minecraft:enchantments",
+          "minecraft:unbreakable"
+        ]
       },
-      "attribute_modifiers": {
-        "modifiers": [],
-        "show_in_tooltip": false
+      "item_name": {
+        "translate": "item.Tool.CROWBAR"
       },
-      "item_name": "{\"translate\": \"item.Tool.CROWBAR\", \"color\": \"white\", \"italic\": false}",
       "item_model": "galaxy:item/tool/crowbar",
       "custom_data": {
         "GalaxyData": {

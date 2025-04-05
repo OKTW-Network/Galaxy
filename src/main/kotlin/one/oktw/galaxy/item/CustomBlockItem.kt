@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,7 +20,6 @@ package one.oktw.galaxy.item
 
 import net.minecraft.item.Items.COMMAND_BLOCK
 import net.minecraft.text.Text
-import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import one.oktw.galaxy.block.CustomBlock
 
@@ -42,5 +41,5 @@ class CustomBlockItem private constructor(private val id: String, private val na
         return CustomBlock.registry.get(Identifier.of("galaxy", "block/$id"))!!
     }
 
-    override fun getName(): Text? = name?.let(Text::translatable)?.styled { it.withColor(Formatting.WHITE).withItalic(false) }
+    override fun getName(): Text? = name?.let(Text::translatable)
 }

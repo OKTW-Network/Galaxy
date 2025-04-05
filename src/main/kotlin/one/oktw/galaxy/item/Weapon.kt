@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,7 +21,6 @@ package one.oktw.galaxy.item
 import net.minecraft.item.Items.COMMAND_BLOCK
 import net.minecraft.text.Text
 import net.minecraft.text.Text.translatable
-import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
 class Weapon private constructor(id: String, private val name: String) :
@@ -55,5 +54,5 @@ class Weapon private constructor(id: String, private val name: String) :
         val SWORD_NANOSABER_SCABBARD = registry.register(Weapon("sword_nanosaber_scabbard", "item.Weapon.NANOSABER.SCABARD"))
     }
 
-    override fun getName(): Text = translatable(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
+    override fun getName(): Text = translatable(name)
 }

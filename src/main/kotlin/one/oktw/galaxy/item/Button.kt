@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -102,5 +102,5 @@ class Button private constructor(id: String) : CustomItem(Identifier.of("galaxy"
         val DISABLED_CHECK_MARK = registry.register(Button("disabled_check_mark"))
     }
 
-    override fun getName(): Text = Text.literal("").styled { it.withItalic(false) }
+    override fun getName(): Text = Text.literal("")
 }

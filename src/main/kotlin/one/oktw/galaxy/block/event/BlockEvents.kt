@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -64,7 +64,7 @@ class BlockEvents {
             if (result.isAccepted) {
                 Criteria.ITEM_USED_ON_BLOCK.trigger(player, hitResult.blockPos, player.getStackInHand(packet.hand))
                 event.swing = (result as? ActionResult.Success)?.swingSource() == ActionResult.SwingSource.SERVER
-                usedLock[player] = player.server.ticks
+                usedLock[player] = player.server?.ticks
             }
         }
     }
@@ -77,18 +77,18 @@ class BlockEvents {
         // Place custom block
         if (CustomBlockHelper.place(ItemPlacementContext(event.context))) {
             event.swing = true
-            usedLock[player] = player.server.ticks
+            usedLock[player] = player.server?.ticks
             return
         }
 
         // Crowbar
         if (player.isSneaking && CustomItemHelper.getItem(item) == Tool.CROWBAR) {
-            val world = player.serverWorld
+            val world = player.world.toServerWorld()
             val blockPos = event.context.blockPos
             if (world.getBlockEntity(blockPos) !is ModelCustomBlockEntity) return // Check is custom block
             CustomBlockHelper.destroyAndDrop(world, blockPos)
             event.swing = true
-            usedLock[player] = player.server.ticks
+            usedLock[player] = player.server?.ticks
         }
     }
 

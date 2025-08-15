@@ -1,8 +1,5 @@
 queue_rules:
   - name: default
-    conditions:
-      - check-success=Build
-      - check-success=Docker-image
 
 pull_request_rules:
   - name: Automatic merge on approval

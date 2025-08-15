@@ -1,5 +1,9 @@
 queue_rules:
   - name: default
+    queue_conditions:
+    - and:
+        - check-success = Docker-image
+        - check-success = Build
 
 merge_queue:
   max_parallel_checks: 1

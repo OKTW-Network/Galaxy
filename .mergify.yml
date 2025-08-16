@@ -1,8 +1,12 @@
 queue_rules:
   - name: default
-    conditions:
-      - check-success=Build
-      - check-success=Docker-image
+    queue_conditions:
+    - and:
+        - check-success = Docker-image
+        - check-success = Build
+
+merge_queue:
+  max_parallel_checks: 1
 
 pull_request_rules:
   - name: Automatic merge on approval

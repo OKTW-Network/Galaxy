@@ -15,15 +15,20 @@
     "count": 1,
     "components": {
       "max_stack_size": 1,
-      "unbreakable": {
-        "show_in_tooltip": false
+      "rarity": "common",
+      "unbreakable": {},
+      "attribute_modifiers": [],
+      "tooltip_display": {
+        "hidden_components": [
+          "minecraft:attribute_modifiers",
+          "minecraft:enchantments",
+          "minecraft:unbreakable"
+        ]
       },
-      "attribute_modifiers": {
-        "modifiers": [],
-        "show_in_tooltip": false
+      "item_name": {
+        "translate": "item.Tool.WRENCH"
       },
-      "item_name": "{\"translate\": \"item.Tool.WRENCH\", \"color\": \"white\", \"italic\": false}",
-      "custom_model_data": 2010100,
+      "item_model": "galaxy:item/tool/wrench",
       "custom_data": {
         "GalaxyData": {
           "CustomItemIdentifier": "galaxy:item/tool/wrench"

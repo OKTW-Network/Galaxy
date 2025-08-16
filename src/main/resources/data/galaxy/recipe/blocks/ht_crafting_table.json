@@ -18,15 +18,20 @@
     "id": "minecraft:command_block",
     "count": 1,
     "components": {
-      "unbreakable": {
-        "show_in_tooltip": false
+      "rarity": "common",
+      "unbreakable": {},
+      "attribute_modifiers": [],
+      "tooltip_display": {
+        "hidden_components": [
+          "minecraft:attribute_modifiers",
+          "minecraft:enchantments",
+          "minecraft:unbreakable"
+        ]
       },
-      "attribute_modifiers": {
-        "modifiers": [],
-        "show_in_tooltip": false
+      "item_name": {
+        "translate": "block.HT_CRAFTING_TABLE"
       },
-      "item_name": "{\"translate\": \"block.HT_CRAFTING_TABLE\", \"color\": \"white\", \"italic\": false}",
-      "custom_model_data": 1010100,
+      "item_model": "galaxy:item/block/ht_crafting_table",
       "custom_data": {
         "GalaxyData": {
           "CustomItemIdentifier": "galaxy:item/block/ht_crafting_table"

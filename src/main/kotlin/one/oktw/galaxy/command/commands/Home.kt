@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -31,6 +31,7 @@ import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.world.TeleportTarget
+import net.minecraft.world.World.OVERWORLD
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import java.util.*
@@ -56,7 +57,7 @@ class Home : Command {
         lock += player.uuid
 
         // Check Stage
-        val spawnPointPosition = player.spawnPointPosition
+        val spawnPointPosition = player.respawn?.pos
         if (spawnPointPosition == null) {
             player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
             lock -= player.uuid
@@ -85,8 +86,8 @@ class Home : Command {
 
                 player.teleportTo(realTeleportTarget)
 
-                val realSpawnPointPosition = player.spawnPointPosition
-                val realWorld = source.server.getWorld(player.spawnPointDimension)
+                val realSpawnPointPosition = player.respawn?.pos
+                val realWorld = source.server.getWorld(player.respawn?.dimension ?: OVERWORLD)
                 if (realWorld != null && realSpawnPointPosition != null) {
                     val blockState = realWorld.getBlockState(realSpawnPointPosition)
                     if (!player.notInAnyWorld && blockState.isOf(Blocks.RESPAWN_ANCHOR)) {

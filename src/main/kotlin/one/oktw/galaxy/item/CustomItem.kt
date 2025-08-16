@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,24 +18,28 @@
 
 package one.oktw.galaxy.item
 
+import it.unimi.dsi.fastutil.objects.ReferenceSortedSets
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.AttributeModifiersComponent
 import net.minecraft.component.type.CustomModelDataComponent
 import net.minecraft.component.type.NbtComponent
-import net.minecraft.component.type.UnbreakableComponent
+import net.minecraft.component.type.TooltipDisplayComponent
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import net.minecraft.util.Rarity
 import one.oktw.galaxy.util.CustomRegistry
 import one.oktw.galaxy.util.Registrable
 
 abstract class CustomItem(
     override val identifier: Identifier,
     private val baseItem: Item,
-    private val modelData: Int,
-    private val maxStackSize: Int = 64
+    private val itemModel: Identifier = identifier,
+    private val customModelData: CustomModelDataComponent? = null,
+    private val maxStackSize: Int = 64,
+    private val hideTooltip: Boolean = false,
 ) : Registrable {
     companion object {
         val registry = CustomRegistry<CustomItem>()
@@ -61,7 +65,7 @@ abstract class CustomItem(
     }
 
     open fun readCustomNbt(nbt: NbtCompound): CustomItem {
-        require(nbt.getString("CustomItemIdentifier") == identifier.toString())
+        require(nbt.getString("CustomItemIdentifier", "") == identifier.toString())
 
         return this
     }
@@ -70,11 +74,23 @@ abstract class CustomItem(
         if (cacheable && this::cacheItemStack.isInitialized) return cacheItemStack.copy()
 
         return ItemStack(baseItem).apply {
-            set(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelDataComponent(modelData))
-            set(DataComponentTypes.UNBREAKABLE, UnbreakableComponent(false))
-            set(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent(emptyList(), false))
+            set(DataComponentTypes.ITEM_MODEL, itemModel)
+            set(DataComponentTypes.UNBREAKABLE, net.minecraft.util.Unit.INSTANCE)
+            set(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent(emptyList()))
             set(DataComponentTypes.ITEM_NAME, this@CustomItem.getName())
+            set(DataComponentTypes.RARITY, Rarity.COMMON)
             set(DataComponentTypes.MAX_STACK_SIZE, maxStackSize)
+            set(DataComponentTypes.RARITY, Rarity.COMMON)
+            set(
+                DataComponentTypes.TOOLTIP_DISPLAY,
+                TooltipDisplayComponent(hideTooltip, ReferenceSortedSets.emptySet())
+                    .with(DataComponentTypes.ATTRIBUTE_MODIFIERS, true)
+                    .with(DataComponentTypes.UNBREAKABLE, true)
+                    .with(DataComponentTypes.ENCHANTMENTS, true)
+            )
+            if (customModelData != null) {
+                set(DataComponentTypes.CUSTOM_MODEL_DATA, customModelData)
+            }
 
             // Galaxy Data
             val galaxyNbt = CustomItemHelper.getNbt(this)

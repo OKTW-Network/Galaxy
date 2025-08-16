@@ -15,15 +15,20 @@
     "id": "minecraft:command_block",
     "count": 1,
     "components": {
-      "unbreakable": {
-        "show_in_tooltip": false
+      "rarity": "common",
+      "unbreakable": {},
+      "attribute_modifiers": [],
+      "tooltip_display": {
+        "hidden_components": [
+          "minecraft:attribute_modifiers",
+          "minecraft:enchantments",
+          "minecraft:unbreakable"
+        ]
       },
-      "attribute_modifiers": {
-        "modifiers": [],
-        "show_in_tooltip": false
+      "item_name": {
+        "translate": "block.HARVEST"
       },
-      "item_name": "{\"translate\": \"block.HARVEST\", \"color\": \"white\", \"italic\": false}",
-      "custom_model_data": 1010700,
+      "item_model": "galaxy:item/block/harvest",
       "custom_data": {
         "GalaxyData": {
           "CustomItemIdentifier": "galaxy:item/block/harvest"

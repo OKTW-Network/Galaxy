@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,17 +21,16 @@ package one.oktw.galaxy.item
 import net.minecraft.item.Items.COMMAND_BLOCK
 import net.minecraft.text.Text
 import net.minecraft.text.Text.translatable
-import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
-class Tool private constructor(id: String, modelData: Int, private val name: String) :
-    CustomItem(Identifier.of("galaxy", "item/tool/$id"), COMMAND_BLOCK, modelData, 1) {
+class Tool private constructor(id: String, private val name: String) :
+    CustomItem(Identifier.of("galaxy", "item/tool/$id"), COMMAND_BLOCK, maxStackSize = 1) {
     override val cacheable = false
 
     companion object {
-        val WRENCH = registry.register(Tool("wrench", 2010100, "item.Tool.WRENCH"))
-        val CROWBAR = registry.register(Tool("crowbar", 2010200, "item.Tool.CROWBAR"))
+        val WRENCH = registry.register(Tool("wrench", "item.Tool.WRENCH"))
+        val CROWBAR = registry.register(Tool("crowbar", "item.Tool.CROWBAR"))
     }
 
-    override fun getName(): Text = translatable(name).styled { it.withColor(Formatting.WHITE).withItalic(false) }
+    override fun getName(): Text = translatable(name)
 }

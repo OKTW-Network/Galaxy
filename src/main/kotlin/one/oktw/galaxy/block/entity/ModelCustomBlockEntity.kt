@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -30,6 +30,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import one.oktw.galaxy.block.listener.CustomBlockTickListener
+import one.oktw.galaxy.util.NbtUuidHelper
 import java.util.*
 
 open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, private val modelItem: ItemStack, facing: Direction? = null) :
@@ -53,7 +54,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         set(direction) {
             if (facing != null && direction != null && direction in allowedFacing) {
                 field = direction
-                (world as? ServerWorld)?.getEntity(entityUUID)?.yaw = direction.asRotation()
+                (world as? ServerWorld)?.getEntity(entityUUID)?.yaw = direction.positiveHorizontalDegrees
             }
         }
     open val allowedFacing: List<Direction> = emptyList()
@@ -72,15 +73,15 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
     override fun readNbt(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
         super.readNbt(nbt, registryLookup)
         val data = nbt.get("GalaxyData") as? NbtCompound ?: return
-        data.getUuid("ModelEntity")?.let { entityUUID = it }
-        data.getString("Facing")?.let { facing = Direction.byName(it) }
+        data.get("ModelEntity")?.let { entityUUID = NbtUuidHelper.toUuid(it) }
+        data.getString("Facing", "")?.let { facing = Direction.byId(it) }
     }
 
     override fun writeNbt(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
         super.writeNbt(nbt, registryLookup)
         val data = NbtCompound()
-        entityUUID?.let { data.putUuid("ModelEntity", it) }
-        facing?.let { data.putString("Facing", it.name) }
+        entityUUID?.let { data.put("ModelEntity", NbtUuidHelper.fromUuid(it)) }
+        facing?.let { data.putString("Facing", it.id) }
         if (!data.isEmpty) {
             nbt.put("GalaxyData", data)
         }
@@ -93,7 +94,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
 
     private fun spawnEntity() {
         val entity: ArmorStandEntity = EntityType.getEntityFromNbt(armorStandNbt, world, SpawnReason.COMMAND).get() as ArmorStandEntity
-        entity.refreshPositionAndAngles(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, facing?.asRotation() ?: 0.0F, 0.0F)
+        entity.refreshPositionAndAngles(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, facing?.positiveHorizontalDegrees ?: 0.0F, 0.0F)
         entity.equipStack(EquipmentSlot.HEAD, modelItem)
         entity.addCommandTag("BLOCK")
         entity.addCommandTag(getId().toString())

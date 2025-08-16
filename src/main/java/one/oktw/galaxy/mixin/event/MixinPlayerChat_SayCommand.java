@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -32,6 +32,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Objects;
+
 @Mixin(SayCommand.class)
 public class MixinPlayerChat_SayCommand {
     @Inject(
@@ -53,7 +55,7 @@ public class MixinPlayerChat_SayCommand {
         assert player != null;
         if (EventManager.safeEmit(new PlayerChatEvent(player, Text.translatable("chat.type.announcement", player.getDisplayName(), message.getContent()))).getCancel()) {
             ci.cancel();
-            player.server.logChatMessage(message.getContent(), MessageType.params(MessageType.SAY_COMMAND, serverCommandSource), "Canceled");
+            Objects.requireNonNull(player.getServer()).logChatMessage(message.getContent(), MessageType.params(MessageType.SAY_COMMAND, serverCommandSource), "Canceled");
         }
     }
 }

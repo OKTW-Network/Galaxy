@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,10 +18,11 @@
 
 package one.oktw.galaxy.chat
 
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
+import com.google.gson.GsonBuilder
+import com.mojang.serialization.JsonOps
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.createS2CPacket
 import net.minecraft.registry.DynamicRegistryManager
-import net.minecraft.text.Text
+import net.minecraft.text.TextCodecs
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerChatEvent
@@ -34,6 +35,9 @@ class Exchange {
     fun handleChat(event: PlayerChatEvent) {
         if (Main.selfUUID == ProxyAPI.dummyUUID) return
 
+        val gson = GsonBuilder().disableHtmlEscaping().create()
+        val registries = DynamicRegistryManager.EMPTY
+
         event.cancel = true
 
         event.player.networkHandler.sendPacket(
@@ -41,7 +45,11 @@ class Exchange {
                 ProxyChatPayload(
                     MessageSend(
                         sender = event.player.uuid,
-                        message = Text.Serialization.toJsonString(event.message, DynamicRegistryManager.EMPTY),
+                        message = gson.toJson(
+                            TextCodecs.CODEC
+                                .encodeStart(registries.getOps(JsonOps.INSTANCE), event.message)
+                                .orThrow
+                        ),
                         targets = listOf(ProxyAPI.globalChatChannel)
                     )
                 )

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -57,7 +57,7 @@ class AngelBlock {
             playerPosition.z + playerLookVec.z * 2
         )
         if (allowReplaceBlocks.contains(player.world.getBlockState(BlockPos.ofFloored(placePosition)).block)) {
-            CustomBlockHelper.place(player.serverWorld, BlockPos.ofFloored(placePosition), CustomBlock.ANGEL_BLOCK)
+            CustomBlockHelper.place(player.world.toServerWorld(), BlockPos.ofFloored(placePosition), CustomBlock.ANGEL_BLOCK)
                 .run {
                     if (!player.isCreative) player.setStackInHand(hand, player.getStackInHand(hand).also { it.decrement(1) })
                 }
@@ -88,8 +88,8 @@ class AngelBlock {
             (player.world.getBlockEntity(blockPos) as? CustomBlockEntity)?.getId() == CustomBlock.ANGEL_BLOCK.identifier &&
             !justBroke.contains(player)
         ) {
-            CustomBlockHelper.destroyAndDrop(player.serverWorld, blockPos)
-            player.serverWorld.playSound(null, blockPos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
+            CustomBlockHelper.destroyAndDrop(player.world.toServerWorld(), blockPos)
+            player.world.toServerWorld().playSound(null, blockPos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
             justBroke.add(player)
         }
     }

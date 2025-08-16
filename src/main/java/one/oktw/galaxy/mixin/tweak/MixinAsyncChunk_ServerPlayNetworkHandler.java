@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -54,7 +54,7 @@ public abstract class MixinAsyncChunk_ServerPlayNetworkHandler {
 
         int x = ChunkSectionPos.getSectionCoord(clampHorizontal(packet.getX(this.player.getX())));
         int z = ChunkSectionPos.getSectionCoord(clampHorizontal(packet.getZ(this.player.getZ())));
-        if (!player.getServerWorld().getChunkManager().isTickingFutureReady(ChunkPos.toLong(x, z))) {
+        if (!player.getWorld().toServerWorld().getChunkManager().isTickingFutureReady(ChunkPos.toLong(x, z))) {
             player.setVelocity(Vec3d.ZERO);
             requestTeleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYaw(), this.player.getPitch());
             ci.cancel();
@@ -63,7 +63,7 @@ public abstract class MixinAsyncChunk_ServerPlayNetworkHandler {
 
     @Inject(method = "requestTeleport(Lnet/minecraft/entity/player/PlayerPosition;Ljava/util/Set;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;setPosition(Lnet/minecraft/entity/player/PlayerPosition;Ljava/util/Set;)V", shift = At.Shift.AFTER))
     private void onTeleport(PlayerPosition pos, Set<PositionFlag> flags, CallbackInfo ci) {
-        ServerWorld world = player.getServerWorld();
+        ServerWorld world = player.getWorld().toServerWorld();
         if (!world.getPlayers().contains(player)) return;
         world.getChunkManager().updatePosition(this.player);
     }

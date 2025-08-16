@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -60,10 +60,10 @@ class Spawn : Command {
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
 
-            val player = originPlayer.server.playerManager.getPlayer(originPlayer.uuid) ?: return@launch
+            val player = originPlayer.server?.playerManager?.getPlayer(originPlayer.uuid) ?: return@launch
             player.sendMessage(Text.translatable("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
 
-            val world = player.serverWorld
+            val world = player.world.toServerWorld()
             val type = world.registryKey
 
             if (type == World.NETHER) {

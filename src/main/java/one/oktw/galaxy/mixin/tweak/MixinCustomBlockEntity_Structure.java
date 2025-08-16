@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -26,6 +26,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.structure.StructureTemplate;
+import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
@@ -43,10 +44,10 @@ import java.util.List;
 public class MixinCustomBlockEntity_Structure {
     @Inject(method = "place",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/world/ServerWorldAccess;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z", ordinal = 1), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void hackPlace(ServerWorldAccess world, BlockPos pos, BlockPos pivot, StructurePlacementData placementData, Random random, int flags, CallbackInfoReturnable<Boolean> cir, List<StructureTemplate.StructureBlockInfo> list, BlockBox blockBox, List<BlockPos> list2, List<BlockPos> list3, List<Pair<BlockPos, NbtCompound>> list4, int j, int k, int l, int m, int n, int o, List<StructureTemplate.StructureBlockInfo> list5, Iterator<StructureTemplate.StructureBlockInfo> var19, StructureTemplate.StructureBlockInfo structureBlockInfo, BlockPos blockPos2, FluidState fluidState, BlockState blockState) {
+    private void hackPlace(ServerWorldAccess world, BlockPos pos, BlockPos pivot, StructurePlacementData placementData, Random random, int flags, CallbackInfoReturnable<Boolean> cir, List<StructureTemplate.StructureBlockInfo> list, BlockBox blockBox, List<BlockPos> list2, List<BlockPos> list3, List<Pair<BlockPos, NbtCompound>> list4, int i, int j, int k, int l, int m, int n, List<StructureTemplate.StructureBlockInfo> list5, ErrorReporter.Logging logging, Iterator<StructureTemplate.StructureBlockInfo> var20, StructureTemplate.StructureBlockInfo structureBlockInfo, BlockPos blockPos, FluidState fluidState, BlockState blockState) {
         // Workaround structure barrier bug
         if (structureBlockInfo.state().getBlock() == Blocks.BARRIER) {
-            world.setBlockState(blockPos2, Blocks.AIR.getDefaultState(), Block.NO_REDRAW | Block.FORCE_STATE);
+            world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), Block.NO_REDRAW | Block.FORCE_STATE);
         }
     }
 }

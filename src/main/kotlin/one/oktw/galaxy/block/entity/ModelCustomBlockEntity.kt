@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy.block.entity
 
+import com.mojang.logging.LogUtils
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.EquipmentSlot
@@ -25,12 +26,15 @@ import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.registry.RegistryWrapper
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.storage.NbtReadView
+import net.minecraft.storage.ReadView
+import net.minecraft.storage.WriteView
+import net.minecraft.util.ErrorReporter
+import net.minecraft.util.Uuids
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import one.oktw.galaxy.block.listener.CustomBlockTickListener
-import one.oktw.galaxy.util.NbtUuidHelper
 import java.util.*
 
 open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, private val modelItem: ItemStack, facing: Direction? = null) :
@@ -70,21 +74,18 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         }
     }
 
-    override fun readNbt(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        super.readNbt(nbt, registryLookup)
-        val data = nbt.get("GalaxyData") as? NbtCompound ?: return
-        data.get("ModelEntity")?.let { entityUUID = NbtUuidHelper.toUuid(it) }
+    override fun readData(view: ReadView) {
+        super.readData(view)
+        val data = view.getReadView("GalaxyData") ?: return
+        data.getOptionalIntArray("ModelEntity")?.let { entityUUID = Uuids.toUuid(it.get()) }
         data.getString("Facing", "")?.let { facing = Direction.byId(it) }
     }
 
-    override fun writeNbt(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        super.writeNbt(nbt, registryLookup)
-        val data = NbtCompound()
-        entityUUID?.let { data.put("ModelEntity", NbtUuidHelper.fromUuid(it)) }
+    override fun writeData(view: WriteView) {
+        super.writeData(view)
+        val data = view.get("GalaxyData")
+        entityUUID?.let { data.putIntArray("ModelEntity", Uuids.toIntArray(it)) }
         facing?.let { data.putString("Facing", it.id) }
-        if (!data.isEmpty) {
-            nbt.put("GalaxyData", data)
-        }
     }
 
     override fun markRemoved() {
@@ -93,7 +94,12 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
     }
 
     private fun spawnEntity() {
-        val entity: ArmorStandEntity = EntityType.getEntityFromNbt(armorStandNbt, world, SpawnReason.COMMAND).get() as ArmorStandEntity
+        val logging = ErrorReporter.Logging(LogUtils.getLogger())
+        val entity: ArmorStandEntity = EntityType.getEntityFromData(
+            NbtReadView.create(logging, world?.registryManager, armorStandNbt),
+            world,
+            SpawnReason.COMMAND
+        ).get() as ArmorStandEntity
         entity.refreshPositionAndAngles(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, facing?.positiveHorizontalDegrees ?: 0.0F, 0.0F)
         entity.equipStack(EquipmentSlot.HEAD, modelItem)
         entity.addCommandTag("BLOCK")

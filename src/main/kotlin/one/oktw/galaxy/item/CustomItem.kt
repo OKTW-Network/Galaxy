@@ -46,7 +46,6 @@ abstract class CustomItem(
 
         init {
             Button
-            Gui
             Material
             Tool
             Upgrade

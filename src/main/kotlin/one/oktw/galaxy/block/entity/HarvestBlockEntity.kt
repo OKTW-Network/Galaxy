@@ -43,7 +43,6 @@ import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.block.listener.CustomBlockTickListener
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
-import one.oktw.galaxy.item.Gui
 import one.oktw.galaxy.util.HarvestUtil
 
 class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) :
@@ -65,8 +64,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         })
     }.build().apply {
         editInventory {
-            // Fill empty
-            fillAll(Gui.MAIN_FIELD.createItemStack())
+            // FIXME: GUI Background
         }
     }
     private var progress = 0

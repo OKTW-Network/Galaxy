@@ -39,7 +39,6 @@ import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
 import one.oktw.galaxy.item.Button
-import one.oktw.galaxy.item.Gui
 
 class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : ModelCustomBlockEntity(type, pos, modelItem),
     CustomBlockClickListener, Inventory {
@@ -50,7 +49,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         for (y in 4 until 6) for (x in 0 until 9) addSlot(x, y, Slot(this@TestGuiBlockEntity, i++, 0, 0))
     }.build().apply {
         editInventory {
-            fill(0 until 9, 1 until 4, Gui.MAIN_FIELD.createItemStack())
+            // FIXME: GUI Background
             set(4, 2, Button.CHECK_MARK.createItemStack())
         }
         addBinding(4, 2) {
@@ -62,7 +61,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         for (y in 0 until 3) for (x in 0 until 9) addSlot(x, y, Slot(this@TestGuiBlockEntity, i++, 0, 0))
     }.build().apply {
         editInventory {
-            fill(0 until 9, 3..3, Gui.MAIN_FIELD.createItemStack())
+            // FIXME: GUI Background
             set(4, 3, Button.CROSS_MARK.createItemStack().apply { this.set(DataComponentTypes.ITEM_NAME, Text.of("CLOSE ALL")) })
         }
         addBinding(4, 3) {

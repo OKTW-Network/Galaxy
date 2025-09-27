@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -58,6 +58,7 @@ class GUI private constructor(
         GENERIC_9X5 -> SimpleInventory(9 * 5)
         GENERIC_9X6 -> SimpleInventory(9 * 6)
         HOPPER -> SimpleInventory(5)
+        ANVIL -> SimpleInventory(3)
         else -> throw IllegalArgumentException("Unsupported container type: $type")
     }
     private val playerInventoryRange = inventory.size() until inventory.size() + 3 * 9
@@ -67,6 +68,8 @@ class GUI private constructor(
     private val inventoryUtils = InventoryUtils(type)
     private val openListener = ConcurrentHashMap.newKeySet<(PlayerEntity) -> Any>()
     private val closeListener = ConcurrentHashMap.newKeySet<(PlayerEntity) -> Any>()
+    var inputText: String = ""
+        private set
 
     override fun getDisplayName() = title
 
@@ -153,7 +156,7 @@ class GUI private constructor(
         }
     }
 
-    private inner class GuiContainer(syncId: Int, playerInventory: PlayerInventory) : ScreenHandler(type, syncId) {
+    inner class GuiContainer(syncId: Int, playerInventory: PlayerInventory) : ScreenHandler(type, syncId) {
         init {
             inventory.onOpen(playerInventory.player)
 
@@ -318,6 +321,11 @@ class GUI private constructor(
             }
 
             return inserted
+        }
+
+        fun updateInputText(input: String) {
+            inputText = input
+            updateToClient()
         }
     }
 }

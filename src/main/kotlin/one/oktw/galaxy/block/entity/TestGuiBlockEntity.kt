@@ -52,9 +52,13 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         editInventory {
             fill(0 until 9, 1 until 4, Gui.MAIN_FIELD.createItemStack())
             set(4, 2, Button.CHECK_MARK.createItemStack())
+            set(2, 2, Button.PLUS.createItemStack())
         }
         addBinding(4, 2) {
             GUISBackStackManager.openGUI(player, gui2)
+        }
+        addBinding(2, 2) {
+            GUISBackStackManager.openGUI(player, gui3)
         }
     }
     private val gui2 = GUI.Builder(ScreenHandlerType.GENERIC_9X4).setTitle(Text.of("Test GUI2")).blockEntity(this).apply {
@@ -67,6 +71,16 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         }
         addBinding(4, 3) {
             GUISBackStackManager.closeAll(player)
+        }
+    }
+    private val gui3 = GUI.Builder(ScreenHandlerType.ANVIL).setTitle(Text.literal("Test GUI3")).blockEntity(this).build().apply {
+        editInventory {
+            set(0, Gui.MAIN_FIELD.createItemStack())
+            set(1, Gui.MAIN_FIELD.createItemStack())
+            set(2, Button.CHECK_MARK.createItemStack())
+        }
+        addBinding(2) {
+            player.sendMessage(Text.literal(inputText))
         }
     }
 

@@ -31,10 +31,10 @@
       "item_name": {
         "translate": "block.HT_CRAFTING_TABLE"
       },
-      "item_model": "galaxy:item/block/ht_crafting_table",
+      "item_model": "galaxy:block/ht_crafting_table",
       "custom_data": {
         "GalaxyData": {
-          "CustomItemIdentifier": "galaxy:item/block/ht_crafting_table"
+          "CustomItemIdentifier": "galaxy:block/ht_crafting_table"
         }
       }
     }

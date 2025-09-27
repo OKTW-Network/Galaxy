@@ -24,7 +24,7 @@ import net.minecraft.text.Text.translatable
 import net.minecraft.util.Identifier
 
 class Weapon private constructor(id: String, private val name: String) :
-    CustomItem(Identifier.of("galaxy", "item/weapon/$id"), COMMAND_BLOCK, maxStackSize = 1) {
+    CustomItem(Identifier.of("galaxy", "weapon/$id"), COMMAND_BLOCK, maxStackSize = 1) {
     override val cacheable = false
 
     companion object {

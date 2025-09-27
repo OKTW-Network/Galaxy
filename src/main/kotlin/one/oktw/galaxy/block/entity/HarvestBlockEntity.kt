@@ -35,6 +35,7 @@ import net.minecraft.storage.WriteView
 import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
+import net.minecraft.util.Identifier
 import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
@@ -43,32 +44,33 @@ import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.block.listener.CustomBlockTickListener
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
-import one.oktw.galaxy.item.Gui
+import one.oktw.galaxy.item.Misc
 import one.oktw.galaxy.util.HarvestUtil
 
 class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) :
-    ModelCustomBlockEntity(type, pos, modelItem, facing = Direction.NORTH),
-    CustomBlockClickListener, SidedInventory, CustomBlockTickListener {
+    ModelCustomBlockEntity(type, pos, modelItem, facing = Direction.NORTH), CustomBlockClickListener, SidedInventory, CustomBlockTickListener {
     companion object {
         private val ALL_SLOT = intArrayOf(0, 1, 2, 3)
     }
 
     override val allowedFacing = listOf(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST)
     private val inventory = DefaultedList.ofSize(4, ItemStack.EMPTY)
-    private val gui = GUI.Builder(ScreenHandlerType.GENERIC_9X3).setTitle(Text.translatable("block.HARVEST")).blockEntity(this).apply {
-        var i = 0
-        addSlot(4, 0, object : Slot(this@HarvestBlockEntity, i++, 0, 0) { // Tool
-            override fun canInsert(item: ItemStack) = isHoe(item)
-        })
-        for (x in 3..5) addSlot(x, 2, object : Slot(this@HarvestBlockEntity, i++, 0, 0) { // Output
-            override fun canInsert(stack: ItemStack) = false
-        })
-    }.build().apply {
-        editInventory {
-            // Fill empty
-            fillAll(Gui.MAIN_FIELD.createItemStack())
+
+    private val gui = GUI.Builder(ScreenHandlerType.GENERIC_9X3).setTitle(Text.translatable("block.HARVEST"))
+        .setBackground("A", Identifier.of("galaxy", "gui_font/container_layout/harvest")).blockEntity(this).apply {
+            var i = 0
+            addSlot(4, 0, object : Slot(this@HarvestBlockEntity, i++, 0, 0) { // Tool
+                override fun canInsert(item: ItemStack) = isHoe(item)
+            })
+            for (x in 3..5) addSlot(x, 2, object : Slot(this@HarvestBlockEntity, i++, 0, 0) { // Output
+                override fun canInsert(stack: ItemStack) = false
+            })
+        }.build().apply {
+            editInventory {
+                // Fill empty
+                fillAll(Misc.PLACEHOLDER.createItemStack())
+            }
         }
-    }
     private var progress = 0
 
     override fun tick() {

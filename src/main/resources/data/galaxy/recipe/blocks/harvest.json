@@ -28,10 +28,10 @@
       "item_name": {
         "translate": "block.HARVEST"
       },
-      "item_model": "galaxy:item/block/harvest",
+      "item_model": "galaxy:block/harvest",
       "custom_data": {
         "GalaxyData": {
-          "CustomItemIdentifier": "galaxy:item/block/harvest"
+          "CustomItemIdentifier": "galaxy:block/harvest"
         }
       }
     }

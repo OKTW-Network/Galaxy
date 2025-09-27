@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -35,11 +35,15 @@ import net.minecraft.screen.slot.Slot
 import net.minecraft.screen.slot.SlotActionType
 import net.minecraft.screen.slot.SlotActionType.*
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.text.MutableText
 import net.minecraft.text.Text
+import net.minecraft.util.Formatting
+import net.minecraft.util.Identifier
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.gui.utils.InventoryEditor
 import one.oktw.galaxy.gui.utils.InventoryUtils
 import org.apache.logging.log4j.LogManager
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
@@ -50,6 +54,11 @@ class GUI private constructor(
     private val blockEntity: BlockEntity? = null
 ) :
     NamedScreenHandlerFactory {
+    companion object {
+        val GUI_FONT_SHIFT_START: Text = Text.literal("<").styled { it.withFont(Identifier.of("galaxy", "gui_font/shift")) }
+        val GUI_FONT_SHIFT_END: Text = Text.literal(";>").styled { it.withFont(Identifier.of("galaxy", "gui_font/shift")) }
+    }
+
     private val inventory = when (type) {
         GENERIC_9X1, GENERIC_3X3 -> SimpleInventory(9)
         GENERIC_9X2 -> SimpleInventory(9 * 2)
@@ -125,11 +134,22 @@ class GUI private constructor(
         private val logger = LogManager.getLogger()
         private val inventoryUtils = InventoryUtils(type)
         private var title: Text = Text.empty()
+        private var background: Optional<MutableText> = Optional.empty()
         private val slotBindings = HashMap<Int, Slot>()
         private var blockEntity: BlockEntity? = null
 
         fun setTitle(title: Text): Builder {
             this.title = title
+            return this
+        }
+
+        fun setBackground(char: String, font: Identifier): Builder {
+            val background = Text.empty()
+                .append(GUI_FONT_SHIFT_START)
+                .append(Text.literal(char).styled { it.withFont(font).withColor(Formatting.WHITE) })
+                .append(GUI_FONT_SHIFT_END)
+
+            this.background = Optional.of(background)
             return this
         }
 
@@ -149,6 +169,7 @@ class GUI private constructor(
         }
 
         fun build(): GUI {
+            val title = if (background.isPresent) background.get().append(title) else title
             return GUI(type, title, slotBindings, blockEntity)
         }
     }

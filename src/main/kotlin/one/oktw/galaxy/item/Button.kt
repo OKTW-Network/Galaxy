@@ -22,7 +22,7 @@ import net.minecraft.item.Items.DIAMOND_HOE
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
-class Button private constructor(id: String) : CustomItem(Identifier.of("galaxy", "item/gui/button/$id"), DIAMOND_HOE) {
+class Button private constructor(id: String) : CustomItem(Identifier.of("galaxy", "gui/$id"), DIAMOND_HOE) {
     companion object {
         val BLANK = registry.register(Button("blank"))
         val ARROWHEAD_UP = registry.register(Button("arrowhead_up"))

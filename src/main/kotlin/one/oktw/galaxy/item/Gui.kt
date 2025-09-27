@@ -22,7 +22,7 @@ import net.minecraft.item.Items.DIAMOND_HOE
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
-class Gui private constructor(id: String) : CustomItem(Identifier.of("galaxy", "item/gui/base/$id"), DIAMOND_HOE, hideTooltip = true) {
+class Gui private constructor(id: String) : CustomItem(Identifier.of("galaxy", "gui/$id"), DIAMOND_HOE, hideTooltip = true) {
     companion object {
         val BLANK = registry.register(Gui("blank"))
         val MAIN_FIELD = registry.register(Gui("main_field"))

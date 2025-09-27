@@ -24,7 +24,7 @@ import net.minecraft.text.Text.translatable
 import net.minecraft.util.Identifier
 
 class Upgrade private constructor(id: String, private val name: String, private val level: Int) :
-    CustomItem(Identifier.of("galaxy", "item/upgrade/$id"), COMMAND_BLOCK) {
+    CustomItem(Identifier.of("galaxy", "upgrade/$id"), COMMAND_BLOCK) {
     companion object {
         val BASE = registry.register(Upgrade("base", "item.Upgrade.BASE", 0))
         val COOLING_LV1 = registry.register(Upgrade("cooling_lv1", "item.Upgrade.COOLING", 1))

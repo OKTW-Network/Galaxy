@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -62,7 +62,7 @@ class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: It
 
         val gui = GUI
             .Builder(ScreenHandlerType.GENERIC_9X4)
-            .setTitle(Text.of("Trashcan"))
+            .setTitle(Text.translatable("block.TRASHCAN"))
             .blockEntity(this)
             .apply {
                 var i = 0

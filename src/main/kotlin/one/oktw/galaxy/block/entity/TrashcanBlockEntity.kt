@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -74,6 +74,6 @@ class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: It
 
         GUISBackStackManager.openGUI(player as ServerPlayerEntity, gui)
 
-        return ActionResult.SUCCESS
+        return ActionResult.SUCCESS_SERVER
     }
 }

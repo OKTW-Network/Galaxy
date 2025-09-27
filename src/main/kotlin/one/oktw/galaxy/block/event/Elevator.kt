@@ -18,11 +18,13 @@
 
 package one.oktw.galaxy.block.event
 
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Vec3d
 import one.oktw.galaxy.block.CustomBlock
 import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.event.annotation.EventListener
@@ -40,6 +42,8 @@ class Elevator {
 
     private fun doTeleport(player: ServerPlayerEntity, pos: BlockPos) {
         player.requestTeleport(player.pos.x, pos.y.toDouble(), player.pos.z)
+        player.velocity = Vec3d.ZERO
+        player.networkHandler.sendPacket(EntityVelocityUpdateS2CPacket(player))
         player.world.playSound(
             null,
             BlockPos(pos),

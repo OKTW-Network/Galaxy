@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -57,7 +57,7 @@ public abstract class ExperienceOrbEntityMixin_RealTime extends EntityMixin_Real
 
     @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/ExperienceOrbEntity;orbAge:I", opcode = Opcodes.PUTFIELD))
     private void realTimeImpl$adjustForRealTimeAge(final ExperienceOrbEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
         this.orbAge += ticks;
     }
 }

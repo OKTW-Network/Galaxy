@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -24,11 +24,11 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventories
 import net.minecraft.inventory.Inventory
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.registry.RegistryWrapper
 import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.screen.slot.Slot
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.storage.ReadView
+import net.minecraft.storage.WriteView
 import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
@@ -70,13 +70,13 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         }
     }
 
-    override fun readCopyableData(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        Inventories.readNbt(nbt, inventory, registryLookup)
+    override fun readCopyableData(view: ReadView) {
+        Inventories.readData(view, inventory)
     }
 
-    override fun writeNbt(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        super.writeNbt(nbt, registryLookup)
-        Inventories.writeNbt(nbt, inventory, registryLookup)
+    override fun writeData(view: WriteView) {
+        super.writeData(view)
+        Inventories.writeData(view, inventory)
     }
 
     override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {

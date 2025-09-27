@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -58,7 +58,7 @@ public abstract class MixinPlayerInteractBlock_NetworkHandler extends ServerComm
             info.cancel();
             if (event.getSwing()) player.swingHand(packet.getHand(), true);
             // Re-sync block & inventory
-            ServerWorld world = player.getServerWorld();
+            ServerWorld world = player.getWorld().toServerWorld();
             BlockPos blockPos = packet.getBlockHitResult().getBlockPos();
             sendPacket(new EntityStatusS2CPacket(player, EntityStatuses.CONSUME_ITEM));
             sendPacket(new HealthUpdateS2CPacket(player.getHealth(), player.getHungerManager().getFoodLevel(), player.getHungerManager().getSaturationLevel()));

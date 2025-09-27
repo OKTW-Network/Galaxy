@@ -1,4 +1,22 @@
 /*
+ * OKTW Galaxy Project
+ * Copyright (C) 2018-2025
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/*
  * This file is part of Sponge, licensed under the MIT License (MIT).
  *
  * Copyright (c) SpongePowered <https://www.spongepowered.org>
@@ -44,7 +62,7 @@ public abstract class PlayerEntityMixin_RealTime extends LivingEntityMixin_RealT
     @Redirect(method = "tick",
         at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerEntity;experiencePickUpDelay:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
     private void realTimeImpl$adjustForRealTimeExperiencePickUpDelay(final PlayerEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
         this.experiencePickUpDelay = Math.max(0, this.experiencePickUpDelay - ticks);
     }
 
@@ -68,7 +86,7 @@ public abstract class PlayerEntityMixin_RealTime extends LivingEntityMixin_RealT
         )
     )
     private void realTimeImpl$adjustForRealTimeSleepTimer(final PlayerEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
         this.sleepTimer += ticks;
     }
 
@@ -91,13 +109,13 @@ public abstract class PlayerEntityMixin_RealTime extends LivingEntityMixin_RealT
         )
     )
     private void realTimeImpl$adjustForRealTimeWakeTimer(final PlayerEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
         this.sleepTimer += ticks;
     }
 
     @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerEntity;lastAttackedTicks:I", opcode = Opcodes.PUTFIELD))
     private void realTimeImpl$adjustForRealTimeAttackCoolDown(final PlayerEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
         this.lastAttackedTicks += ticks;
     }
 }

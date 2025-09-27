@@ -19,24 +19,24 @@
 package one.oktw.galaxy.block.entity
 
 import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.registry.RegistryWrapper
+import net.minecraft.storage.ReadView
+import net.minecraft.storage.WriteView
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.CustomBlock
 
 class DummyBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : CustomBlockEntity(type, pos) {
-    override fun readNbt(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        super.readNbt(nbt, registryLookup)
-        nbt.getString("id", "")?.let(Identifier::tryParse)?.let(CustomBlock.registry::get)?.let {
+    override fun readData(view: ReadView) {
+        super.readData(view)
+        view.getString("id", "")?.let(Identifier::tryParse)?.let(CustomBlock.registry::get)?.let {
             if (it != CustomBlock.DUMMY) {
                 world?.removeBlockEntity(pos)
-                world?.addBlockEntity(it.createBlockEntity(pos).apply { readCopyableData(nbt, registryLookup) })
+                world?.addBlockEntity(it.createBlockEntity(pos).apply { readCopyableData(view) })
             }
         }
     }
 
-    override fun writeNbt(nbt: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
+    override fun writeData(view: WriteView) {
         // I'm dummy.
     }
 }

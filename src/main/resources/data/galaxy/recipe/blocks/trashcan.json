@@ -29,10 +29,10 @@
       "item_name": {
         "translate": "block.TRASHCAN"
       },
-      "item_model": "galaxy:item/block/trashcan",
+      "item_model": "galaxy:block/trashcan",
       "custom_data": {
         "GalaxyData": {
-          "CustomItemIdentifier": "galaxy:item/block/trashcan"
+          "CustomItemIdentifier": "galaxy:block/trashcan"
         }
       }
     }

@@ -22,10 +22,10 @@
       "item_name": {
         "translate": "block.ELEVATOR"
       },
-      "item_model": "galaxy:item/block/elevator",
+      "item_model": "galaxy:block/elevator",
       "custom_data": {
         "GalaxyData": {
-          "CustomItemIdentifier": "galaxy:item/block/elevator"
+          "CustomItemIdentifier": "galaxy:block/elevator"
         }
       }
     }

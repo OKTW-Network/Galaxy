@@ -18,19 +18,14 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.item.Items.COMMAND_BLOCK
+import net.minecraft.item.Items.DIAMOND_HOE
 import net.minecraft.text.Text
-import net.minecraft.text.Text.translatable
 import net.minecraft.util.Identifier
 
-class Tool private constructor(id: String, private val name: String) :
-    CustomItem(Identifier.of("galaxy", "tool/$id"), COMMAND_BLOCK, maxStackSize = 1) {
-    override val cacheable = false
-
+class Misc private constructor(id: String) : CustomItem(Identifier.of("galaxy", "misc/$id"), DIAMOND_HOE, hideTooltip = true) {
     companion object {
-        val WRENCH = registry.register(Tool("wrench", "item.Tool.WRENCH"))
-        val CROWBAR = registry.register(Tool("crowbar", "item.Tool.CROWBAR"))
+        val PLACEHOLDER = registry.register(Misc("placeholder"))
     }
 
-    override fun getName(): Text = translatable(name)
+    override fun getName(): Text = Text.literal("")
 }

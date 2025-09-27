@@ -43,6 +43,7 @@ import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.block.listener.CustomBlockTickListener
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
+import one.oktw.galaxy.item.Misc
 import one.oktw.galaxy.util.HarvestUtil
 
 class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) :
@@ -54,6 +55,8 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
 
     override val allowedFacing = listOf(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST)
     private val inventory = DefaultedList.ofSize(4, ItemStack.EMPTY)
+
+    // FIXME: GUI Background in title
     private val gui = GUI.Builder(ScreenHandlerType.GENERIC_9X3).setTitle(Text.translatable("block.HARVEST")).blockEntity(this).apply {
         var i = 0
         addSlot(4, 0, object : Slot(this@HarvestBlockEntity, i++, 0, 0) { // Tool
@@ -64,7 +67,8 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         })
     }.build().apply {
         editInventory {
-            // FIXME: GUI Background
+            // Fill empty
+            fillAll(Misc.PLACEHOLDER.createItemStack())
         }
     }
     private var progress = 0

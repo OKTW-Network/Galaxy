@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -26,6 +26,7 @@ import net.minecraft.item.Items
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
+import net.minecraft.state.property.Properties
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
@@ -44,6 +45,10 @@ object CustomBlockHelper {
     fun place(context: ItemPlacementContext): Boolean {
         val item = CustomItemHelper.getItem(context.stack) as? CustomBlockItem ?: return false
         if ((Items.BARRIER as BlockItem).place(context).isAccepted) {
+            // Clear waterlogged
+            val newState = context.world.getBlockState(context.blockPos).withIfExists(Properties.WATERLOGGED, false)
+            context.world.setBlockState(context.blockPos, newState)
+
             postPlace(context.world as ServerWorld, context.blockPos, item.getBlock(), context.placementDirections)
             return true
         }
@@ -57,7 +62,7 @@ object CustomBlockHelper {
     }
 
     /**
-     * Set BlockEntity and ARMOR_STAND and play sound
+     * Set BlockEntity and play sound
      */
     private fun postPlace(world: ServerWorld, pos: BlockPos, block: CustomBlock, direction: Array<Direction>? = null) {
         val entity = block.createBlockEntity(pos)

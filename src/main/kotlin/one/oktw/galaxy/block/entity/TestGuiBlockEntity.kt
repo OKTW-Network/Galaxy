@@ -38,7 +38,7 @@ import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
-import one.oktw.galaxy.item.Button
+import one.oktw.galaxy.item.Gui
 
 class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : ModelCustomBlockEntity(type, pos, modelItem),
     CustomBlockClickListener, Inventory {
@@ -50,7 +50,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     }.build().apply {
         editInventory {
             // FIXME: GUI Background
-            set(4, 2, Button.CHECK_MARK.createItemStack())
+            set(4, 2, Gui.CHECK_MARK.createItemStack())
         }
         addBinding(4, 2) {
             GUISBackStackManager.openGUI(player, gui2)
@@ -62,7 +62,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     }.build().apply {
         editInventory {
             // FIXME: GUI Background
-            set(4, 3, Button.CROSS_MARK.createItemStack().apply { this.set(DataComponentTypes.ITEM_NAME, Text.of("CLOSE ALL")) })
+            set(4, 3, Gui.CROSS_MARK.createItemStack().apply { this.set(DataComponentTypes.ITEM_NAME, Text.of("CLOSE ALL")) })
         }
         addBinding(4, 3) {
             GUISBackStackManager.closeAll(player)

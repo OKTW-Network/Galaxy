@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -36,7 +36,7 @@ public class MixinPlayerUseItemOnBlock_ItemStack {
 
         PlayerUseItemOnBlock event = EventManager.safeEmit(new PlayerUseItemOnBlock(context));
         if (event.getCancel()) {
-            cir.setReturnValue(event.getSwing() ? ActionResult.SUCCESS : ActionResult.CONSUME);
+            cir.setReturnValue(event.getSwing() ? ActionResult.SUCCESS_SERVER : ActionResult.CONSUME);
             cir.cancel();
         }
     }

@@ -78,6 +78,6 @@ class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: It
 
         GUISBackStackManager.openGUI(player as ServerPlayerEntity, gui)
 
-        return ActionResult.SUCCESS
+        return ActionResult.SUCCESS_SERVER
     }
 }

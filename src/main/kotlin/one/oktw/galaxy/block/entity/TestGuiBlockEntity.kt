@@ -92,7 +92,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
 
     override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {
         GUISBackStackManager.openGUI(player as ServerPlayerEntity, gui)
-        return ActionResult.SUCCESS
+        return ActionResult.SUCCESS_SERVER
     }
 
     override fun clear() {

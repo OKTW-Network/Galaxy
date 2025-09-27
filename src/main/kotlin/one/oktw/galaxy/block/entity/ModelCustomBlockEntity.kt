@@ -18,19 +18,13 @@
 
 package one.oktw.galaxy.block.entity
 
-import com.mojang.logging.LogUtils
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.EntityType
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.SpawnReason
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.entity.decoration.DisplayEntity
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
-import net.minecraft.storage.NbtReadView
 import net.minecraft.storage.ReadView
 import net.minecraft.storage.WriteView
-import net.minecraft.util.ErrorReporter
 import net.minecraft.util.Uuids
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
@@ -40,18 +34,6 @@ import java.util.*
 open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, private val modelItem: ItemStack, facing: Direction? = null) :
     CustomBlockEntity(type, pos),
     CustomBlockTickListener {
-    companion object {
-        private val armorStandNbt = NbtCompound().apply {
-            putString("id", "minecraft:armor_stand")
-            putBoolean("Invisible", true)
-            putBoolean("Invulnerable", true)
-            putBoolean("Marker", true)
-            putBoolean("NoGravity", true)
-            putBoolean("Silent", true)
-            putBoolean("Small", true)
-            putInt("DisabledSlots", 4144959)
-        }
-    }
 
     private var entityUUID: UUID? = null
     open var facing = facing
@@ -94,14 +76,9 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
     }
 
     private fun spawnEntity() {
-        val logging = ErrorReporter.Logging(LogUtils.getLogger())
-        val entity: ArmorStandEntity = EntityType.getEntityFromData(
-            NbtReadView.create(logging, world?.registryManager, armorStandNbt),
-            world,
-            SpawnReason.COMMAND
-        ).get() as ArmorStandEntity
+        val entity = DisplayEntity.ItemDisplayEntity(EntityType.ITEM_DISPLAY, world)
+        entity.itemStack = modelItem
         entity.refreshPositionAndAngles(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, facing?.positiveHorizontalDegrees ?: 0.0F, 0.0F)
-        entity.equipStack(EquipmentSlot.HEAD, modelItem)
         entity.addCommandTag("BLOCK")
         entity.addCommandTag(getId().toString())
         if (world!!.spawnEntity(entity)) entityUUID = entity.uuid

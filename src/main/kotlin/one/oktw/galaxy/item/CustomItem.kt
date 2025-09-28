@@ -60,11 +60,11 @@ abstract class CustomItem(
     abstract fun getName(): Text?
 
     open fun writeCustomNbt(nbt: NbtCompound) {
-        nbt.putString("CustomItemIdentifier", identifier.toString())
+        nbt.putString("custom_item_identifier", identifier.toString())
     }
 
     open fun readCustomNbt(nbt: NbtCompound): CustomItem {
-        require(nbt.getString("CustomItemIdentifier", "") == identifier.toString())
+        require(nbt.getString("custom_item_identifier", "") == identifier.toString())
 
         return this
     }
@@ -96,7 +96,7 @@ abstract class CustomItem(
             writeCustomNbt(galaxyNbt)
             apply(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT) { component ->
                 component.apply { nbt ->
-                    nbt.put("GalaxyData", galaxyNbt)
+                    nbt.put("galaxy_data", galaxyNbt)
                 }
             }
         }.also { if (cacheable) cacheItemStack = it.copy() }

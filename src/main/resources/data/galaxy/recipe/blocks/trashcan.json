@@ -31,8 +31,8 @@
       },
       "item_model": "galaxy:block/trashcan",
       "custom_data": {
-        "GalaxyData": {
-          "CustomItemIdentifier": "galaxy:block/trashcan"
+        "galaxy_data": {
+          "custom_item_identifier": "galaxy:block/trashcan"
         }
       }
     }

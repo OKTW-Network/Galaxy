@@ -30,8 +30,8 @@
       },
       "item_model": "galaxy:tool/wrench",
       "custom_data": {
-        "GalaxyData": {
-          "CustomItemIdentifier": "galaxy:tool/wrench"
+        "galaxy_data": {
+          "custom_item_identifier": "galaxy:tool/wrench"
         }
       }
     }

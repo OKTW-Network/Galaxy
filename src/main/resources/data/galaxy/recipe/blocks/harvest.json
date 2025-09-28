@@ -30,8 +30,8 @@
       },
       "item_model": "galaxy:block/harvest",
       "custom_data": {
-        "GalaxyData": {
-          "CustomItemIdentifier": "galaxy:block/harvest"
+        "galaxy_data": {
+          "custom_item_identifier": "galaxy:block/harvest"
         }
       }
     }

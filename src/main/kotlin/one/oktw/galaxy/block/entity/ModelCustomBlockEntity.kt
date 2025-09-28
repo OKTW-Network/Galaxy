@@ -58,16 +58,16 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
 
     override fun readData(view: ReadView) {
         super.readData(view)
-        val data = view.getReadView("GalaxyData") ?: return
-        data.getOptionalIntArray("ModelEntity")?.let { entityUUID = Uuids.toUuid(it.get()) }
-        data.getString("Facing", "")?.let { facing = Direction.byId(it) }
+        val data = view.getReadView("galaxy_data") ?: return
+        data.getOptionalIntArray("model_entity")?.let { entityUUID = Uuids.toUuid(it.get()) }
+        data.getString("facing", "")?.let { facing = Direction.byId(it) }
     }
 
     override fun writeData(view: WriteView) {
         super.writeData(view)
-        val data = view.get("GalaxyData")
-        entityUUID?.let { data.putIntArray("ModelEntity", Uuids.toIntArray(it)) }
-        facing?.let { data.putString("Facing", it.id) }
+        val data = view.get("galaxy_data")
+        entityUUID?.let { data.putIntArray("model_entity", Uuids.toIntArray(it)) }
+        facing?.let { data.putString("facing", it.id) }
     }
 
     override fun markRemoved() {

@@ -24,8 +24,8 @@
       },
       "item_model": "galaxy:block/elevator",
       "custom_data": {
-        "GalaxyData": {
-          "CustomItemIdentifier": "galaxy:block/elevator"
+        "galaxy_data": {
+          "custom_item_identifier": "galaxy:block/elevator"
         }
       }
     }

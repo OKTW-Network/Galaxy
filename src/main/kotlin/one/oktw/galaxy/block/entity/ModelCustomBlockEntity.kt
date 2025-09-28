@@ -48,7 +48,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
     override fun tick() {
         if (entityUUID == null || (world as ServerWorld).getEntity(entityUUID) == null) {
             // Kill leak entities
-            (world as ServerWorld).getEntitiesByType(EntityType.ARMOR_STAND) { it.blockPos == pos && it.commandTags.contains("BLOCK") }.forEach {
+            (world as ServerWorld).getEntitiesByType(EntityType.ITEM_DISPLAY) { it.blockPos == pos && it.commandTags.contains("BLOCK") }.forEach {
                 it.kill(world as ServerWorld)
             }
 

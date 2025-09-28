@@ -24,7 +24,7 @@ import net.minecraft.util.Identifier
 import one.oktw.galaxy.block.CustomBlock
 
 class CustomBlockItem private constructor(private val id: String, private val name: String?) :
-    CustomItem(Identifier.of("galaxy", "item/block/$id"), COMMAND_BLOCK) {
+    CustomItem(Identifier.of("galaxy", "block/$id"), COMMAND_BLOCK) {
     companion object {
         val HT_CRAFTING_TABLE = registry.register(CustomBlockItem("ht_crafting_table", "block.HT_CRAFTING_TABLE"))
         val ELEVATOR = registry.register(CustomBlockItem("elevator", "block.ELEVATOR"))

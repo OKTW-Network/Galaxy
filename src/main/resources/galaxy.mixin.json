@@ -7,10 +7,9 @@
     "MixinPlayerChat_MeCommand",
     "MixinPlayerChat_NetworkHandler",
     "MixinPlayerChat_SayCommand",
+    "MixinPlayerInput_NetworkHandler",
     "MixinPlayerInteractBlock_NetworkHandler",
     "MixinPlayerInteractItem_NetworkHandler",
-    "MixinPlayerJump_NetworkHandler",
-    "MixinPlayerSneak_NetworkHandler",
     "MixinPlayerUseItemOnBlock_ItemStack"
   ],
   "client": [],

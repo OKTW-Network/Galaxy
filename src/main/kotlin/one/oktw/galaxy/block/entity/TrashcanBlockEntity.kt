@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -29,11 +29,13 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
+import net.minecraft.util.Identifier
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
+import one.oktw.galaxy.item.Misc
 
 class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : Inventory, ModelCustomBlockEntity(type, pos, modelItem),
     CustomBlockClickListener {
@@ -61,19 +63,21 @@ class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: It
         }
 
         val gui = GUI
-            .Builder(ScreenHandlerType.GENERIC_9X4)
-            .setTitle(Text.of("Trashcan"))
+            .Builder(ScreenHandlerType.GENERIC_9X6)
+            .setTitle(Text.translatable("block.TRASHCAN"))
+            .setBackground("A", Identifier.of("galaxy", "gui_font/container_layout/trashcan"))
             .blockEntity(this)
             .apply {
                 var i = 0
-                val inv = SimpleInventory(9 * 4)
+                val inv = SimpleInventory(9 * 6)
 
-                for (y in 0 until 4) for (x in 0 until 9) addSlot(x, y, Slot(inv, i++, 0, 0))
+                for (y in 0 until 6) for (x in 0 until 6) addSlot(x, y, Slot(inv, i++, 0, 0))
             }
             .build()
+            .apply { editInventory { fillAll(Misc.PLACEHOLDER.createItemStack()) } }
 
         GUISBackStackManager.openGUI(player as ServerPlayerEntity, gui)
 
-        return ActionResult.SUCCESS
+        return ActionResult.SUCCESS_SERVER
     }
 }

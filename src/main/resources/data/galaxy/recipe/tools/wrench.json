@@ -28,10 +28,10 @@
       "item_name": {
         "translate": "item.Tool.WRENCH"
       },
-      "item_model": "galaxy:item/tool/wrench",
+      "item_model": "galaxy:tool/wrench",
       "custom_data": {
         "GalaxyData": {
-          "CustomItemIdentifier": "galaxy:item/tool/wrench"
+          "CustomItemIdentifier": "galaxy:tool/wrench"
         }
       }
     }

@@ -27,10 +27,10 @@
       "item_name": {
         "translate": "item.Tool.CROWBAR"
       },
-      "item_model": "galaxy:item/tool/crowbar",
+      "item_model": "galaxy:tool/crowbar",
       "custom_data": {
         "GalaxyData": {
-          "CustomItemIdentifier": "galaxy:item/tool/crowbar"
+          "CustomItemIdentifier": "galaxy:tool/crowbar"
         }
       }
     }

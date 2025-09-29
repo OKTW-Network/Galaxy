@@ -22,7 +22,9 @@ import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.decoration.DisplayEntity
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.storage.NbtWriteView
 import net.minecraft.storage.ReadView
 import net.minecraft.storage.WriteView
 import net.minecraft.util.Uuids
@@ -68,6 +70,13 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         val data = view.get("galaxy_data")
         entityUUID?.let { data.putIntArray("model_entity", Uuids.toIntArray(it)) }
         facing?.let { data.putString("facing", it.id) }
+    }
+
+    override fun removeFromCopiedStackData(view: WriteView) {
+        val nbt = (view as NbtWriteView).nbt.get("galaxy_data") as? NbtCompound ?: return
+        nbt.remove("model_entity")
+        nbt.remove("facing")
+        if (nbt.isEmpty) view.remove("galaxy_data")
     }
 
     override fun markRemoved() {

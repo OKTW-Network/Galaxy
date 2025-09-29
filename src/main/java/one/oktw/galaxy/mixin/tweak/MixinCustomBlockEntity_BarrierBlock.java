@@ -25,11 +25,15 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
 import one.oktw.galaxy.block.CustomBlock;
 import one.oktw.galaxy.block.CustomBlockEntityTicker;
+import one.oktw.galaxy.block.entity.CustomBlockEntity;
+import one.oktw.galaxy.item.CustomBlockItem;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -59,5 +63,15 @@ public abstract class MixinCustomBlockEntity_BarrierBlock extends Block implemen
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return new CustomBlockEntityTicker<>();
+    }
+
+    @Override
+    protected ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
+        if (world.getBlockEntity(pos) instanceof CustomBlockEntity blockEntity) {
+            if (CustomBlock.Companion.getRegistry().get(blockEntity.getId()) instanceof CustomBlock block && block.toItem() instanceof CustomBlockItem item) {
+                return item.createItemStack();
+            }
+        }
+        return super.getPickStack(world, pos, state, includeData);
     }
 }

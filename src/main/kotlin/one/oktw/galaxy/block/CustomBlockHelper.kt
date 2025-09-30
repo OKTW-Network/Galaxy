@@ -40,14 +40,6 @@ import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.CustomItemHelper
 
 object CustomBlockHelper {
-    fun place(world: ServerWorld, pos: BlockPos, block: CustomBlock): Boolean {
-        if (world.setBlockState(pos, block.baseBlock.defaultState)) {
-            postPlace(world, pos, block)
-            return true
-        }
-        return false
-    }
-
     fun place(context: ItemPlacementContext): Boolean {
         val item = CustomItemHelper.getItem(context.stack) as? CustomBlockItem ?: return false
         val stack2 = context.stack.copy()

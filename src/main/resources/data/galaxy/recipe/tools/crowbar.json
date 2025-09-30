@@ -29,8 +29,8 @@
       },
       "item_model": "galaxy:tool/crowbar",
       "custom_data": {
-        "GalaxyData": {
-          "CustomItemIdentifier": "galaxy:tool/crowbar"
+        "galaxy_data": {
+          "custom_item_identifier": "galaxy:tool/crowbar"
         }
       }
     }

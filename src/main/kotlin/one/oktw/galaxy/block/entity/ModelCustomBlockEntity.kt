@@ -32,6 +32,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import one.oktw.galaxy.block.listener.CustomBlockTickListener
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, private val modelItem: ItemStack, facing: Direction? = null) :
     CustomBlockEntity(type, pos),
@@ -43,6 +44,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
             if (facing != null && direction != null && direction in allowedFacing) {
                 field = direction
                 (world as? ServerWorld)?.getEntity(entityUUID)?.yaw = direction.positiveHorizontalDegrees
+                markDirty()
             }
         }
     open val allowedFacing: List<Direction> = emptyList()
@@ -60,9 +62,12 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
 
     override fun readData(view: ReadView) {
         super.readData(view)
-        val data = view.getReadView("galaxy_data") ?: return
-        data.getOptionalIntArray("model_entity")?.let { entityUUID = Uuids.toUuid(it.get()) }
-        data.getString("facing", "")?.let { facing = Direction.byId(it) }
+        view.getReadView("galaxy_data")?.getOptionalIntArray("model_entity")?.getOrNull()?.let { entityUUID = Uuids.toUuid(it) }
+    }
+
+    override fun readCopyableData(view: ReadView) {
+        super.readCopyableData(view)
+        view.getReadView("galaxy_data")?.getOptionalString("facing")?.getOrNull()?.let { facing = Direction.byId(it) }
     }
 
     override fun writeData(view: WriteView) {

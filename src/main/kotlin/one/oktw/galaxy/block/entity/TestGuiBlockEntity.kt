@@ -85,6 +85,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         }
 
     override fun readCopyableData(view: ReadView) {
+        super.readCopyableData(view)
         Inventories.readData(view, inventory)
     }
 

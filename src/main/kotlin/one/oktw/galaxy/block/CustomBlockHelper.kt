@@ -71,5 +71,7 @@ object CustomBlockHelper {
         val blockEntity = world.getBlockEntity(pos) as? ModelCustomBlockEntity ?: return
         world.setBlockState(pos, Blocks.AIR.defaultState)
         Block.dropStack(world, pos, CustomBlock.registry.get(blockEntity.getId())!!.toItem()!!.createItemStack())
+
+        world.playSound(null, pos, SoundEvents.BLOCK_METAL_BREAK, SoundCategory.BLOCKS, 1.0F, 1.0F)
     }
 }

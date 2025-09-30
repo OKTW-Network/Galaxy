@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,10 +23,9 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.minecraft.command.argument.IdentifierArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
 import one.oktw.galaxy.item.CustomItem
+import one.oktw.galaxy.player.PlayerHelper
 
 class GetItem {
     val command: LiteralArgumentBuilder<ServerCommandSource> = CommandManager.literal("getItem")
@@ -51,28 +50,7 @@ class GetItem {
 
                     val itemStack = item.createItemStack()
                     val player = it.source.playerOrThrow
-                    if (player.inventory.insertStack(itemStack)) {
-                        itemStack.count = 1
-                        val itemEntity = player.dropItem(itemStack, false)
-                        itemEntity?.setDespawnImmediately()
-
-                        player.world.playSound(
-                            null,
-                            player.x,
-                            player.y,
-                            player.z,
-                            SoundEvents.ENTITY_ITEM_PICKUP,
-                            SoundCategory.PLAYERS,
-                            0.2F,
-                            ((player.random.nextFloat() - player.random.nextFloat()) * 0.7F + 1.0F) * 2.0F
-                        )
-                        player.playerScreenHandler.sendContentUpdates()
-                    } else {
-                        player.dropItem(itemStack, false)?.apply {
-                            resetPickupDelay()
-                            setOwner(player.uuid)
-                        }
-                    }
+                    PlayerHelper.giveItemToPlayer(player, itemStack)
                     it.source.sendFeedback({ Text.translatable("commands.give.success.single", 1, itemStack.toHoverableText(), it.source.displayName) }, true)
 
                     return@executes Command.SINGLE_SUCCESS

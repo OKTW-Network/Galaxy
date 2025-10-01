@@ -20,6 +20,10 @@ package one.oktw.galaxy.block.entity
 
 import net.minecraft.block.*
 import net.minecraft.block.entity.BlockEntityType
+import net.minecraft.component.ComponentMap
+import net.minecraft.component.ComponentsAccess
+import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.type.ContainerComponent
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventories
 import net.minecraft.inventory.Inventory
@@ -128,12 +132,28 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     }
 
     override fun readCopyableData(view: ReadView) {
+        super.readCopyableData(view)
         Inventories.readData(view, inventory)
     }
 
     override fun writeData(view: WriteView) {
         super.writeData(view)
         Inventories.writeData(view, inventory)
+    }
+
+    override fun addComponents(builder: ComponentMap.Builder) {
+        super.addComponents(builder)
+        builder.add(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(inventory))
+    }
+
+    override fun readComponents(components: ComponentsAccess) {
+        super.readComponents(components)
+        components.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(inventory)
+    }
+
+    override fun removeFromCopiedStackData(view: WriteView) {
+        super.removeFromCopiedStackData(view)
+        view.remove("Items")
     }
 
     override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {

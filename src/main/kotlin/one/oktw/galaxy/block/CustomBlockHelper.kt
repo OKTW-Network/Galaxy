@@ -18,8 +18,11 @@
 
 package one.oktw.galaxy.block
 
+import com.mojang.logging.LogUtils
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
+import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.type.NbtComponent
 import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.item.Items
@@ -27,29 +30,38 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.state.property.Properties
+import net.minecraft.storage.NbtReadView
+import net.minecraft.util.ErrorReporter
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
 import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.CustomItemHelper
 
 object CustomBlockHelper {
-    fun place(world: ServerWorld, pos: BlockPos, block: CustomBlock): Boolean {
-        if (world.setBlockState(pos, block.baseBlock.defaultState)) {
-            postPlace(world, pos, block)
-            return true
-        }
-        return false
-    }
-
     fun place(context: ItemPlacementContext): Boolean {
         val item = CustomItemHelper.getItem(context.stack) as? CustomBlockItem ?: return false
+        val stack2 = context.stack.copy()
         if ((Items.BARRIER as BlockItem).place(context).isAccepted) {
-            // Clear waterlogged
-            val newState = context.world.getBlockState(context.blockPos).withIfExists(Properties.WATERLOGGED, false)
-            context.world.setBlockState(context.blockPos, newState)
+            val world = context.world
+            val pos = context.blockPos
 
-            postPlace(context.world as ServerWorld, context.blockPos, item.getBlock(), context.placementDirections)
+            // Clear waterlogged
+            world.setBlockState(pos, world.getBlockState(pos).withIfExists(Properties.WATERLOGGED, false))
+
+            // Create block entity and read data
+            val entity = item.getBlock().createBlockEntity(pos)
+            val nbt = stack2.getOrDefault(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.DEFAULT).copyNbt()
+            val reporter = ErrorReporter.Logging(entity.reporterContext, LogUtils.getLogger())
+            entity.readCopyableData(NbtReadView.create(reporter, world.registryManager, nbt))
+            entity.readComponents(stack2)
+            // Set facing
+            if (entity is ModelCustomBlockEntity) {
+                val allowed = entity.allowedFacing
+                entity.facing = context.placementDirections?.firstOrNull { it.opposite in allowed }?.opposite
+            }
+            world.addBlockEntity(entity)
+
+            world.playSound(null, pos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
             return true
         }
         return false
@@ -59,19 +71,7 @@ object CustomBlockHelper {
         val blockEntity = world.getBlockEntity(pos) as? ModelCustomBlockEntity ?: return
         world.setBlockState(pos, Blocks.AIR.defaultState)
         Block.dropStack(world, pos, CustomBlock.registry.get(blockEntity.getId())!!.toItem()!!.createItemStack())
-    }
 
-    /**
-     * Set BlockEntity and play sound
-     */
-    private fun postPlace(world: ServerWorld, pos: BlockPos, block: CustomBlock, direction: Array<Direction>? = null) {
-        val entity = block.createBlockEntity(pos)
-        if (entity is ModelCustomBlockEntity) {
-            val allowed = entity.allowedFacing
-            entity.facing = direction?.firstOrNull { it.opposite in allowed }?.opposite
-        }
-        world.addBlockEntity(entity)
-
-        world.playSound(null, pos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
+        world.playSound(null, pos, SoundEvents.BLOCK_METAL_BREAK, SoundCategory.BLOCKS, 1.0F, 1.0F)
     }
 }

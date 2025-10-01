@@ -19,7 +19,10 @@
 package one.oktw.galaxy.block.entity
 
 import net.minecraft.block.entity.BlockEntityType
+import net.minecraft.component.ComponentMap
+import net.minecraft.component.ComponentsAccess
 import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.type.ContainerComponent
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventories
 import net.minecraft.inventory.Inventory
@@ -58,9 +61,13 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
             editInventory {
                 fill(0 until 9, 1 until 4, Misc.PLACEHOLDER.createItemStack())
                 set(4, 2, Gui.CHECK_MARK.createItemStack())
+                set(2, 2, Gui.PLUS.createItemStack())
             }
             addBinding(4, 2) {
                 GUISBackStackManager.openGUI(player, gui2)
+            }
+            addBinding(2, 2) {
+                GUISBackStackManager.openGUI(player, gui3)
             }
         }
 
@@ -80,14 +87,44 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
                 GUISBackStackManager.closeAll(player)
             }
         }
+    private val gui3 = GUI.Builder(ScreenHandlerType.ANVIL)
+        .setTitle(Text.literal("Test GUI3"))
+        .setBackground("C", Identifier.of("galaxy", "gui_font/container_layout/test_gui"))
+        .blockEntity(this).build()
+        .apply {
+            editInventory {
+                set(0, Misc.PLACEHOLDER.createItemStack())
+                set(1, Misc.PLACEHOLDER.createItemStack())
+                set(2, Gui.CHECK_MARK.createItemStack())
+            }
+            addBinding(2) {
+                player.sendMessage(Text.literal(inputText))
+            }
+        }
 
     override fun readCopyableData(view: ReadView) {
+        super.readCopyableData(view)
         Inventories.readData(view, inventory)
     }
 
     override fun writeData(view: WriteView) {
         super.writeData(view)
         Inventories.writeData(view, inventory)
+    }
+
+    override fun addComponents(builder: ComponentMap.Builder) {
+        super.addComponents(builder)
+        builder.add(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(inventory))
+    }
+
+    override fun readComponents(components: ComponentsAccess) {
+        super.readComponents(components)
+        components.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(inventory)
+    }
+
+    override fun removeFromCopiedStackData(view: WriteView) {
+        super.removeFromCopiedStackData(view)
+        view.remove("Items")
     }
 
     override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {

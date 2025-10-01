@@ -22,7 +22,9 @@ import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.decoration.DisplayEntity
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.storage.NbtWriteView
 import net.minecraft.storage.ReadView
 import net.minecraft.storage.WriteView
 import net.minecraft.util.Uuids
@@ -30,6 +32,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import one.oktw.galaxy.block.listener.CustomBlockTickListener
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, private val modelItem: ItemStack, facing: Direction? = null) :
     CustomBlockEntity(type, pos),
@@ -41,6 +44,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
             if (facing != null && direction != null && direction in allowedFacing) {
                 field = direction
                 (world as? ServerWorld)?.getEntity(entityUUID)?.yaw = direction.positiveHorizontalDegrees
+                markDirty()
             }
         }
     open val allowedFacing: List<Direction> = emptyList()
@@ -58,9 +62,12 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
 
     override fun readData(view: ReadView) {
         super.readData(view)
-        val data = view.getReadView("galaxy_data") ?: return
-        data.getOptionalIntArray("model_entity")?.let { entityUUID = Uuids.toUuid(it.get()) }
-        data.getString("facing", "")?.let { facing = Direction.byId(it) }
+        view.getReadView("galaxy_data")?.getOptionalIntArray("model_entity")?.getOrNull()?.let { entityUUID = Uuids.toUuid(it) }
+    }
+
+    override fun readCopyableData(view: ReadView) {
+        super.readCopyableData(view)
+        view.getReadView("galaxy_data")?.getOptionalString("facing")?.getOrNull()?.let { facing = Direction.byId(it) }
     }
 
     override fun writeData(view: WriteView) {
@@ -68,6 +75,13 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         val data = view.get("galaxy_data")
         entityUUID?.let { data.putIntArray("model_entity", Uuids.toIntArray(it)) }
         facing?.let { data.putString("facing", it.id) }
+    }
+
+    override fun removeFromCopiedStackData(view: WriteView) {
+        val nbt = (view as NbtWriteView).nbt.get("galaxy_data") as? NbtCompound ?: return
+        nbt.remove("model_entity")
+        nbt.remove("facing")
+        if (nbt.isEmpty) view.remove("galaxy_data")
     }
 
     override fun markRemoved() {

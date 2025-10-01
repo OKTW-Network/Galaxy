@@ -23,9 +23,10 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.minecraft.command.argument.IdentifierArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
 import one.oktw.galaxy.item.CustomItem
-import one.oktw.galaxy.player.PlayerHelper
 
 class GetItem {
     val command: LiteralArgumentBuilder<ServerCommandSource> = CommandManager.literal("getItem")
@@ -50,7 +51,9 @@ class GetItem {
 
                     val itemStack = item.createItemStack()
                     val player = it.source.playerOrThrow
-                    PlayerHelper.giveItemToPlayer(player, itemStack)
+                    player.giveOrDropStack(itemStack.copy())
+                    val pitch = ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f
+                    player.world.playSound(null, player.x, player.y, player.z, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2f, pitch)
                     it.source.sendFeedback({ Text.translatable("commands.give.success.single", 1, itemStack.toHoverableText(), it.source.displayName) }, true)
 
                     return@executes Command.SINGLE_SUCCESS

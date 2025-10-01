@@ -234,6 +234,7 @@ class GUI private constructor(
             // Cancel player change inventory
             if (slot < inventory.size() && slot != -999 && !slotBindings.contains(slot)) {
                 if (action == QUICK_CRAFT) endQuickCraft()
+                if (action == CLONE && player.isCreative) super.onSlotClick(slot, button, action, player)
                 return
             }
 

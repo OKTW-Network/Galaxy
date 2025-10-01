@@ -229,7 +229,9 @@ class GUI private constructor(
 
                     val inventorySlot = slots[slot]
 
-                    if (inventorySlot.hasStack()) {
+                    val maxStack = inventorySlot.stack.maxCount
+                    var count = 0
+                    while (count++ < maxStack && inventorySlot.hasStack() && inventorySlot.canTakeItems(player)) {
                         val slotItemStack = inventorySlot.stack
 
                         // Move item from GUI to player inventory
@@ -244,6 +246,8 @@ class GUI private constructor(
                         } else {
                             inventorySlot.markDirty()
                         }
+
+                        inventorySlot.onTakeItem(player, slotItemStack)
                     }
 
                     return

@@ -64,7 +64,7 @@ class BlockEvents {
             if (result.isAccepted) {
                 Criteria.ITEM_USED_ON_BLOCK.trigger(player, hitResult.blockPos, player.getStackInHand(packet.hand))
                 event.swing = (result as? ActionResult.Success)?.swingSource() == ActionResult.SwingSource.SERVER
-                usedLock[player] = player.server?.ticks
+                usedLock[player] = player.entityWorld.server.ticks
             }
         }
     }
@@ -77,7 +77,7 @@ class BlockEvents {
         // Place custom block
         if (CustomBlockHelper.place(ItemPlacementContext(event.context))) {
             event.swing = true
-            usedLock[player] = player.server?.ticks
+            usedLock[player] = player.entityWorld.server.ticks
             return
         }
 
@@ -88,7 +88,7 @@ class BlockEvents {
             if (world.getBlockEntity(blockPos) !is ModelCustomBlockEntity) return // Check is custom block
             CustomBlockHelper.destroyAndDrop(world, blockPos)
             event.swing = true
-            usedLock[player] = player.server?.ticks
+            usedLock[player] = world.server.ticks
         }
     }
 

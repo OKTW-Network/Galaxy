@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -60,7 +60,7 @@ public abstract class EntityMixin_RealTime {
     protected int ridingCooldown;
 
     @Shadow
-    public abstract World getWorld();
+    public abstract World getEntityWorld();
 
     @Redirect(method = "baseTick",
         at = @At(
@@ -80,7 +80,7 @@ public abstract class EntityMixin_RealTime {
         )
     )
     private void realTimeImpl$adjustForRealTimeEntityCooldown(final Entity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) this.getWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) this.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         this.ridingCooldown = Math.max(0, this.ridingCooldown - ticks);
     }
 }

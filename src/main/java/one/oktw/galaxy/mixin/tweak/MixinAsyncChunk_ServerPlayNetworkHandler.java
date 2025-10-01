@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.entity.player.PlayerPosition;
+import net.minecraft.entity.EntityPosition;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -54,16 +54,16 @@ public abstract class MixinAsyncChunk_ServerPlayNetworkHandler {
 
         int x = ChunkSectionPos.getSectionCoord(clampHorizontal(packet.getX(this.player.getX())));
         int z = ChunkSectionPos.getSectionCoord(clampHorizontal(packet.getZ(this.player.getZ())));
-        if (!player.getWorld().toServerWorld().getChunkManager().isTickingFutureReady(ChunkPos.toLong(x, z))) {
+        if (!player.getEntityWorld().getChunkManager().isTickingFutureReady(ChunkPos.toLong(x, z))) {
             player.setVelocity(Vec3d.ZERO);
             requestTeleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYaw(), this.player.getPitch());
             ci.cancel();
         }
     }
 
-    @Inject(method = "requestTeleport(Lnet/minecraft/entity/player/PlayerPosition;Ljava/util/Set;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;setPosition(Lnet/minecraft/entity/player/PlayerPosition;Ljava/util/Set;)V", shift = At.Shift.AFTER))
-    private void onTeleport(PlayerPosition pos, Set<PositionFlag> flags, CallbackInfo ci) {
-        ServerWorld world = player.getWorld().toServerWorld();
+    @Inject(method = "requestTeleport(Lnet/minecraft/entity/EntityPosition;Ljava/util/Set;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;setPosition(Lnet/minecraft/entity/EntityPosition;Ljava/util/Set;)V", shift = At.Shift.AFTER))
+    private void onTeleport(EntityPosition pos, Set<PositionFlag> flags, CallbackInfo ci) {
+        ServerWorld world = player.getEntityWorld();
         if (!world.getPlayers().contains(player)) return;
         world.getChunkManager().updatePosition(this.player);
     }

@@ -58,7 +58,7 @@ public abstract class MixinPlayerInteractBlock_NetworkHandler extends ServerComm
             info.cancel();
             if (event.getSwing()) player.swingHand(packet.getHand(), true);
             // Re-sync block & inventory
-            ServerWorld world = player.getWorld().toServerWorld();
+            ServerWorld world = player.getEntityWorld();
             BlockPos blockPos = packet.getBlockHitResult().getBlockPos();
             sendPacket(new EntityStatusS2CPacket(player, EntityStatuses.CONSUME_ITEM));
             sendPacket(new HealthUpdateS2CPacket(player.getHealth(), player.getHungerManager().getFoodLevel(), player.getHungerManager().getSaturationLevel()));

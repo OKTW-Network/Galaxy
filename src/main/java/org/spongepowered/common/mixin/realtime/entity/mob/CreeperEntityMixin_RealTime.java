@@ -78,7 +78,7 @@ public abstract class CreeperEntityMixin_RealTime {
     )
     private void realTimeImpl$adjustForRealTimeCreeperFuseTime(final CreeperEntity self, final int modifier) {
         if (modifier != 0) {
-            final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+            final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
             this.currentFuseTime += (getFuseSpeed() * ticks);
 
             // delay 1 tick wait AI detect player distance

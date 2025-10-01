@@ -60,14 +60,14 @@ public abstract class ItemEntityMixin_RealTime extends EntityMixin_RealTime {
     @Redirect(method = "tick",
         at = @At(value = "FIELD", target = "Lnet/minecraft/entity/ItemEntity;pickupDelay:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
     private void realTimeImpl$adjustForRealTimePickupDelay(final ItemEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         this.pickupDelay = Math.max(0, this.pickupDelay - ticks);
     }
 
     @Redirect(method = "tick",
         at = @At(value = "FIELD", target = "Lnet/minecraft/entity/ItemEntity;itemAge:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
     private void realTimeImpl$adjustForRealTimeAge(final ItemEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         this.itemAge += ticks;
     }
 }

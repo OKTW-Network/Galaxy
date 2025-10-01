@@ -27,7 +27,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
 import java.util.concurrent.ConcurrentLinkedDeque
 
-class GUISBackStackManager(private val player: ServerPlayerEntity) : CoroutineScope by CoroutineScope(player.server!!.asCoroutineDispatcher()) {
+class GUISBackStackManager(private val player: ServerPlayerEntity) : CoroutineScope by CoroutineScope(player.entityWorld.server.asCoroutineDispatcher()) {
     private val stack = ConcurrentLinkedDeque<GUI>()
 
     companion object {
@@ -46,10 +46,10 @@ class GUISBackStackManager(private val player: ServerPlayerEntity) : CoroutineSc
     fun open(gui: GUI) {
         gui.onClose { this.closeCallback(gui, it) }
         stack.offerLast(gui)
-        if (player.server!!.isOnThread) {
+        if (player.entityWorld.server.isOnThread) {
             // Delay 1 tick to workaround open GUI on close callback
             launch { player.openHandledScreen(gui) }
-        } else runBlocking(player.server!!.asCoroutineDispatcher()) {
+        } else runBlocking(player.entityWorld.server.asCoroutineDispatcher()) {
             player.openHandledScreen(gui)
         }
     }

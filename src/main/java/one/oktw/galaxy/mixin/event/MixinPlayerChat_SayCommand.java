@@ -32,8 +32,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Objects;
-
 @Mixin(SayCommand.class)
 public class MixinPlayerChat_SayCommand {
     @Inject(
@@ -55,7 +53,7 @@ public class MixinPlayerChat_SayCommand {
         assert player != null;
         if (EventManager.safeEmit(new PlayerChatEvent(player, Text.translatable("chat.type.announcement", player.getDisplayName(), message.getContent()))).getCancel()) {
             ci.cancel();
-            Objects.requireNonNull(player.getServer()).logChatMessage(message.getContent(), MessageType.params(MessageType.SAY_COMMAND, serverCommandSource), "Canceled");
+            player.getEntityWorld().getServer().logChatMessage(message.getContent(), MessageType.params(MessageType.SAY_COMMAND, serverCommandSource), "Canceled");
         }
     }
 }

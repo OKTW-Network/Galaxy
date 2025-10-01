@@ -57,7 +57,7 @@ class Home : Command {
         lock += player.uuid
 
         // Check Stage
-        val spawnPointPosition = player.respawn?.pos
+        val spawnPointPosition = player.respawn?.respawnData?.pos
         if (spawnPointPosition == null) {
             player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
             lock -= player.uuid
@@ -86,8 +86,8 @@ class Home : Command {
 
                 player.teleportTo(realTeleportTarget)
 
-                val realSpawnPointPosition = player.respawn?.pos
-                val realWorld = source.server.getWorld(player.respawn?.dimension ?: OVERWORLD)
+                val realSpawnPointPosition = player.respawn?.respawnData?.pos
+                val realWorld = source.server.getWorld(player.respawn?.respawnData?.dimension ?: OVERWORLD)
                 if (realWorld != null && realSpawnPointPosition != null) {
                     val blockState = realWorld.getBlockState(realSpawnPointPosition)
                     if (!player.notInAnyWorld && blockState.isOf(Blocks.RESPAWN_ANCHOR)) {

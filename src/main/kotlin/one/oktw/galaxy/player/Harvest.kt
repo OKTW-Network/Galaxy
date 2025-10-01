@@ -40,7 +40,7 @@ class Harvest {
         val player = event.player
         if (player in justHarvested) event.cancel = true
 
-        val world = player.world.toServerWorld()
+        val world = player.entityWorld
         val blockPos = event.packet.blockHitResult.blockPos
         val blockState = world.getBlockState(blockPos)
 

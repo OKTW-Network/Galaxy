@@ -59,7 +59,7 @@ class BlockEvents {
         if (!player.shouldCancelInteraction() || player.mainHandStack.isEmpty && player.offHandStack.isEmpty) {
             val packet = event.packet
             val hitResult = packet.blockHitResult
-            val blockEntity = player.world.getBlockEntity(hitResult.blockPos) as? CustomBlockClickListener ?: return
+            val blockEntity = player.entityWorld.getBlockEntity(hitResult.blockPos) as? CustomBlockClickListener ?: return
             val result = blockEntity.onClick(player, packet.hand, hitResult)
             if (result.isAccepted) {
                 Criteria.ITEM_USED_ON_BLOCK.trigger(player, hitResult.blockPos, player.getStackInHand(packet.hand))
@@ -83,7 +83,7 @@ class BlockEvents {
 
         // Crowbar
         if (player.isSneaking && CustomItemHelper.getItem(item) == Tool.CROWBAR) {
-            val world = player.world.toServerWorld()
+            val world = player.entityWorld
             val blockPos = event.context.blockPos
             if (world.getBlockEntity(blockPos) !is ModelCustomBlockEntity) return // Check is custom block
             CustomBlockHelper.destroyAndDrop(world, blockPos)

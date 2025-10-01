@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -56,7 +56,7 @@ class GetItem {
                         val itemEntity = player.dropItem(itemStack, false)
                         itemEntity?.setDespawnImmediately()
 
-                        player.world.playSound(
+                        player.entityWorld.playSound(
                             null,
                             player.x,
                             player.y,

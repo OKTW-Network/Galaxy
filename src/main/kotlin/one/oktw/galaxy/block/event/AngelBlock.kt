@@ -51,7 +51,7 @@ class AngelBlock {
 
     private fun placeAngelBlock(player: ServerPlayerEntity, hand: Hand, item: ItemStack) {
         val blockHit = player.raycast(3.0, 1.0f, false) as BlockHitResult
-        if (allowReplaceBlocks.contains(player.world.getBlockState(blockHit.blockPos).block)) {
+        if (allowReplaceBlocks.contains(player.entityWorld.getBlockState(blockHit.blockPos).block)) {
             val placeContext = ItemPlacementContext(player, hand, item, blockHit)
             CustomBlockHelper.place(placeContext)
                 .run {
@@ -82,11 +82,11 @@ class AngelBlock {
         val player = event.player
         val blockPos = event.packet.pos
         if (event.packet.action == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK &&
-            (player.world.getBlockEntity(blockPos) as? CustomBlockEntity)?.getId() == CustomBlock.ANGEL_BLOCK.identifier &&
+            (player.entityWorld.getBlockEntity(blockPos) as? CustomBlockEntity)?.getId() == CustomBlock.ANGEL_BLOCK.identifier &&
             !justBroke.contains(player)
         ) {
-            CustomBlockHelper.destroyAndDrop(player.world.toServerWorld(), blockPos)
-            player.world.toServerWorld().playSound(null, blockPos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
+            CustomBlockHelper.destroyAndDrop(player.entityWorld, blockPos)
+            player.entityWorld.playSound(null, blockPos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
             justBroke.add(player)
         }
     }

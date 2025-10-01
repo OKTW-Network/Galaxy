@@ -63,7 +63,7 @@ class Spawn : Command {
             val player = originPlayer.server?.playerManager?.getPlayer(originPlayer.uuid) ?: return@launch
             player.sendMessage(Text.translatable("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
 
-            val world = player.world.toServerWorld()
+            val world = player.entityWorld
             val type = world.registryKey
 
             if (type == World.NETHER) {

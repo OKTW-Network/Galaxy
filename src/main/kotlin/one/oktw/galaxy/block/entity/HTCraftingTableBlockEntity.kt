@@ -19,6 +19,8 @@
 package one.oktw.galaxy.block.entity
 
 import net.minecraft.block.entity.BlockEntityType
+import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.type.LoreComponent
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.SimpleInventory
 import net.minecraft.item.ItemStack
@@ -28,6 +30,7 @@ import net.minecraft.screen.slot.Slot
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
+import net.minecraft.util.Formatting
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.hit.BlockHitResult
@@ -67,7 +70,7 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                     ItemStack(Items.CRAFTING_TABLE, 1),
                     ItemStack(Items.OBSIDIAN, 1)
                 )
-                GUISBackStackManager.openGUI(player, getRecipeGui(recipe, CustomBlockItem.HT_CRAFTING_TABLE.createItemStack()))
+                GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe, CustomBlockItem.HT_CRAFTING_TABLE.createItemStack()))
             }
             addBinding(3, 0) {
                 cancel = true
@@ -75,12 +78,12 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                     ItemStack(Items.IRON_BLOCK, 1),
                     ItemStack(Items.ENDER_PEARL, 1)
                 )
-                GUISBackStackManager.openGUI(player, getRecipeGui(recipe, CustomBlockItem.ELEVATOR.createItemStack()))
+                GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe, CustomBlockItem.ELEVATOR.createItemStack()))
             }
             addBinding(4, 0) {
                 cancel = true
                 val recipe = listOf(CustomBlockItem.ANGEL_BLOCK.createItemStack()) // TODO
-                GUISBackStackManager.openGUI(player, getRecipeGui(recipe, CustomBlockItem.ANGEL_BLOCK.createItemStack()))
+                GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe, CustomBlockItem.ANGEL_BLOCK.createItemStack()))
             }
             addBinding(5, 0) {
                 cancel = true
@@ -89,7 +92,7 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                     ItemStack(Items.DISPENSER, 1),
                     ItemStack(Items.OBSERVER, 1)
                 )
-                GUISBackStackManager.openGUI(player, getRecipeGui(recipe, CustomBlockItem.HARVEST.createItemStack()))
+                GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe, CustomBlockItem.HARVEST.createItemStack()))
             }
             addBinding(6, 0) {
                 cancel = true
@@ -99,11 +102,11 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                     ItemStack(Items.TERRACOTTA, 2),
                     ItemStack(Items.SAND, 1)
                 )
-                GUISBackStackManager.openGUI(player, getRecipeGui(recipe, CustomBlockItem.TRASHCAN.createItemStack()))
+                GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe, CustomBlockItem.TRASHCAN.createItemStack()))
             }
         }
 
-    private fun getRecipeGui(recipe: List<ItemStack>, itemStack: ItemStack): GUI {
+    private fun getRecipeGui(player: PlayerEntity, recipe: List<ItemStack>, itemStack: ItemStack): GUI {
         val output = SimpleInventory(itemStack.copy())
         return GUI.Builder(ScreenHandlerType.GENERIC_9X3)
             .setTitle(Text.translatable("UI.Title.HiTechCraftingTableRecipe", itemStack.itemName))
@@ -144,6 +147,31 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                     for (y in 0..2) for (x in 1..4) {
                         val item = recipe.getOrNull(i++) ?: break
                         set(x, y, item)
+                    }
+                }
+                onUpdate {
+                    // Show missing items
+                    val missing = recipe.mapNotNull {
+                        var count = it.count
+                        for (item in player.inventory.mainStacks) {
+                            if (ItemStack.areItemsAndComponentsEqual(item, it)) count -= item.count
+                            if (count <= 0) break
+                        }
+                        if (count > 0) it.copyWithCount(count) else null
+                    }
+                    if (missing.isNotEmpty()) {
+                        val lore = listOf(
+                            Text.literal("Missing:").styled { it.withColor(Formatting.RED).withBold(true).withItalic(false) },
+                            *missing.map {
+                                it.itemName.copy().append(Text.literal("*")).append(Text.literal(it.count.toString()))
+                                    .styled { style -> style.withItalic(false).withColor(Formatting.WHITE) }
+                            }.toTypedArray()
+                        )
+                        val item = itemStack.copy()
+                        item.set(DataComponentTypes.LORE, LoreComponent(lore))
+                        output.setStack(0, item)
+                    } else {
+                        output.setStack(0, itemStack.copy())
                     }
                 }
             }

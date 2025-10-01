@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -37,7 +37,7 @@ class InventoryUtils(private val type: ScreenHandlerType<out ScreenHandler>) {
         return when (type) {
             in genericScreenHandlerType -> y * 9 + x
             ScreenHandlerType.GENERIC_3X3 -> y * 3 + x
-            ScreenHandlerType.HOPPER -> x
+            ScreenHandlerType.HOPPER, ScreenHandlerType.ANVIL -> x
             else -> throw IllegalArgumentException("Unsupported container type: $type")
         }
     }
@@ -46,7 +46,7 @@ class InventoryUtils(private val type: ScreenHandlerType<out ScreenHandler>) {
         return when (type) {
             in genericScreenHandlerType -> Pair(index % 9, index / 9)
             ScreenHandlerType.GENERIC_3X3 -> Pair(index % 3, index / 3)
-            ScreenHandlerType.HOPPER -> Pair(index, 0)
+            ScreenHandlerType.HOPPER, ScreenHandlerType.ANVIL -> Pair(index, 0)
             else -> throw IllegalArgumentException("Unsupported container type: $type")
         }
     }

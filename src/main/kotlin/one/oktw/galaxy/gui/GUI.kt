@@ -55,8 +55,10 @@ class GUI private constructor(
 ) :
     NamedScreenHandlerFactory {
     companion object {
-        val GUI_FONT_SHIFT_START: Text = Text.literal("<").styled { it.withFont(Identifier.of("galaxy", "gui_font/shift")) }
-        val GUI_FONT_SHIFT_END: Text = Text.literal(";>").styled { it.withFont(Identifier.of("galaxy", "gui_font/shift")) }
+        val GUI_FONT_SHIFT_CHEST_START: Text = Text.literal("<").styled { it.withFont(Identifier.of("galaxy", "gui_font/shift")) }
+        val GUI_FONT_SHIFT_CHEST_END: Text = Text.literal(";>").styled { it.withFont(Identifier.of("galaxy", "gui_font/shift")) }
+        val GUI_FONT_SHIFT_ANVIL_START: Text = Text.literal("⟨").styled { it.withFont(Identifier.of("galaxy", "gui_font/shift")) }
+        val GUI_FONT_SHIFT_ANVIL_END: Text = Text.literal(";⟩").styled { it.withFont(Identifier.of("galaxy", "gui_font/shift")) }
     }
 
     private val inventory = when (type) {
@@ -67,6 +69,7 @@ class GUI private constructor(
         GENERIC_9X5 -> SimpleInventory(9 * 5)
         GENERIC_9X6 -> SimpleInventory(9 * 6)
         HOPPER -> SimpleInventory(5)
+        ANVIL -> SimpleInventory(3)
         else -> throw IllegalArgumentException("Unsupported container type: $type")
     }
     private val playerInventoryRange = inventory.size() until inventory.size() + 3 * 9
@@ -76,6 +79,8 @@ class GUI private constructor(
     private val inventoryUtils = InventoryUtils(type)
     private val openListener = ConcurrentHashMap.newKeySet<(PlayerEntity) -> Any>()
     private val closeListener = ConcurrentHashMap.newKeySet<(PlayerEntity) -> Any>()
+    var inputText: String = ""
+        private set
 
     override fun getDisplayName() = title
 
@@ -145,9 +150,9 @@ class GUI private constructor(
 
         fun setBackground(char: String, font: Identifier): Builder {
             val background = Text.empty()
-                .append(GUI_FONT_SHIFT_START)
+                .append(if (type == ANVIL) GUI_FONT_SHIFT_ANVIL_START else GUI_FONT_SHIFT_CHEST_START)
                 .append(Text.literal(char).styled { it.withFont(font).withColor(Formatting.WHITE) })
-                .append(GUI_FONT_SHIFT_END)
+                .append(if (type == ANVIL) GUI_FONT_SHIFT_ANVIL_END else GUI_FONT_SHIFT_CHEST_END)
 
             this.background = Optional.of(background)
             return this
@@ -174,7 +179,7 @@ class GUI private constructor(
         }
     }
 
-    private inner class GuiContainer(syncId: Int, playerInventory: PlayerInventory) : ScreenHandler(type, syncId) {
+    inner class GuiContainer(syncId: Int, playerInventory: PlayerInventory) : ScreenHandler(type, syncId) {
         init {
             inventory.onOpen(playerInventory.player)
 
@@ -339,6 +344,11 @@ class GUI private constructor(
             }
 
             return inserted
+        }
+
+        fun updateInputText(input: String) {
+            inputText = input
+            updateToClient()
         }
     }
 }

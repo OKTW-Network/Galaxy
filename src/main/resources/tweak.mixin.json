@@ -9,6 +9,7 @@
     "MixinCustomBlockEntity_Structure",
     "MixinFixBeacon_BeaconBlockEntity",
     "MixinGlobalDataPack_VanillaDataPackProvider",
+    "MixinGUI_ServerPlayNetworkHandler",
     "MixinItemStackEqualAllowNull_ItemStack",
     "MixinMapExistingChunk_FilledMapItem",
     "MixinOptimizeArmorStand_ArmorStandEntity",

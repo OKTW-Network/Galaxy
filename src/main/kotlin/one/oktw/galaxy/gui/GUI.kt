@@ -29,6 +29,7 @@ import net.minecraft.inventory.SimpleInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.screen.NamedScreenHandlerFactory
 import net.minecraft.screen.ScreenHandler
+import net.minecraft.screen.ScreenHandlerListener
 import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.screen.ScreenHandlerType.*
 import net.minecraft.screen.slot.Slot
@@ -77,6 +78,7 @@ class GUI private constructor(
     private val inventoryUtils = InventoryUtils(type)
     private val openListener = ConcurrentHashMap.newKeySet<(PlayerEntity) -> Any>()
     private val closeListener = ConcurrentHashMap.newKeySet<(PlayerEntity) -> Any>()
+    private val updateListener = ConcurrentHashMap.newKeySet<() -> Any>()
 
     override fun getDisplayName() = title
 
@@ -127,6 +129,10 @@ class GUI private constructor(
 
     fun onClose(block: (PlayerEntity) -> Any) {
         closeListener += block
+    }
+
+    fun onUpdate(block: () -> Any) {
+        updateListener += block
     }
 
     private fun checkRange(x: Int, y: Int) = inventoryUtils.xyToIndex(x, y) in 0 until inventory.size()
@@ -189,8 +195,9 @@ class GUI private constructor(
         }
     }
 
-    private inner class GuiContainer(syncId: Int, playerInventory: PlayerInventory) : ScreenHandler(type, syncId) {
+    private inner class GuiContainer(syncId: Int, playerInventory: PlayerInventory) : ScreenHandler(type, syncId), ScreenHandlerListener {
         init {
+            this.addListener(this)
             inventory.onOpen(playerInventory.player)
 
             // Add slot
@@ -215,6 +222,14 @@ class GUI private constructor(
         override fun onClosed(player: PlayerEntity) {
             super.onClosed(player)
             closeListener.forEach { it.invoke(player) }
+        }
+
+        override fun onSlotUpdate(handler: ScreenHandler, slotId: Int, stack: ItemStack) {
+            updateListener.forEach { it.invoke() }
+        }
+
+        override fun onPropertyUpdate(handler: ScreenHandler?, property: Int, value: Int) {
+            // Unused
         }
 
         override fun onSlotClick(slot: Int, button: Int, action: SlotActionType, player: PlayerEntity) {

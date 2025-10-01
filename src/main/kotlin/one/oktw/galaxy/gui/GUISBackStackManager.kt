@@ -25,9 +25,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
+import one.oktw.galaxy.util.MinecraftAsyncExecutor
 import java.util.concurrent.ConcurrentLinkedDeque
 
-class GUISBackStackManager(private val player: ServerPlayerEntity) : CoroutineScope by CoroutineScope(player.entityWorld.server.asCoroutineDispatcher()) {
+class GUISBackStackManager(private val player: ServerPlayerEntity) :
+    CoroutineScope by CoroutineScope(MinecraftAsyncExecutor(player.entityWorld.server).asCoroutineDispatcher()) {
     private val stack = ConcurrentLinkedDeque<GUI>()
 
     companion object {

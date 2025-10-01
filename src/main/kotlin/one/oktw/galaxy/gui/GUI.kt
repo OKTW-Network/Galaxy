@@ -51,6 +51,7 @@ class GUI private constructor(
     private val type: ScreenHandlerType<out ScreenHandler>,
     private val title: Text,
     private val slotBindings: HashMap<Int, Slot>,
+    private val skipPick: HashSet<Int>,
     private val blockEntity: BlockEntity? = null
 ) :
     NamedScreenHandlerFactory {
@@ -136,6 +137,7 @@ class GUI private constructor(
         private var title: Text = Text.empty()
         private var background: Optional<MutableText> = Optional.empty()
         private val slotBindings = HashMap<Int, Slot>()
+        private val skipPick = HashSet<Int>()
         private var blockEntity: BlockEntity? = null
 
         fun setTitle(title: Text): Builder {
@@ -163,6 +165,19 @@ class GUI private constructor(
 
         fun addSlot(x: Int, y: Int, slot: Slot) = this.addSlot(inventoryUtils.xyToIndex(x, y), slot)
 
+        /**
+         * Set Slot to be skipped during PICK_ALL scan
+         */
+        fun setSkipPick(index: Int): Builder {
+            skipPick += index
+            return this
+        }
+
+        /**
+         * Set Slot to be skipped during PICK_ALL scan
+         */
+        fun setSkipPick(x: Int, y: Int) = this.setSkipPick(inventoryUtils.xyToIndex(x, y))
+
         fun blockEntity(entity: BlockEntity): Builder {
             this.blockEntity = entity
             return this
@@ -170,7 +185,7 @@ class GUI private constructor(
 
         fun build(): GUI {
             val title = if (background.isPresent) background.get().append(title) else title
-            return GUI(type, title, slotBindings, blockEntity)
+            return GUI(type, title, slotBindings, skipPick, blockEntity)
         }
     }
 
@@ -263,6 +278,7 @@ class GUI private constructor(
                             val list = (slotBindings.keys.sorted() + (inventory.size() until slots.size)).let { if (button == 0) it else it.reversed() }
                             for (index in list) {
                                 if (cursorItemStack.count >= cursorItemStack.maxCount) break@loop
+                                if (index in skipPick) continue
 
                                 val scanSlot = slots[index]
                                 // Check slot item

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -29,6 +29,7 @@ import net.minecraft.block.enums.RailShape
 import net.minecraft.block.enums.SlabType
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.state.property.Properties.*
+import net.minecraft.state.property.Property
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
@@ -38,7 +39,6 @@ import one.oktw.galaxy.event.type.PlayerUseItemOnBlock
 import one.oktw.galaxy.item.CustomItemHelper
 import one.oktw.galaxy.item.Tool
 import java.util.*
-import kotlin.collections.set
 
 class Wrench {
     private val startDirection = WeakHashMap<ServerPlayerEntity, Pair<BlockPos, Direction>>() // Don't leak ServerPlayerEntity
@@ -204,7 +204,7 @@ class Wrench {
             }
 
             // Cycle property
-            for (prop in listOf(BLOCK_HALF, FACE, ATTACHMENT)) {
+            for (prop: Property<*> in listOf(BLOCK_HALF, FACE, ATTACHMENT)) {
                 if (newState!!.contains(prop)) {
                     newState = newState.cycle(prop)
                     break

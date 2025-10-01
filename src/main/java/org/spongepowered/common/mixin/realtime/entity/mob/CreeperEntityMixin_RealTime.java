@@ -46,6 +46,7 @@ import net.minecraft.entity.mob.CreeperEntity;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
@@ -53,6 +54,7 @@ import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
 @Mixin(CreeperEntity.class)
 public abstract class CreeperEntityMixin_RealTime {
+    @Unique
     private boolean delay;
 
     @Shadow

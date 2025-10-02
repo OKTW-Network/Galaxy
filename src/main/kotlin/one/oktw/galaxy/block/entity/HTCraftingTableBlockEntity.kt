@@ -24,7 +24,6 @@ import net.minecraft.component.type.LoreComponent
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.SimpleInventory
 import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
 import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.screen.slot.Slot
 import net.minecraft.server.network.ServerPlayerEntity
@@ -38,73 +37,88 @@ import net.minecraft.util.math.BlockPos
 import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
-import one.oktw.galaxy.item.CustomBlockItem
+import one.oktw.galaxy.item.CustomItemBrowser
+import one.oktw.galaxy.item.Gui
 import one.oktw.galaxy.item.Misc
+import one.oktw.galaxy.item.recipe.CustomItemRecipe
 
 class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : ModelCustomBlockEntity(type, pos, modelItem),
     CustomBlockClickListener {
 
     // TODO Recipe Manager
-    private val listGui = GUI.Builder(ScreenHandlerType.GENERIC_9X3)
-        .setTitle(Text.translatable("UI.Title.HiTechCraftingTableList"))
-        .setBackground("A", Identifier.of("galaxy", "gui_font/container_layout/ht_crafting_table"))
-        .blockEntity(this)
-        .build()
-        .apply {
-            editInventory {
-                fillAll(Misc.PLACEHOLDER.createItemStack())
-                set(0, 1, CustomBlockItem.HT_CRAFTING_TABLE.createItemStack())
-                set(2, 0, CustomBlockItem.HT_CRAFTING_TABLE.createItemStack())
-                set(3, 0, CustomBlockItem.ELEVATOR.createItemStack())
-                set(4, 0, CustomBlockItem.ANGEL_BLOCK.createItemStack())
-                set(5, 0, CustomBlockItem.HARVEST.createItemStack())
-                set(6, 0, CustomBlockItem.TRASHCAN.createItemStack())
+    private fun getListGui(): GUI {
+        val itemBrowser = CustomItemBrowser()
+        return GUI.Builder(ScreenHandlerType.GENERIC_9X3)
+            .setTitle(Text.translatable("UI.Title.HiTechCraftingTableList"))
+            .setBackground("A", Identifier.of("galaxy", "gui_font/container_layout/ht_crafting_table"))
+            .blockEntity(this)
+            .build()
+            .apply {
+                editInventory {
+                    fillAll(Misc.PLACEHOLDER.createItemStack())
+
+                    val updateView = {
+                        // Category
+                        val category = itemBrowser.getCategoryGui()
+                        var i = 0
+                        for (y in 0..2) {
+                            val item = category.getOrNull(i++) ?: break
+                            set(0, y, item.displayItem.createItemStack())
+                        }
+
+                        // Category Item
+                        val categoryItem = itemBrowser.getCategoryItems()
+                        i = 0
+                        for (y in 0..2) for (x in 2..7) {
+                            // TODO check recipe exist
+                            val item = categoryItem.getOrNull(i++) ?: break
+                            set(x, y, item.createItemStack())
+                        }
+
+                        // Category Paging
+                        if (itemBrowser.isNextPageAvailable()) {
+                            set(0, 8, Gui.ARROWHEAD_UP.createItemStack())
+                        }
+                        if (itemBrowser.isNextPageAvailable()) {
+                            set(2, 8, Gui.ARROWHEAD_DOWN.createItemStack())
+                        }
+                    }
+                    updateView()
+                    itemBrowser.onPageUpdate { updateView() }
+                }
+                // Category Paging
+                addBinding(0, 0) {
+                    cancel = true
+                    itemBrowser.previousCategory()
+                }
+                addBinding(0, 2) {
+                    cancel = true
+                    itemBrowser.nextCategory()
+                }
+
+                // Handle Items
+                var i = 0
+                for (y in 0..2) for (x in 2..7) {
+                    addBinding(x, y) {
+                        cancel = true
+                        val item = itemBrowser.getItemByIndex(i++) ?: return@addBinding Unit
+                        // TODO REPLACE with CustomItemRecipe function
+                        val recipe = CustomItemRecipe.recipes[item] ?: return@addBinding Unit
+                        GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe.ingredients, recipe.outputItem.createItemStack()))
+                    }
+                }
+
+                // Handle Pages
+                addBinding(8, 0) {
+                    cancel = true
+                    itemBrowser.previousPage()
+                }
+                addBinding(8, 2) {
+                    cancel = true
+                    itemBrowser.nextPage()
+                }
             }
-            addBinding(2, 0) {
-                cancel = true
-                val recipe = listOf(
-                    ItemStack(Items.REDSTONE, 2),
-                    ItemStack(Items.IRON_INGOT, 2),
-                    ItemStack(Items.LAPIS_LAZULI, 2),
-                    ItemStack(Items.DIAMOND, 1),
-                    ItemStack(Items.CRAFTING_TABLE, 1),
-                    ItemStack(Items.OBSIDIAN, 1)
-                )
-                GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe, CustomBlockItem.HT_CRAFTING_TABLE.createItemStack()))
-            }
-            addBinding(3, 0) {
-                cancel = true
-                val recipe = listOf(
-                    ItemStack(Items.IRON_BLOCK, 1),
-                    ItemStack(Items.ENDER_PEARL, 1)
-                )
-                GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe, CustomBlockItem.ELEVATOR.createItemStack()))
-            }
-            addBinding(4, 0) {
-                cancel = true
-                val recipe = listOf(CustomBlockItem.ANGEL_BLOCK.createItemStack()) // TODO
-                GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe, CustomBlockItem.ANGEL_BLOCK.createItemStack()))
-            }
-            addBinding(5, 0) {
-                cancel = true
-                val recipe = listOf(
-                    ItemStack(Items.COPPER_INGOT, 7),
-                    ItemStack(Items.DISPENSER, 1),
-                    ItemStack(Items.OBSERVER, 1)
-                )
-                GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe, CustomBlockItem.HARVEST.createItemStack()))
-            }
-            addBinding(6, 0) {
-                cancel = true
-                val recipe = listOf(
-                    ItemStack(Items.GLASS, 4),
-                    ItemStack(Items.CACTUS, 1),
-                    ItemStack(Items.TERRACOTTA, 2),
-                    ItemStack(Items.SAND, 1)
-                )
-                GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe, CustomBlockItem.TRASHCAN.createItemStack()))
-            }
-        }
+    }
 
     private fun getRecipeGui(player: PlayerEntity, recipe: List<ItemStack>, itemStack: ItemStack): GUI {
         val output = SimpleInventory(itemStack.copy())
@@ -116,6 +130,7 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                 override fun canInsert(stack: ItemStack) = false
 
                 override fun canTakeItems(player: PlayerEntity): Boolean {
+                    // TODO REPLACE with CustomItemRecipe function
                     return recipe.all { recipe ->
                         var count = recipe.count
                         for (item in player.inventory.mainStacks) {
@@ -127,6 +142,7 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                 }
 
                 override fun onTakeItem(player: PlayerEntity, stack: ItemStack) {
+                    // TODO REPLACE with CustomItemRecipe function
                     recipe.forEach {
                         var count = it.count
                         while (count > 0) {
@@ -150,6 +166,7 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                     }
                 }
                 onUpdate {
+                    // Todo REPLACE with CustomItemRecipe function
                     // Show missing items
                     val missing = recipe.mapNotNull {
                         var count = it.count
@@ -183,7 +200,7 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
         hand: Hand,
         hit: BlockHitResult
     ): ActionResult {
-        GUISBackStackManager.openGUI(player as ServerPlayerEntity, listGui)
+        GUISBackStackManager.openGUI(player as ServerPlayerEntity, getListGui())
         return ActionResult.SUCCESS_SERVER
     }
 }

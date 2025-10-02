@@ -78,7 +78,7 @@ class CustomItemBrowser(val isCreative: Boolean = false) {
         pageUpdateListener?.invoke()
     }
 
-    fun getItemByIndex(index: Int) = getCategoryItems()[index]
+    fun getItemByIndex(index: Int) = getCategoryItems().getOrNull(index)
 
     fun onPageUpdate(action: () -> Unit) {
         pageUpdateListener = action

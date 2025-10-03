@@ -18,13 +18,13 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.item.Items.COMMAND_BLOCK
+import net.minecraft.item.Items.RECOVERY_COMPASS
 import net.minecraft.text.Text
 import net.minecraft.text.Text.translatable
 import net.minecraft.util.Identifier
 
 class Weapon private constructor(id: String, private val name: String) :
-    CustomItem(Identifier.of("galaxy", "weapon/$id"), COMMAND_BLOCK, maxStackSize = 1) {
+    CustomItem(Identifier.of("galaxy", "weapon/$id"), RECOVERY_COMPASS, maxStackSize = 1) {
     override val cacheable = false
 
     companion object {

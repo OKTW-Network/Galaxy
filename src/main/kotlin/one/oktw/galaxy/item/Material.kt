@@ -18,13 +18,13 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.item.Items.COMMAND_BLOCK
+import net.minecraft.item.Items.RECOVERY_COMPASS
 import net.minecraft.text.Text
 import net.minecraft.text.Text.translatable
 import net.minecraft.util.Identifier
 
 class Material private constructor(id: String, private val name: String) :
-    CustomItem(Identifier.of("galaxy", "material/$id"), COMMAND_BLOCK) {
+    CustomItem(Identifier.of("galaxy", "material/$id"), RECOVERY_COMPASS) {
     companion object {
         val RAW_BASE_PLATE = registry.register(Material("raw_base_plate", "item.Material.PART_RAW_BASE"))
         val BASE_PLATE = registry.register(Material("base_plate", "item.Material.PART_BASE"))

@@ -11,7 +11,7 @@
     "S": "minecraft:stick"
   },
   "result": {
-    "id": "minecraft:command_block",
+    "id": "minecraft:recovery_compass",
     "count": 1,
     "components": {
       "max_stack_size": 1,

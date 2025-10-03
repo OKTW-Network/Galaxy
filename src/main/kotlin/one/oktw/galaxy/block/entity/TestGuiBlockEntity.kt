@@ -29,6 +29,7 @@ import net.minecraft.inventory.Inventory
 import net.minecraft.item.ItemStack
 import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.screen.slot.Slot
+import net.minecraft.screen.slot.SlotActionType
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.storage.ReadView
 import net.minecraft.storage.WriteView
@@ -64,10 +65,12 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
                 set(2, 2, Gui.PLUS.createItemStack())
             }
             addBinding(4, 2) {
-                GUISBackStackManager.openGUI(player, gui2)
+                cancel = true
+                if (action == SlotActionType.PICKUP) GUISBackStackManager.openGUI(player, gui2)
             }
             addBinding(2, 2) {
-                GUISBackStackManager.openGUI(player, gui3)
+                cancel = true
+                if (action == SlotActionType.PICKUP) GUISBackStackManager.openGUI(player, gui3)
             }
         }
 
@@ -84,7 +87,8 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
                 set(4, 3, Gui.CROSS_MARK.createItemStack().apply { this.set(DataComponentTypes.ITEM_NAME, Text.of("CLOSE ALL")) })
             }
             addBinding(4, 3) {
-                GUISBackStackManager.closeAll(player)
+                cancel = true
+                if (action == SlotActionType.PICKUP) GUISBackStackManager.closeAll(player)
             }
         }
     private val gui3 = GUI.Builder(ScreenHandlerType.ANVIL)
@@ -98,7 +102,8 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
                 set(2, Gui.CHECK_MARK.createItemStack())
             }
             addBinding(2) {
-                player.sendMessage(Text.literal(inputText))
+                cancel = true
+                if (action == SlotActionType.PICKUP) player.sendMessage(Text.literal(inputText))
             }
         }
 

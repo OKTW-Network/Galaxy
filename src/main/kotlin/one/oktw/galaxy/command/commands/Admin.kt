@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,6 +22,7 @@ import com.mojang.brigadier.CommandDispatcher
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import one.oktw.galaxy.command.Command
+import one.oktw.galaxy.command.commands.admin.Creative
 import one.oktw.galaxy.command.commands.admin.FlySpeed
 import one.oktw.galaxy.command.commands.admin.GetItem
 import one.oktw.galaxy.command.commands.admin.RegisterBlock
@@ -31,6 +32,7 @@ class Admin : Command {
         dispatcher.register(
             CommandManager.literal("admin")
                 .requires { source -> source.hasPermissionLevel(2) }
+                .then(Creative().command)
                 .then(GetItem().command)
                 .then(RegisterBlock.command)
                 .then(FlySpeed().command)

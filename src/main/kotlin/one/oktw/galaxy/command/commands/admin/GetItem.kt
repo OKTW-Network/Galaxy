@@ -51,28 +51,9 @@ class GetItem {
 
                     val itemStack = item.createItemStack()
                     val player = it.source.playerOrThrow
-                    if (player.inventory.insertStack(itemStack)) {
-                        itemStack.count = 1
-                        val itemEntity = player.dropItem(itemStack, false)
-                        itemEntity?.setDespawnImmediately()
-
-                        player.entityWorld.playSound(
-                            null,
-                            player.x,
-                            player.y,
-                            player.z,
-                            SoundEvents.ENTITY_ITEM_PICKUP,
-                            SoundCategory.PLAYERS,
-                            0.2F,
-                            ((player.random.nextFloat() - player.random.nextFloat()) * 0.7F + 1.0F) * 2.0F
-                        )
-                        player.playerScreenHandler.sendContentUpdates()
-                    } else {
-                        player.dropItem(itemStack, false)?.apply {
-                            resetPickupDelay()
-                            setOwner(player.uuid)
-                        }
-                    }
+                    player.giveOrDropStack(itemStack.copy())
+                    val pitch = ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f
+                    player.entityWorld.playSound(null, player.x, player.y, player.z, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2f, pitch)
                     it.source.sendFeedback({ Text.translatable("commands.give.success.single", 1, itemStack.toHoverableText(), it.source.displayName) }, true)
 
                     return@executes Command.SINGLE_SUCCESS

@@ -39,6 +39,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
     CustomBlockTickListener {
 
     private var entityUUID: UUID? = null
+    private var checkCooldown = 0
     open var facing = facing
         set(direction) {
             if (facing != null && direction != null && direction in allowedFacing) {
@@ -50,14 +51,16 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
     open val allowedFacing: List<Direction> = emptyList()
 
     override fun tick() {
-        if (entityUUID == null || (world as ServerWorld).getEntity(entityUUID) == null) {
+        if (entityUUID == null || --checkCooldown <= 0 && (world as ServerWorld).getEntity(entityUUID) == null) {
             // Kill leak entities
             (world as ServerWorld).getEntitiesByType(EntityType.ITEM_DISPLAY) { it.blockPos == pos && it.commandTags.contains("BLOCK") }.forEach {
                 it.kill(world as ServerWorld)
             }
 
             spawnEntity()
+            checkCooldown = 20
         }
+        if (checkCooldown <= 0) checkCooldown = 10
     }
 
     override fun readData(view: ReadView) {

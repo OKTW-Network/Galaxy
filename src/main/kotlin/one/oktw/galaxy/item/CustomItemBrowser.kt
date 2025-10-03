@@ -23,7 +23,7 @@ import one.oktw.galaxy.item.category.CustomItemCategory
 class CustomItemBrowser(val isCreative: Boolean = false) {
     private val categories = if (isCreative) CustomItemCategory.creativeCategories else CustomItemCategory.categories
     private var currentIndex = 0
-    private var currentPage = 0
+    private var currentPageOffset = 0
     private var pageUpdateListener: (() -> Unit)? = null
 
     // Category paging
@@ -41,7 +41,7 @@ class CustomItemBrowser(val isCreative: Boolean = false) {
         } else {
             currentIndex -= 1
         }
-        currentPage = 0
+        currentPageOffset = 0
         pageUpdateListener?.invoke()
     }
 
@@ -51,29 +51,33 @@ class CustomItemBrowser(val isCreative: Boolean = false) {
         } else {
             currentIndex += 1
         }
-        currentPage = 0
+        currentPageOffset = 0
         pageUpdateListener?.invoke()
     }
 
     // Category item paging
     fun getCurrent() = categories[currentIndex]
-    private fun getPagedItems(): List<List<CustomItem>> = getCurrent().items.chunked(18)
+    private fun getAllPagedItems(): List<List<CustomItem>> = getCurrent().items.chunked(6)
 
-    fun getCategoryItems() = getPagedItems()[currentPage]
+    fun getCategoryItems() =
+        getAllPagedItems()
+            .drop(currentPageOffset)
+            .take(3)
+            .flatten()
 
-    fun isPreviousPageAvailable() = currentPage > 0
-    fun isNextPageAvailable() = currentPage < getPagedItems().lastIndex
+    fun isPreviousPageAvailable() = currentPageOffset > 0
+    fun isNextPageAvailable() = currentPageOffset + 2 < getAllPagedItems().lastIndex
 
     fun previousPage() {
         if (isPreviousPageAvailable()) {
-            currentPage -=1
+            currentPageOffset -= 1
         }
         pageUpdateListener?.invoke()
     }
 
     fun nextPage() {
         if (isNextPageAvailable()) {
-            currentPage +=1
+            currentPageOffset += 1
         }
         pageUpdateListener?.invoke()
     }

@@ -75,7 +75,7 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                         }
 
                         // Category Paging
-                        if (itemBrowser.isNextPageAvailable()) {
+                        if (itemBrowser.isPreviousPageAvailable()) {
                             set(8, 0, Gui.ARROWHEAD_UP.createItemStack())
                         }
                         if (itemBrowser.isNextPageAvailable()) {

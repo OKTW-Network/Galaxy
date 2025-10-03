@@ -96,5 +96,6 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         entity.addCommandTag("BLOCK")
         entity.addCommandTag(getId().toString())
         if (world!!.spawnEntity(entity)) entityUUID = entity.uuid
+        markDirty()
     }
 }

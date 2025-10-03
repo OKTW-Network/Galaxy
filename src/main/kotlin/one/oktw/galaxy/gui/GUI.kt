@@ -29,6 +29,7 @@ import net.minecraft.inventory.SimpleInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.screen.NamedScreenHandlerFactory
 import net.minecraft.screen.ScreenHandler
+import net.minecraft.screen.ScreenHandlerListener
 import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.screen.ScreenHandlerType.*
 import net.minecraft.screen.slot.Slot
@@ -51,6 +52,7 @@ class GUI private constructor(
     private val type: ScreenHandlerType<out ScreenHandler>,
     private val title: Text,
     private val slotBindings: HashMap<Int, Slot>,
+    private val skipPick: HashSet<Int>,
     private val blockEntity: BlockEntity? = null
 ) :
     NamedScreenHandlerFactory {
@@ -79,6 +81,7 @@ class GUI private constructor(
     private val inventoryUtils = InventoryUtils(type)
     private val openListener = ConcurrentHashMap.newKeySet<(PlayerEntity) -> Any>()
     private val closeListener = ConcurrentHashMap.newKeySet<(PlayerEntity) -> Any>()
+    private val updateListener = ConcurrentHashMap.newKeySet<() -> Any>()
     var inputText: String = ""
         private set
 
@@ -133,6 +136,10 @@ class GUI private constructor(
         closeListener += block
     }
 
+    fun onUpdate(block: () -> Any) {
+        updateListener += block
+    }
+
     private fun checkRange(x: Int, y: Int) = inventoryUtils.xyToIndex(x, y) in 0 until inventory.size()
 
     class Builder(private val type: ScreenHandlerType<out ScreenHandler>) {
@@ -141,6 +148,7 @@ class GUI private constructor(
         private var title: Text = Text.empty()
         private var background: Optional<MutableText> = Optional.empty()
         private val slotBindings = HashMap<Int, Slot>()
+        private val skipPick = HashSet<Int>()
         private var blockEntity: BlockEntity? = null
 
         fun setTitle(title: Text): Builder {
@@ -168,6 +176,19 @@ class GUI private constructor(
 
         fun addSlot(x: Int, y: Int, slot: Slot) = this.addSlot(inventoryUtils.xyToIndex(x, y), slot)
 
+        /**
+         * Set Slot to be skipped during PICK_ALL scan
+         */
+        fun setSkipPick(index: Int): Builder {
+            skipPick += index
+            return this
+        }
+
+        /**
+         * Set Slot to be skipped during PICK_ALL scan
+         */
+        fun setSkipPick(x: Int, y: Int) = this.setSkipPick(inventoryUtils.xyToIndex(x, y))
+
         fun blockEntity(entity: BlockEntity): Builder {
             this.blockEntity = entity
             return this
@@ -175,12 +196,13 @@ class GUI private constructor(
 
         fun build(): GUI {
             val title = if (background.isPresent) background.get().append(title) else title
-            return GUI(type, title, slotBindings, blockEntity)
+            return GUI(type, title, slotBindings, skipPick, blockEntity)
         }
     }
 
-    inner class GuiContainer(syncId: Int, playerInventory: PlayerInventory) : ScreenHandler(type, syncId) {
+    inner class GuiContainer(syncId: Int, playerInventory: PlayerInventory) : ScreenHandler(type, syncId), ScreenHandlerListener {
         init {
+            this.addListener(this)
             inventory.onOpen(playerInventory.player)
 
             // Add slot
@@ -207,6 +229,14 @@ class GUI private constructor(
             closeListener.forEach { it.invoke(player) }
         }
 
+        override fun onSlotUpdate(handler: ScreenHandler, slotId: Int, stack: ItemStack) {
+            updateListener.forEach { it.invoke() }
+        }
+
+        override fun onPropertyUpdate(handler: ScreenHandler?, property: Int, value: Int) {
+            // Unused
+        }
+
         override fun onSlotClick(slot: Int, button: Int, action: SlotActionType, player: PlayerEntity) {
             // Trigger binding
             if (slot in 0 until inventory.size()) {
@@ -224,6 +254,7 @@ class GUI private constructor(
             // Cancel player change inventory
             if (slot < inventory.size() && slot != -999 && !slotBindings.contains(slot)) {
                 if (action == QUICK_CRAFT) endQuickCraft()
+                if (action == CLONE && player.isCreative) super.onSlotClick(slot, button, action, player)
                 return
             }
 
@@ -234,7 +265,9 @@ class GUI private constructor(
 
                     val inventorySlot = slots[slot]
 
-                    if (inventorySlot.hasStack()) {
+                    val maxStack = inventorySlot.stack.maxCount
+                    var count = 0
+                    while (count++ < maxStack && inventorySlot.hasStack() && inventorySlot.canTakeItems(player)) {
                         val slotItemStack = inventorySlot.stack
 
                         // Move item from GUI to player inventory
@@ -249,6 +282,8 @@ class GUI private constructor(
                         } else {
                             inventorySlot.markDirty()
                         }
+
+                        inventorySlot.onTakeItem(player, slotItemStack)
                     }
 
                     return
@@ -264,6 +299,7 @@ class GUI private constructor(
                             val list = (slotBindings.keys.sorted() + (inventory.size() until slots.size)).let { if (button == 0) it else it.reversed() }
                             for (index in list) {
                                 if (cursorItemStack.count >= cursorItemStack.maxCount) break@loop
+                                if (index in skipPick) continue
 
                                 val scanSlot = slots[index]
                                 // Check slot item

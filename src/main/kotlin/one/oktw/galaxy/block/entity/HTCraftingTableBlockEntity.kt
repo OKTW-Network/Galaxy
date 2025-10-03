@@ -20,6 +20,7 @@ package one.oktw.galaxy.block.entity
 
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.DataComponentTypes.ITEM_NAME
 import net.minecraft.component.type.LoreComponent
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.SimpleInventory
@@ -62,7 +63,7 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                         var i = 0
                         for (y in 0..2) {
                             val item = category.getOrNull(i++) ?: break
-                            set(0, y, item.displayItem.createItemStack())
+                            set(0, y, item.displayItem.createItemStack().apply { set(ITEM_NAME, item.displayName) })
                         }
 
                         // Category Item
@@ -76,10 +77,10 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
 
                         // Category Paging
                         if (itemBrowser.isPreviousPageAvailable()) {
-                            set(8, 0, Gui.ARROWHEAD_UP.createItemStack())
+                            set(8, 0, Gui.ARROWHEAD_UP.createItemStack().apply { set(ITEM_NAME, Text.translatable("UI.Button.PreviousPage")) })
                         }
                         if (itemBrowser.isNextPageAvailable()) {
-                            set(8, 2, Gui.ARROWHEAD_DOWN.createItemStack())
+                            set(8, 2, Gui.ARROWHEAD_DOWN.createItemStack().apply { set(ITEM_NAME, Text.translatable("UI.Button.NextPage")) })
                         }
                     }
                     updateView()

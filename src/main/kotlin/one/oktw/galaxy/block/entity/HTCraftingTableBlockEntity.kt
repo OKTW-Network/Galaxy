@@ -96,15 +96,14 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                 }
 
                 // Handle Items
-                var i = 0
-                for (y in 0..2) for (x in 2..7) {
-                    addBinding(x, y) {
-                        cancel = true
-                        val item = itemBrowser.getItemByIndex(i++) ?: return@addBinding Unit
-                        // TODO REPLACE with CustomItemRecipe function
-                        val recipe = CustomItemRecipe.recipes[item] ?: return@addBinding Unit
-                        GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe.ingredients, recipe.outputItem.createItemStack()))
-                    }
+                addBinding(2..7, 0..2) {
+                    cancel = true
+                    // Slot is 6 x 3
+                    val index = this.y * 6 + (this.x - 2)
+                    val item = itemBrowser.getItemByIndex(index) ?: return@addBinding Unit
+                    // TODO REPLACE with CustomItemRecipe function
+                    val recipe = CustomItemRecipe.recipes[item] ?: return@addBinding Unit
+                    GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe.ingredients, recipe.outputItem.createItemStack()))
                 }
 
                 // Handle Pages

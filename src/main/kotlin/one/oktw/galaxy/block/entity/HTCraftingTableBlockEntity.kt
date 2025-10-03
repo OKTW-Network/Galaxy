@@ -19,9 +19,7 @@
 package one.oktw.galaxy.block.entity
 
 import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.DataComponentTypes.ITEM_NAME
-import net.minecraft.component.type.LoreComponent
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.SimpleInventory
 import net.minecraft.item.ItemStack
@@ -30,7 +28,6 @@ import net.minecraft.screen.slot.Slot
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
-import net.minecraft.util.Formatting
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.hit.BlockHitResult
@@ -46,7 +43,6 @@ import one.oktw.galaxy.item.recipe.CustomItemRecipe
 class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : ModelCustomBlockEntity(type, pos, modelItem),
     CustomBlockClickListener {
 
-    // TODO Recipe Manager
     private fun getListGui(): GUI {
         val itemBrowser = CustomItemBrowser(filterRecipe = true)
         return GUI.Builder(ScreenHandlerType.GENERIC_9X3)
@@ -101,9 +97,8 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                     // Slot is 6 x 3
                     val index = this.y * 6 + (this.x - 2)
                     val item = itemBrowser.getItemByIndex(index) ?: return@addBinding Unit
-                    // TODO REPLACE with CustomItemRecipe function
                     val recipe = CustomItemRecipe.recipes[item] ?: return@addBinding Unit
-                    GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe.ingredients, recipe.outputItem.createItemStack()))
+                    GUISBackStackManager.openGUI(player, getRecipeGui(player, recipe))
                 }
 
                 // Handle Pages
@@ -118,38 +113,20 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
             }
     }
 
-    private fun getRecipeGui(player: PlayerEntity, recipe: List<ItemStack>, itemStack: ItemStack): GUI {
-        val output = SimpleInventory(itemStack.copy())
+    private fun getRecipeGui(player: PlayerEntity, recipe: CustomItemRecipe): GUI {
+        val output = SimpleInventory(recipe.outputItem.createItemStack())
         return GUI.Builder(ScreenHandlerType.GENERIC_9X3)
-            .setTitle(Text.translatable("UI.Title.HiTechCraftingTableRecipe", itemStack.itemName))
+            .setTitle(Text.translatable("UI.Title.HiTechCraftingTableRecipe", recipe.outputItem.getName()))
             .setBackground("B", Identifier.of("galaxy", "gui_font/container_layout/ht_crafting_table"))
             .blockEntity(this)
             .addSlot(7, 1, object : Slot(output, 0, 0, 0) {
                 override fun canInsert(stack: ItemStack) = false
 
-                override fun canTakeItems(player: PlayerEntity): Boolean {
-                    // TODO REPLACE with CustomItemRecipe function
-                    return recipe.all { recipe ->
-                        var count = recipe.count
-                        for (item in player.inventory.mainStacks) {
-                            if (ItemStack.areItemsAndComponentsEqual(item, recipe)) count -= item.count
-                            if (count <= 0) break
-                        }
-                        count <= 0
-                    }
-                }
+                override fun canTakeItems(player: PlayerEntity): Boolean = recipe.isAffordable(player)
 
                 override fun onTakeItem(player: PlayerEntity, stack: ItemStack) {
-                    // TODO REPLACE with CustomItemRecipe function
-                    recipe.forEach {
-                        var count = it.count
-                        while (count > 0) {
-                            val slot = player.inventory.getSlotWithStack(it)
-                            if (slot == -1) break // not found
-                            count -= player.inventory.removeStack(slot, count).count
-                        }
-                    }
-                    setStackNoCallbacks(itemStack.copy()) // refill output
+                    recipe.takeItem(player)
+                    setStackNoCallbacks(recipe.outputItem.createItemStack()) // refill output
                     super.onTakeItem(player, stack)
                 }
             })
@@ -159,39 +136,15 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                     fillAll(Misc.PLACEHOLDER.createItemStack())
                     var i = 0
                     for (y in 0..2) for (x in 1..4) {
-                        val item = recipe.getOrNull(i++) ?: break
+                        val item = recipe.ingredients.getOrNull(i++) ?: break
                         set(x, y, item)
                     }
                 }
                 onUpdate {
-                    // Todo REPLACE with CustomItemRecipe function
-                    // Show missing items
-                    val missing = recipe.mapNotNull {
-                        var count = it.count
-                        for (item in player.inventory.mainStacks) {
-                            if (ItemStack.areItemsAndComponentsEqual(item, it)) count -= item.count
-                            if (count <= 0) break
-                        }
-                        if (count > 0) it.copyWithCount(count) else null
-                    }
-                    if (missing.isNotEmpty()) {
-                        val lore = listOf(
-                            Text.literal("Missing:").styled { it.withColor(Formatting.RED).withBold(true).withItalic(false) },
-                            *missing.map {
-                                it.itemName.copy().append(Text.literal("*")).append(Text.literal(it.count.toString()))
-                                    .styled { style -> style.withItalic(false).withColor(Formatting.WHITE) }
-                            }.toTypedArray()
-                        )
-                        val item = itemStack.copy()
-                        item.set(DataComponentTypes.LORE, LoreComponent(lore))
-                        output.setStack(0, item)
-                    } else {
-                        output.setStack(0, itemStack.copy())
-                    }
+                    output.setStack(0, recipe.getOutputItem(player))
                 }
             }
     }
-
 
     override fun onClick(
         player: PlayerEntity,

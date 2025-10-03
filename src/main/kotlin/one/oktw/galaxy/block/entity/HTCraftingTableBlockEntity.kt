@@ -87,7 +87,7 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                     cancel = true
                     if (action == SlotActionType.PICKUP) itemBrowser.previousCategory()
                 }
-                addBinding(0,1) {
+                addBinding(0, 1) {
                     cancel = true // Cancel creative clone item
                 }
                 addBinding(0, 2) {
@@ -143,6 +143,14 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                     for (y in 0..2) for (x in 1..4) {
                         val item = recipe.ingredients.getOrNull(i++) ?: break
                         set(x, y, item)
+                    }
+                }
+                addBinding(7, 1) {
+                    // Allow creative clone true item
+                    if (action == SlotActionType.CLONE && player.isCreative) {
+                        cancel = true
+                        val screen = player.currentScreenHandler
+                        if (screen.cursorStack.isEmpty) screen.cursorStack = recipe.outputItem.createItemStack().apply { count = maxCount }
                     }
                 }
                 onUpdate {

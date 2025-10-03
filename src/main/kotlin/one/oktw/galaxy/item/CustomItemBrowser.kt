@@ -19,12 +19,21 @@
 package one.oktw.galaxy.item
 
 import one.oktw.galaxy.item.category.CustomItemCategory
+import one.oktw.galaxy.item.recipe.CustomItemRecipe
 
-class CustomItemBrowser(val isCreative: Boolean = false) {
-    private val categories = if (isCreative) CustomItemCategory.creativeCategories else CustomItemCategory.categories
+class CustomItemBrowser(val isCreative: Boolean = false, val filterRecipe: Boolean = false) {
+    private var categories = (if (isCreative) CustomItemCategory.creativeCategories else CustomItemCategory.categories)
     private var currentIndex = 0
     private var currentPageOffset = 0
     private var pageUpdateListener: (() -> Unit)? = null
+
+    init {
+        if (filterRecipe) {
+            categories = categories.filter {
+                it.items.any { item -> CustomItemRecipe.recipes.containsKey(item) }
+            }
+        }
+    }
 
     // Category paging
     fun getCategoryGui(): List<CustomItemCategory> {
@@ -57,7 +66,12 @@ class CustomItemBrowser(val isCreative: Boolean = false) {
 
     // Category item paging
     fun getCurrent() = categories[currentIndex]
-    private fun getAllPagedItems(): List<List<CustomItem>> = getCurrent().items.chunked(6)
+    private fun getAllPagedItems(): List<List<CustomItem>> =
+        if (filterRecipe) {
+            getCurrent().items.filter { CustomItemRecipe.recipes.containsKey(it) }.chunked(6)
+        } else {
+            getCurrent().items.chunked(6)
+        }
 
     fun getCategoryItems() =
         getAllPagedItems()

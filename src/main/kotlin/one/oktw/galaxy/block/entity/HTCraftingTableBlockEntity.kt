@@ -48,7 +48,7 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
 
     // TODO Recipe Manager
     private fun getListGui(): GUI {
-        val itemBrowser = CustomItemBrowser()
+        val itemBrowser = CustomItemBrowser(filterRecipe = true)
         return GUI.Builder(ScreenHandlerType.GENERIC_9X3)
             .setTitle(Text.translatable("UI.Title.HiTechCraftingTableList"))
             .setBackground("A", Identifier.of("galaxy", "gui_font/container_layout/ht_crafting_table"))
@@ -70,7 +70,6 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                         val categoryItem = itemBrowser.getCategoryItems()
                         i = 0
                         for (y in 0..2) for (x in 2..7) {
-                            // TODO check recipe exist
                             val item = categoryItem.getOrNull(i++) ?: break
                             set(x, y, item.createItemStack())
                         }

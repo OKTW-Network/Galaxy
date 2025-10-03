@@ -44,7 +44,6 @@ abstract class CustomItemRecipe {
 
     abstract val ingredients: List<ItemStack>
     abstract val outputItem: CustomItem
-    open val itemStack = outputItem.createItemStack()
 
     open fun isAffordable(player: PlayerEntity) = ingredients.all { ingredient ->
         var count = ingredient.count
@@ -85,11 +84,11 @@ abstract class CustomItemRecipe {
                         .styled { style -> style.withItalic(false).withColor(Formatting.WHITE) }
                 }.toTypedArray()
             )
-            val item = itemStack.copy()
+            val item = outputItem.createItemStack()
             item.set(DataComponentTypes.LORE, LoreComponent(lore))
             return item
         } else {
-            return itemStack.copy()
+            return outputItem.createItemStack()
         }
     }
 }

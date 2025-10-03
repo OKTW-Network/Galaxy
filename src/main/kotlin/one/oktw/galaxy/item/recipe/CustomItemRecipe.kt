@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.item.recipe
 
-import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.DataComponentTypes.LORE
 import net.minecraft.component.type.LoreComponent
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
@@ -78,14 +78,14 @@ abstract class CustomItemRecipe {
         if (missing.isNotEmpty()) {
             val lore = listOf(
                 // TODO Translate
-                Text.literal("Missing:").styled { it.withColor(Formatting.RED).withBold(true).withItalic(false) },
-                *missing.map {
-                    it.itemName.copy().append(Text.literal("*")).append(Text.literal(it.count.toString()))
-                        .styled { style -> style.withItalic(false).withColor(Formatting.WHITE) }
+                Text.literal("Missing:").styled { it.withColor(Formatting.RED).withBold(true).withItalic(false) }, *missing.map { item ->
+                    item.itemName.copy().styled { it.withColor(Formatting.WHITE).withItalic(false) }
+                        .append(Text.literal(" * ").styled { it.withColor(Formatting.GRAY).withItalic(false) })
+                        .append(Text.literal(item.count.toString()).styled { it.withColor(Formatting.GRAY).withItalic(false) })
                 }.toTypedArray()
             )
             val item = outputItem.createItemStack()
-            item.set(DataComponentTypes.LORE, LoreComponent(lore))
+            item.set(LORE, LoreComponent(lore))
             return item
         } else {
             return outputItem.createItemStack()

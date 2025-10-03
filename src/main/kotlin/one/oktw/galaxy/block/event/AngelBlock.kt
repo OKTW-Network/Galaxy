@@ -19,14 +19,11 @@
 package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
-import net.minecraft.block.Blocks
 import net.minecraft.item.ItemPlacementContext
-import net.minecraft.item.ItemStack
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 import one.oktw.galaxy.block.CustomBlock
 import one.oktw.galaxy.block.CustomBlockHelper
@@ -40,24 +37,12 @@ import one.oktw.galaxy.item.CustomItemHelper
 class AngelBlock {
     private val justBroke = HashSet<ServerPlayerEntity>()
     private val usedLock = HashSet<ServerPlayerEntity>()
-    private val allowReplaceBlocks = arrayOf(Blocks.AIR, Blocks.CAVE_AIR, Blocks.WATER, Blocks.LAVA)
 
     init {
         ServerTickEvents.END_WORLD_TICK.register(ServerTickEvents.EndWorldTick {
             justBroke.clear()
             usedLock.clear()
         })
-    }
-
-    private fun placeAngelBlock(player: ServerPlayerEntity, hand: Hand, item: ItemStack) {
-        val blockHit = player.raycast(3.0, 1.0f, false) as BlockHitResult
-        if (allowReplaceBlocks.contains(player.world.getBlockState(blockHit.blockPos).block)) {
-            val placeContext = ItemPlacementContext(player, hand, item, blockHit)
-            CustomBlockHelper.place(placeContext)
-                .run {
-                    if (!player.isCreative) player.setStackInHand(hand, player.getStackInHand(hand).also { it.decrement(1) })
-                }
-        }
     }
 
     @EventListener(sync = true)
@@ -71,8 +56,10 @@ class AngelBlock {
 
         val item = player.getStackInHand(event.packet.hand)
         if (CustomItemHelper.getItem(item) == CustomBlockItem.ANGEL_BLOCK) {
-            placeAngelBlock(player, event.packet.hand, item)
-            event.swing = true
+            val blockHit = player.raycast(3.0, 1.0f, false) as BlockHitResult
+            val placeContext = ItemPlacementContext(player, event.packet.hand, item, blockHit)
+            if (CustomBlockHelper.place(placeContext)) event.swing = true
+
             usedLock.add(player)
         }
     }

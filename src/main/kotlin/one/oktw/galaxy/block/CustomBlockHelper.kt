@@ -33,6 +33,7 @@ import net.minecraft.state.property.Properties
 import net.minecraft.storage.NbtReadView
 import net.minecraft.util.ErrorReporter
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Direction
 import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.CustomItemHelper
@@ -57,7 +58,8 @@ object CustomBlockHelper {
             // Set facing
             if (entity is ModelCustomBlockEntity) {
                 val allowed = entity.allowedFacing
-                entity.facing = context.placementDirections?.firstOrNull { it.opposite in allowed }?.opposite
+                val facing = context.player?.let(Direction::getEntityFacingOrder) ?: arrayOf(context.side)
+                entity.facing = facing.firstOrNull { it.opposite in allowed }?.opposite
             }
             world.addBlockEntity(entity)
 

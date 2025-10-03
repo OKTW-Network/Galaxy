@@ -47,6 +47,7 @@ import one.oktw.galaxy.gui.utils.InventoryUtils
 import org.apache.logging.log4j.LogManager
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.min
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 class GUI private constructor(
@@ -263,17 +264,41 @@ class GUI private constructor(
                 return
             }
 
-            return when (action) {
-                PICKUP, SWAP, CLONE, THROW, QUICK_CRAFT -> super.onSlotClick(slot, button, action, player)
+            when (action) {
+                PICKUP, SWAP, CLONE, QUICK_CRAFT -> super.onSlotClick(slot, button, action, player)
+                THROW -> {
+                    if (!player.canDropItems() || slot < 0) return
+                    val inventorySlot = slots[slot]
+                    val takeCount = if (button == 0) 1 else inventorySlot.stack.count
+
+                    // Limit max take count
+                    val maxStack = inventorySlot.stack.maxCount
+                    var stack = inventorySlot.takeStackRange(takeCount, Int.MAX_VALUE, player)
+                    var count = stack.count
+                    player.dropItem(stack, true)
+                    if (button == 1) {
+                        while (count + min(takeCount, inventorySlot.stack.count) <= maxStack && ItemStack.areItemsEqual(inventorySlot.stack, stack)) {
+                            if (!player.canDropItems()) return
+
+                            stack = inventorySlot.takeStackRange(takeCount, Int.MAX_VALUE, player)
+                            if (stack.isEmpty) break
+                            count += stack.count
+                            player.dropItem(stack, true)
+                        }
+                    }
+                }
+
                 QUICK_MOVE -> {
                     if (slot in 0 until inventory.size() && !slotBindings.contains(slot)) return
 
                     val inventorySlot = slots[slot]
 
+                    // Limit max take count
                     val maxStack = inventorySlot.stack.maxCount
                     var count = 0
-                    while (count++ < maxStack && inventorySlot.hasStack() && inventorySlot.canTakeItems(player)) {
+                    while (count + inventorySlot.stack.count <= maxStack && inventorySlot.hasStack() && inventorySlot.canTakeItems(player)) {
                         val slotItemStack = inventorySlot.stack
+                        val origCount = slotItemStack.count
 
                         // Move item from GUI to player inventory
                         if (slot < inventory.size() && !insertItem(slotItemStack, playerInventoryRange.first, playerHotBarRange.last, true)) return
@@ -288,10 +313,9 @@ class GUI private constructor(
                             inventorySlot.markDirty()
                         }
 
+                        count += origCount - slotItemStack.count
                         inventorySlot.onTakeItem(player, slotItemStack)
                     }
-
-                    return
                 }
 
                 PICKUP_ALL -> { // Rewrite PICKUP_ALL only take from allow use slot & player inventory.

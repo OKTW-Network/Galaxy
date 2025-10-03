@@ -53,7 +53,7 @@ class GetItem {
                     val player = it.source.playerOrThrow
                     player.giveOrDropStack(itemStack.copy())
                     val pitch = ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f
-                    player.world.playSound(null, player.x, player.y, player.z, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2f, pitch)
+                    player.entityWorld.playSound(null, player.x, player.y, player.z, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2f, pitch)
                     it.source.sendFeedback({ Text.translatable("commands.give.success.single", 1, itemStack.toHoverableText(), it.source.displayName) }, true)
 
                     return@executes Command.SINGLE_SUCCESS

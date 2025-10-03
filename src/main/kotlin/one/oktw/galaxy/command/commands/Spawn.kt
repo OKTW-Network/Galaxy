@@ -60,10 +60,10 @@ class Spawn : Command {
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
 
-            val player = originPlayer.server?.playerManager?.getPlayer(originPlayer.uuid) ?: return@launch
+            val player = originPlayer.entityWorld.server.playerManager.getPlayer(originPlayer.uuid) ?: return@launch
             player.sendMessage(Text.translatable("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
 
-            val world = player.world.toServerWorld()
+            val world = player.entityWorld
             val type = world.registryKey
 
             if (type == World.NETHER) {
@@ -72,7 +72,7 @@ class Spawn : Command {
                 return@launch
             }
 
-            val oldPos = player.pos
+            val oldPos = player.entityPos
 
             player.stopRiding()
             if (player.isSleeping) {
@@ -87,11 +87,10 @@ class Spawn : Command {
                 return@launch
             }
 
-            player.refreshPositionAndAngles(player.getWorldSpawnPos(world, world.spawnPos).toBottomCenterPos(), 0.0f, 0.0f)
+            player.refreshPositionAndAngles(player.getWorldSpawnPos(world, world.spawnPoint.pos).toBottomCenterPos(), 0.0f, 0.0f)
             // force teleport when player pos does not change at all
-            if (oldPos.distanceTo(player.pos) == 0.0) {
-                val spawnPosition = world.spawnPos
-                player.refreshPositionAndAngles(spawnPosition, 0.0f, 0.0f)
+            if (oldPos.distanceTo(player.entityPos) == 0.0) {
+                player.refreshPositionAndAngles(world.spawnPoint.pos, 0.0f, 0.0f)
             }
 
             while (!world.isSpaceEmpty(player) && player.y < world.topYInclusive) {

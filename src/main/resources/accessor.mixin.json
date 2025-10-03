@@ -4,8 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "BeaconLevelAccessor",
-    "PlayerAbilitiesAccessor",
-    "ServerChunkLoadingManagerAccessor"
+    "PlayerAbilitiesAccessor"
   ],
   "client": [],
   "injectors": {

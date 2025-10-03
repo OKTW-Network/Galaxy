@@ -37,6 +37,7 @@ import net.minecraft.screen.slot.SlotActionType
 import net.minecraft.screen.slot.SlotActionType.*
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.MutableText
+import net.minecraft.text.StyleSpriteSource
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
@@ -57,10 +58,14 @@ class GUI private constructor(
 ) :
     NamedScreenHandlerFactory {
     companion object {
-        val GUI_FONT_SHIFT_CHEST_START: Text = Text.literal("<").styled { it.withFont(Identifier.of("galaxy", "gui_font/shift")) }
-        val GUI_FONT_SHIFT_CHEST_END: Text = Text.literal(";>").styled { it.withFont(Identifier.of("galaxy", "gui_font/shift")) }
-        val GUI_FONT_SHIFT_ANVIL_START: Text = Text.literal("⟨").styled { it.withFont(Identifier.of("galaxy", "gui_font/shift")) }
-        val GUI_FONT_SHIFT_ANVIL_END: Text = Text.literal(";⟩").styled { it.withFont(Identifier.of("galaxy", "gui_font/shift")) }
+        val GUI_FONT_SHIFT_CHEST_START: Text = Text.literal("<")
+            .styled { it.withFont(StyleSpriteSource.Font(Identifier.of("galaxy", "gui_font/shift"))) }
+        val GUI_FONT_SHIFT_CHEST_END: Text = Text.literal(";>")
+            .styled { it.withFont(StyleSpriteSource.Font(Identifier.of("galaxy", "gui_font/shift"))) }
+        val GUI_FONT_SHIFT_ANVIL_START: Text = Text.literal("⟨")
+            .styled { it.withFont(StyleSpriteSource.Font(Identifier.of("galaxy", "gui_font/shift"))) }
+        val GUI_FONT_SHIFT_ANVIL_END: Text = Text.literal(";⟩")
+            .styled { it.withFont(StyleSpriteSource.Font(Identifier.of("galaxy", "gui_font/shift"))) }
     }
 
     private val inventory = when (type) {
@@ -159,7 +164,7 @@ class GUI private constructor(
         fun setBackground(char: String, font: Identifier): Builder {
             val background = Text.empty()
                 .append(if (type == ANVIL) GUI_FONT_SHIFT_ANVIL_START else GUI_FONT_SHIFT_CHEST_START)
-                .append(Text.literal(char).styled { it.withFont(font).withColor(Formatting.WHITE) })
+                .append(Text.literal(char).styled { it.withFont(StyleSpriteSource.Font(font)).withColor(Formatting.WHITE) })
                 .append(if (type == ANVIL) GUI_FONT_SHIFT_ANVIL_END else GUI_FONT_SHIFT_CHEST_END)
 
             this.background = Optional.of(background)

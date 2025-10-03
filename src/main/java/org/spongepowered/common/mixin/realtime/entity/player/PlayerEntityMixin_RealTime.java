@@ -62,7 +62,7 @@ public abstract class PlayerEntityMixin_RealTime extends LivingEntityMixin_RealT
     @Redirect(method = "tick",
         at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerEntity;experiencePickUpDelay:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
     private void realTimeImpl$adjustForRealTimeExperiencePickUpDelay(final PlayerEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         this.experiencePickUpDelay = Math.max(0, this.experiencePickUpDelay - ticks);
     }
 
@@ -86,7 +86,7 @@ public abstract class PlayerEntityMixin_RealTime extends LivingEntityMixin_RealT
         )
     )
     private void realTimeImpl$adjustForRealTimeSleepTimer(final PlayerEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         this.sleepTimer += ticks;
     }
 
@@ -109,13 +109,13 @@ public abstract class PlayerEntityMixin_RealTime extends LivingEntityMixin_RealT
         )
     )
     private void realTimeImpl$adjustForRealTimeWakeTimer(final PlayerEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         this.sleepTimer += ticks;
     }
 
     @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerEntity;lastAttackedTicks:I", opcode = Opcodes.PUTFIELD))
     private void realTimeImpl$adjustForRealTimeAttackCoolDown(final PlayerEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         this.lastAttackedTicks += ticks;
     }
 }

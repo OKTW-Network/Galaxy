@@ -46,6 +46,7 @@ import net.minecraft.entity.mob.CreeperEntity;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
@@ -53,6 +54,7 @@ import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
 @Mixin(CreeperEntity.class)
 public abstract class CreeperEntityMixin_RealTime {
+    @Unique
     private boolean delay;
 
     @Shadow
@@ -78,7 +80,7 @@ public abstract class CreeperEntityMixin_RealTime {
     )
     private void realTimeImpl$adjustForRealTimeCreeperFuseTime(final CreeperEntity self, final int modifier) {
         if (modifier != 0) {
-            final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+            final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
             this.currentFuseTime += (getFuseSpeed() * ticks);
 
             // delay 1 tick wait AI detect player distance

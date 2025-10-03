@@ -31,8 +31,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.Objects;
-
 @Mixin(MeCommand.class)
 public class MixinPlayerChat_MeCommand {
     @Redirect(method = "method_43645", at = @At(
@@ -47,7 +45,7 @@ public class MixinPlayerChat_MeCommand {
         if (player == null || !EventManager.safeEmit(new PlayerChatEvent(player, Text.translatable("chat.type.emote", player.getDisplayName(), message.getContent()))).getCancel()) {
             playerManager.broadcast(message, source, messageType);
         } else {
-            Objects.requireNonNull(player.getServer()).logChatMessage(message.getContent(), messageType, "Canceled");
+            player.getEntityWorld().getServer().logChatMessage(message.getContent(), messageType, "Canceled");
         }
     }
 }

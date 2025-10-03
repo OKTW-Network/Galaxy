@@ -41,10 +41,10 @@ class Elevator {
     }
 
     private fun doTeleport(player: ServerPlayerEntity, pos: BlockPos) {
-        player.requestTeleport(player.pos.x, pos.y.toDouble(), player.pos.z)
+        player.requestTeleport(player.x, pos.y.toDouble(), player.z)
         player.velocity = Vec3d.ZERO
         player.networkHandler.sendPacket(EntityVelocityUpdateS2CPacket(player))
-        player.world.playSound(
+        player.entityWorld.playSound(
             null,
             BlockPos(pos),
             SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
@@ -57,8 +57,8 @@ class Elevator {
     @EventListener(sync = true)
     fun onJump(event: PlayerJumpEvent) {
         val player = event.player
-        val playerWorld = player.world.toServerWorld()
-        val blockPos = BlockPos.ofFloored(player.pos)
+        val playerWorld = player.entityWorld
+        val blockPos = player.blockPos
 
         if (isElevator(playerWorld, blockPos.down()) && isSafe(playerWorld, blockPos)) {
             for (i in 1..7) {
@@ -74,8 +74,8 @@ class Elevator {
     @EventListener(sync = true)
     fun onSneak(event: PlayerSneakEvent) {
         val player = event.player
-        val playerWorld = player.world.toServerWorld()
-        val blockPos = BlockPos.ofFloored(player.pos)
+        val playerWorld = player.entityWorld
+        val blockPos = player.blockPos
 
         if (isElevator(playerWorld, blockPos.down()) && isSafe(playerWorld, blockPos)) {
             for (i in 3..9) {

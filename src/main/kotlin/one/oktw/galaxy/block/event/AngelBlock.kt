@@ -69,11 +69,11 @@ class AngelBlock {
         val player = event.player
         val blockPos = event.packet.pos
         if (event.packet.action == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK &&
-            (player.world.getBlockEntity(blockPos) as? CustomBlockEntity)?.getId() == CustomBlock.ANGEL_BLOCK.identifier &&
+            (player.entityWorld.getBlockEntity(blockPos) as? CustomBlockEntity)?.getId() == CustomBlock.ANGEL_BLOCK.identifier &&
             !justBroke.contains(player)
         ) {
-            CustomBlockHelper.destroyAndDrop(player.world.toServerWorld(), blockPos)
-            player.world.toServerWorld().playSound(null, blockPos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
+            CustomBlockHelper.destroyAndDrop(player.entityWorld, blockPos)
+            player.entityWorld.playSound(null, blockPos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
             justBroke.add(player)
         }
     }

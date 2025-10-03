@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -42,7 +42,7 @@ public abstract class MixinPlayerAction_NetworkHandler {
     private void onPlayerAction(PlayerActionC2SPacket packet, CallbackInfo ci) {
         if (EventManager.safeEmit(new PlayerActionEvent(packet, player)).getCancel()) {
             ci.cancel();
-            player.networkHandler.sendPacket(new BlockUpdateS2CPacket(player.getWorld(), packet.getPos()));
+            player.networkHandler.sendPacket(new BlockUpdateS2CPacket(player.getEntityWorld(), packet.getPos()));
             player.currentScreenHandler.syncState();
         }
     }

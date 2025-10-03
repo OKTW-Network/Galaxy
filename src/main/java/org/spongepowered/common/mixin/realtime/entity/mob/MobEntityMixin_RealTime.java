@@ -61,7 +61,7 @@ public abstract class MobEntityMixin_RealTime extends LivingEntityMixin_RealTime
         )
     )
     private void realTimeImpl$adjustForRealTimeEntityDespawnAge(final MobEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         this.despawnCounter += ticks;
     }
 }

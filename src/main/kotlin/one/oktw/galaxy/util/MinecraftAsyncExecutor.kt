@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,19 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.mixin.accessor;
+package one.oktw.galaxy.util
 
-import net.minecraft.server.world.ChunkHolder;
-import net.minecraft.server.world.ServerChunkLoadingManager;
-import net.minecraft.util.math.ChunkPos;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Invoker;
+import net.minecraft.server.MinecraftServer
+import java.util.concurrent.Executor
 
-@Mixin(ServerChunkLoadingManager.class)
-public interface ServerChunkLoadingManagerAccessor {
-    @Invoker
-    Iterable<ChunkHolder> callEntryIterator();
-
-    @Invoker
-    boolean callShouldTick(ChunkPos pos);
+/**
+ * Force async execute task in server thread
+ */
+class MinecraftAsyncExecutor(private val server: MinecraftServer) : Executor {
+    override fun execute(command: Runnable) {
+        server.send(server.createTask(command))
+    }
 }

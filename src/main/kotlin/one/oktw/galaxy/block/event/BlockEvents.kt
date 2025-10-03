@@ -59,12 +59,12 @@ class BlockEvents {
         if (!player.shouldCancelInteraction() || player.mainHandStack.isEmpty && player.offHandStack.isEmpty) {
             val packet = event.packet
             val hitResult = packet.blockHitResult
-            val blockEntity = player.world.getBlockEntity(hitResult.blockPos) as? CustomBlockClickListener ?: return
+            val blockEntity = player.entityWorld.getBlockEntity(hitResult.blockPos) as? CustomBlockClickListener ?: return
             val result = blockEntity.onClick(player, packet.hand, hitResult)
             if (result.isAccepted) {
                 Criteria.ITEM_USED_ON_BLOCK.trigger(player, hitResult.blockPos, player.getStackInHand(packet.hand))
                 event.swing = (result as? ActionResult.Success)?.swingSource() == ActionResult.SwingSource.SERVER
-                usedLock[player] = player.server?.ticks
+                usedLock[player] = player.entityWorld.server.ticks
             }
         }
     }
@@ -77,18 +77,18 @@ class BlockEvents {
         // Place custom block
         if (CustomBlockHelper.place(ItemPlacementContext(event.context))) {
             event.swing = true
-            usedLock[player] = player.server?.ticks
+            usedLock[player] = player.entityWorld.server.ticks
             return
         }
 
         // Crowbar
         if (player.isSneaking && CustomItemHelper.getItem(item) == Tool.CROWBAR) {
-            val world = player.world.toServerWorld()
+            val world = player.entityWorld
             val blockPos = event.context.blockPos
             if (world.getBlockEntity(blockPos) !is ModelCustomBlockEntity) return // Check is custom block
             CustomBlockHelper.destroyAndDrop(world, blockPos)
             event.swing = true
-            usedLock[player] = player.server?.ticks
+            usedLock[player] = world.server.ticks
         }
     }
 

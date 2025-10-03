@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,13 +18,13 @@
 
 package one.oktw.galaxy.command.commands
 
-import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.suggestion.Suggestions
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.command.argument.GameProfileArgumentType
+import net.minecraft.server.PlayerConfigEntry
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
@@ -46,7 +46,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(
             CommandManager.literal("join")
-                .executes { context -> execute(context.source, listOf(context.source.playerOrThrow.gameProfile)) }
+                .executes { context -> execute(context.source, listOf(PlayerConfigEntry(context.source.playerOrThrow.gameProfile))) }
                 .then(
                     CommandManager.argument("player", GameProfileArgumentType.gameProfile())
                         .suggests { commandContext, suggestionsBuilder ->
@@ -77,7 +77,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
         )
     }
 
-    private fun execute(source: ServerCommandSource, collection: Collection<GameProfile>): Int {
+    private fun execute(source: ServerCommandSource, collection: Collection<PlayerConfigEntry>): Int {
         val sourcePlayer = source.playerOrThrow
         if (!lock.getOrPut(sourcePlayer) { Mutex() }.tryLock()) {
             source.sendFeedback({ Text.of("請稍後...") }, false)

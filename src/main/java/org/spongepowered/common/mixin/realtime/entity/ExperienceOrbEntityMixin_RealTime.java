@@ -57,7 +57,7 @@ public abstract class ExperienceOrbEntityMixin_RealTime extends EntityMixin_Real
 
     @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/ExperienceOrbEntity;orbAge:I", opcode = Opcodes.PUTFIELD))
     private void realTimeImpl$adjustForRealTimeAge(final ExperienceOrbEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         this.orbAge += ticks;
     }
 }

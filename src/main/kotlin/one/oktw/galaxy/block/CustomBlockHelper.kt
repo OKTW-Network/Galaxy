@@ -22,7 +22,6 @@ import com.mojang.logging.LogUtils
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
 import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.NbtComponent
 import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.item.Items
@@ -51,9 +50,10 @@ object CustomBlockHelper {
 
             // Create block entity and read data
             val entity = item.getBlock().createBlockEntity(pos)
-            val nbt = stack2.getOrDefault(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.DEFAULT).copyNbt()
-            val reporter = ErrorReporter.Logging(entity.reporterContext, LogUtils.getLogger())
-            entity.readCopyableData(NbtReadView.create(reporter, world.registryManager, nbt))
+            stack2.get(DataComponentTypes.BLOCK_ENTITY_DATA)?.let {
+                val reporter = ErrorReporter.Logging(entity.reporterContext, LogUtils.getLogger())
+                entity.readCopyableData(NbtReadView.create(reporter, world.registryManager, it.copyNbtWithoutId()))
+            }
             entity.readComponents(stack2)
             // Set facing
             if (entity is ModelCustomBlockEntity) {

@@ -64,7 +64,7 @@ public abstract class ZombieVillagerEntityMixin_RealTime extends LivingEntityMix
         )
     )
     private int realTimeImpl$adjustForRealTimeConversionTimeBoost(final ZombieVillagerEntity self) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
         return this.getConversionRate() * ticks;
     }
 

@@ -55,9 +55,8 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
             .build()
             .apply {
                 editInventory {
-                    fillAll(Misc.PLACEHOLDER.createItemStack())
-
                     val updateView = {
+                        fillAll(Misc.PLACEHOLDER.createItemStack())
                         // Category
                         val category = itemBrowser.getCategoryGui()
                         var i = 0
@@ -77,10 +76,10 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
 
                         // Category Paging
                         if (itemBrowser.isNextPageAvailable()) {
-                            set(0, 8, Gui.ARROWHEAD_UP.createItemStack())
+                            set(8, 0, Gui.ARROWHEAD_UP.createItemStack())
                         }
                         if (itemBrowser.isNextPageAvailable()) {
-                            set(2, 8, Gui.ARROWHEAD_DOWN.createItemStack())
+                            set(8, 2, Gui.ARROWHEAD_DOWN.createItemStack())
                         }
                     }
                     updateView()

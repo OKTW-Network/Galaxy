@@ -25,6 +25,7 @@ import net.minecraft.inventory.SimpleInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.screen.slot.Slot
+import net.minecraft.screen.slot.SlotActionType
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
@@ -84,16 +85,20 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                 // Category Paging
                 addBinding(0, 0) {
                     cancel = true
-                    itemBrowser.previousCategory()
+                    if (action == SlotActionType.PICKUP) itemBrowser.previousCategory()
+                }
+                addBinding(0,1) {
+                    cancel = true // Cancel creative clone item
                 }
                 addBinding(0, 2) {
                     cancel = true
-                    itemBrowser.nextCategory()
+                    if (action == SlotActionType.PICKUP) itemBrowser.nextCategory()
                 }
 
                 // Handle Items
                 addBinding(2..7, 0..2) {
                     cancel = true
+                    if (action != SlotActionType.PICKUP) return@addBinding Unit
                     // Slot is 6 x 3
                     val index = this.y * 6 + (this.x - 2)
                     val item = itemBrowser.getItemByIndex(index) ?: return@addBinding Unit
@@ -104,11 +109,11 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                 // Handle Pages
                 addBinding(8, 0) {
                     cancel = true
-                    itemBrowser.previousPage()
+                    if (action == SlotActionType.PICKUP) itemBrowser.previousPage()
                 }
                 addBinding(8, 2) {
                     cancel = true
-                    itemBrowser.nextPage()
+                    if (action == SlotActionType.PICKUP) itemBrowser.nextPage()
                 }
             }
     }

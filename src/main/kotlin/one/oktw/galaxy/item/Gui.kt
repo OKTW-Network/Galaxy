@@ -23,8 +23,14 @@ import net.minecraft.item.Items.DIAMOND_HOE
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
-class Gui(customModelData: CustomModelDataComponent, private val name: Text = Text.literal("")) :
-    CustomItem(Identifier.of("galaxy", "gui"), DIAMOND_HOE, itemModel = Identifier.of("galaxy", "gui/complex"), customModelData = customModelData) {
+class Gui(customModelData: CustomModelDataComponent, private val name: Text = Text.of("")) :
+    CustomItem(
+        Identifier.of("galaxy", "gui"),
+        DIAMOND_HOE,
+        itemModel = Identifier.of("galaxy", "gui/complex"),
+        customModelData = customModelData,
+        hideTooltip = name.literalString.isNullOrBlank()
+    ) {
 
     override fun getName(): Text = name
 }

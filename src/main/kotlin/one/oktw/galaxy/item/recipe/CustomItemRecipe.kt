@@ -21,7 +21,11 @@ package one.oktw.galaxy.item.recipe
 import net.minecraft.component.DataComponentTypes.LORE
 import net.minecraft.component.type.LoreComponent
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.Item
+import net.minecraft.item.ItemConvertible
 import net.minecraft.item.ItemStack
+import net.minecraft.registry.Registries
+import net.minecraft.registry.tag.TagKey
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import one.oktw.galaxy.item.CustomBlockItem
@@ -42,13 +46,13 @@ abstract class CustomItemRecipe {
         )
     }
 
-    abstract val ingredients: List<ItemStack>
+    abstract val ingredients: List<CustomIngredient>
     abstract val outputItem: CustomItem
 
-    open fun isAffordable(player: PlayerEntity) = ingredients.all { ingredient ->
-        var count = ingredient.count
+    open fun isAffordable(player: PlayerEntity) = ingredients.all {
+        var count = it.count
         for (item in player.inventory.mainStacks) {
-            if (ItemStack.areItemsAndComponentsEqual(item, ingredient)) count -= item.count
+            if (it.test(item)) count -= item.count
             if (count <= 0) break
         }
         count <= 0
@@ -57,10 +61,16 @@ abstract class CustomItemRecipe {
     open fun takeItem(player: PlayerEntity) {
         ingredients.forEach {
             var count = it.count
-            while (count > 0) {
-                val slot = player.inventory.getSlotWithStack(it)
-                if (slot == -1) break // not found
-                count -= player.inventory.removeStack(slot, count).count
+            loop@ while (count > 0) {
+                var found = false
+                for (item in player.inventory.mainStacks) {
+                    if (it.test(item)) {
+                        count -= item.split(count).count
+                        found = true
+                    }
+                    if (count <= 0) break@loop
+                }
+                if (!found) break@loop // not found
             }
         }
     }
@@ -70,10 +80,10 @@ abstract class CustomItemRecipe {
         val missing = ingredients.mapNotNull {
             var count = it.count
             for (item in player.inventory.mainStacks) {
-                if (ItemStack.areItemsAndComponentsEqual(item, it)) count -= item.count
+                if (it.test(item)) count -= item.count
                 if (count <= 0) break
             }
-            if (count > 0) it.copyWithCount(count) else null
+            if (count > 0) it.getExample().first().copyWithCount(count) else null
         }
         if (missing.isNotEmpty()) {
             val lore = listOf(
@@ -89,6 +99,67 @@ abstract class CustomItemRecipe {
             return item
         } else {
             return outputItem.createItemStack()
+        }
+    }
+
+    open class CustomIngredient() {
+        var stackMatch: ArrayList<ItemStack> = ArrayList()
+        var itemMatch: ArrayList<Item> = ArrayList()
+        var tagMatch: ArrayList<TagKey<Item>> = ArrayList()
+        var count: Int = 1
+
+        constructor(item: ItemStack, count: Int) : this() {
+            this.addMatch(item).setCount(count)
+        }
+
+        constructor(item: ItemConvertible, count: Int) : this() {
+            this.addMatch(item).setCount(count)
+        }
+
+        constructor(itemTags: TagKey<Item>, count: Int) : this() {
+            this.addMatch(itemTags).setCount(count)
+        }
+
+        fun addMatch(itemStack: ItemStack): CustomIngredient {
+            this.stackMatch += itemStack
+            return this
+        }
+
+        fun addMatch(item: ItemConvertible): CustomIngredient {
+            this.itemMatch += item.asItem()
+            return this
+        }
+
+        fun addMatch(tag: TagKey<Item>): CustomIngredient {
+            this.tagMatch += tag
+            return this
+        }
+
+        fun setCount(count: Int): CustomIngredient {
+            this.count = count
+            return this
+        }
+
+        open fun getExample(): List<ItemStack> {
+            if (stackMatch.isNotEmpty()) return stackMatch.map { it.copyWithCount(count) }
+            if (itemMatch.isNotEmpty()) return itemMatch.map { it.defaultStack.copyWithCount(count) }
+            if (tagMatch.isNotEmpty()) return tagMatch.flatMap { tag ->
+                val items = Registries.ITEM.filter { it.registryEntry.isIn(tag) }
+                // TODO Translate
+                val lore = listOf(
+                    Text.literal("Accept:").styled { it.withColor(Formatting.AQUA).withBold(true).withItalic(false) },
+                    *items.map { item -> item.name.copy().styled { it.withColor(Formatting.WHITE).withItalic(false) } }.toTypedArray()
+                )
+
+                items.map { it.defaultStack.copyWithCount(count).apply { set(LORE, LoreComponent(lore)) } }
+            }
+            return emptyList()
+        }
+
+        open fun test(item: ItemStack): Boolean {
+            return itemMatch.any { item.item == it } ||
+                stackMatch.any { ItemStack.areItemsAndComponentsEqual(it, item) } ||
+                tagMatch.any { item.isIn(it) }
         }
     }
 }

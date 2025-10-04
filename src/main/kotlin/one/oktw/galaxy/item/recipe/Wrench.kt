@@ -18,14 +18,13 @@
 
 package one.oktw.galaxy.item.recipe
 
-import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import one.oktw.galaxy.item.Tool.Companion.WRENCH
 
 class Wrench : CustomItemRecipe() {
     override val ingredients = listOf(
-        ItemStack(Items.STICK, 1),
-        ItemStack(Items.IRON_INGOT, 3)
+        CustomIngredient(Items.STICK, 1),
+        CustomIngredient(Items.IRON_INGOT, 3)
     )
     override val outputItem = WRENCH
 }

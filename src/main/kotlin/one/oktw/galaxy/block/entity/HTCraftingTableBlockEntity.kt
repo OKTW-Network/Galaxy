@@ -18,6 +18,7 @@
 
 package one.oktw.galaxy.block.entity
 
+import kotlinx.coroutines.*
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.component.DataComponentTypes.ITEM_NAME
 import net.minecraft.entity.player.PlayerEntity
@@ -45,7 +46,7 @@ import one.oktw.galaxy.item.gui.GuiModelBuilder
 import one.oktw.galaxy.item.recipe.CustomItemRecipe
 
 class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : ModelCustomBlockEntity(type, pos, modelItem),
-    CustomBlockClickListener {
+    CustomBlockClickListener, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     private val previousPageButton = Gui(
         GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_UP).build(),
         Text.translatable("UI.Button.PreviousPage")
@@ -54,7 +55,6 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
         GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_DOWN).build(),
         Text.translatable("UI.Button.NextPage")
     ).createItemStack()
-
 
     private fun getListGui(): GUI {
         val itemBrowser = CustomItemBrowser(filterRecipe = true)
@@ -132,43 +132,65 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
 
     private fun getRecipeGui(player: PlayerEntity, recipe: CustomItemRecipe): GUI {
         val output = SimpleInventory(recipe.outputItem.createItemStack())
-        return GUI.Builder(ScreenHandlerType.GENERIC_9X3)
-            .setTitle(Text.translatable("UI.Title.HiTechCraftingTableRecipe", recipe.outputItem.getName()))
-            .setBackground("B", Identifier.of("galaxy", "gui_font/container_layout/ht_crafting_table"))
-            .blockEntity(this)
-            .addSlot(7, 1, object : Slot(output, 0, 0, 0) {
-                override fun canInsert(stack: ItemStack) = false
+        val gui =
+            GUI.Builder(ScreenHandlerType.GENERIC_9X3)
+                .setTitle(Text.translatable("UI.Title.HiTechCraftingTableRecipe", recipe.outputItem.getName()))
+                .setBackground("B", Identifier.of("galaxy", "gui_font/container_layout/ht_crafting_table"))
+                .blockEntity(this)
+                .addSlot(7, 1, object : Slot(output, 0, 0, 0) {
+                    override fun canInsert(stack: ItemStack) = false
 
-                override fun canTakeItems(player: PlayerEntity): Boolean = recipe.isAffordable(player)
+                    override fun canTakeItems(player: PlayerEntity): Boolean = recipe.isAffordable(player)
 
-                override fun onTakeItem(player: PlayerEntity, stack: ItemStack) {
-                    recipe.takeItem(player)
-                    setStackNoCallbacks(recipe.outputItem.createItemStack()) // refill output
-                    super.onTakeItem(player, stack)
+                    override fun onTakeItem(player: PlayerEntity, stack: ItemStack) {
+                        recipe.takeItem(player)
+                        setStackNoCallbacks(recipe.outputItem.createItemStack()) // refill output
+                        super.onTakeItem(player, stack)
+                    }
+                })
+                .setSkipPick(7, 1)
+                .build().apply {
+                    editInventory {
+                        fillAll(Misc.PLACEHOLDER.createItemStack())
+                        var i = 0
+                        loop@ for (y in 0..2) for (x in 1..4) {
+                            val item = recipe.ingredients.getOrNull(i++)?.getExample()?.first() ?: break@loop
+                            set(x, y, item)
+                        }
+                    }
+                    addBinding(7, 1) {
+                        // Allow creative clone true item
+                        if (action == SlotActionType.CLONE && player.isCreative) {
+                            cancel = true
+                            val screen = player.currentScreenHandler
+                            if (screen.cursorStack.isEmpty) screen.cursorStack = recipe.outputItem.createItemStack().apply { count = maxCount }
+                        }
+                    }
+                    onUpdate {
+                        output.setStack(0, recipe.getOutputItem(player))
+                    }
                 }
-            })
-            .setSkipPick(7, 1)
-            .build().apply {
-                editInventory {
-                    fillAll(Misc.PLACEHOLDER.createItemStack())
+
+        // Multi item display animation
+        val job = launch {
+            var loop = 0
+            while (!(player as ServerPlayerEntity).isDisconnected) {
+                gui.editInventory {
                     var i = 0
-                    for (y in 0..2) for (x in 1..4) {
-                        val item = recipe.ingredients.getOrNull(i++) ?: break
-                        set(x, y, item)
+                    loop@ for (y in 0..2) for (x in 1..4) {
+                        val item = recipe.ingredients.getOrNull(i++)?.getExample() ?: break@loop
+                        if (item.count() > 1) {
+                            set(x, y, item[loop % item.count()])
+                        }
                     }
+                    loop++
                 }
-                addBinding(7, 1) {
-                    // Allow creative clone true item
-                    if (action == SlotActionType.CLONE && player.isCreative) {
-                        cancel = true
-                        val screen = player.currentScreenHandler
-                        if (screen.cursorStack.isEmpty) screen.cursorStack = recipe.outputItem.createItemStack().apply { count = maxCount }
-                    }
-                }
-                onUpdate {
-                    output.setStack(0, recipe.getOutputItem(player))
-                }
+                delay(1000)
             }
+        }
+        gui.onClose { job.cancel() }
+
+        return gui
     }
 
     override fun onClick(

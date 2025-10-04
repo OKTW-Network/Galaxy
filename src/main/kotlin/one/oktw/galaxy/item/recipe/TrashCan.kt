@@ -18,16 +18,16 @@
 
 package one.oktw.galaxy.item.recipe
 
-import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
+import net.minecraft.registry.tag.ItemTags
 import one.oktw.galaxy.item.CustomBlockItem.Companion.TRASHCAN
 
 class TrashCan : CustomItemRecipe() {
     override val ingredients = listOf(
-        ItemStack(Items.GLASS, 4),
-        ItemStack(Items.CACTUS, 1),
-        ItemStack(Items.TERRACOTTA, 2),
-        ItemStack(Items.SAND, 1)
+        CustomIngredient(Items.GLASS, 5),
+        CustomIngredient(Items.CACTUS, 1),
+        CustomIngredient(Items.TERRACOTTA, 2),
+        CustomIngredient(ItemTags.SAND, 1)
     )
     override val outputItem = TRASHCAN
 }

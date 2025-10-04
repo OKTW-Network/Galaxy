@@ -18,14 +18,13 @@
 
 package one.oktw.galaxy.item.recipe
 
-import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import one.oktw.galaxy.item.CustomBlockItem.Companion.ELEVATOR
 
 class Elevator : CustomItemRecipe() {
     override val ingredients = listOf(
-        ItemStack(Items.IRON_BLOCK, 1),
-        ItemStack(Items.ENDER_PEARL, 1)
+        CustomIngredient(Items.IRON_BLOCK, 1),
+        CustomIngredient(Items.ENDER_PEARL, 1)
     )
     override val outputItem = ELEVATOR
 }

@@ -45,7 +45,6 @@ abstract class CustomItem(
         val registry = CustomRegistry<CustomItem>()
 
         init {
-            Gui
             Material
             Tool
             Upgrade

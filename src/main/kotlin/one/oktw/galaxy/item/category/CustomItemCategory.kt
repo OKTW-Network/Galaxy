@@ -31,7 +31,7 @@ abstract class CustomItemCategory {
             Upgrade()
         )
 
-        val creativeCategories = categories + Gui()
+        val creativeCategories = categories
     }
 
     abstract val displayName: Text

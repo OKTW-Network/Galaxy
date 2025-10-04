@@ -16,14 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.category
+package one.oktw.galaxy.item.gui
 
-import net.minecraft.text.Text
-import one.oktw.galaxy.item.CustomItem
-import one.oktw.galaxy.item.Gui
-
-class Gui : CustomItemCategory() {
-    override val displayName: Text = Text.of("GUI")
-    override val displayItem = Gui.NUMBER_0
-    override val items = CustomItem.registry.getAll().filterValues { it is Gui }.values.toList()
+enum class GuiBackground(val value: String) {
+    NONE(""),
+    DEBUG("debug"),
+    TOP_LEFT_DEBUG_3X("3xtl_debug"),
+    BOTTOM_RIGHT_DEBUG_3X("br_debug"),
+    MAIN_FIELD("main_field"),
+    SUB_FIELD("sub_field")
 }

@@ -16,15 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item
+package one.oktw.galaxy.item.gui
 
-import net.minecraft.component.type.CustomModelDataComponent
-import net.minecraft.item.Items.DIAMOND_HOE
-import net.minecraft.text.Text
-import net.minecraft.util.Identifier
-
-class Gui(customModelData: CustomModelDataComponent, private val name: Text = Text.literal("")) :
-    CustomItem(Identifier.of("galaxy", "gui"), DIAMOND_HOE, itemModel = Identifier.of("galaxy", "gui/complex"), customModelData = customModelData) {
-
-    override fun getName(): Text = name
+enum class GuiButton(val value: String) {
+    NONE(""),
+    BUTTON("button"),
+    BUTTON_UNAVAILABLE("button_unavailable"),
+    BUTTON_3X("3x_button"),
+    BUTTON_UNAVAILABLE_3X("3x_button_unavailable"),
 }

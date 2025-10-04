@@ -1,0 +1,39 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "C": "minecraft:cactus",
+    "G": "minecraft:glass",
+    "S": "#minecraft:sand",
+    "T": "minecraft:terracotta"
+  },
+  "pattern": [
+    "GGG",
+    "GCG",
+    "TST"
+  ],
+  "result": {
+    "components": {
+      "minecraft:custom_data": {
+        "galaxy_data": {
+          "custom_item_identifier": "galaxy:block/trashcan"
+        }
+      },
+      "minecraft:item_model": "galaxy:block/trashcan",
+      "minecraft:item_name": {
+        "translate": "block.TRASHCAN"
+      },
+      "minecraft:rarity": "common",
+      "minecraft:tooltip_display": {
+        "hidden_components": [
+          "minecraft:attribute_modifiers",
+          "minecraft:unbreakable",
+          "minecraft:enchantments"
+        ]
+      },
+      "minecraft:unbreakable": {}
+    },
+    "count": 1,
+    "id": "minecraft:command_block"
+  }
+}

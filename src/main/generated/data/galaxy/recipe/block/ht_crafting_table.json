@@ -1,0 +1,41 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "C": "minecraft:crafting_table",
+    "D": "minecraft:diamond",
+    "I": "minecraft:iron_ingot",
+    "L": "minecraft:lapis_lazuli",
+    "O": "minecraft:obsidian",
+    "R": "minecraft:redstone"
+  },
+  "pattern": [
+    "RDL",
+    "ICI",
+    "LOR"
+  ],
+  "result": {
+    "components": {
+      "minecraft:custom_data": {
+        "galaxy_data": {
+          "custom_item_identifier": "galaxy:block/ht_crafting_table"
+        }
+      },
+      "minecraft:item_model": "galaxy:block/ht_crafting_table",
+      "minecraft:item_name": {
+        "translate": "block.HT_CRAFTING_TABLE"
+      },
+      "minecraft:rarity": "common",
+      "minecraft:tooltip_display": {
+        "hidden_components": [
+          "minecraft:attribute_modifiers",
+          "minecraft:unbreakable",
+          "minecraft:enchantments"
+        ]
+      },
+      "minecraft:unbreakable": {}
+    },
+    "count": 1,
+    "id": "minecraft:command_block"
+  }
+}

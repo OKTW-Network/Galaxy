@@ -1,0 +1,38 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "I I",
+    " S ",
+    " I "
+  ],
+  "result": {
+    "components": {
+      "minecraft:custom_data": {
+        "galaxy_data": {
+          "custom_item_identifier": "galaxy:tool/wrench"
+        }
+      },
+      "minecraft:item_model": "galaxy:tool/wrench",
+      "minecraft:item_name": {
+        "translate": "item.Tool.WRENCH"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:rarity": "common",
+      "minecraft:tooltip_display": {
+        "hidden_components": [
+          "minecraft:attribute_modifiers",
+          "minecraft:unbreakable",
+          "minecraft:enchantments"
+        ]
+      },
+      "minecraft:unbreakable": {}
+    },
+    "count": 1,
+    "id": "minecraft:recovery_compass"
+  }
+}

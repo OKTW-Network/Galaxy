@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "minecraft:ender_pearl",
+    "minecraft:iron_block"
+  ],
+  "result": {
+    "components": {
+      "minecraft:custom_data": {
+        "galaxy_data": {
+          "custom_item_identifier": "galaxy:block/elevator"
+        }
+      },
+      "minecraft:item_model": "galaxy:block/elevator",
+      "minecraft:item_name": {
+        "translate": "block.ELEVATOR"
+      },
+      "minecraft:rarity": "common",
+      "minecraft:tooltip_display": {
+        "hidden_components": [
+          "minecraft:attribute_modifiers",
+          "minecraft:unbreakable",
+          "minecraft:enchantments"
+        ]
+      },
+      "minecraft:unbreakable": {}
+    },
+    "count": 1,
+    "id": "minecraft:command_block"
+  }
+}

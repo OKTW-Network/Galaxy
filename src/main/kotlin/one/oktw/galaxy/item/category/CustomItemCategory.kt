@@ -30,8 +30,6 @@ abstract class CustomItemCategory {
             Material(),
             Upgrade()
         )
-
-        val creativeCategories = categories
     }
 
     abstract val displayName: Text

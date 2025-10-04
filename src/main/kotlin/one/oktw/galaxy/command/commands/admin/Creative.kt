@@ -51,7 +51,7 @@ class Creative {
     ).createItemStack()
 
     private fun getListGui(): GUI {
-        val itemBrowser = CustomItemBrowser(isCreative = true)
+        val itemBrowser = CustomItemBrowser()
         val inventory = SimpleInventory(6 * 3)
         return GUI.Builder(ScreenHandlerType.GENERIC_9X3)
             .setTitle(Text.of("Galaxy"))

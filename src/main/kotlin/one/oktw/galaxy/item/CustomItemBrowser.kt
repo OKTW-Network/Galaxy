@@ -21,8 +21,8 @@ package one.oktw.galaxy.item
 import one.oktw.galaxy.item.category.CustomItemCategory
 import one.oktw.galaxy.item.recipe.CustomItemRecipe
 
-class CustomItemBrowser(val isCreative: Boolean = false, val filterRecipe: Boolean = false) {
-    private var categories = (if (isCreative) CustomItemCategory.creativeCategories else CustomItemCategory.categories)
+class CustomItemBrowser(val filterRecipe: Boolean = false) {
+    private var categories = CustomItemCategory.categories
     private var currentIndex = 0
     private var currentPageOffset = 0
     private var pageUpdateListener: (() -> Unit)? = null

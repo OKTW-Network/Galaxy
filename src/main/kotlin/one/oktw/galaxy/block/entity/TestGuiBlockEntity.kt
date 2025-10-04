@@ -62,7 +62,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         Text.of("CLOSE ALL")
     ).createItemStack()
     private val plusButton = Gui(
-        GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.PLUS_SIGN).build(),
+        GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.PLUS_SIGN).build()
     ).createItemStack()
 
 

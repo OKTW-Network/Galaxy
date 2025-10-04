@@ -66,3 +66,4 @@ gradle-app.setting
 .gradletasknamecache
 run/
 .kotlin/
+src/main/generated/.cache

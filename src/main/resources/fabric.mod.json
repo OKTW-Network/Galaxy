@@ -16,6 +16,9 @@
   "entrypoints": {
     "server": [
       "one.oktw.galaxy.Main"
+    ],
+    "fabric-datagen": [
+      "one.oktw.galaxy.datagen.GalaxyDataGenerator"
     ]
   },
   "accessWidener": "galaxy.accesswidener",

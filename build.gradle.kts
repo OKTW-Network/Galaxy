@@ -43,6 +43,13 @@ loom {
     accessWidenerPath.set(file("src/main/resources/galaxy.accesswidener"))
 }
 
+fabricApi {
+    configureDataGeneration {
+        createSourceSet = true
+        modId = "galaxy"
+    }
+}
+
 dependencies {
     // Core
     minecraft("com.mojang:minecraft:${minecraftVersion}")

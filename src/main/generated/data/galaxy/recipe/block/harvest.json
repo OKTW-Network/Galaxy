@@ -1,0 +1,38 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "D": "minecraft:dispenser",
+    "O": "minecraft:observer"
+  },
+  "pattern": [
+    "CCC",
+    "CDO",
+    "CCC"
+  ],
+  "result": {
+    "components": {
+      "minecraft:custom_data": {
+        "galaxy_data": {
+          "custom_item_identifier": "galaxy:block/harvest"
+        }
+      },
+      "minecraft:item_model": "galaxy:block/harvest",
+      "minecraft:item_name": {
+        "translate": "block.HARVEST"
+      },
+      "minecraft:rarity": "common",
+      "minecraft:tooltip_display": {
+        "hidden_components": [
+          "minecraft:attribute_modifiers",
+          "minecraft:unbreakable",
+          "minecraft:enchantments"
+        ]
+      },
+      "minecraft:unbreakable": {}
+    },
+    "count": 1,
+    "id": "minecraft:command_block"
+  }
+}

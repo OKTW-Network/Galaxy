@@ -45,9 +45,27 @@ import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
 import one.oktw.galaxy.item.Gui
 import one.oktw.galaxy.item.Misc
+import one.oktw.galaxy.item.gui.GuiButton
+import one.oktw.galaxy.item.gui.GuiIcon
+import one.oktw.galaxy.item.gui.GuiModelBuilder
 
 class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : ModelCustomBlockEntity(type, pos, modelItem),
     CustomBlockClickListener, Inventory {
+    private val checkMarkButton = Gui(
+        GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.CHECK_MARK).build()
+    ).createItemStack()
+    private val eraseButton = Gui(
+        GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ERASE).build()
+    ).createItemStack()
+    private val closeAllButton = Gui(
+        GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.CROSS_MARK).build(),
+        Text.of("CLOSE ALL")
+    ).createItemStack()
+    private val plusButton = Gui(
+        GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.PLUS_SIGN).build()
+    ).createItemStack()
+
+
     private val inventory = DefaultedList.ofSize(3 * 9, ItemStack.EMPTY)
 
     private val gui = GUI.Builder(ScreenHandlerType.GENERIC_9X6)
@@ -61,8 +79,8 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         }.build().apply {
             editInventory {
                 fill(0 until 9, 1 until 4, Misc.PLACEHOLDER.createItemStack())
-                set(4, 2, Gui.CHECK_MARK.createItemStack())
-                set(2, 2, Gui.PLUS.createItemStack())
+                set(4, 2, checkMarkButton)
+                set(2, 2, plusButton)
             }
             addBinding(4, 2) {
                 cancel = true
@@ -84,7 +102,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         }.build().apply {
             editInventory {
                 fill(0 until 9, 3..3, Misc.PLACEHOLDER.createItemStack())
-                set(4, 3, Gui.CROSS_MARK.createItemStack().apply { this.set(DataComponentTypes.ITEM_NAME, Text.of("CLOSE ALL")) })
+                set(4, 3, closeAllButton)
             }
             addBinding(4, 3) {
                 cancel = true
@@ -97,9 +115,9 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         .blockEntity(this).build()
         .apply {
             editInventory {
-                set(0, Misc.PLACEHOLDER.createItemStack())
+                set(0, eraseButton)
                 set(1, Misc.PLACEHOLDER.createItemStack())
-                set(2, Gui.CHECK_MARK.createItemStack())
+                set(2, checkMarkButton)
             }
             addBinding(2) {
                 cancel = true

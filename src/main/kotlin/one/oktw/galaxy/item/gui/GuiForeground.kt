@@ -16,23 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package one.oktw.galaxy.item.category
+package one.oktw.galaxy.item.gui
 
-import net.minecraft.text.Text
-import one.oktw.galaxy.item.CustomItem
-
-abstract class CustomItemCategory {
-    companion object {
-        val categories = listOf(
-            Block(),
-            Tool(),
-            Weapon(),
-            Material(),
-            Upgrade()
-        )
-    }
-
-    abstract val displayName: Text
-    abstract val displayItem: CustomItem
-    abstract val items: List<CustomItem>
+enum class GuiForeground(val value: String) {
+    NONE(""),
+    DEBUG("debug"),
+    TOP_LEFT_DEBUG_3X("3xtl_debug"),
+    BOTTOM_RIGHT_DEBUG_3X("3xbr_debug"),
 }

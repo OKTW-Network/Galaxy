@@ -39,10 +39,22 @@ import one.oktw.galaxy.gui.GUISBackStackManager
 import one.oktw.galaxy.item.CustomItemBrowser
 import one.oktw.galaxy.item.Gui
 import one.oktw.galaxy.item.Misc
+import one.oktw.galaxy.item.gui.GuiButton
+import one.oktw.galaxy.item.gui.GuiIcon
+import one.oktw.galaxy.item.gui.GuiModelBuilder
 import one.oktw.galaxy.item.recipe.CustomItemRecipe
 
 class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : ModelCustomBlockEntity(type, pos, modelItem),
     CustomBlockClickListener {
+    private val previousPageButton = Gui(
+        GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_UP).build(),
+        Text.translatable("UI.Button.PreviousPage")
+    ).createItemStack()
+    private val nextPageButton = Gui(
+        GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_DOWN).build(),
+        Text.translatable("UI.Button.NextPage")
+    ).createItemStack()
+
 
     private fun getListGui(): GUI {
         val itemBrowser = CustomItemBrowser(filterRecipe = true)
@@ -73,10 +85,10 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
 
                         // Category Paging
                         if (itemBrowser.isPreviousPageAvailable()) {
-                            set(8, 0, Gui.ARROWHEAD_UP.createItemStack().apply { set(ITEM_NAME, Text.translatable("UI.Button.PreviousPage")) })
+                            set(8, 0, previousPageButton)
                         }
                         if (itemBrowser.isNextPageAvailable()) {
-                            set(8, 2, Gui.ARROWHEAD_DOWN.createItemStack().apply { set(ITEM_NAME, Text.translatable("UI.Button.NextPage")) })
+                            set(8, 2, nextPageButton)
                         }
                     }
                     updateView()

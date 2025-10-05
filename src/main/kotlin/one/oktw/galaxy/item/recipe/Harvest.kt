@@ -18,15 +18,14 @@
 
 package one.oktw.galaxy.item.recipe
 
-import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import one.oktw.galaxy.item.CustomBlockItem.Companion.HARVEST
 
 class Harvest : CustomItemRecipe() {
     override val ingredients = listOf(
-        ItemStack(Items.COPPER_INGOT, 7),
-        ItemStack(Items.DISPENSER, 1),
-        ItemStack(Items.OBSERVER, 1)
+        CustomIngredient(Items.COPPER_INGOT, 7),
+        CustomIngredient(Items.DISPENSER, 1),
+        CustomIngredient(Items.OBSERVER, 1)
     )
     override val outputItem = HARVEST
 }

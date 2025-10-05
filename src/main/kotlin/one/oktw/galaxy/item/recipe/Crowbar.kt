@@ -18,13 +18,12 @@
 
 package one.oktw.galaxy.item.recipe
 
-import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import one.oktw.galaxy.item.Tool.Companion.CROWBAR
 
 class Crowbar : CustomItemRecipe() {
     override val ingredients = listOf(
-        ItemStack(Items.IRON_INGOT, 4)
+        CustomIngredient(Items.IRON_INGOT, 4)
     )
 
     override val outputItem = CROWBAR

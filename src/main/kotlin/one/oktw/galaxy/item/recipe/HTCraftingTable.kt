@@ -18,18 +18,17 @@
 
 package one.oktw.galaxy.item.recipe
 
-import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import one.oktw.galaxy.item.CustomBlockItem.Companion.HT_CRAFTING_TABLE
 
 class HTCraftingTable : CustomItemRecipe() {
     override val ingredients = listOf(
-        ItemStack(Items.REDSTONE, 2),
-        ItemStack(Items.IRON_INGOT, 2),
-        ItemStack(Items.LAPIS_LAZULI, 2),
-        ItemStack(Items.DIAMOND, 1),
-        ItemStack(Items.CRAFTING_TABLE, 1),
-        ItemStack(Items.OBSIDIAN, 1)
+        CustomIngredient(Items.REDSTONE, 2),
+        CustomIngredient(Items.IRON_INGOT, 2),
+        CustomIngredient(Items.LAPIS_LAZULI, 2),
+        CustomIngredient(Items.DIAMOND, 1),
+        CustomIngredient(Items.CRAFTING_TABLE, 1),
+        CustomIngredient(Items.OBSIDIAN, 1)
     )
     override val outputItem = HT_CRAFTING_TABLE
 }

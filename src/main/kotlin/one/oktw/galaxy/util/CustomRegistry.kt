@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -22,7 +22,7 @@ import net.minecraft.util.Identifier
 import java.util.*
 
 open class CustomRegistry<T : Registrable> {
-    private val registry = HashMap<Identifier, T>()
+    private val registry = LinkedHashMap<Identifier, T>()
 
     @Throws(IllegalArgumentException::class)
     open fun register(obj: T): T {

@@ -49,24 +49,31 @@ import one.oktw.galaxy.block.listener.CustomBlockTickListener
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
 import one.oktw.galaxy.item.Misc
+import one.oktw.galaxy.item.Upgrade
 import one.oktw.galaxy.util.HarvestUtil
 
 class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) :
     ModelCustomBlockEntity(type, pos, modelItem, facing = Direction.NORTH), CustomBlockClickListener, SidedInventory, CustomBlockTickListener {
     companion object {
-        private val ALL_SLOT = intArrayOf(0, 1, 2, 3)
+        private val TOOL_SLOT = 0..0
+        private val UPGRADE_SLOT = 1..1
+        private val STORAGE_SLOT = 2..6
+        private val ACCESS_SLOT = (TOOL_SLOT + STORAGE_SLOT).toIntArray()
     }
 
     override val allowedFacing = listOf(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST)
-    private val inventory = DefaultedList.ofSize(4, ItemStack.EMPTY)
+    private val inventory = DefaultedList.ofSize(7, ItemStack.EMPTY)
 
     private val gui = GUI.Builder(ScreenHandlerType.GENERIC_9X3).setTitle(Text.translatable("block.HARVEST"))
         .setBackground("A", Identifier.of("galaxy", "gui_font/container_layout/harvest")).blockEntity(this).apply {
-            var i = 0
-            addSlot(4, 0, object : Slot(this@HarvestBlockEntity, i++, 0, 0) { // Tool
+            addSlot(4, 0, object : Slot(this@HarvestBlockEntity, TOOL_SLOT.first, 0, 0) { // Tool
                 override fun canInsert(item: ItemStack) = isHoe(item)
             })
-            for (x in 3..5) addSlot(x, 2, object : Slot(this@HarvestBlockEntity, i++, 0, 0) { // Output
+            addSlot(8, 0, object : Slot(this@HarvestBlockEntity, UPGRADE_SLOT.first, 0, 0) { // Upgrade
+                override fun canInsert(item: ItemStack) = Upgrade.getFromItem(item)?.type == Upgrade.Type.RANGE
+            })
+            var i = STORAGE_SLOT.first
+            for (x in 2..6) addSlot(x, 2, object : Slot(this@HarvestBlockEntity, i++, 0, 0) { // Output
                 override fun canInsert(stack: ItemStack) = false
             })
         }.build().apply {
@@ -81,12 +88,12 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         super.tick()
 
         // Only work have hoe and empty slot >= 2
-        val tool = inventory[0]
-        if (!isHoe(tool) || inventory.count { it.isEmpty } < 2) return
+        val tool = inventory[TOOL_SLOT.first]
+        if (!isHoe(tool) || inventory.slice(STORAGE_SLOT).count { it.isEmpty } < 2) return
 
         val world = world as? ServerWorld ?: return
 
-        val range = 4 // TODO range upgrade
+        val range = getRange()
         val diameter = range * 2 + 1
         if (progress >= diameter * diameter) progress = 0
         val blockPos = pos.offset(facing, (progress / diameter) + 1).offset(facing!!.rotateYClockwise(), (progress % diameter) - range)
@@ -98,7 +105,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
             world.breakBlock(blockPos, false)
             val drop = Block.getDroppedStacks(blockState, world, blockPos, null, null, tool)
             for (item in drop) {
-                for (slot in 1..3) {
+                for (slot in STORAGE_SLOT) {
                     val originItem = getStack(slot)
                     if (originItem.isEmpty) {
                         setStack(slot, item)
@@ -186,16 +193,28 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     }
 
     override fun getAvailableSlots(side: Direction): IntArray {
-        return ALL_SLOT
+        return ACCESS_SLOT
     }
 
     override fun canInsert(slot: Int, item: ItemStack, dir: Direction?): Boolean {
-        return slot == 0 && isHoe(item)
+        return slot in TOOL_SLOT && isHoe(item)
     }
 
     override fun canExtract(slot: Int, item: ItemStack, dir: Direction): Boolean {
-        return slot in 1..3
+        return slot in STORAGE_SLOT
     }
 
     private fun isHoe(item: ItemStack) = item.item is HoeItem
+
+    private fun getRange(): Int {
+        val base = 4
+        for (slot in UPGRADE_SLOT) {
+            val item = inventory[slot]
+            if (item.isEmpty) continue
+            val upgrade = Upgrade.getFromItem(item) ?: continue
+            if (upgrade.type == Upgrade.Type.RANGE) return base + upgrade.level
+        }
+
+        return base
+    }
 }

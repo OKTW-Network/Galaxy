@@ -19,13 +19,13 @@
 package one.oktw.galaxy.player
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
-import net.minecraft.block.*
-import net.minecraft.block.Blocks.*
+import net.minecraft.block.Block
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.Hand
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerInteractBlockEvent
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent
+import one.oktw.galaxy.util.HarvestUtil
 import one.oktw.galaxy.util.HarvestUtil.isMature
 
 class Harvest {
@@ -50,21 +50,13 @@ class Harvest {
             isMature(world, blockPos, blockState)
         ) {
             event.cancel = true
-            val block = blockState.block
-            val ageProperties = when (block) {
-                WHEAT, CARROTS, POTATOES -> CropBlock.AGE
-                BEETROOTS -> BeetrootsBlock.AGE
-                COCOA -> CocoaBlock.AGE
-                NETHER_WART -> NetherWartBlock.AGE
-                PUMPKIN, MELON -> null
-                else -> return
-            }
+            val ageProperties = HarvestUtil.getAgeProp(blockState.block)
             player.swingHand(Hand.MAIN_HAND, true)
             world.breakBlock(blockPos, false)
-            Block.dropStacks(blockState, world, blockPos, world.getBlockEntity(blockPos), player, player.mainHandStack) // Fortune drop
-            if (block != PUMPKIN && block != MELON) {
+            Block.dropStacks(blockState, world, blockPos, null, player, player.mainHandStack) // Fortune drop
+            if (ageProperties != null) {
                 world.setBlockState(blockPos, blockState.with(ageProperties, 0))
-                world.updateNeighbors(blockPos, block)
+                world.updateNeighbors(blockPos, blockState.block)
             }
             justHarvested.add(player)
         }

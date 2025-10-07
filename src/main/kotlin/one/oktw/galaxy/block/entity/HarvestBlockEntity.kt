@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.block.entity
 
-import net.minecraft.block.*
+import net.minecraft.block.Block
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.component.ComponentMap
 import net.minecraft.component.ComponentsAccess
@@ -93,18 +93,10 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         progress++
         val blockState = world.getBlockState(blockPos)
 
-        if (HarvestUtil.isMature(world, blockPos, world.getBlockState(blockPos))) {
-            val block = blockState.block
-            val ageProperties = when (block) {
-                Blocks.WHEAT, Blocks.CARROTS, Blocks.POTATOES -> CropBlock.AGE
-                Blocks.BEETROOTS -> BeetrootsBlock.AGE
-                Blocks.COCOA -> CocoaBlock.AGE
-                Blocks.NETHER_WART -> NetherWartBlock.AGE
-                Blocks.PUMPKIN, Blocks.MELON -> null
-                else -> return
-            }
+        if (HarvestUtil.isMature(world, blockPos, blockState)) {
+            val ageProperties = HarvestUtil.getAgeProp(blockState.block)
             world.breakBlock(blockPos, false)
-            val drop = Block.getDroppedStacks(blockState, world, blockPos, world.getBlockEntity(blockPos), null, tool)
+            val drop = Block.getDroppedStacks(blockState, world, blockPos, null, null, tool)
             for (item in drop) {
                 for (slot in 1..3) {
                     val originItem = getStack(slot)
@@ -124,9 +116,9 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
                 tool.damage = 0
             }
 
-            if (block != Blocks.PUMPKIN && block != Blocks.MELON) {
+            if (ageProperties != null) {
                 world.setBlockState(blockPos, blockState.with(ageProperties, 0))
-                world.updateNeighbors(blockPos, block)
+                world.updateNeighbors(blockPos, blockState.block)
             }
         }
     }

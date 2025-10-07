@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,18 +20,28 @@ package one.oktw.galaxy.util
 
 import net.minecraft.block.*
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.state.property.IntProperty
 import net.minecraft.state.property.Properties.HORIZONTAL_FACING
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 
 object HarvestUtil {
     fun isMature(world: ServerWorld, blockPos: BlockPos, blockState: BlockState): Boolean = when (blockState.block) {
-        Blocks.WHEAT, Blocks.CARROTS, Blocks.POTATOES, Blocks.BEETROOTS -> blockState.let((blockState.block as CropBlock)::isMature)
+        is CropBlock -> (blockState.block as CropBlock).isMature(blockState)
         Blocks.COCOA -> blockState[CocoaBlock.AGE] >= 2
         Blocks.NETHER_WART -> blockState[NetherWartBlock.AGE] >= 3
         Blocks.MELON -> isNextTo(world, blockPos, Blocks.ATTACHED_MELON_STEM)
         Blocks.PUMPKIN -> isNextTo(world, blockPos, Blocks.ATTACHED_PUMPKIN_STEM)
         else -> false
+    }
+
+    fun getAgeProp(block: Block): IntProperty? = when (block) {
+        Blocks.WHEAT, Blocks.CARROTS, Blocks.POTATOES -> CropBlock.AGE
+        Blocks.BEETROOTS -> BeetrootsBlock.AGE
+        Blocks.COCOA -> CocoaBlock.AGE
+        Blocks.NETHER_WART -> NetherWartBlock.AGE
+        Blocks.PUMPKIN, Blocks.MELON -> null
+        else -> null
     }
 
     private fun isNextTo(world: ServerWorld, blockPos: BlockPos, block: Block): Boolean {

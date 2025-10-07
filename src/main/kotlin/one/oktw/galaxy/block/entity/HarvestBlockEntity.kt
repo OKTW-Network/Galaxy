@@ -63,6 +63,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
 
     override val allowedFacing = listOf(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST)
     private val inventory = DefaultedList.ofSize(7, ItemStack.EMPTY)
+    private var rangeCache = 0
 
     private val gui = GUI.Builder(ScreenHandlerType.GENERIC_9X3).setTitle(Text.translatable("block.HARVEST"))
         .setBackground("A", Identifier.of("galaxy", "gui_font/container_layout/harvest")).blockEntity(this).apply {
@@ -71,6 +72,10 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
             })
             addSlot(8, 0, object : Slot(this@HarvestBlockEntity, UPGRADE_SLOT.first, 0, 0) { // Upgrade
                 override fun canInsert(item: ItemStack) = Upgrade.getFromItem(item)?.type == Upgrade.Type.RANGE
+                override fun markDirty() {
+                    rangeCache = 0
+                    super.markDirty()
+                }
             })
             var i = STORAGE_SLOT.first
             for (x in 2..6) addSlot(x, 2, object : Slot(this@HarvestBlockEntity, i++, 0, 0) { // Output
@@ -207,14 +212,20 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     private fun isHoe(item: ItemStack) = item.item is HoeItem
 
     private fun getRange(): Int {
+        if (rangeCache != 0) return rangeCache
+
         val base = 4
         for (slot in UPGRADE_SLOT) {
             val item = inventory[slot]
             if (item.isEmpty) continue
             val upgrade = Upgrade.getFromItem(item) ?: continue
-            if (upgrade.type == Upgrade.Type.RANGE) return base + upgrade.level
+            if (upgrade.type == Upgrade.Type.RANGE) {
+                rangeCache = base + upgrade.level
+                return rangeCache
+            }
         }
 
-        return base
+        rangeCache = base
+        return rangeCache
     }
 }

@@ -37,6 +37,7 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -106,6 +107,22 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
         writeResult();
     }
 
+    @Inject(method = "readChunkData", at = @At("HEAD"), cancellable = true)
+    private void fastRead(ChunkPos pos, CallbackInfoReturnable<CompletableFuture<Optional<NbtCompound>>> cir) {
+        StorageIoWorker.Result result = this.results.get(pos);
+        if (result != null) {
+            cir.setReturnValue(CompletableFuture.completedFuture(Optional.ofNullable(result.copyNbt())));
+        }
+    }
+
+    @Inject(method = "scanChunk", at = @At("HEAD"), cancellable = true)
+    private void fastScan(ChunkPos pos, NbtScanner scanner, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
+        StorageIoWorker.Result result = this.results.get(pos);
+        if (result != null) {
+            if (result.nbt != null) result.nbt.accept(scanner);
+            cir.setReturnValue(CompletableFuture.completedFuture(null));
+        }
+    }
 
     @Inject(method = "write", at = @At(value = "HEAD"), cancellable = true)
     private void removeResults(ChunkPos pos, StorageIoWorker.Result result, CallbackInfo ci) {

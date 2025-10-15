@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -44,6 +44,7 @@ import one.oktw.galaxy.network.ProxyAPIPayload
 import one.oktw.galaxy.network.ProxyChatPayload
 import one.oktw.galaxy.player.Harvest
 import one.oktw.galaxy.proxy.api.ProxyAPI
+import one.oktw.galaxy.util.MinecraftAsyncExecutor
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
@@ -54,7 +55,7 @@ class Main : DedicatedServerModInitializer, CoroutineScope {
     lateinit var eventManager: EventManager
         private set
     override val coroutineContext: CoroutineContext
-        get() = job + server.asCoroutineDispatcher()
+        get() = job + MinecraftAsyncExecutor(server).asCoroutineDispatcher()
 
     companion object {
         var main: Main? = null

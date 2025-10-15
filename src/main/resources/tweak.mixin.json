@@ -3,7 +3,10 @@
   "package": "one.oktw.galaxy.mixin.tweak",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "MixinAsyncChunk_RegionBasedStorage",
+    "MixinAsyncChunk_RegionFile",
     "MixinAsyncChunk_ServerPlayNetworkHandler",
+    "MixinAsyncChunk_StorageIoWorker",
     "MixinCustomBlockEntity_BarrierBlock",
     "MixinCustomBlockEntity_ChunkData",
     "MixinCustomBlockEntity_Structure",

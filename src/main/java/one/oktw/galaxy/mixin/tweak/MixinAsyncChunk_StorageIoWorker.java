@@ -18,7 +18,13 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtInt;
+import net.minecraft.nbt.scanner.NbtScanQuery;
+import net.minecraft.nbt.scanner.NbtScanner;
+import net.minecraft.nbt.scanner.SelectiveNbtCollector;
 import net.minecraft.util.Pair;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.thread.PrioritizedConsecutiveExecutor;
 import net.minecraft.util.thread.TaskQueue;
@@ -26,16 +32,15 @@ import net.minecraft.world.storage.StorageIoWorker;
 import net.minecraft.world.storage.StorageIoWorker.Priority;
 import net.minecraft.world.storage.StorageKey;
 import one.oktw.galaxy.util.KotlinCoroutineTaskExecutor;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.SequencedMap;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -43,6 +48,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class MixinAsyncChunk_StorageIoWorker {
     @Unique
     private final AtomicBoolean writeLock = new AtomicBoolean(false);
+
+    @Shadow
+    @Final
+    private static Logger LOGGER;
 
     @Mutable
     @Shadow
@@ -56,6 +65,12 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
 
     @Shadow
     protected abstract void write(ChunkPos pos, StorageIoWorker.Result result);
+
+    @Shadow
+    public abstract CompletableFuture<Void> scanChunk(ChunkPos pos, NbtScanner scanner);
+
+    @Shadow
+    protected abstract boolean needsBlending(NbtCompound nbt);
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void parallelExecutor(StorageKey storageKey, Path directory, boolean dsync, CallbackInfo ci) {
@@ -97,5 +112,43 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
         if (!this.results.remove(pos, result)) { // Only write once
             ci.cancel();
         }
+    }
+
+    /**
+     * @author James58899
+     * @reason Parallelization
+     */
+    @Overwrite
+    private CompletableFuture<BitSet> computeBlendingStatus(int chunkX, int chunkZ) {
+        return CompletableFuture.supplyAsync(
+            () -> {
+                BitSet bitSet = new BitSet();
+                ChunkPos.stream(ChunkPos.fromRegion(chunkX, chunkZ), ChunkPos.fromRegionCenter(chunkX, chunkZ))
+                    .parallel()
+                    .forEach(
+                        chunkPos -> {
+                            SelectiveNbtCollector selectiveNbtCollector = new SelectiveNbtCollector(
+                                new NbtScanQuery(NbtInt.TYPE, "DataVersion"), new NbtScanQuery(NbtCompound.TYPE, "blending_data")
+                            );
+
+                            try {
+                                scanChunk(chunkPos, selectiveNbtCollector).join();
+                            } catch (Exception var7) {
+                                LOGGER.warn("Failed to scan chunk {}", chunkPos, var7);
+                                return;
+                            }
+
+                            if (selectiveNbtCollector.getRoot() instanceof NbtCompound nbtCompound && needsBlending(nbtCompound)) {
+                                int ix = chunkPos.getRegionRelativeZ() * 32 + chunkPos.getRegionRelativeX();
+                                synchronized (bitSet) {
+                                    bitSet.set(ix);
+                                }
+                            }
+                        }
+                    );
+                return bitSet;
+            },
+            Util.getMainWorkerExecutor()
+        );
     }
 }

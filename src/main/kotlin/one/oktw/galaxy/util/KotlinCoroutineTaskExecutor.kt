@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class KotlinCoroutineTaskExecutor(queueCount: Int, name: String) : PrioritizedConsecutiveExecutor(queueCount, null, name), CoroutineScope {
     companion object {
         private var index = 0
-        private val dispatcher = Executors.newFixedThreadPool(16) { r -> Thread(r, "IO-Kotlin-${index++}").apply { isDaemon = true } }.asCoroutineDispatcher()
+        private val dispatcher = Executors.newFixedThreadPool(8) { r -> Thread(r, "IO-Kotlin-${index++}").apply { isDaemon = true } }.asCoroutineDispatcher()
     }
 
     private val job = SupervisorJob()

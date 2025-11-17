@@ -19,18 +19,18 @@
 package one.oktw.galaxy.mixin.tweak;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.structure.StructurePlacementData;
-import net.minecraft.structure.StructureTemplate;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.material.FluidState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -42,12 +42,12 @@ import java.util.List;
 
 @Mixin(StructureTemplate.class)
 public class MixinCustomBlockEntity_Structure {
-    @Inject(method = "place",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/ServerWorldAccess;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z", ordinal = 1), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void hackPlace(ServerWorldAccess world, BlockPos pos, BlockPos pivot, StructurePlacementData placementData, Random random, int flags, CallbackInfoReturnable<Boolean> cir, List<StructureTemplate.StructureBlockInfo> list, BlockBox blockBox, List<BlockPos> list2, List<BlockPos> list3, List<Pair<BlockPos, NbtCompound>> list4, int i, int j, int k, int l, int m, int n, List<StructureTemplate.StructureBlockInfo> list5, ErrorReporter.Logging logging, Iterator<StructureTemplate.StructureBlockInfo> var20, StructureTemplate.StructureBlockInfo structureBlockInfo, BlockPos blockPos, FluidState fluidState, BlockState blockState) {
+    @Inject(method = "placeInWorld",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerLevelAccessor;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z", ordinal = 1), locals = LocalCapture.CAPTURE_FAILSOFT)
+    private void hackPlace(ServerLevelAccessor world, BlockPos pos, BlockPos pivot, StructurePlaceSettings placementData, RandomSource random, int flags, CallbackInfoReturnable<Boolean> cir, List<StructureTemplate.StructureBlockInfo> list, BoundingBox blockBox, List<BlockPos> list2, List<BlockPos> list3, List<Pair<BlockPos, CompoundTag>> list4, int i, int j, int k, int l, int m, int n, List<StructureTemplate.StructureBlockInfo> list5, ProblemReporter.ScopedCollector logging, Iterator<StructureTemplate.StructureBlockInfo> var20, StructureTemplate.StructureBlockInfo structureBlockInfo, BlockPos blockPos, FluidState fluidState, BlockState blockState) {
         // Workaround structure barrier bug
         if (structureBlockInfo.state().getBlock() == Blocks.BARRIER) {
-            world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), Block.NO_REDRAW | Block.FORCE_STATE);
+            world.setBlock(blockPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_INVISIBLE | Block.UPDATE_KNOWN_SHAPE);
         }
     }
 }

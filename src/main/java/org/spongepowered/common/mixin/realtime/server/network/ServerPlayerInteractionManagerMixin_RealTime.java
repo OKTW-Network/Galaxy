@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -42,8 +42,8 @@
  */
 package org.spongepowered.common.mixin.realtime.server.network;
 
-import net.minecraft.server.network.ServerPlayerInteractionManager;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayerGameMode;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -51,24 +51,24 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
-@Mixin(ServerPlayerInteractionManager.class)
+@Mixin(ServerPlayerGameMode.class)
 public abstract class ServerPlayerInteractionManagerMixin_RealTime {
     @Shadow
-    protected ServerWorld world;
+    protected ServerLevel level;
 
     @Shadow
-    private int tickCounter;
+    private int gameTicks;
 
     @Redirect(
-        method = "update",
+        method = "tick",
         at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;tickCounter:I",
+            target = "Lnet/minecraft/server/level/ServerPlayerGameMode;gameTicks:I",
             opcode = Opcodes.PUTFIELD
         )
     )
-    private void realTimeImpl$adjustForRealTimeDiggingTime(final ServerPlayerInteractionManager self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) world.getServer()).realTimeBridge$getRealTimeTicks();
-        this.tickCounter += ticks;
+    private void realTimeImpl$adjustForRealTimeDiggingTime(final ServerPlayerGameMode self, final int modifier) {
+        final int ticks = (int) ((RealTimeTrackingBridge) level.getServer()).realTimeBridge$getRealTimeTicks();
+        this.gameTicks += ticks;
     }
 }

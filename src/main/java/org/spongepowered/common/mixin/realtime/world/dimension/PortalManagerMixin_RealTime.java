@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,9 +18,9 @@
 
 package org.spongepowered.common.mixin.realtime.world.dimension;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.dimension.PortalManager;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.PortalProcessor;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,22 +29,22 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
-@Mixin(PortalManager.class)
+@Mixin(PortalProcessor.class)
 public abstract class PortalManagerMixin_RealTime {
     @Shadow
-    private int ticksInPortal;
+    private int portalTime;
 
-    @Inject(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/dimension/PortalManager;ticksInPortal:I", opcode = Opcodes.GETFIELD))
-    private void realTimeImpl$adjustForRealTimePortalCounter(ServerWorld world, Entity entity, boolean canUsePortals, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "processPortalTeleportation", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/PortalProcessor;portalTime:I", opcode = Opcodes.GETFIELD))
+    private void realTimeImpl$adjustForRealTimePortalCounter(ServerLevel world, Entity entity, boolean canUsePortals, CallbackInfoReturnable<Boolean> cir) {
         final int ticks = (int) ((RealTimeTrackingBridge) world).realTimeBridge$getRealTimeTicks() - 1;
-        this.ticksInPortal += Math.max(0, ticks);
+        this.portalTime += Math.max(0, ticks);
     }
 
-    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/dimension/PortalManager;decayTicksInPortal()V"))
-    private void realTimeImpl$PortalDecayCounter(ServerWorld world, Entity entity, boolean canUsePortals, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "processPortalTeleportation", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/PortalProcessor;decayTick()V"))
+    private void realTimeImpl$PortalDecayCounter(ServerLevel world, Entity entity, boolean canUsePortals, CallbackInfoReturnable<Boolean> cir) {
         final int ticks = (int) ((RealTimeTrackingBridge) world).realTimeBridge$getRealTimeTicks() - 1;
         if (ticks > 0) {
-            this.ticksInPortal = Math.max(0, this.ticksInPortal - ticks * 4);
+            this.portalTime = Math.max(0, this.portalTime - ticks * 4);
         }
     }
 }

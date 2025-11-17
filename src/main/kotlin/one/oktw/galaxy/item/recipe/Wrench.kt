@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.item.recipe
 
-import net.minecraft.item.Items
+import net.minecraft.world.item.Items
 import one.oktw.galaxy.item.Tool.Companion.WRENCH
 
 class Wrench : CustomItemRecipe() {

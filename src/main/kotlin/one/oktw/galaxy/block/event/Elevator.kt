@@ -18,13 +18,13 @@
 
 package one.oktw.galaxy.block.event
 
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Vec3d
+import net.minecraft.core.BlockPos
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.world.phys.Vec3
 import one.oktw.galaxy.block.CustomBlock
 import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.event.annotation.EventListener
@@ -32,23 +32,23 @@ import one.oktw.galaxy.event.type.PlayerJumpEvent
 import one.oktw.galaxy.event.type.PlayerSneakEvent
 
 class Elevator {
-    private fun isElevator(world: ServerWorld, blockPos: BlockPos): Boolean {
+    private fun isElevator(world: ServerLevel, blockPos: BlockPos): Boolean {
         return (world.getBlockEntity(blockPos) as? CustomBlockEntity)?.getId() == CustomBlock.ELEVATOR.identifier
     }
 
-    private fun isSafe(world: ServerWorld, blockPos: BlockPos): Boolean {
-        return !world.getBlockState(blockPos).isOpaqueFullCube
+    private fun isSafe(world: ServerLevel, blockPos: BlockPos): Boolean {
+        return !world.getBlockState(blockPos).isSolidRender
     }
 
-    private fun doTeleport(player: ServerPlayerEntity, pos: BlockPos) {
-        player.requestTeleport(player.x, pos.y.toDouble(), player.z)
-        player.velocity = Vec3d.ZERO
-        player.networkHandler.sendPacket(EntityVelocityUpdateS2CPacket(player))
-        player.entityWorld.playSound(
+    private fun doTeleport(player: ServerPlayer, pos: BlockPos) {
+        player.teleportTo(player.x, pos.y.toDouble(), player.z)
+        player.deltaMovement = Vec3.ZERO
+        player.connection.send(ClientboundSetEntityMotionPacket(player))
+        player.level().playSound(
             null,
             BlockPos(pos),
-            SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
-            SoundCategory.BLOCKS,
+            SoundEvents.CHORUS_FRUIT_TELEPORT,
+            SoundSource.BLOCKS,
             1.0f,
             1.0f
         )
@@ -57,14 +57,14 @@ class Elevator {
     @EventListener(sync = true)
     fun onJump(event: PlayerJumpEvent) {
         val player = event.player
-        val playerWorld = player.entityWorld
-        val blockPos = player.blockPos
+        val playerWorld = player.level()
+        val blockPos = player.blockPosition()
 
-        if (isElevator(playerWorld, blockPos.down()) && isSafe(playerWorld, blockPos)) {
+        if (isElevator(playerWorld, blockPos.below()) && isSafe(playerWorld, blockPos)) {
             for (i in 1..7) {
-                val nextBlockPos = blockPos.up(i)
-                if (isElevator(playerWorld, nextBlockPos) && isSafe(playerWorld, nextBlockPos.up())) {
-                    doTeleport(player, nextBlockPos.up())
+                val nextBlockPos = blockPos.above(i)
+                if (isElevator(playerWorld, nextBlockPos) && isSafe(playerWorld, nextBlockPos.above())) {
+                    doTeleport(player, nextBlockPos.above())
                     break
                 }
             }
@@ -74,14 +74,14 @@ class Elevator {
     @EventListener(sync = true)
     fun onSneak(event: PlayerSneakEvent) {
         val player = event.player
-        val playerWorld = player.entityWorld
-        val blockPos = player.blockPos
+        val playerWorld = player.level()
+        val blockPos = player.blockPosition()
 
-        if (isElevator(playerWorld, blockPos.down()) && isSafe(playerWorld, blockPos)) {
+        if (isElevator(playerWorld, blockPos.below()) && isSafe(playerWorld, blockPos)) {
             for (i in 3..9) {
-                val nextBlockPos = blockPos.down(i)
-                if (isElevator(playerWorld, nextBlockPos) && isSafe(playerWorld, nextBlockPos.up())) {
-                    doTeleport(player, nextBlockPos.up())
+                val nextBlockPos = blockPos.below(i)
+                if (isElevator(playerWorld, nextBlockPos) && isSafe(playerWorld, nextBlockPos.above())) {
+                    doTeleport(player, nextBlockPos.above())
                     break
                 }
             }

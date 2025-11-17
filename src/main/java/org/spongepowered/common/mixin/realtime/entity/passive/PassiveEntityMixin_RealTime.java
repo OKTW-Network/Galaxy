@@ -42,7 +42,7 @@
  */
 package org.spongepowered.common.mixin.realtime.entity.passive;
 
-import net.minecraft.entity.passive.PassiveEntity;
+import net.minecraft.world.entity.AgeableMob;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -50,15 +50,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 import org.spongepowered.common.mixin.realtime.entity.EntityMixin_RealTime;
 
-@Mixin(PassiveEntity.class)
+@Mixin(AgeableMob.class)
 public abstract class PassiveEntityMixin_RealTime extends EntityMixin_RealTime {
     @Shadow
-    public abstract void setBreedingAge(int int_1);
+    public abstract void setAge(int int_1);
 
-    @Redirect(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/passive/PassiveEntity;setBreedingAge(I)V"))
-    private void realTimeImpl$adjustForRealTimeGrowingUp(final PassiveEntity self, final int age) {
+    @Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/AgeableMob;setAge(I)V"))
+    private void realTimeImpl$adjustForRealTimeGrowingUp(final AgeableMob self, final int age) {
         // Subtract the one the original update method added
-        final int diff = (int) ((RealTimeTrackingBridge) this.getEntityWorld()).realTimeBridge$getRealTimeTicks() - 1;
-        this.setBreedingAge(Math.min(0, age + diff));
+        final int diff = (int) ((RealTimeTrackingBridge) this.level()).realTimeBridge$getRealTimeTicks() - 1;
+        this.setAge(Math.min(0, age + diff));
     }
 }

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,8 +19,8 @@
 package one.oktw.galaxy.command
 
 import com.mojang.brigadier.CommandDispatcher
-import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.commands.CommandSourceStack
 
 interface Command {
-    fun register(dispatcher: CommandDispatcher<ServerCommandSource>)
+    fun register(dispatcher: CommandDispatcher<CommandSourceStack>)
 }

@@ -18,9 +18,9 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.storage.RegionBasedStorage;
-import net.minecraft.world.storage.RegionFile;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.storage.RegionFile;
+import net.minecraft.world.level.chunk.storage.RegionFileStorage;
 import one.oktw.galaxy.mixin.interfaces.RegionFileInputStream;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -34,7 +34,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
-@Mixin(RegionBasedStorage.class)
+@Mixin(RegionFileStorage.class)
 public abstract class MixinAsyncChunk_RegionBasedStorage {
     @Unique
     private final ReentrantLock lock = new ReentrantLock();
@@ -59,22 +59,22 @@ public abstract class MixinAsyncChunk_RegionBasedStorage {
         lock.unlock();
     }
 
-    @Inject(method = "sync", at = @At("HEAD"))
+    @Inject(method = "flush", at = @At("HEAD"))
     private void syncLock(CallbackInfo ci) {
         lock.lock();
     }
 
-    @Inject(method = "sync", at = @At("RETURN"))
+    @Inject(method = "flush", at = @At("RETURN"))
     private void syncUnlock(CallbackInfo ci) {
         lock.unlock();
     }
 
-    @Redirect(method = "getTagAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/storage/RegionFile;getChunkInputStream(Lnet/minecraft/util/math/ChunkPos;)Ljava/io/DataInputStream;"))
+    @Redirect(method = "read", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/storage/RegionFile;getChunkDataInputStream(Lnet/minecraft/world/level/ChunkPos;)Ljava/io/DataInputStream;"))
     private DataInputStream overwriteGetInputStream(RegionFile regionFile, ChunkPos pos) throws IOException {
         return ((RegionFileInputStream) regionFile).galaxy$getChunkInputStreamNoSync(pos);
     }
 
-    @Redirect(method = "scanChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/storage/RegionFile;getChunkInputStream(Lnet/minecraft/util/math/ChunkPos;)Ljava/io/DataInputStream;"))
+    @Redirect(method = "scanChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/storage/RegionFile;getChunkDataInputStream(Lnet/minecraft/world/level/ChunkPos;)Ljava/io/DataInputStream;"))
     private DataInputStream overwriteGetInputStream2(RegionFile regionFile, ChunkPos pos) throws IOException {
         return ((RegionFileInputStream) regionFile).galaxy$getChunkInputStreamNoSync(pos);
     }

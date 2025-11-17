@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,9 +18,9 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.network.packet.s2c.play.ChunkData;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import one.oktw.galaxy.block.entity.CustomBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,9 +30,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Mixin(ChunkData.class)
+@Mixin(ClientboundLevelChunkPacketData.class)
 public class MixinCustomBlockEntity_ChunkData {
-    @Redirect(method = "<init>(Lnet/minecraft/world/chunk/WorldChunk;)V", at = @At(value = "INVOKE", target = "Ljava/util/Map;entrySet()Ljava/util/Set;"))
+    @Redirect(method = "<init>(Lnet/minecraft/world/level/chunk/LevelChunk;)V", at = @At(value = "INVOKE", target = "Ljava/util/Map;entrySet()Ljava/util/Set;"))
     private Set<Map.Entry<BlockPos, BlockEntity>> removeCustomBlock(Map<BlockPos, BlockEntity> instance) {
         return instance.entrySet().stream().filter(e -> !(e.getValue() instanceof CustomBlockEntity)).collect(Collectors.toSet());
     }

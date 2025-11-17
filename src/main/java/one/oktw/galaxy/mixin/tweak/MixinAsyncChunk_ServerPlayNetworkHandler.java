@@ -18,15 +18,15 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.entity.EntityPosition;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.s2c.play.PositionFlag;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.SectionPos;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.entity.Relative;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -35,10 +35,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Set;
 
-@Mixin(ServerPlayNetworkHandler.class)
+@Mixin(ServerGamePacketListenerImpl.class)
 public abstract class MixinAsyncChunk_ServerPlayNetworkHandler {
     @Shadow
-    public ServerPlayerEntity player;
+    public ServerPlayer player;
 
     @Shadow
     private static double clampHorizontal(double d) {
@@ -46,25 +46,25 @@ public abstract class MixinAsyncChunk_ServerPlayNetworkHandler {
     }
 
     @Shadow
-    public abstract void requestTeleport(double x, double y, double z, float yaw, float pitch);
+    public abstract void teleport(double x, double y, double z, float yaw, float pitch);
 
-    @Inject(method = "onPlayerMove", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"), cancellable = true)
-    private void noBlockingMove(PlayerMoveC2SPacket packet, CallbackInfo ci) {
-        if (!packet.changesPosition()) return;
+    @Inject(method = "handleMovePlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V"), cancellable = true)
+    private void noBlockingMove(ServerboundMovePlayerPacket packet, CallbackInfo ci) {
+        if (!packet.hasPosition()) return;
 
-        int x = ChunkSectionPos.getSectionCoord(clampHorizontal(packet.getX(this.player.getX())));
-        int z = ChunkSectionPos.getSectionCoord(clampHorizontal(packet.getZ(this.player.getZ())));
-        if (!player.getEntityWorld().getChunkManager().isTickingFutureReady(ChunkPos.toLong(x, z))) {
-            player.setVelocity(Vec3d.ZERO);
-            requestTeleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYaw(), this.player.getPitch());
+        int x = SectionPos.posToSectionCoord(clampHorizontal(packet.getX(this.player.getX())));
+        int z = SectionPos.posToSectionCoord(clampHorizontal(packet.getZ(this.player.getZ())));
+        if (!player.level().getChunkSource().isPositionTicking(ChunkPos.asLong(x, z))) {
+            player.setDeltaMovement(Vec3.ZERO);
+            teleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYRot(), this.player.getXRot());
             ci.cancel();
         }
     }
 
-    @Inject(method = "requestTeleport(Lnet/minecraft/entity/EntityPosition;Ljava/util/Set;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;setPosition(Lnet/minecraft/entity/EntityPosition;Ljava/util/Set;)V", shift = At.Shift.AFTER))
-    private void onTeleport(EntityPosition pos, Set<PositionFlag> flags, CallbackInfo ci) {
-        ServerWorld world = player.getEntityWorld();
-        if (!world.getPlayers().contains(player)) return;
-        world.getChunkManager().updatePosition(this.player);
+    @Inject(method = "teleport(Lnet/minecraft/world/entity/PositionMoveRotation;Ljava/util/Set;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;teleportSetPosition(Lnet/minecraft/world/entity/PositionMoveRotation;Ljava/util/Set;)V", shift = At.Shift.AFTER))
+    private void onTeleport(PositionMoveRotation pos, Set<Relative> flags, CallbackInfo ci) {
+        ServerLevel world = player.level();
+        if (!world.players().contains(player)) return;
+        world.getChunkSource().move(this.player);
     }
 }

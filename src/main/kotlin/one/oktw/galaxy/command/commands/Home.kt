@@ -21,17 +21,17 @@ package one.oktw.galaxy.command.commands
 import com.mojang.brigadier.CommandDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.minecraft.block.Blocks
-import net.minecraft.block.RespawnAnchorBlock
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
-import net.minecraft.server.command.CommandManager
-import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.text.Text
-import net.minecraft.util.Formatting
-import net.minecraft.world.TeleportTarget
-import net.minecraft.world.World.OVERWORLD
+import net.minecraft.ChatFormatting
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.Commands
+import net.minecraft.network.chat.Component
+import net.minecraft.network.protocol.game.ClientboundSoundPacket
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.world.level.Level.OVERWORLD
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.RespawnAnchorBlock
+import net.minecraft.world.level.portal.TeleportTransition
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import java.util.*
@@ -40,16 +40,16 @@ import java.util.concurrent.TimeUnit
 class Home : Command {
     private val lock = HashSet<UUID>()
 
-    override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
+    override fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
         dispatcher.register(
-            CommandManager.literal("home")
+            Commands.literal("home")
                 .executes { context ->
                     execute(context.source)
                 }
         )
     }
 
-    private fun execute(source: ServerCommandSource): Int {
+    private fun execute(source: CommandSourceStack): Int {
         val player = source.player
 
         if (player == null || lock.contains(player.uuid)) return com.mojang.brigadier.Command.SINGLE_SUCCESS
@@ -57,50 +57,53 @@ class Home : Command {
         lock += player.uuid
 
         // Check Stage
-        val spawnPointPosition = player.respawn?.respawnData?.pos
+        val spawnPointPosition = player.respawnConfig?.respawnData?.pos()
         if (spawnPointPosition == null) {
-            player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
+            player.displayClientMessage(Component.translatable("block.minecraft.spawn.not_valid").withStyle { it.withColor(ChatFormatting.RED) }, false)
             lock -= player.uuid
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
 
-        val teleportTarget = player.getRespawnTarget(player.notInAnyWorld, TeleportTarget.NO_OP)
+        val teleportTarget = player.findRespawnPositionAndUseSpawnBlock(player.wonGame, TeleportTransition.DO_NOTHING)
         if (teleportTarget.missingRespawnBlock()) {
-            player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
+            player.displayClientMessage(Component.translatable("block.minecraft.spawn.not_valid").withStyle { it.withColor(ChatFormatting.RED) }, false)
             lock -= player.uuid
         } else {
             main?.launch {
                 for (i in 0..4) {
-                    player.sendMessage(Text.translatable("Respond.commandCountdown", 5 - i).styled { it.withColor(Formatting.GREEN) }, true)
+                    player.displayClientMessage(
+                        Component.translatable("Respond.commandCountdown", 5 - i).withStyle { it.withColor(ChatFormatting.GREEN) },
+                        true
+                    )
                     delay(TimeUnit.SECONDS.toMillis(1))
                 }
-                player.sendMessage(Text.translatable("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
+                player.displayClientMessage(Component.translatable("Respond.TeleportStart").withStyle { it.withColor(ChatFormatting.GREEN) }, true)
 
                 // Check Again (Actual Teleport Stage)
-                val realTeleportTarget = player.getRespawnTarget(player.notInAnyWorld, TeleportTarget.NO_OP)
+                val realTeleportTarget = player.findRespawnPositionAndUseSpawnBlock(player.wonGame, TeleportTransition.DO_NOTHING)
                 if (realTeleportTarget.missingRespawnBlock()) {
-                    player.sendMessage(Text.translatable("block.minecraft.spawn.not_valid").styled { it.withColor(Formatting.RED) }, false)
+                    player.displayClientMessage(Component.translatable("block.minecraft.spawn.not_valid").withStyle { it.withColor(ChatFormatting.RED) }, false)
                     lock -= player.uuid
                     return@launch
                 }
 
-                player.teleportTo(realTeleportTarget)
+                player.teleport(realTeleportTarget)
 
-                val realSpawnPointPosition = player.respawn?.respawnData?.pos
-                val realWorld = source.server.getWorld(player.respawn?.respawnData?.dimension ?: OVERWORLD)
+                val realSpawnPointPosition = player.respawnConfig?.respawnData?.pos()
+                val realWorld = source.server.getLevel(player.respawnConfig?.respawnData?.dimension() ?: OVERWORLD)
                 if (realWorld != null && realSpawnPointPosition != null) {
                     val blockState = realWorld.getBlockState(realSpawnPointPosition)
-                    if (!player.notInAnyWorld && blockState.isOf(Blocks.RESPAWN_ANCHOR)) {
+                    if (!player.wonGame && blockState.`is`(Blocks.RESPAWN_ANCHOR)) {
                         // Consume Respawn Anchor Charge
-                        realWorld.setBlockState(
-                            realSpawnPointPosition, blockState.with(RespawnAnchorBlock.CHARGES, blockState[RespawnAnchorBlock.CHARGES] - 1)
+                        realWorld.setBlockAndUpdate(
+                            realSpawnPointPosition, blockState.setValue(RespawnAnchorBlock.CHARGE, blockState.getValue(RespawnAnchorBlock.CHARGE) - 1)
                         )
-                        realWorld.updateNeighbors(realSpawnPointPosition, blockState.block)
+                        realWorld.updateNeighborsAt(realSpawnPointPosition, blockState.block)
 
-                        player.networkHandler.sendPacket(
-                            PlaySoundS2CPacket(
-                                SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE,
-                                SoundCategory.BLOCKS,
+                        player.connection.send(
+                            ClientboundSoundPacket(
+                                SoundEvents.RESPAWN_ANCHOR_DEPLETE,
+                                SoundSource.BLOCKS,
                                 realSpawnPointPosition.x.toDouble(),
                                 realSpawnPointPosition.y.toDouble(),
                                 realSpawnPointPosition.z.toDouble(),

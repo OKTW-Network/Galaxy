@@ -42,7 +42,7 @@
  */
 package org.spongepowered.common.mixin.realtime.entity.mob;
 
-import net.minecraft.entity.mob.CreeperEntity;
+import net.minecraft.world.entity.monster.Creeper;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -52,41 +52,41 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
-@Mixin(CreeperEntity.class)
+@Mixin(Creeper.class)
 public abstract class CreeperEntityMixin_RealTime {
     @Unique
     private boolean delay;
 
     @Shadow
-    private int currentFuseTime;
+    private int swell;
     @Shadow
-    private int fuseTime;
+    private int maxSwell;
 
     @Shadow
-    public abstract int getFuseSpeed();
+    public abstract int getSwellDir();
 
     @Redirect(
         method = "tick",
         at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/entity/mob/CreeperEntity;currentFuseTime:I",
+            target = "Lnet/minecraft/world/entity/monster/Creeper;swell:I",
             opcode = Opcodes.PUTFIELD,
             ordinal = 0
         ),
         slice = @Slice(
-            from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/CreeperEntity;playSound(Lnet/minecraft/sound/SoundEvent;FF)V"),
+            from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/Creeper;playSound(Lnet/minecraft/sounds/SoundEvent;FF)V"),
             to = @At(value = "CONSTANT", args = "intValue=0", ordinal = 0)
         )
     )
-    private void realTimeImpl$adjustForRealTimeCreeperFuseTime(final CreeperEntity self, final int modifier) {
+    private void realTimeImpl$adjustForRealTimeCreeperFuseTime(final Creeper self, final int modifier) {
         if (modifier != 0) {
-            final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
-            this.currentFuseTime += (getFuseSpeed() * ticks);
+            final int ticks = (int) ((RealTimeTrackingBridge) self.level()).realTimeBridge$getRealTimeTicks();
+            this.swell += (getSwellDir() * ticks);
 
             // delay 1 tick wait AI detect player distance
-            if (currentFuseTime >= fuseTime && !delay) {
+            if (swell >= maxSwell && !delay) {
                 delay = true;
-                currentFuseTime = fuseTime - 1;
+                swell = maxSwell - 1;
             } else if (delay) {
                 delay = false;
             }

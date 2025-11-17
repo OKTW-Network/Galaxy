@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,7 +18,7 @@
 
 package org.spongepowered.common.mixin.realtime.accessor;
 
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -31,10 +31,10 @@ public interface AbstractFurnaceBlockEntityAccessor {
     void setLitTimeRemaining(int i);
 
     @Accessor
-    int getCookingTimeSpent();
+    int getCookingTimer();
 
     @Accessor
-    void setCookingTimeSpent(int i);
+    void setCookingTimer(int i);
 
     @Accessor
     int getCookingTotalTime();

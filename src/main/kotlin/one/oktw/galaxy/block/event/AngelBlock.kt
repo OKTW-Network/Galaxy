@@ -19,12 +19,12 @@
 package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.hit.BlockHitResult
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.phys.BlockHitResult
 import one.oktw.galaxy.block.CustomBlock
 import one.oktw.galaxy.block.CustomBlockHelper
 import one.oktw.galaxy.block.entity.CustomBlockEntity
@@ -35,8 +35,8 @@ import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.CustomItemHelper
 
 class AngelBlock {
-    private val justBroke = HashSet<ServerPlayerEntity>()
-    private val usedLock = HashSet<ServerPlayerEntity>()
+    private val justBroke = HashSet<ServerPlayer>()
+    private val usedLock = HashSet<ServerPlayer>()
 
     init {
         ServerTickEvents.END_WORLD_TICK.register(ServerTickEvents.EndWorldTick {
@@ -54,10 +54,10 @@ class AngelBlock {
             return
         }
 
-        val item = player.getStackInHand(event.packet.hand)
+        val item = player.getItemInHand(event.packet.hand)
         if (CustomItemHelper.getItem(item) == CustomBlockItem.ANGEL_BLOCK) {
-            val blockHit = player.raycast(3.0, 1.0f, false) as BlockHitResult
-            val placeContext = ItemPlacementContext(player, event.packet.hand, item, blockHit)
+            val blockHit = player.pick(3.0, 1.0f, false) as BlockHitResult
+            val placeContext = BlockPlaceContext(player, event.packet.hand, item, blockHit)
             if (CustomBlockHelper.place(placeContext)) event.swing = true
 
             usedLock.add(player)
@@ -68,12 +68,12 @@ class AngelBlock {
     fun onBreak(event: PlayerActionEvent) {
         val player = event.player
         val blockPos = event.packet.pos
-        if (event.packet.action == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK &&
-            (player.entityWorld.getBlockEntity(blockPos) as? CustomBlockEntity)?.getId() == CustomBlock.ANGEL_BLOCK.identifier &&
+        if (event.packet.action == ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK &&
+            (player.level().getBlockEntity(blockPos) as? CustomBlockEntity)?.getId() == CustomBlock.ANGEL_BLOCK.identifier &&
             !justBroke.contains(player)
         ) {
-            CustomBlockHelper.destroyAndDrop(player.entityWorld, blockPos)
-            player.entityWorld.playSound(null, blockPos, SoundEvents.BLOCK_METAL_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F)
+            CustomBlockHelper.destroyAndDrop(player.level(), blockPos)
+            player.level().playSound(null, blockPos, SoundEvents.METAL_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F)
             justBroke.add(player)
         }
     }

@@ -26,6 +26,6 @@ import java.util.concurrent.Executor
  */
 class MinecraftAsyncExecutor(private val server: MinecraftServer) : Executor {
     override fun execute(command: Runnable) {
-        server.send(server.createTask(command))
+        server.schedule(server.wrapRunnable(command))
     }
 }

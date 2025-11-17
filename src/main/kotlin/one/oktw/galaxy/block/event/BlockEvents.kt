@@ -19,11 +19,11 @@
 package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
-import net.minecraft.advancement.criterion.Criteria
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.ActionResult
-import net.minecraft.util.Hand
+import net.minecraft.advancements.CriteriaTriggers
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.item.context.BlockPlaceContext
 import one.oktw.galaxy.block.CustomBlockHelper
 import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
 import one.oktw.galaxy.block.listener.CustomBlockClickListener
@@ -36,12 +36,12 @@ import one.oktw.galaxy.item.Tool
 import java.util.*
 
 class BlockEvents {
-    private val usedLock = WeakHashMap<ServerPlayerEntity, Int>()
+    private val usedLock = WeakHashMap<ServerPlayer, Int>()
 
     init {
         ServerTickEvents.END_WORLD_TICK.register(
             ServerTickEvents.EndWorldTick {
-                usedLock.entries.removeIf { (_, v) -> v + 3 < it.server.ticks } // Packet task max delay 3 tick
+                usedLock.entries.removeIf { (_, v) -> v + 3 < it.server.tickCount } // Packet task max delay 3 tick
             }
         )
     }
@@ -51,44 +51,44 @@ class BlockEvents {
         val player = event.player
         if (usedLock.contains(player)) {
             event.cancel = true
-            if (event.packet.hand == Hand.OFF_HAND && player.offHandStack.isEmpty) usedLock.remove(player) // Interact block using off_hand is the last event when off_hand is empty.
+            if (event.packet.hand == InteractionHand.OFF_HAND && player.offhandItem.isEmpty) usedLock.remove(player) // Interact block using off_hand is the last event when off_hand is empty.
             return
         }
 
         // CustomBlockClickListener
-        if (!player.shouldCancelInteraction() || player.mainHandStack.isEmpty && player.offHandStack.isEmpty) {
+        if (!player.isSecondaryUseActive || player.offhandItem.isEmpty && player.offhandItem.isEmpty) {
             val packet = event.packet
-            val hitResult = packet.blockHitResult
-            val blockEntity = player.entityWorld.getBlockEntity(hitResult.blockPos) as? CustomBlockClickListener ?: return
+            val hitResult = packet.hitResult
+            val blockEntity = player.level().getBlockEntity(hitResult.blockPos) as? CustomBlockClickListener ?: return
             val result = blockEntity.onClick(player, packet.hand, hitResult)
-            if (result.isAccepted) {
-                Criteria.ITEM_USED_ON_BLOCK.trigger(player, hitResult.blockPos, player.getStackInHand(packet.hand))
-                event.swing = (result as? ActionResult.Success)?.swingSource() == ActionResult.SwingSource.SERVER
-                usedLock[player] = player.entityWorld.server.ticks
+            if (result.consumesAction()) {
+                CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(player, hitResult.blockPos, player.getItemInHand(packet.hand))
+                event.swing = (result as? InteractionResult.Success)?.swingSource() == InteractionResult.SwingSource.SERVER
+                usedLock[player] = player.level().server.tickCount
             }
         }
     }
 
     @EventListener(true)
     fun onUseItemOnBlock(event: PlayerUseItemOnBlock) {
-        val item = event.context.stack
-        val player = event.context.player as ServerPlayerEntity
+        val item = event.context.itemInHand
+        val player = event.context.player as ServerPlayer
 
         // Place custom block
-        if (CustomBlockHelper.place(ItemPlacementContext(event.context))) {
+        if (CustomBlockHelper.place(BlockPlaceContext(event.context))) {
             event.swing = true
-            usedLock[player] = player.entityWorld.server.ticks
+            usedLock[player] = player.level().server.tickCount
             return
         }
 
         // Crowbar
-        if (player.isSneaking && CustomItemHelper.getItem(item) == Tool.CROWBAR) {
-            val world = player.entityWorld
-            val blockPos = event.context.blockPos
+        if (player.isShiftKeyDown && CustomItemHelper.getItem(item) == Tool.CROWBAR) {
+            val world = player.level()
+            val blockPos = event.context.clickedPos
             if (world.getBlockEntity(blockPos) !is ModelCustomBlockEntity) return // Check is custom block
             CustomBlockHelper.destroyAndDrop(world, blockPos)
             event.swing = true
-            usedLock[player] = world.server.ticks
+            usedLock[player] = world.server.tickCount
         }
     }
 
@@ -97,7 +97,7 @@ class BlockEvents {
         val player = event.player
         if (usedLock.contains(player)) {
             event.cancel = true
-            if (event.packet.hand == Hand.OFF_HAND) usedLock.remove(player) // Interact item is the last interactive event
+            if (event.packet.hand == InteractionHand.OFF_HAND) usedLock.remove(player) // Interact item is the last interactive event
         }
     }
 }

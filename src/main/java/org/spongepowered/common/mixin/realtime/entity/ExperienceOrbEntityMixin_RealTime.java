@@ -42,7 +42,7 @@
  */
 package org.spongepowered.common.mixin.realtime.entity;
 
-import net.minecraft.entity.ExperienceOrbEntity;
+import net.minecraft.world.entity.ExperienceOrb;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -50,14 +50,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
-@Mixin(ExperienceOrbEntity.class)
+@Mixin(ExperienceOrb.class)
 public abstract class ExperienceOrbEntityMixin_RealTime extends EntityMixin_RealTime {
     @Shadow
-    private int orbAge;
+    private int age;
 
-    @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/ExperienceOrbEntity;orbAge:I", opcode = Opcodes.PUTFIELD))
-    private void realTimeImpl$adjustForRealTimeAge(final ExperienceOrbEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
-        this.orbAge += ticks;
+    @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/ExperienceOrb;age:I", opcode = Opcodes.PUTFIELD))
+    private void realTimeImpl$adjustForRealTimeAge(final ExperienceOrb self, final int modifier) {
+        final int ticks = (int) ((RealTimeTrackingBridge) self.level()).realTimeBridge$getRealTimeTicks();
+        this.age += ticks;
     }
 }

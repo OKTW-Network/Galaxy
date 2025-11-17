@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,24 +20,24 @@ package one.oktw.galaxy.command.commands.admin
 
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import net.minecraft.command.argument.BlockPosArgumentType
-import net.minecraft.command.argument.IdentifierArgumentType
-import net.minecraft.server.command.CommandManager
-import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.text.Text
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.Commands
+import net.minecraft.commands.arguments.ResourceLocationArgument
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument
+import net.minecraft.network.chat.Component
 import one.oktw.galaxy.block.CustomBlock
 
 class RegisterBlock {
     companion object {
-        val command: LiteralArgumentBuilder<ServerCommandSource> = CommandManager.literal("registerBlock")
+        val command: LiteralArgumentBuilder<CommandSourceStack> = Commands.literal("registerBlock")
             .then(
-                CommandManager.argument("pos", BlockPosArgumentType.blockPos())
+                Commands.argument("pos", BlockPosArgument.blockPos())
                     .then(RegisterBlock().block)
             )
     }
 
     private val block =
-        CommandManager.argument("block", IdentifierArgumentType.identifier())
+        Commands.argument("block", ResourceLocationArgument.id())
             .suggests { _, builder ->
                 CustomBlock.registry.getAll().keys.forEach { identifier ->
                     if (identifier.toString().contains(builder.remaining, ignoreCase = true)) {
@@ -47,19 +47,19 @@ class RegisterBlock {
                 return@suggests builder.buildFuture()
             }
             .executes {
-                val identifier = IdentifierArgumentType.getIdentifier(it, "block")
+                val identifier = ResourceLocationArgument.getId(it, "block")
                 val block = CustomBlock.registry.get(identifier)
 
                 if (block == null) {
-                    it.source.sendError(Text.translatable("argument.block.id.invalid", identifier))
+                    it.source.sendFailure(Component.translatable("argument.block.id.invalid", identifier))
                     return@executes 0
                 }
 
-                val blockPos = BlockPosArgumentType.getLoadedBlockPos(it, "pos")
+                val blockPos = BlockPosArgument.getLoadedBlockPos(it, "pos")
 
-                it.source.world.removeBlockEntity(blockPos)
-                it.source.world.addBlockEntity(block.createBlockEntity(blockPos))
-                it.source.sendFeedback({ Text.of("Registered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z} to ${block.identifier}") }, true)
+                it.source.level.removeBlockEntity(blockPos)
+                it.source.level.setBlockEntity(block.createBlockEntity(blockPos))
+                it.source.sendSuccess({ Component.nullToEmpty("Registered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z} to ${block.identifier}") }, true)
 
                 return@executes Command.SINGLE_SUCCESS
             }

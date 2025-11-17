@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -42,7 +42,7 @@
  */
 package org.spongepowered.common.mixin.realtime.blockentity;
 
-import net.minecraft.block.entity.BrewingStandBlockEntity;
+import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -53,10 +53,10 @@ import org.spongepowered.common.mixin.realtime.accessor.BrewingStandBlockEntityA
 @Mixin(BrewingStandBlockEntity.class)
 public abstract class BrewingStandBlockEntityMixin_RealTime {
     @Redirect(
-        method = "tick",
-        at = @At(value = "FIELD", target = "Lnet/minecraft/block/entity/BrewingStandBlockEntity;brewTime:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
+        method = "serverTick",
+        at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/block/entity/BrewingStandBlockEntity;brewTime:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
     private static void realTimeImpl$adjustForRealTimeBrewTime(final BrewingStandBlockEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getLevel()).realTimeBridge$getRealTimeTicks();
 
         BrewingStandBlockEntityAccessor accessor = (BrewingStandBlockEntityAccessor) self;
         accessor.setBrewTime(Math.max(0, accessor.getBrewTime() - ticks));

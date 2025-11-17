@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,16 +18,16 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.entity.EntityStatuses;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
-import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
-import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
+import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
+import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ConnectedClientData;
-import net.minecraft.server.network.ServerCommonNetworkHandler;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.network.ServerCommonPacketListenerImpl;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.entity.EntityEvent;
 import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerInteractItemEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,27 +36,27 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ServerPlayNetworkHandler.class)
-public abstract class MixinPlayerInteractItem_NetworkHandler extends ServerCommonNetworkHandler {
+@Mixin(ServerGamePacketListenerImpl.class)
+public abstract class MixinPlayerInteractItem_NetworkHandler extends ServerCommonPacketListenerImpl {
     @Shadow
-    public ServerPlayerEntity player;
+    public ServerPlayer player;
 
-    public MixinPlayerInteractItem_NetworkHandler(MinecraftServer server, ClientConnection connection, ConnectedClientData clientData) {
+    public MixinPlayerInteractItem_NetworkHandler(MinecraftServer server, Connection connection, CommonListenerCookie clientData) {
         super(server, connection, clientData);
     }
 
-    @Inject(method = "onPlayerInteractItem", at = @At(
+    @Inject(method = "handleUseItem", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;interactItem(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;"
+        target = "Lnet/minecraft/server/level/ServerPlayerGameMode;useItem(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"
     ), cancellable = true)
-    private void onPlayerInteractItem(PlayerInteractItemC2SPacket packet, CallbackInfo info) {
+    private void onPlayerInteractItem(ServerboundUseItemPacket packet, CallbackInfo info) {
         PlayerInteractItemEvent event = EventManager.safeEmit(new PlayerInteractItemEvent(packet, player));
         if (event.getCancel()) {
             info.cancel();
-            sendPacket(new EntityStatusS2CPacket(player, EntityStatuses.CONSUME_ITEM));
-            sendPacket(new HealthUpdateS2CPacket(player.getHealth(), player.getHungerManager().getFoodLevel(), player.getHungerManager().getSaturationLevel()));
-            player.currentScreenHandler.syncState();
+            send(new ClientboundEntityEventPacket(player, EntityEvent.USE_ITEM_COMPLETE));
+            send(new ClientboundSetHealthPacket(player.getHealth(), player.getFoodData().getFoodLevel(), player.getFoodData().getSaturationLevel()));
+            player.containerMenu.sendAllDataToRemote();
         }
-        if (event.getSwing()) this.player.swingHand(packet.getHand(), true);
+        if (event.getSwing()) this.player.swing(packet.getHand(), true);
     }
 }

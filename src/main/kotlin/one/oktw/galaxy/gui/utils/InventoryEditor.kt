@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,29 +18,29 @@
 
 package one.oktw.galaxy.gui.utils
 
-import net.minecraft.inventory.Inventory
-import net.minecraft.item.ItemStack
-import net.minecraft.screen.ScreenHandler
-import net.minecraft.screen.ScreenHandlerType
+import net.minecraft.world.Container
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.MenuType
+import net.minecraft.world.item.ItemStack
 
-class InventoryEditor(type: ScreenHandlerType<out ScreenHandler>, private val inventory: Inventory) {
+class InventoryEditor(type: MenuType<out AbstractContainerMenu>, private val inventory: Container) {
     private val inventoryUtils = InventoryUtils(type)
 
     fun set(x: Int, y: Int, item: ItemStack) = set(inventoryUtils.xyToIndex(x, y), item)
 
     fun set(index: Int, item: ItemStack) {
-        inventory.setStack(index, item)
+        inventory.setItem(index, item)
     }
 
     fun fill(xRange: IntRange, yRange: IntRange, item: ItemStack) {
         for (x in xRange) {
             for (y in yRange) {
-                inventory.setStack(inventoryUtils.xyToIndex(x, y), item)
+                inventory.setItem(inventoryUtils.xyToIndex(x, y), item)
             }
         }
     }
 
     fun fillAll(item: ItemStack) {
-        for (index in 0 until inventory.size()) inventory.setStack(index, item)
+        for (index in 0 until inventory.containerSize) inventory.setItem(index, item)
     }
 }

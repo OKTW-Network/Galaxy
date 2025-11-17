@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,28 +18,28 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.item.FilledMapItem;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.chunk.EmptyChunk;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.MapItem;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.chunk.EmptyLevelChunk;
+import net.minecraft.world.level.chunk.LevelChunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(FilledMapItem.class)
+@Mixin(MapItem.class)
 public abstract class MixinMapExistingChunk_FilledMapItem {
-    @Redirect(method = "updateColors", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getChunk(II)Lnet/minecraft/world/chunk/WorldChunk;"))
-    private WorldChunk getExistingChunk(World world, int x, int z) {
-        ServerWorld serverWorld = (ServerWorld) world;
+    @Redirect(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getChunk(II)Lnet/minecraft/world/level/chunk/LevelChunk;"))
+    private LevelChunk getExistingChunk(Level world, int x, int z) {
+        ServerLevel serverWorld = (ServerLevel) world;
         ChunkPos chunkPos = new ChunkPos(x, z);
-        if (serverWorld.getChunkManager().isTickingFutureReady(chunkPos.toLong())) { // TODO check this
-            WorldChunk chunk = (WorldChunk) world.getChunkAsView(chunkPos.x, chunkPos.z);
+        if (serverWorld.getChunkSource().isPositionTicking(chunkPos.toLong())) { // TODO check this
+            LevelChunk chunk = (LevelChunk) world.getChunkForCollisions(chunkPos.x, chunkPos.z);
             if (chunk != null) return chunk;
         }
-        return new EmptyChunk(world, new ChunkPos(x, z), world.getRegistryManager().getOrThrow(RegistryKeys.BIOME).getOrThrow(BiomeKeys.PLAINS));
+        return new EmptyLevelChunk(world, new ChunkPos(x, z), world.registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS));
     }
 }

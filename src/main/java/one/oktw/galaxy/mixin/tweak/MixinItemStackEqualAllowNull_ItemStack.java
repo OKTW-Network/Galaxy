@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemStack.class)
 public class MixinItemStackEqualAllowNull_ItemStack {
-    @Inject(method = "areEqual", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "matches", at = @At("HEAD"), cancellable = true)
     private static void allowNull(ItemStack itemStack_1, ItemStack itemStack_2, CallbackInfoReturnable<Boolean> cir) {
         if (itemStack_1 == null || itemStack_2 == null) {
             cir.setReturnValue(false);

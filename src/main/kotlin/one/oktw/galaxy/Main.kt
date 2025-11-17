@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -26,7 +26,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
-import net.minecraft.server.dedicated.MinecraftDedicatedServer
+import net.minecraft.server.dedicated.DedicatedServer
 import one.oktw.galaxy.block.CustomBlock
 import one.oktw.galaxy.block.event.AngelBlock
 import one.oktw.galaxy.block.event.BlockEvents
@@ -49,7 +49,7 @@ import kotlin.coroutines.CoroutineContext
 
 class Main : DedicatedServerModInitializer, CoroutineScope {
     private val job = SupervisorJob()
-    lateinit var server: MinecraftDedicatedServer
+    lateinit var server: DedicatedServer
         private set
     lateinit var eventManager: EventManager
         private set
@@ -79,7 +79,7 @@ class Main : DedicatedServerModInitializer, CoroutineScope {
         CustomBlock
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting {
-            server = it as MinecraftDedicatedServer
+            server = it as DedicatedServer
             eventManager = EventManager(server)
 
             // Register Custom Payload

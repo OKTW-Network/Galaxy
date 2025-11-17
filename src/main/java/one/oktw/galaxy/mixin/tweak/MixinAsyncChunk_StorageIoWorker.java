@@ -18,19 +18,19 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtInt;
-import net.minecraft.nbt.scanner.NbtScanQuery;
-import net.minecraft.nbt.scanner.NbtScanner;
-import net.minecraft.nbt.scanner.SelectiveNbtCollector;
-import net.minecraft.util.Pair;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.thread.PrioritizedConsecutiveExecutor;
-import net.minecraft.util.thread.TaskQueue;
-import net.minecraft.world.storage.StorageIoWorker;
-import net.minecraft.world.storage.StorageIoWorker.Priority;
-import net.minecraft.world.storage.StorageKey;
+import net.minecraft.Util;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.StreamTagVisitor;
+import net.minecraft.nbt.visitors.CollectFields;
+import net.minecraft.nbt.visitors.FieldSelector;
+import net.minecraft.util.Tuple;
+import net.minecraft.util.thread.PriorityConsecutiveExecutor;
+import net.minecraft.util.thread.StrictQueue;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.storage.IOWorker;
+import net.minecraft.world.level.chunk.storage.IOWorker.Priority;
+import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
 import one.oktw.galaxy.util.KotlinCoroutineTaskExecutor;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.*;
@@ -45,7 +45,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@Mixin(StorageIoWorker.class)
+@Mixin(IOWorker.class)
 public abstract class MixinAsyncChunk_StorageIoWorker {
     @Unique
     private final AtomicBoolean writeLock = new AtomicBoolean(false);
@@ -57,26 +57,26 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
     @Mutable
     @Shadow
     @Final
-    private PrioritizedConsecutiveExecutor executor;
+    private PriorityConsecutiveExecutor consecutiveExecutor;
 
     @Mutable
     @Shadow
     @Final
-    private SequencedMap<ChunkPos, StorageIoWorker.Result> results;
+    private SequencedMap<ChunkPos, IOWorker.PendingStore> pendingWrites;
 
     @Shadow
-    protected abstract void write(ChunkPos pos, StorageIoWorker.Result result);
+    protected abstract void runStore(ChunkPos pos, IOWorker.PendingStore result);
 
     @Shadow
-    public abstract CompletableFuture<Void> scanChunk(ChunkPos pos, NbtScanner scanner);
+    public abstract CompletableFuture<Void> scanChunk(ChunkPos pos, StreamTagVisitor scanner);
 
     @Shadow
-    protected abstract boolean needsBlending(NbtCompound nbt);
+    protected abstract boolean isOldChunk(CompoundTag nbt);
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void parallelExecutor(StorageKey storageKey, Path directory, boolean dsync, CallbackInfo ci) {
-        results = new ConcurrentSkipListMap<>(Comparator.comparingLong(ChunkPos::toLong));
-        executor = new KotlinCoroutineTaskExecutor(3 /* FOREGROUND,BACKGROUND,SHUTDOWN */, "IOWorker-" + storageKey.type());
+    private void parallelExecutor(RegionStorageInfo storageKey, Path directory, boolean dsync, CallbackInfo ci) {
+        pendingWrites = new ConcurrentSkipListMap<>(Comparator.comparingLong(ChunkPos::toLong));
+        consecutiveExecutor = new KotlinCoroutineTaskExecutor(3 /* FOREGROUND,BACKGROUND,SHUTDOWN */, "IOWorker-" + storageKey.type());
     }
 
     /**
@@ -84,16 +84,16 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
      * @reason no low priority write & bulk write
      */
     @Overwrite
-    private void writeResult() {
-        if (!this.results.isEmpty() && !writeLock.getAndSet(true)) {
-            HashMap<Long, ArrayList<Pair<ChunkPos, StorageIoWorker.Result>>> map = new HashMap<>();
-            results.forEach((pos, result) -> map.computeIfAbsent(ChunkPos.toLong(pos.getRegionX(), pos.getRegionZ()), k -> new ArrayList<>()).add(new Pair<>(pos, result)));
+    private void storePendingChunk() {
+        if (!this.pendingWrites.isEmpty() && !writeLock.getAndSet(true)) {
+            HashMap<Long, ArrayList<Tuple<ChunkPos, IOWorker.PendingStore>>> map = new HashMap<>();
+            pendingWrites.forEach((pos, result) -> map.computeIfAbsent(ChunkPos.asLong(pos.getRegionX(), pos.getRegionZ()), k -> new ArrayList<>()).add(new Tuple<>(pos, result)));
             map.values().forEach(list ->
-                executor.send(new TaskQueue.PrioritizedTask(Priority.FOREGROUND.ordinal(), () -> list.forEach(pair -> write(pair.getLeft(), pair.getRight()))))
+                consecutiveExecutor.schedule(new StrictQueue.RunnableWithPriority(Priority.FOREGROUND.ordinal(), () -> list.forEach(pair -> runStore(pair.getA(), pair.getB()))))
             );
-            this.executor.send(new TaskQueue.PrioritizedTask(Priority.BACKGROUND.ordinal(), () -> {
+            this.consecutiveExecutor.schedule(new StrictQueue.RunnableWithPriority(Priority.BACKGROUND.ordinal(), () -> {
                 writeLock.set(false);
-                writeResult();
+                storePendingChunk();
             }));
         }
     }
@@ -103,30 +103,30 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
      * @reason no low priority write
      */
     @Overwrite
-    private void writeRemainingResults() {
-        writeResult();
+    private void tellStorePending() {
+        storePendingChunk();
     }
 
-    @Inject(method = "readChunkData", at = @At("HEAD"), cancellable = true)
-    private void fastRead(ChunkPos pos, CallbackInfoReturnable<CompletableFuture<Optional<NbtCompound>>> cir) {
-        StorageIoWorker.Result result = this.results.get(pos);
+    @Inject(method = "loadAsync", at = @At("HEAD"), cancellable = true)
+    private void fastRead(ChunkPos pos, CallbackInfoReturnable<CompletableFuture<Optional<CompoundTag>>> cir) {
+        IOWorker.PendingStore result = this.pendingWrites.get(pos);
         if (result != null) {
-            cir.setReturnValue(CompletableFuture.completedFuture(Optional.ofNullable(result.copyNbt())));
+            cir.setReturnValue(CompletableFuture.completedFuture(Optional.ofNullable(result.copyData())));
         }
     }
 
     @Inject(method = "scanChunk", at = @At("HEAD"), cancellable = true)
-    private void fastScan(ChunkPos pos, NbtScanner scanner, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
-        StorageIoWorker.Result result = this.results.get(pos);
+    private void fastScan(ChunkPos pos, StreamTagVisitor scanner, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
+        IOWorker.PendingStore result = this.pendingWrites.get(pos);
         if (result != null) {
-            if (result.nbt != null) result.nbt.accept(scanner);
+            if (result.data != null) result.data.acceptAsRoot(scanner);
             cir.setReturnValue(CompletableFuture.completedFuture(null));
         }
     }
 
-    @Inject(method = "write", at = @At(value = "HEAD"), cancellable = true)
-    private void removeResults(ChunkPos pos, StorageIoWorker.Result result, CallbackInfo ci) {
-        if (!this.results.remove(pos, result)) { // Only write once
+    @Inject(method = "runStore", at = @At(value = "HEAD"), cancellable = true)
+    private void removeResults(ChunkPos pos, IOWorker.PendingStore result, CallbackInfo ci) {
+        if (!this.pendingWrites.remove(pos, result)) { // Only write once
             ci.cancel();
         }
     }
@@ -136,16 +136,16 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
      * @reason Parallelization
      */
     @Overwrite
-    private CompletableFuture<BitSet> computeBlendingStatus(int chunkX, int chunkZ) {
+    private CompletableFuture<BitSet> createOldDataForRegion(int chunkX, int chunkZ) {
         return CompletableFuture.supplyAsync(
             () -> {
                 BitSet bitSet = new BitSet();
-                ChunkPos.stream(ChunkPos.fromRegion(chunkX, chunkZ), ChunkPos.fromRegionCenter(chunkX, chunkZ))
+                ChunkPos.rangeClosed(ChunkPos.minFromRegion(chunkX, chunkZ), ChunkPos.maxFromRegion(chunkX, chunkZ))
                     .parallel()
                     .forEach(
                         chunkPos -> {
-                            SelectiveNbtCollector selectiveNbtCollector = new SelectiveNbtCollector(
-                                new NbtScanQuery(NbtInt.TYPE, "DataVersion"), new NbtScanQuery(NbtCompound.TYPE, "blending_data")
+                            CollectFields selectiveNbtCollector = new CollectFields(
+                                new FieldSelector(IntTag.TYPE, "DataVersion"), new FieldSelector(CompoundTag.TYPE, "blending_data")
                             );
 
                             try {
@@ -155,8 +155,8 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
                                 return;
                             }
 
-                            if (selectiveNbtCollector.getRoot() instanceof NbtCompound nbtCompound && needsBlending(nbtCompound)) {
-                                int ix = chunkPos.getRegionRelativeZ() * 32 + chunkPos.getRegionRelativeX();
+                            if (selectiveNbtCollector.getResult() instanceof CompoundTag nbtCompound && isOldChunk(nbtCompound)) {
+                                int ix = chunkPos.getRegionLocalZ() * 32 + chunkPos.getRegionLocalX();
                                 synchronized (bitSet) {
                                     bitSet.set(ix);
                                 }
@@ -165,7 +165,7 @@ public abstract class MixinAsyncChunk_StorageIoWorker {
                     );
                 return bitSet;
             },
-            Util.getMainWorkerExecutor()
+            Util.backgroundExecutor()
         );
     }
 }

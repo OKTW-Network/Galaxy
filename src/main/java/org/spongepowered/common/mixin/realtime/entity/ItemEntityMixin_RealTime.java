@@ -42,7 +42,7 @@
  */
 package org.spongepowered.common.mixin.realtime.entity;
 
-import net.minecraft.entity.ItemEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -55,19 +55,19 @@ public abstract class ItemEntityMixin_RealTime extends EntityMixin_RealTime {
     @Shadow
     private int pickupDelay;
     @Shadow
-    private int itemAge;
+    private int age;
 
     @Redirect(method = "tick",
-        at = @At(value = "FIELD", target = "Lnet/minecraft/entity/ItemEntity;pickupDelay:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
+        at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/item/ItemEntity;pickupDelay:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
     private void realTimeImpl$adjustForRealTimePickupDelay(final ItemEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.level()).realTimeBridge$getRealTimeTicks();
         this.pickupDelay = Math.max(0, this.pickupDelay - ticks);
     }
 
     @Redirect(method = "tick",
-        at = @At(value = "FIELD", target = "Lnet/minecraft/entity/ItemEntity;itemAge:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
+        at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/item/ItemEntity;age:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
     private void realTimeImpl$adjustForRealTimeAge(final ItemEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
-        this.itemAge += ticks;
+        final int ticks = (int) ((RealTimeTrackingBridge) self.level()).realTimeBridge$getRealTimeTicks();
+        this.age += ticks;
     }
 }

@@ -21,8 +21,8 @@ package one.oktw.galaxy.chat
 import com.google.gson.GsonBuilder
 import com.mojang.serialization.JsonOps
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.createS2CPacket
-import net.minecraft.registry.DynamicRegistryManager
-import net.minecraft.text.TextCodecs
+import net.minecraft.core.RegistryAccess
+import net.minecraft.network.chat.ComponentSerialization
 import one.oktw.galaxy.Main
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.PlayerChatEvent
@@ -36,18 +36,18 @@ class Exchange {
         if (Main.selfUUID == ProxyAPI.dummyUUID) return
 
         val gson = GsonBuilder().disableHtmlEscaping().create()
-        val registries = DynamicRegistryManager.EMPTY
+        val registries = RegistryAccess.EMPTY
 
         event.cancel = true
 
-        event.player.networkHandler.sendPacket(
+        event.player.connection.send(
             createS2CPacket(
                 ProxyChatPayload(
                     MessageSend(
                         sender = event.player.uuid,
                         message = gson.toJson(
-                            TextCodecs.CODEC
-                                .encodeStart(registries.getOps(JsonOps.INSTANCE), event.message)
+                            ComponentSerialization.CODEC
+                                .encodeStart(registries.createSerializationContext(JsonOps.INSTANCE), event.message)
                                 .orThrow
                         ),
                         targets = listOf(ProxyAPI.globalChatChannel)

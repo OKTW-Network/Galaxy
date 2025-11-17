@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,28 +18,30 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.entity.projectile.SpectralArrowEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.projectile.SpectralArrow;
 import one.oktw.galaxy.mixin.interfaces.IThrownCountdown_Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Entity.class)
 public abstract class MixinThrownCountdown_Entity implements IThrownCountdown_Entity {
+    @Unique
     private int intoWater = 0;
 
     @Shadow
     public abstract void discard();
 
-    @Inject(method = "checkWaterState",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;onSwimmingStart()V"))
+    @Inject(method = "updateInWaterStateAndDoWaterCurrentPushing",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;doWaterSplashEffect()V"))
     private void countIntoWater(CallbackInfo ci) {
         //noinspection ConstantConditions
-        if (((Object) this) instanceof ArrowEntity || ((Object) this) instanceof SpectralArrowEntity) {
+        if (((Object) this) instanceof Arrow || ((Object) this) instanceof SpectralArrow) {
             if (intoWater > 10) {
                 discard();
             }
@@ -48,7 +50,7 @@ public abstract class MixinThrownCountdown_Entity implements IThrownCountdown_En
     }
 
     @Override
-    public int getIntoWater() {
+    public int galaxy$getIntoWater() {
         return intoWater;
     }
 }

@@ -18,13 +18,13 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.entity.projectile.thrown.ThrownEntity;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import one.oktw.galaxy.mixin.interfaces.IThrownCountdown_Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,16 +32,16 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.function.Predicate;
 
-@Mixin(ThrownEntity.class)
+@Mixin(ThrowableProjectile.class)
 public class MixinThrownCountdown_ThrownEntity {
-    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/ProjectileUtil;getCollision(Lnet/minecraft/entity/Entity;Ljava/util/function/Predicate;)Lnet/minecraft/util/hit/HitResult;"))
+    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/ProjectileUtil;getHitResultOnMoveVector(Lnet/minecraft/world/entity/Entity;Ljava/util/function/Predicate;)Lnet/minecraft/world/phys/HitResult;"))
     private HitResult addWaterHit(Entity entity, Predicate<Entity> predicate) {
-        HitResult hit = ProjectileUtil.getCollision(entity, predicate);
+        HitResult hit = ProjectileUtil.getHitResultOnMoveVector(entity, predicate);
 
-        if (hit.getType() == HitResult.Type.MISS && ((IThrownCountdown_Entity) this).getIntoWater() > 10) {
-            Vec3d pos = entity.getEntityPos();
-            Vec3d velocity = pos.add(entity.getVelocity());
-            BlockHitResult newHit = entity.getEntityWorld().raycast(new RaycastContext(pos, velocity, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.ANY, entity));
+        if (hit.getType() == HitResult.Type.MISS && ((IThrownCountdown_Entity) this).galaxy$getIntoWater() > 10) {
+            Vec3 pos = entity.position();
+            Vec3 velocity = pos.add(entity.getDeltaMovement());
+            BlockHitResult newHit = entity.level().clip(new ClipContext(pos, velocity, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, entity));
             if (newHit.getType() != HitResult.Type.MISS) {
                 hit = newHit;
             }

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2023
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,16 +18,16 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.message.MessageType;
-import net.minecraft.network.message.SignedMessage;
+import net.minecraft.network.Connection;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ConnectedClientData;
-import net.minecraft.server.network.ServerCommonNetworkHandler;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.network.ServerCommonPacketListenerImpl;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.players.PlayerList;
 import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerChatEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,22 +35,22 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(ServerPlayNetworkHandler.class)
-public abstract class MixinPlayerChat_NetworkHandler extends ServerCommonNetworkHandler {
+@Mixin(ServerGamePacketListenerImpl.class)
+public abstract class MixinPlayerChat_NetworkHandler extends ServerCommonPacketListenerImpl {
     @Shadow
-    public ServerPlayerEntity player;
+    public ServerPlayer player;
 
-    public MixinPlayerChat_NetworkHandler(MinecraftServer server, ClientConnection connection, ConnectedClientData clientData) {
+    public MixinPlayerChat_NetworkHandler(MinecraftServer server, Connection connection, CommonListenerCookie clientData) {
         super(server, connection, clientData);
     }
 
-    @Redirect(method = "handleDecoratedMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/network/message/SignedMessage;Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/network/message/MessageType$Parameters;)V"))
-    private void onChat(PlayerManager playerManager, SignedMessage message, ServerPlayerEntity sender, MessageType.Parameters messageType) {
+    @Redirect(method = "broadcastChatMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastChatMessage(Lnet/minecraft/network/chat/PlayerChatMessage;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/network/chat/ChatType$Bound;)V"))
+    private void onChat(PlayerList playerManager, PlayerChatMessage message, ServerPlayer sender, ChatType.Bound messageType) {
         // TODO sync SignedMessage
-        if (!EventManager.safeEmit(new PlayerChatEvent(player, Text.translatable("chat.type.text", player.getDisplayName(), message.getContent()))).getCancel()) {
-            playerManager.broadcast(message, sender, messageType);
+        if (!EventManager.safeEmit(new PlayerChatEvent(player, Component.translatable("chat.type.text", player.getDisplayName(), message.decoratedContent()))).getCancel()) {
+            playerManager.broadcastChatMessage(message, sender, messageType);
         } else {
-            server.logChatMessage(message.getContent(), messageType, "Canceled");
+            server.logChatMessage(message.decoratedContent(), messageType, "Canceled");
         }
     }
 }

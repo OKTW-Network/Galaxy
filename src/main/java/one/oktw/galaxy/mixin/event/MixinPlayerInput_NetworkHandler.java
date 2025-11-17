@@ -18,9 +18,9 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.network.protocol.game.ServerboundPlayerInputPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerJumpEvent;
 import one.oktw.galaxy.event.type.PlayerSneakEvent;
@@ -31,21 +31,21 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ServerPlayNetworkHandler.class)
+@Mixin(ServerGamePacketListenerImpl.class)
 public class MixinPlayerInput_NetworkHandler {
     @Shadow
-    public ServerPlayerEntity player;
+    public ServerPlayer player;
 
-    @Inject(method = "onPlayerInput", at = @At(
+    @Inject(method = "handlePlayerInput", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/server/network/ServerPlayerEntity;setPlayerInput(Lnet/minecraft/util/PlayerInput;)V"
+        target = "Lnet/minecraft/server/level/ServerPlayer;setLastClientInput(Lnet/minecraft/world/entity/player/Input;)V"
     ))
-    private void playerInput(PlayerInputC2SPacket packet, CallbackInfo ci) {
-        if (packet.input().sneak() != player.getPlayerInput().sneak()) {
-            EventManager.safeEmit(packet.input().sneak() ? new PlayerSneakEvent(player) : new PlayerSneakReleaseEvent(player));
+    private void playerInput(ServerboundPlayerInputPacket packet, CallbackInfo ci) {
+        if (packet.input().shift() != player.getLastClientInput().shift()) {
+            EventManager.safeEmit(packet.input().shift() ? new PlayerSneakEvent(player) : new PlayerSneakReleaseEvent(player));
         }
 
-        if (packet.input().jump() && !player.getPlayerInput().jump()) {
+        if (packet.input().jump() && !player.getLastClientInput().jump()) {
             EventManager.safeEmit(new PlayerJumpEvent(player));
         }
     }

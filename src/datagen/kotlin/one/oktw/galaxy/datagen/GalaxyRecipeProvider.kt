@@ -20,31 +20,31 @@ package one.oktw.galaxy.datagen
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider
-import net.minecraft.data.recipe.RecipeExporter
-import net.minecraft.data.recipe.RecipeGenerator
-import net.minecraft.item.Items
-import net.minecraft.recipe.book.RecipeCategory
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.RegistryWrapper
-import net.minecraft.registry.tag.ItemTags
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.recipes.RecipeCategory
+import net.minecraft.data.recipes.RecipeOutput
+import net.minecraft.data.recipes.RecipeProvider
+import net.minecraft.tags.ItemTags
+import net.minecraft.world.item.Items
 import one.oktw.galaxy.datagen.util.ShapedRecipeJsonBuilder
 import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.Tool
 import java.util.concurrent.CompletableFuture
 
-class GalaxyRecipeProvider(output: FabricDataOutput, registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>) :
+class GalaxyRecipeProvider(output: FabricDataOutput, registriesFuture: CompletableFuture<HolderLookup.Provider>) :
     FabricRecipeProvider(output, registriesFuture) {
-    override fun getRecipeGenerator(registries: RegistryWrapper.WrapperLookup, exporter: RecipeExporter) = object : RecipeGenerator(registries, exporter) {
-        override fun generate() {
-            val itemLookup = registries.getOrThrow(RegistryKeys.ITEM)
+    override fun createRecipeProvider(registries: HolderLookup.Provider, exporter: RecipeOutput) = object : RecipeProvider(registries, exporter) {
+        override fun buildRecipes() {
+            val itemLookup = registries.lookupOrThrow(Registries.ITEM)
 
             // Block
-            createShapeless(RecipeCategory.BUILDING_BLOCKS, CustomBlockItem.ELEVATOR.createItemStack())
-                .input(Items.ENDER_PEARL)
-                .input(Items.IRON_BLOCK)
-                .criterion(hasItem(Items.ENDER_PEARL), conditionsFromItem(Items.ENDER_PEARL))
-                .criterion(hasItem(Items.IRON_BLOCK), conditionsFromItem(Items.IRON_BLOCK))
-                .offerTo(exporter, "block/elevator")
+            shapeless(RecipeCategory.BUILDING_BLOCKS, CustomBlockItem.ELEVATOR.createItemStack())
+                .requires(Items.ENDER_PEARL)
+                .requires(Items.IRON_BLOCK)
+                .unlockedBy(getHasName(Items.ENDER_PEARL), has(Items.ENDER_PEARL))
+                .unlockedBy(getHasName(Items.IRON_BLOCK), has(Items.IRON_BLOCK))
+                .save(exporter, "block/elevator")
             ShapedRecipeJsonBuilder(itemLookup, RecipeCategory.BUILDING_BLOCKS, CustomBlockItem.HARVEST.createItemStack())
                 .addInput('C', Items.COPPER_INGOT)
                 .addInput('D', Items.DISPENSER)
@@ -56,10 +56,10 @@ class GalaxyRecipeProvider(output: FabricDataOutput, registriesFuture: Completab
                         "CCC"
                     )
                 )
-                .criterion(hasItem(Items.COPPER_INGOT), conditionsFromItem(Items.COPPER_INGOT))
-                .criterion(hasItem(Items.DISPENSER), conditionsFromItem(Items.DISPENSER))
-                .criterion(hasItem(Items.OBSERVER), conditionsFromItem(Items.OBSERVER))
-                .offerTo(exporter, "block/harvest")
+                .unlockedBy(getHasName(Items.COPPER_INGOT), has(Items.COPPER_INGOT))
+                .unlockedBy(getHasName(Items.DISPENSER), has(Items.DISPENSER))
+                .unlockedBy(getHasName(Items.OBSERVER), has(Items.OBSERVER))
+                .save(exporter, "block/harvest")
             ShapedRecipeJsonBuilder(itemLookup, RecipeCategory.BUILDING_BLOCKS, CustomBlockItem.HT_CRAFTING_TABLE.createItemStack())
                 .addInput('R', Items.REDSTONE)
                 .addInput('D', Items.DIAMOND)
@@ -74,13 +74,13 @@ class GalaxyRecipeProvider(output: FabricDataOutput, registriesFuture: Completab
                         "LOR"
                     )
                 )
-                .criterion(hasItem(Items.REDSTONE), conditionsFromItem(Items.REDSTONE))
-                .criterion(hasItem(Items.DIAMOND), conditionsFromItem(Items.DIAMOND))
-                .criterion(hasItem(Items.LAPIS_LAZULI), conditionsFromItem(Items.LAPIS_LAZULI))
-                .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
-                .criterion(hasItem(Items.CRAFTING_TABLE), conditionsFromItem(Items.CRAFTING_TABLE))
-                .criterion(hasItem(Items.OBSIDIAN), conditionsFromItem(Items.OBSIDIAN))
-                .offerTo(exporter, "block/ht_crafting_table")
+                .unlockedBy(getHasName(Items.REDSTONE), has(Items.REDSTONE))
+                .unlockedBy(getHasName(Items.DIAMOND), has(Items.DIAMOND))
+                .unlockedBy(getHasName(Items.LAPIS_LAZULI), has(Items.LAPIS_LAZULI))
+                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .unlockedBy(getHasName(Items.CRAFTING_TABLE), has(Items.CRAFTING_TABLE))
+                .unlockedBy(getHasName(Items.OBSIDIAN), has(Items.OBSIDIAN))
+                .save(exporter, "block/ht_crafting_table")
             ShapedRecipeJsonBuilder(itemLookup, RecipeCategory.BUILDING_BLOCKS, CustomBlockItem.TRASHCAN.createItemStack())
                 .addInput('G', Items.GLASS)
                 .addInput('C', Items.CACTUS)
@@ -93,11 +93,11 @@ class GalaxyRecipeProvider(output: FabricDataOutput, registriesFuture: Completab
                         "TST"
                     )
                 )
-                .criterion(hasItem(Items.GLASS), conditionsFromItem(Items.GLASS))
-                .criterion(hasItem(Items.CACTUS), conditionsFromItem(Items.CACTUS))
-                .criterion(hasItem(Items.TERRACOTTA), conditionsFromItem(Items.TERRACOTTA))
-                .criterion(hasItem(Items.SAND), conditionsFromTag(ItemTags.SAND))
-                .offerTo(exporter, "block/trashcan")
+                .unlockedBy(getHasName(Items.GLASS), has(Items.GLASS))
+                .unlockedBy(getHasName(Items.CACTUS), has(Items.CACTUS))
+                .unlockedBy(getHasName(Items.TERRACOTTA), has(Items.TERRACOTTA))
+                .unlockedBy(getHasName(Items.SAND), has(ItemTags.SAND))
+                .save(exporter, "block/trashcan")
 
             // Tool
             ShapedRecipeJsonBuilder(itemLookup, RecipeCategory.TOOLS, Tool.CROWBAR.createItemStack())
@@ -109,8 +109,8 @@ class GalaxyRecipeProvider(output: FabricDataOutput, registriesFuture: Completab
                         " I"
                     )
                 )
-                .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
-                .offerTo(exporter, "tool/crowbar")
+                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .save(exporter, "tool/crowbar")
             ShapedRecipeJsonBuilder(itemLookup, RecipeCategory.TOOLS, Tool.WRENCH.createItemStack())
                 .addInput('I', Items.IRON_INGOT)
                 .addInput('S', Items.STICK)
@@ -121,9 +121,9 @@ class GalaxyRecipeProvider(output: FabricDataOutput, registriesFuture: Completab
                         " I "
                     )
                 )
-                .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
-                .criterion(hasItem(Items.STICK), conditionsFromItem(Items.STICK))
-                .offerTo(exporter, "tool/wrench")
+                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .unlockedBy(getHasName(Items.STICK), has(Items.STICK))
+                .save(exporter, "tool/wrench")
         }
     }
 

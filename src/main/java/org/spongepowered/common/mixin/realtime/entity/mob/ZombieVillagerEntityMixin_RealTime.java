@@ -42,7 +42,7 @@
  */
 package org.spongepowered.common.mixin.realtime.entity.mob;
 
-import net.minecraft.entity.mob.ZombieVillagerEntity;
+import net.minecraft.world.entity.monster.ZombieVillager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -50,22 +50,22 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 import org.spongepowered.common.mixin.realtime.entity.LivingEntityMixin_RealTime;
 
-@Mixin(ZombieVillagerEntity.class)
+@Mixin(ZombieVillager.class)
 public abstract class ZombieVillagerEntityMixin_RealTime extends LivingEntityMixin_RealTime {
     @Shadow
-    protected abstract int getConversionRate();
+    protected abstract int getConversionProgress();
 
     @Redirect(
         method = "tick",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/entity/mob/ZombieVillagerEntity;getConversionRate()I",
+            target = "Lnet/minecraft/world/entity/monster/ZombieVillager;getConversionProgress()I",
             ordinal = 0
         )
     )
-    private int realTimeImpl$adjustForRealTimeConversionTimeBoost(final ZombieVillagerEntity self) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
-        return this.getConversionRate() * ticks;
+    private int realTimeImpl$adjustForRealTimeConversionTimeBoost(final ZombieVillager self) {
+        final int ticks = (int) ((RealTimeTrackingBridge) self.level()).realTimeBridge$getRealTimeTicks();
+        return this.getConversionProgress() * ticks;
     }
 
 }

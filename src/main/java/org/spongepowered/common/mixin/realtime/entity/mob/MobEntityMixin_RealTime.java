@@ -42,7 +42,7 @@
  */
 package org.spongepowered.common.mixin.realtime.entity.mob;
 
-import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.world.entity.Mob;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -50,18 +50,18 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 import org.spongepowered.common.mixin.realtime.entity.LivingEntityMixin_RealTime;
 
-@Mixin(MobEntity.class)
+@Mixin(Mob.class)
 public abstract class MobEntityMixin_RealTime extends LivingEntityMixin_RealTime {
     @Redirect(
-        method = "tickNewAi",
+        method = "serverAiStep",
         at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/entity/mob/MobEntity;despawnCounter:I",
+            target = "Lnet/minecraft/world/entity/Mob;noActionTime:I",
             opcode = Opcodes.PUTFIELD
         )
     )
-    private void realTimeImpl$adjustForRealTimeEntityDespawnAge(final MobEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
-        this.despawnCounter += ticks;
+    private void realTimeImpl$adjustForRealTimeEntityDespawnAge(final Mob self, final int modifier) {
+        final int ticks = (int) ((RealTimeTrackingBridge) self.level()).realTimeBridge$getRealTimeTicks();
+        this.noActionTime += ticks;
     }
 }

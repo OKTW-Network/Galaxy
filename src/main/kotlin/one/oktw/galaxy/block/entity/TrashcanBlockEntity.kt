@@ -18,66 +18,66 @@
 
 package one.oktw.galaxy.block.entity
 
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.inventory.Inventory
-import net.minecraft.inventory.SimpleInventory
-import net.minecraft.item.ItemStack
-import net.minecraft.screen.ScreenHandlerType
-import net.minecraft.screen.slot.Slot
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.text.Text
-import net.minecraft.util.ActionResult
-import net.minecraft.util.Hand
-import net.minecraft.util.Identifier
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.math.BlockPos
+import net.minecraft.core.BlockPos
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.Container
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.MenuType
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.phys.BlockHitResult
 import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
 import one.oktw.galaxy.item.Misc
 
-class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : Inventory, ModelCustomBlockEntity(type, pos, modelItem),
+class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : Container, ModelCustomBlockEntity(type, pos, modelItem),
     CustomBlockClickListener {
-    override fun clear() {}
+    override fun clearContent() {}
 
-    override fun size(): Int = 1
+    override fun getContainerSize(): Int = 1
 
     override fun isEmpty(): Boolean = true
 
-    override fun getStack(slot: Int): ItemStack = ItemStack.EMPTY
+    override fun getItem(slot: Int): ItemStack = ItemStack.EMPTY
 
-    override fun removeStack(slot: Int, amount: Int): ItemStack = ItemStack.EMPTY
+    override fun removeItem(slot: Int, amount: Int): ItemStack = ItemStack.EMPTY
 
-    override fun removeStack(slot: Int): ItemStack = ItemStack.EMPTY
+    override fun removeItemNoUpdate(slot: Int): ItemStack = ItemStack.EMPTY
 
-    override fun setStack(slot: Int, stack: ItemStack?) {}
+    override fun setItem(slot: Int, stack: ItemStack) {}
 
-    override fun canPlayerUse(player: PlayerEntity): Boolean {
-        return Inventory.canPlayerUse(this, player)
+    override fun stillValid(player: Player): Boolean {
+        return Container.stillValidBlockEntity(this, player)
     }
 
-    override fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {
+    override fun onClick(player: Player, hand: InteractionHand, hit: BlockHitResult): InteractionResult {
         if (player.isSpectator) {
-            return ActionResult.CONSUME
+            return InteractionResult.CONSUME
         }
 
         val gui = GUI
-            .Builder(ScreenHandlerType.GENERIC_9X6)
-            .setTitle(Text.translatable("block.TRASHCAN"))
-            .setBackground("A", Identifier.of("galaxy", "gui_font/container_layout/trashcan"))
+            .Builder(MenuType.GENERIC_9x6)
+            .setTitle(Component.translatable("block.TRASHCAN"))
+            .setBackground("A", ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/container_layout/trashcan"))
             .blockEntity(this)
             .apply {
                 var i = 0
-                val inv = SimpleInventory(9 * 6)
+                val inv = SimpleContainer(9 * 6)
 
                 for (y in 0 until 6) for (x in 0 until 6) addSlot(x, y, Slot(inv, i++, 0, 0))
             }
             .build()
             .apply { editInventory { fillAll(Misc.PLACEHOLDER.createItemStack()) } }
 
-        GUISBackStackManager.openGUI(player as ServerPlayerEntity, gui)
+        GUISBackStackManager.openGUI(player as ServerPlayer, gui)
 
-        return ActionResult.SUCCESS_SERVER
+        return InteractionResult.SUCCESS_SERVER
     }
 }

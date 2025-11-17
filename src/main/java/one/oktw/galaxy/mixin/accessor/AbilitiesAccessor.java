@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,12 +18,12 @@
 
 package one.oktw.galaxy.mixin.accessor;
 
-import net.minecraft.entity.player.PlayerAbilities;
+import net.minecraft.world.entity.player.Abilities;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(PlayerAbilities.class)
-public interface PlayerAbilitiesAccessor {
+@Mixin(Abilities.class)
+public interface AbilitiesAccessor {
     @Accessor
-    void setFlySpeed(float speed);
+    void setFlyingSpeed(float speed);
 }

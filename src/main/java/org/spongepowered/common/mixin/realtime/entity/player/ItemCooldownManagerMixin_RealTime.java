@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -42,26 +42,28 @@
  */
 package org.spongepowered.common.mixin.realtime.entity.player;
 
-import net.minecraft.entity.player.ItemCooldownManager;
+import net.minecraft.world.item.ItemCooldowns;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(ItemCooldownManager.class)
+@Mixin(ItemCooldowns.class)
 public abstract class ItemCooldownManagerMixin_RealTime {
+    @Unique
     private static long lastTickNanos = System.nanoTime();
 
     @Shadow
-    private int tick;
+    private int tickCount;
 
-    @Redirect(method = "update",
-        at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/ItemCooldownManager;tick:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
-    private void realTimeImpl$adjustForRealTimeExperiencePickUpDelay(final ItemCooldownManager self, final int modifier) {
+    @Redirect(method = "tick",
+        at = @At(value = "FIELD", target = "Lnet/minecraft/world/item/ItemCooldowns;tickCount:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
+    private void realTimeImpl$adjustForRealTimeExperiencePickUpDelay(final ItemCooldowns self, final int modifier) {
         final long currentNanos = System.nanoTime();
         long realTimeTicks = Math.max(1, (currentNanos - lastTickNanos) / 50000000);
         lastTickNanos = currentNanos;
-        this.tick += realTimeTicks;
+        this.tickCount += (int) realTimeTicks;
     }
 }

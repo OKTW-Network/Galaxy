@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -26,6 +26,6 @@ class CustomItemEventHandler {
     @EventListener(sync = true)
     fun onUseCustomItemOnBlock(event: PlayerUseItemOnBlock) {
         // Cancel creative player place command block.
-        if (CustomItemHelper.getItem(event.context.stack) != null) event.cancel = true
+        if (CustomItemHelper.getItem(event.context.itemInHand) != null) event.cancel = true
     }
 }

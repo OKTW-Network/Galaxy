@@ -59,7 +59,7 @@ class RegisterBlock {
 
                 it.source.level.removeBlockEntity(blockPos)
                 it.source.level.setBlockEntity(block.createBlockEntity(blockPos))
-                it.source.sendSuccess({ Component.nullToEmpty("Registered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z} to ${block.identifier}") }, true)
+                it.source.sendSuccess({ Component.literal("Registered block at ${blockPos.x}, ${blockPos.y}, ${blockPos.z} to ${block.identifier}") }, true)
 
                 return@executes Command.SINGLE_SUCCESS
             }

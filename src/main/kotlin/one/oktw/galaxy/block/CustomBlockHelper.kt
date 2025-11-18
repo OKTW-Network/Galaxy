@@ -51,8 +51,9 @@ object CustomBlockHelper {
             // Create block entity and read data
             val entity = item.getBlock().createBlockEntity(pos)
             stack2.get(DataComponents.BLOCK_ENTITY_DATA)?.let {
-                val reporter = ProblemReporter.ScopedCollector(entity.problemPath(), LogUtils.getLogger())
-                entity.readCopyableData(TagValueInput.create(reporter, world.registryAccess(), it.copyTagWithoutId()))
+                ProblemReporter.ScopedCollector(entity.problemPath(), LogUtils.getLogger()).use { reporter ->
+                    entity.readCopyableData(TagValueInput.create(reporter, world.registryAccess(), it.copyTagWithoutId()))
+                }
             }
             entity.applyComponentsFromItemStack(stack2)
             // Set facing

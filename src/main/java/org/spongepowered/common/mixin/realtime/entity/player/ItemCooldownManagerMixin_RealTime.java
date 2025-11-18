@@ -60,7 +60,7 @@ public abstract class ItemCooldownManagerMixin_RealTime {
 
     @Redirect(method = "tick",
         at = @At(value = "FIELD", target = "Lnet/minecraft/world/item/ItemCooldowns;tickCount:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
-    private void realTimeImpl$adjustForRealTimeExperiencePickUpDelay(final ItemCooldowns self, final int modifier) {
+    private void realTimeImpl$adjustForRealTimeItemCooldown(final ItemCooldowns self, final int modifier) {
         final long currentNanos = System.nanoTime();
         long realTimeTicks = Math.max(1, (currentNanos - lastTickNanos) / 50000000);
         lastTickNanos = currentNanos;

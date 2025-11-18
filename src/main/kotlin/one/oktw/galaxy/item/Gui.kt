@@ -32,5 +32,5 @@ class Gui(customModelData: CustomModelData, private val name: Component? = null)
         hideTooltip = name == null
     ) {
 
-    override fun getName(): Component = name ?: Component.nullToEmpty("")
+    override fun getName(): Component = name ?: Component.empty()
 }

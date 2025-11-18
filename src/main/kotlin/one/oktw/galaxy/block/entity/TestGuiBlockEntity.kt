@@ -59,7 +59,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     ).createItemStack()
     private val closeAllButton = Gui(
         GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.CROSS_MARK).build(),
-        Component.nullToEmpty("CLOSE ALL")
+        Component.literal("CLOSE ALL")
     ).createItemStack()
     private val plusButton = Gui(
         GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.PLUS_SIGN).build()
@@ -69,7 +69,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     private val inventory = NonNullList.withSize(3 * 9, ItemStack.EMPTY)
 
     private val gui = GUI.Builder(MenuType.GENERIC_9x6)
-        .setTitle(Component.nullToEmpty("Test GUI"))
+        .setTitle(Component.literal("Test GUI"))
         .setBackground("A", ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/container_layout/test_gui"))
         .blockEntity(this)
         .apply {
@@ -93,7 +93,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         }
 
     private val gui2 = GUI.Builder(MenuType.GENERIC_9x4)
-        .setTitle(Component.nullToEmpty("Test GUI2"))
+        .setTitle(Component.literal("Test GUI2"))
         .setBackground("B", ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/container_layout/test_gui"))
         .blockEntity(this)
         .apply {

@@ -26,10 +26,12 @@ import kotlinx.coroutines.runBlocking
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
 import one.oktw.galaxy.util.MinecraftAsyncExecutor
+import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentLinkedDeque
 
-class GUISBackStackManager(private val player: ServerPlayer) :
+class GUISBackStackManager(player: ServerPlayer) :
     CoroutineScope by CoroutineScope(MinecraftAsyncExecutor(player.level().server).asCoroutineDispatcher()) {
+    private val player = WeakReference(player)
     private val stack = ConcurrentLinkedDeque<GUI>()
 
     companion object {
@@ -46,6 +48,7 @@ class GUISBackStackManager(private val player: ServerPlayer) :
     }
 
     fun open(gui: GUI) {
+        val player = player.get() ?: return
         gui.onClose { this.closeCallback(gui, it) }
         stack.offerLast(gui)
         if (player.level().server.isSameThread) {
@@ -57,7 +60,7 @@ class GUISBackStackManager(private val player: ServerPlayer) :
     }
 
     private fun closeCallback(gui: GUI, player: Player) {
-        if (player == this.player && gui == stack.lastOrNull()) {
+        if (player == this.player.get() && gui == stack.lastOrNull()) {
             stack.pollLast() // Remove closed
 
             // Delay 1 tick to workaround open GUI on close callback

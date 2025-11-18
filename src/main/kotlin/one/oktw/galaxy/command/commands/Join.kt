@@ -80,7 +80,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
     private fun execute(source: CommandSourceStack, collection: Collection<NameAndId>): Int {
         val sourcePlayer = source.playerOrException
         if (!lock.getOrPut(sourcePlayer) { Mutex() }.tryLock()) {
-            source.sendSuccess({ Component.nullToEmpty("請稍後...") }, false)
+            source.sendSuccess({ Component.literal("請稍後...") }, false)
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
 
@@ -88,7 +88,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
 
         ServerPlayNetworking.send(sourcePlayer, ProxyAPIPayload(CreateGalaxy(targetPlayer.id)))
         source.sendSuccess(
-            { Component.nullToEmpty(if (sourcePlayer.gameProfile.id == targetPlayer.id) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系") },
+            { Component.literal(if (sourcePlayer.gameProfile.id == targetPlayer.id) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系") },
             false
         )
 
@@ -102,17 +102,17 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                 if (data.uuid != targetPlayer.id) return
 
                 when (data.stage) {
-                    Queue -> sourcePlayer.displayClientMessage(Component.nullToEmpty("正在等待星系載入"), false)
-                    Creating -> sourcePlayer.displayClientMessage(Component.nullToEmpty("星系載入中..."), false)
-                    Starting -> sourcePlayer.displayClientMessage(Component.nullToEmpty("星系正在啟動請稍後..."), false)
+                    Queue -> sourcePlayer.displayClientMessage(Component.literal("正在等待星系載入"), false)
+                    Creating -> sourcePlayer.displayClientMessage(Component.literal("星系載入中..."), false)
+                    Starting -> sourcePlayer.displayClientMessage(Component.literal("星系正在啟動請稍後..."), false)
                     Started -> {
-                        sourcePlayer.displayClientMessage(Component.nullToEmpty("星系已載入！"), false)
+                        sourcePlayer.displayClientMessage(Component.literal("星系已載入！"), false)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }
 
                     Failed -> {
-                        sourcePlayer.displayClientMessage(Component.nullToEmpty("星系載入失敗，請聯絡開發團隊！"), false)
+                        sourcePlayer.displayClientMessage(Component.literal("星系載入失敗，請聯絡開發團隊！"), false)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }

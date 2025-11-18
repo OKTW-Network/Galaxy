@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.event.type
 
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
+import net.minecraft.server.level.ServerPlayer
 
-class PlayerActionEvent(val packet: PlayerActionC2SPacket, val player: ServerPlayerEntity) : CancelableEvent()
+class PlayerActionEvent(val packet: ServerboundPlayerActionPacket, val player: ServerPlayer) : CancelableEvent()

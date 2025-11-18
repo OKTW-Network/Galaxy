@@ -18,32 +18,32 @@
 
 package one.oktw.galaxy.block.entity
 
-import net.minecraft.block.Blocks
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.storage.ReadView
-import net.minecraft.storage.WriteView
-import net.minecraft.util.math.BlockPos
+import net.minecraft.core.BlockPos
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.storage.ValueInput
+import net.minecraft.world.level.storage.ValueOutput
 
 // BlockEntity need extend
-open class CustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : BlockEntity(type, pos, Blocks.BARRIER.defaultState) {
-    fun getId() = BlockEntityType.getId(type)!!
+open class CustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : BlockEntity(type, pos, Blocks.BARRIER.defaultBlockState()) {
+    fun getId() = BlockEntityType.getKey(type)!!
 
-    override fun readData(view: ReadView) {
-        super.readData(view)
+    override fun loadAdditional(view: ValueInput) {
+        super.loadAdditional(view)
         readCopyableData(view)
 
     }
 
-    override fun writeData(view: WriteView) {
-        super.writeData(view)
+    override fun saveAdditional(view: ValueOutput) {
+        super.saveAdditional(view)
         view.putString("id", getId().toString()) // We need ID to mapping block entity, always write it.
     }
 
     /**
      * Read custom data from NBT, it will use on block clone.
      *
-     * Also call by [readNbt].
+     * Also call by [loadAdditional].
      */
-    open fun readCopyableData(view: ReadView) = Unit
+    open fun readCopyableData(view: ValueInput) = Unit
 }

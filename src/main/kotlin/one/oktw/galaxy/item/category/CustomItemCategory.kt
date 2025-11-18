@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.item.category
 
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 import one.oktw.galaxy.item.CustomItem
 
 abstract class CustomItemCategory {
@@ -32,7 +32,7 @@ abstract class CustomItemCategory {
         )
     }
 
-    abstract val displayName: Text
+    abstract val displayName: Component
     abstract val displayItem: CustomItem
     abstract val items: List<CustomItem>
 }

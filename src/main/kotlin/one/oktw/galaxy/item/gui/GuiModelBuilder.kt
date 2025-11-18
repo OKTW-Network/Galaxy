@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.item.gui
 
-import net.minecraft.component.type.CustomModelDataComponent
+import net.minecraft.world.item.component.CustomModelData
 
 class GuiModelBuilder {
     private var background: GuiBackground = GuiBackground.NONE
@@ -64,7 +64,7 @@ class GuiModelBuilder {
         return this
     }
 
-    fun build(): CustomModelDataComponent = CustomModelDataComponent(
+    fun build(): CustomModelData = CustomModelData(
         emptyList(),
         emptyList(),
         mutableListOf(

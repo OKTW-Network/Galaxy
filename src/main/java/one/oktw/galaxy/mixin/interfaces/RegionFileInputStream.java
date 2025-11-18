@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.mixin.interfaces;
 
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.level.ChunkPos;
 
 import java.io.DataInputStream;
 import java.io.IOException;

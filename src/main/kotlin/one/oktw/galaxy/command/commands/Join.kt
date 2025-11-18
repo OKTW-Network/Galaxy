@@ -23,12 +23,12 @@ import com.mojang.brigadier.suggestion.Suggestions
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
-import net.minecraft.command.argument.GameProfileArgumentType
-import net.minecraft.server.PlayerConfigEntry
-import net.minecraft.server.command.CommandManager
-import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.text.Text
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.Commands
+import net.minecraft.commands.arguments.GameProfileArgument
+import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.server.players.NameAndId
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.event.type.ProxyResponseEvent
@@ -41,17 +41,17 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
-    private val lock = ConcurrentHashMap<ServerPlayerEntity, Mutex>()
+    private val lock = ConcurrentHashMap<ServerPlayer, Mutex>()
 
-    override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
+    override fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
         dispatcher.register(
-            CommandManager.literal("join")
-                .executes { context -> execute(context.source, listOf(PlayerConfigEntry(context.source.playerOrThrow.gameProfile))) }
+            Commands.literal("join")
+                .executes { context -> execute(context.source, listOf(NameAndId(context.source.playerOrException.gameProfile))) }
                 .then(
-                    CommandManager.argument("player", GameProfileArgumentType.gameProfile())
+                    Commands.argument("player", GameProfileArgument.gameProfile())
                         .suggests { commandContext, suggestionsBuilder ->
                             val future = CompletableFuture<Suggestions>()
-                            val player = commandContext.source.playerOrThrow
+                            val player = commandContext.source.playerOrException
 
                             ServerPlayNetworking.send(player, ProxyAPIPayload(SearchPlayer(suggestionsBuilder.remaining, 10)))
 
@@ -71,23 +71,26 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                             return@suggests future
                         }
                         .executes { context ->
-                            execute(context.source, GameProfileArgumentType.getProfileArgument(context, "player"))
+                            execute(context.source, GameProfileArgument.getGameProfiles(context, "player"))
                         }
                 )
         )
     }
 
-    private fun execute(source: ServerCommandSource, collection: Collection<PlayerConfigEntry>): Int {
-        val sourcePlayer = source.playerOrThrow
+    private fun execute(source: CommandSourceStack, collection: Collection<NameAndId>): Int {
+        val sourcePlayer = source.playerOrException
         if (!lock.getOrPut(sourcePlayer) { Mutex() }.tryLock()) {
-            source.sendFeedback({ Text.of("請稍後...") }, false)
+            source.sendSuccess({ Component.literal("請稍後...") }, false)
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
 
         val targetPlayer = collection.first()
 
         ServerPlayNetworking.send(sourcePlayer, ProxyAPIPayload(CreateGalaxy(targetPlayer.id)))
-        source.sendFeedback({ Text.of(if (sourcePlayer.gameProfile == targetPlayer) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系") }, false)
+        source.sendSuccess(
+            { Component.literal(if (sourcePlayer.gameProfile.id == targetPlayer.id) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系") },
+            false
+        )
 
         launch {
 
@@ -99,18 +102,18 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                 if (data.uuid != targetPlayer.id) return
 
                 when (data.stage) {
-                    Queue -> sourcePlayer.sendMessage(Text.of("正在等待星系載入"), false)
-                    Creating -> sourcePlayer.sendMessage(Text.of("星系載入中..."), false)
-                    Starting -> sourcePlayer.sendMessage(Text.of("星系正在啟動請稍後..."), false)
+                    Queue -> sourcePlayer.displayClientMessage(Component.literal("正在等待星系載入"), false)
+                    Creating -> sourcePlayer.displayClientMessage(Component.literal("星系載入中..."), false)
+                    Starting -> sourcePlayer.displayClientMessage(Component.literal("星系正在啟動請稍後..."), false)
                     Started -> {
-                        sourcePlayer.sendMessage(Text.of("星系已載入！"), false)
+                        sourcePlayer.displayClientMessage(Component.literal("星系已載入！"), false)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }
 
                     Failed -> {
-                        sourcePlayer.sendMessage(Text.of("星系載入失敗，請聯絡開發團隊！"), false)
-                        lock[source.player]?.unlock()
+                        sourcePlayer.displayClientMessage(Component.literal("星系載入失敗，請聯絡開發團隊！"), false)
+                        lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }
                 }

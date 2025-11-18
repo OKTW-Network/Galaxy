@@ -5,16 +5,15 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     //    "maven-publish"
     kotlin("jvm") version "2.2.20"
-    id("fabric-loom") version "1.11-SNAPSHOT"
+    id("fabric-loom") version "1.13-SNAPSHOT"
 }
 
 val version = "0.0.1"
 val group = "one.oktw"
 
 val minecraftVersion = "1.21.10"
-val mappingVersion = "1.21.10+build.1"
-val fabricLoaderVersion = "0.17.2"
-val fabricAPIVersion = "0.134.1+1.21.10"
+val fabricLoaderVersion = "0.17.3"
+val fabricAPIVersion = "0.138.3+1.21.10"
 val galaxyLibVersion = "f4e1b25"
 
 repositories {
@@ -53,7 +52,7 @@ fabricApi {
 dependencies {
     // Core
     minecraft("com.mojang:minecraft:${minecraftVersion}")
-    mappings("net.fabricmc:yarn:${mappingVersion}:v2")
+    mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc:fabric-loader:${fabricLoaderVersion}")
 
     // fabric api

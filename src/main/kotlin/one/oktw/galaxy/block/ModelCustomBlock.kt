@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,17 +18,17 @@
 
 package one.oktw.galaxy.block
 
-import net.minecraft.block.Blocks.BARRIER
-import net.minecraft.item.ItemStack
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.BlockPos
+import net.minecraft.core.BlockPos
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Blocks.BARRIER
 import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.block.entity.ModelCustomBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.CustomItemHelper
 
-open class ModelCustomBlock(identifier: Identifier, protected open val modelItem: ItemStack) : CustomBlock(identifier, BARRIER) {
-    constructor(id: String, modelItem: ItemStack) : this(Identifier.of("galaxy", "block/$id"), modelItem)
+open class ModelCustomBlock(identifier: ResourceLocation, protected open val modelItem: ItemStack) : CustomBlock(identifier, BARRIER) {
+    constructor(id: String, modelItem: ItemStack) : this(ResourceLocation.fromNamespaceAndPath("galaxy", "block/$id"), modelItem)
 
     override fun toItem() = modelItem.let { CustomItemHelper.getItem(it) as? CustomBlockItem }
 

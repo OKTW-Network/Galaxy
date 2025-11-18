@@ -19,8 +19,8 @@
 package one.oktw.galaxy.command.commands
 
 import com.mojang.brigadier.CommandDispatcher
-import net.minecraft.server.command.CommandManager
-import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.Commands
 import one.oktw.galaxy.command.Command
 import one.oktw.galaxy.command.commands.admin.Creative
 import one.oktw.galaxy.command.commands.admin.FlySpeed
@@ -28,10 +28,10 @@ import one.oktw.galaxy.command.commands.admin.GetItem
 import one.oktw.galaxy.command.commands.admin.RegisterBlock
 
 class Admin : Command {
-    override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
+    override fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
         dispatcher.register(
-            CommandManager.literal("admin")
-                .requires { source -> source.hasPermissionLevel(2) }
+            Commands.literal("admin")
+                .requires { source -> source.hasPermission(2) }
                 .then(Creative().command)
                 .then(GetItem().command)
                 .then(RegisterBlock.command)

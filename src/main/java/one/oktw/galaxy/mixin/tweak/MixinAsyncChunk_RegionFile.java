@@ -18,11 +18,11 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.profiling.jfr.FlightProfiler;
-import net.minecraft.world.storage.ChunkCompressionFormat;
-import net.minecraft.world.storage.RegionFile;
-import net.minecraft.world.storage.StorageKey;
+import net.minecraft.util.profiling.jfr.JvmProfiler;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.storage.RegionFile;
+import net.minecraft.world.level.chunk.storage.RegionFileVersion;
+import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
 import one.oktw.galaxy.mixin.interfaces.RegionFileInputStream;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -54,78 +54,78 @@ public abstract class MixinAsyncChunk_RegionFile implements RegionFileInputStrea
 
     @Shadow
     @Final
-    private FileChannel channel;
+    private FileChannel file;
 
     @Shadow
     @Final
-    StorageKey storageKey;
+    RegionStorageInfo info;
 
     @Shadow
     @Final
-    ChunkCompressionFormat compressionFormat;
+    RegionFileVersion version;
 
     @Shadow
-    protected abstract int getSectorData(ChunkPos pos);
+    protected abstract int getOffset(ChunkPos pos);
 
     @Shadow
-    private static int getOffset(int sectorData) {
+    private static int getSectorNumber(int sectorData) {
         return 0;
     }
 
     @Shadow
-    private static int getSize(int sectorData) {
+    private static int getNumSectors(int sectorData) {
         return 0;
     }
 
     @Shadow
-    private static boolean hasChunkStreamVersionId(byte b) {
+    private static boolean isExternalStreamChunk(byte b) {
         return false;
     }
 
     @Shadow
-    private static byte getChunkStreamVersionId(byte b) {
+    private static byte getExternalChunkVersion(byte b) {
         return 0;
     }
 
     @Shadow
-    private static ByteArrayInputStream getInputStream(ByteBuffer buffer, int length) {
+    private static ByteArrayInputStream createStream(ByteBuffer buffer, int length) {
         return null;
     }
 
     @Shadow
     @Nullable
-    protected abstract DataInputStream getInputStream(ChunkPos chunkPos, byte b) throws IOException;
+    protected abstract DataInputStream createExternalChunkInputStream(ChunkPos chunkPos, byte b) throws IOException;
 
     @Shadow
     @Nullable
-    protected abstract DataInputStream decompress(ChunkPos chunkPos, byte b, InputStream inputStream) throws IOException;
+    protected abstract DataInputStream createChunkInputStream(ChunkPos chunkPos, byte b, InputStream inputStream) throws IOException;
 
-    @Inject(method = "delete", at = @At("HEAD"))
+    @Inject(method = "clear", at = @At("HEAD"))
     private void deleteLock(ChunkPos chunkPos, CallbackInfo ci) {
         lock.lock();
     }
 
-    @Inject(method = "delete", at = @At("RETURN"))
+    @Inject(method = "clear", at = @At("RETURN"))
     private void deleteUnlock(ChunkPos chunkPos, CallbackInfo ci) {
         lock.unlock();
     }
 
-    @Inject(method = "writeChunk", at = @At("HEAD"))
+    @Inject(method = "write", at = @At("HEAD"))
     private void writeChunkLock(ChunkPos pos, ByteBuffer byteBuffer, CallbackInfo ci) {
         lock.lock();
     }
 
-    @Inject(method = "writeChunk", at = @At("RETURN"))
+    @Inject(method = "write", at = @At("RETURN"))
     private void writeChunkUnlock(ChunkPos pos, ByteBuffer byteBuffer, CallbackInfo ci) {
         lock.unlock();
     }
 
-    @Inject(method = "getSectorData", at = @At("HEAD"))
+    @Inject(method = "getOffset", at = @At("HEAD"))
     private void getSectorDataLock(ChunkPos pos, CallbackInfoReturnable<Integer> cir) {
         lock.lock();
     }
 
-    @Inject(method = "getSectorData", at = @At("RETURN"))
+    @Inject(method = "getOffset", at = @At("RETURN"))
     private void getSectorDataUnlock(ChunkPos pos, CallbackInfoReturnable<Integer> cir) {
         lock.unlock();
     }
@@ -133,13 +133,13 @@ public abstract class MixinAsyncChunk_RegionFile implements RegionFileInputStrea
     // Remove synchronized.
     @Override
     public DataInputStream galaxy$getChunkInputStreamNoSync(ChunkPos pos) throws IOException {
-        int i = getSectorData(pos);
+        int i = getOffset(pos);
         if (i == 0) return null;
-        int start = getOffset(i);
-        int count = getSize(i);
+        int start = getSectorNumber(i);
+        int count = getNumSectors(i);
         int length = count * 4096;
         ByteBuffer byteBuffer = ByteBuffer.allocate(length);
-        channel.read(byteBuffer, start * 4096L);
+        file.read(byteBuffer, start * 4096L);
         byteBuffer.flip();
         if (byteBuffer.remaining() < 5) {
             LOGGER.error("Chunk {} header is truncated: expected {} but read {}", pos, length, byteBuffer.remaining());
@@ -152,9 +152,9 @@ public abstract class MixinAsyncChunk_RegionFile implements RegionFileInputStrea
             return null;
         }
         int n = m - 1;
-        if (hasChunkStreamVersionId(b)) {
+        if (isExternalStreamChunk(b)) {
             if (n != 0) LOGGER.warn("Chunk has both internal and external streams");
-            return getInputStream(pos, getChunkStreamVersionId(b));
+            return createExternalChunkInputStream(pos, getExternalChunkVersion(b));
         }
         if (n > byteBuffer.remaining()) {
             LOGGER.error("Chunk {} stream is truncated: expected {} but read {}", pos, n, byteBuffer.remaining());
@@ -164,7 +164,7 @@ public abstract class MixinAsyncChunk_RegionFile implements RegionFileInputStrea
             LOGGER.error("Declared size {} of chunk {} is negative", m, pos);
             return null;
         }
-        FlightProfiler.INSTANCE.onChunkRegionRead(storageKey, pos, compressionFormat, n);
-        return decompress(pos, b, getInputStream(byteBuffer, n));
+        JvmProfiler.INSTANCE.onRegionFileRead(info, pos, version, n);
+        return createChunkInputStream(pos, b, createStream(byteBuffer, n));
     }
 }

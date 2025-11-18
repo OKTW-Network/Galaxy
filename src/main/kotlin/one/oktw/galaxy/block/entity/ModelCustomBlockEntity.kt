@@ -18,18 +18,18 @@
 
 package one.oktw.galaxy.block.entity
 
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.decoration.DisplayEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.storage.NbtWriteView
-import net.minecraft.storage.ReadView
-import net.minecraft.storage.WriteView
-import net.minecraft.util.Uuids
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.UUIDUtil
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.entity.Display
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.storage.TagValueOutput
+import net.minecraft.world.level.storage.ValueInput
+import net.minecraft.world.level.storage.ValueOutput
 import one.oktw.galaxy.block.listener.CustomBlockTickListener
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
@@ -44,17 +44,17 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         set(direction) {
             if (facing != null && direction != null && direction in allowedFacing) {
                 field = direction
-                (world as? ServerWorld)?.getEntity(entityUUID)?.yaw = direction.positiveHorizontalDegrees
-                markDirty()
+                (level as? ServerLevel)?.getEntity(entityUUID!!)?.yRot = direction.toYRot()
+                setChanged()
             }
         }
     open val allowedFacing: List<Direction> = emptyList()
 
     override fun tick() {
-        if (entityUUID == null || --checkCooldown <= 0 && (world as ServerWorld).getEntity(entityUUID) == null) {
+        if (entityUUID == null || --checkCooldown <= 0 && (level as ServerLevel).getEntity(entityUUID!!) == null) {
             // Kill leak entities
-            (world as ServerWorld).getEntitiesByType(EntityType.ITEM_DISPLAY) { it.blockPos == pos && it.commandTags.contains("BLOCK") }.forEach {
-                it.kill(world as ServerWorld)
+            (level as ServerLevel).getEntities(EntityType.ITEM_DISPLAY) { it.blockPosition() == worldPosition && it.tags.contains("BLOCK") }.forEach {
+                it.kill(level as ServerLevel)
             }
 
             spawnEntity()
@@ -63,42 +63,42 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         if (checkCooldown <= 0) checkCooldown = 10
     }
 
-    override fun readData(view: ReadView) {
-        super.readData(view)
-        view.getReadView("galaxy_data")?.getOptionalIntArray("model_entity")?.getOrNull()?.let { entityUUID = Uuids.toUuid(it) }
+    override fun loadAdditional(view: ValueInput) {
+        super.loadAdditional(view)
+        view.childOrEmpty("galaxy_data")?.getIntArray("model_entity")?.getOrNull()?.let { entityUUID = UUIDUtil.uuidFromIntArray(it) }
     }
 
-    override fun readCopyableData(view: ReadView) {
+    override fun readCopyableData(view: ValueInput) {
         super.readCopyableData(view)
-        view.getReadView("galaxy_data")?.getOptionalString("facing")?.getOrNull()?.let { facing = Direction.byId(it) }
+        view.childOrEmpty("galaxy_data")?.getString("facing")?.getOrNull()?.let { facing = Direction.byName(it) }
     }
 
-    override fun writeData(view: WriteView) {
-        super.writeData(view)
-        val data = view.get("galaxy_data")
-        entityUUID?.let { data.putIntArray("model_entity", Uuids.toIntArray(it)) }
-        facing?.let { data.putString("facing", it.id) }
+    override fun saveAdditional(view: ValueOutput) {
+        super.saveAdditional(view)
+        val data = view.child("galaxy_data")
+        entityUUID?.let { data.putIntArray("model_entity", UUIDUtil.uuidToIntArray(it)) }
+        facing?.let { data.putString("facing", it.name) }
     }
 
-    override fun removeFromCopiedStackData(view: WriteView) {
-        val nbt = (view as NbtWriteView).nbt.get("galaxy_data") as? NbtCompound ?: return
+    override fun removeComponentsFromTag(view: ValueOutput) {
+        val nbt = (view as TagValueOutput).buildResult().get("galaxy_data") as? CompoundTag ?: return
         nbt.remove("model_entity")
         nbt.remove("facing")
-        if (nbt.isEmpty) view.remove("galaxy_data")
+        if (nbt.isEmpty) view.discard("galaxy_data")
     }
 
-    override fun markRemoved() {
-        super.markRemoved()
-        (world as ServerWorld).getEntity(entityUUID)?.kill(world as ServerWorld)
+    override fun setRemoved() {
+        super.setRemoved()
+        (level as ServerLevel).getEntity(entityUUID!!)?.kill(level as ServerLevel)
     }
 
     private fun spawnEntity() {
-        val entity = DisplayEntity.ItemDisplayEntity(EntityType.ITEM_DISPLAY, world)
+        val entity = Display.ItemDisplay(EntityType.ITEM_DISPLAY, level!!)
         entity.itemStack = modelItem
-        entity.refreshPositionAndAngles(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, facing?.positiveHorizontalDegrees ?: 0.0F, 0.0F)
-        entity.addCommandTag("BLOCK")
-        entity.addCommandTag(getId().toString())
-        if (world!!.spawnEntity(entity)) entityUUID = entity.uuid
-        markDirty()
+        entity.snapTo(worldPosition.x + 0.5, worldPosition.y + 0.5, worldPosition.z + 0.5, facing?.toYRot() ?: 0.0F, 0.0F)
+        entity.addTag("BLOCK")
+        entity.addTag(getId().toString())
+        if (level!!.addFreshEntity(entity)) entityUUID = entity.uuid
+        setChanged()
     }
 }

@@ -18,25 +18,25 @@
 
 package one.oktw.galaxy.block.entity
 
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.storage.ReadView
-import net.minecraft.storage.WriteView
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.BlockPos
+import net.minecraft.core.BlockPos
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.storage.ValueInput
+import net.minecraft.world.level.storage.ValueOutput
 import one.oktw.galaxy.block.CustomBlock
 
 class DummyBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : CustomBlockEntity(type, pos) {
-    override fun readData(view: ReadView) {
-        super.readData(view)
-        view.getString("id", "")?.let(Identifier::tryParse)?.let(CustomBlock.registry::get)?.let {
+    override fun loadAdditional(view: ValueInput) {
+        super.loadAdditional(view)
+        view.getStringOr("id", "")?.let(ResourceLocation::tryParse)?.let(CustomBlock.registry::get)?.let {
             if (it != CustomBlock.DUMMY) {
-                world?.removeBlockEntity(pos)
-                world?.addBlockEntity(it.createBlockEntity(pos).apply { readCopyableData(view) })
+                level?.removeBlockEntity(worldPosition)
+                level?.setBlockEntity(it.createBlockEntity(worldPosition).apply { readCopyableData(view) })
             }
         }
     }
 
-    override fun writeData(view: WriteView) {
+    override fun saveAdditional(view: ValueOutput) {
         // I'm dummy.
     }
 }

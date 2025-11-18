@@ -18,13 +18,13 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.item.Items.COMMAND_BLOCK
-import net.minecraft.text.Text
-import net.minecraft.util.Identifier
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.Items.COMMAND_BLOCK
 import one.oktw.galaxy.block.CustomBlock
 
 class CustomBlockItem private constructor(private val id: String, private val name: String?) :
-    CustomItem(Identifier.of("galaxy", "block/$id"), COMMAND_BLOCK) {
+    CustomItem(ResourceLocation.fromNamespaceAndPath("galaxy", "block/$id"), COMMAND_BLOCK) {
     companion object {
         val HT_CRAFTING_TABLE = registry.register(CustomBlockItem("ht_crafting_table", "block.HT_CRAFTING_TABLE"))
         val ELEVATOR = registry.register(CustomBlockItem("elevator", "block.ELEVATOR"))
@@ -38,8 +38,8 @@ class CustomBlockItem private constructor(private val id: String, private val na
     }
 
     fun getBlock(): CustomBlock {
-        return CustomBlock.registry.get(Identifier.of("galaxy", "block/$id"))!!
+        return CustomBlock.registry.get(ResourceLocation.fromNamespaceAndPath("galaxy", "block/$id"))!!
     }
 
-    override fun getName(): Text? = name?.let(Text::translatable)
+    override fun getName(): Component? = name?.let(Component::translatable)
 }

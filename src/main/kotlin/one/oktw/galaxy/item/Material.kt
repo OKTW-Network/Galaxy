@@ -18,13 +18,13 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.item.Items.RECOVERY_COMPASS
-import net.minecraft.text.Text
-import net.minecraft.text.Text.translatable
-import net.minecraft.util.Identifier
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Component.translatable
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.Items.RECOVERY_COMPASS
 
 class Material private constructor(id: String, private val name: String) :
-    CustomItem(Identifier.of("galaxy", "material/$id"), RECOVERY_COMPASS) {
+    CustomItem(ResourceLocation.fromNamespaceAndPath("galaxy", "material/$id"), RECOVERY_COMPASS) {
     companion object {
         val RAW_BASE_PLATE = registry.register(Material("raw_base_plate", "item.Material.PART_RAW_BASE"))
         val BASE_PLATE = registry.register(Material("base_plate", "item.Material.PART_BASE"))
@@ -39,5 +39,5 @@ class Material private constructor(id: String, private val name: String) :
         val BARREL = registry.register(Material("barrel", "item.Material.BARREL"))
     }
 
-    override fun getName(): Text = translatable(name)
+    override fun getName(): Component = translatable(name)
 }

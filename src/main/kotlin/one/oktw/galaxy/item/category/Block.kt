@@ -18,12 +18,12 @@
 
 package one.oktw.galaxy.item.category
 
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.CustomItem
 
 class Block : CustomItemCategory() {
-    override val displayName: Text = Text.translatable("recipe.catalog.MACHINE")
+    override val displayName: Component = Component.translatable("recipe.catalog.MACHINE")
     override val displayItem = CustomBlockItem.HT_CRAFTING_TABLE
     override val items = CustomItem.registry.getAll().filterValues { it is CustomBlockItem }.values.toList()
 }

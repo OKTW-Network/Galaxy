@@ -18,12 +18,12 @@
 
 package one.oktw.galaxy.item.category
 
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 import one.oktw.galaxy.item.CustomItem
 import one.oktw.galaxy.item.Material
 
 class Material : CustomItemCategory() {
-    override val displayName: Text = Text.translatable("recipe.catalog.MATERIAL")
+    override val displayName: Component = Component.translatable("recipe.catalog.MATERIAL")
     override val displayItem = Material.BASE_PLATE
     override val items = CustomItem.registry.getAll().filterValues { it is Material }.values.toList()
 }

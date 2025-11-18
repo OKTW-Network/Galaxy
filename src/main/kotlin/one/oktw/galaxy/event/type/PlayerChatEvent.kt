@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2019
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,7 +18,7 @@
 
 package one.oktw.galaxy.event.type
 
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerPlayer
 
-class PlayerChatEvent(val player: ServerPlayerEntity, val message: Text) : CancelableEvent()
+class PlayerChatEvent(val player: ServerPlayer, val message: Component) : CancelableEvent()

@@ -18,37 +18,38 @@
 
 package one.oktw.galaxy.util
 
-import net.minecraft.block.*
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.state.property.IntProperty
-import net.minecraft.state.property.Properties.HORIZONTAL_FACING
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING
+import net.minecraft.world.level.block.state.properties.IntegerProperty
 
 object HarvestUtil {
-    fun isMature(world: ServerWorld, blockPos: BlockPos, blockState: BlockState): Boolean = when (blockState.block) {
-        is CropBlock -> (blockState.block as CropBlock).isMature(blockState)
-        Blocks.COCOA -> blockState[CocoaBlock.AGE] >= 2
-        Blocks.NETHER_WART -> blockState[NetherWartBlock.AGE] >= 3
+    fun isMature(world: ServerLevel, blockPos: BlockPos, blockState: BlockState): Boolean = when (blockState.block) {
+        is CropBlock -> (blockState.block as CropBlock).isMaxAge(blockState)
+        Blocks.COCOA -> blockState.getValue(CocoaBlock.AGE) >= 2
+        Blocks.NETHER_WART -> blockState.getValue(NetherWartBlock.AGE) >= 3
         Blocks.MELON -> isNextTo(world, blockPos, Blocks.ATTACHED_MELON_STEM)
         Blocks.PUMPKIN -> isNextTo(world, blockPos, Blocks.ATTACHED_PUMPKIN_STEM)
         else -> false
     }
 
-    fun getAgeProp(block: Block): IntProperty? = when (block) {
+    fun getAgeProp(block: Block): IntegerProperty? = when (block) {
         Blocks.WHEAT, Blocks.CARROTS, Blocks.POTATOES -> CropBlock.AGE
-        Blocks.BEETROOTS -> BeetrootsBlock.AGE
+        Blocks.BEETROOTS -> BeetrootBlock.AGE
         Blocks.COCOA -> CocoaBlock.AGE
         Blocks.NETHER_WART -> NetherWartBlock.AGE
         Blocks.PUMPKIN, Blocks.MELON -> null
         else -> null
     }
 
-    private fun isNextTo(world: ServerWorld, blockPos: BlockPos, block: Block): Boolean {
+    private fun isNextTo(world: ServerLevel, blockPos: BlockPos, block: Block): Boolean {
         for (direction in arrayOf(Direction.EAST, Direction.WEST, Direction.NORTH, Direction.SOUTH)) {
-            val pos = blockPos.offset(direction)
+            val pos = blockPos.relative(direction)
             val blockState = world.getBlockState(pos)
-            if (blockState.block == block && pos.offset(blockState.get(HORIZONTAL_FACING)) == blockPos) return true
+            if (blockState.block == block && pos.relative(blockState.getValue(HORIZONTAL_FACING)) == blockPos) return true
         }
         return false
     }

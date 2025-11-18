@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,11 +18,11 @@
 
 package one.oktw.galaxy.block.listener
 
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.util.ActionResult
-import net.minecraft.util.Hand
-import net.minecraft.util.hit.BlockHitResult
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.phys.BlockHitResult
 
 interface CustomBlockClickListener {
-    fun onClick(player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult
+    fun onClick(player: Player, hand: InteractionHand, hit: BlockHitResult): InteractionResult
 }

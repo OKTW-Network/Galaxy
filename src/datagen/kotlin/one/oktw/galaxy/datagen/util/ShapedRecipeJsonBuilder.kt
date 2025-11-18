@@ -18,28 +18,28 @@
 
 package one.oktw.galaxy.datagen.util
 
-import net.minecraft.advancement.AdvancementCriterion
-import net.minecraft.advancement.AdvancementRequirements
-import net.minecraft.advancement.AdvancementRewards
-import net.minecraft.advancement.criterion.RecipeUnlockedCriterion
-import net.minecraft.data.recipe.CraftingRecipeJsonBuilder
-import net.minecraft.data.recipe.RecipeExporter
-import net.minecraft.item.Item
-import net.minecraft.item.ItemConvertible
-import net.minecraft.item.ItemStack
-import net.minecraft.recipe.Ingredient
-import net.minecraft.recipe.RawShapedRecipe
-import net.minecraft.recipe.Recipe
-import net.minecraft.recipe.ShapedRecipe
-import net.minecraft.recipe.book.RecipeCategory
-import net.minecraft.registry.RegistryEntryLookup
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.tag.TagKey
+import net.minecraft.advancements.AdvancementRequirements
+import net.minecraft.advancements.AdvancementRewards
+import net.minecraft.advancements.Criterion
+import net.minecraft.advancements.critereon.RecipeUnlockedTrigger
+import net.minecraft.core.HolderGetter
+import net.minecraft.data.recipes.RecipeBuilder
+import net.minecraft.data.recipes.RecipeCategory
+import net.minecraft.data.recipes.RecipeOutput
+import net.minecraft.resources.ResourceKey
+import net.minecraft.tags.TagKey
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.item.crafting.Recipe
+import net.minecraft.world.item.crafting.ShapedRecipe
+import net.minecraft.world.item.crafting.ShapedRecipePattern
+import net.minecraft.world.level.ItemLike
 import java.util.*
 
-class ShapedRecipeJsonBuilder(private val registry: RegistryEntryLookup<Item>, private val category: RecipeCategory, private val output: ItemStack) :
-    CraftingRecipeJsonBuilder {
-    private val criteria: MutableMap<String, AdvancementCriterion<*>> = LinkedHashMap()
+class ShapedRecipeJsonBuilder(private val registry: HolderGetter<Item>, private val category: RecipeCategory, private val output: ItemStack) :
+    RecipeBuilder {
+    private val criteria: MutableMap<String, Criterion<*>> = LinkedHashMap()
     private var group: String? = null
     private val inputs: MutableMap<Char, Ingredient> = LinkedHashMap()
     private val pattern: MutableList<String> = ArrayList()
@@ -53,9 +53,9 @@ class ShapedRecipeJsonBuilder(private val registry: RegistryEntryLookup<Item>, p
         return this
     }
 
-    fun addInput(char: Char, tag: TagKey<Item>) = addInput(char, Ingredient.ofTag(registry.getOrThrow(tag)))
+    fun addInput(char: Char, tag: TagKey<Item>) = addInput(char, Ingredient.of(registry.getOrThrow(tag)))
 
-    fun addInput(char: Char, item: ItemConvertible) = addInput(char, Ingredient.ofItem(item))
+    fun addInput(char: Char, item: ItemLike) = addInput(char, Ingredient.of(item))
 
     fun setPattern(pattern: List<String>): ShapedRecipeJsonBuilder {
         this.pattern.clear()
@@ -68,7 +68,7 @@ class ShapedRecipeJsonBuilder(private val registry: RegistryEntryLookup<Item>, p
         return this
     }
 
-    override fun criterion(name: String, criterion: AdvancementCriterion<*>): ShapedRecipeJsonBuilder {
+    override fun unlockedBy(name: String, criterion: Criterion<*>): ShapedRecipeJsonBuilder {
         this.criteria[name] = criterion
         return this
     }
@@ -78,24 +78,24 @@ class ShapedRecipeJsonBuilder(private val registry: RegistryEntryLookup<Item>, p
         return this
     }
 
-    override fun getOutputItem(): Item = output.item
+    override fun getResult(): Item = output.item
 
-    override fun offerTo(exporter: RecipeExporter, recipeKey: RegistryKey<Recipe<*>>) {
-        val recipeKey = RegistryKey.of(recipeKey.getRegistryRef(), exporter.getRecipeIdentifier(recipeKey.value))
-        val rawRecipe = RawShapedRecipe.create(this.inputs, this.pattern)
-        val builder = exporter.advancementBuilder
-            .criterion("has_the_recipe", RecipeUnlockedCriterion.create(recipeKey))
+    override fun save(exporter: RecipeOutput, recipeKey: ResourceKey<Recipe<*>>) {
+        val recipeKey = ResourceKey.create(recipeKey.registryKey(), exporter.getRecipeIdentifier(recipeKey.location()))
+        val rawRecipe = ShapedRecipePattern.of(this.inputs, this.pattern)
+        val builder = exporter.advancement()
+            .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(recipeKey))
             .rewards(AdvancementRewards.Builder.recipe(recipeKey))
-            .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
-        this.criteria.forEach(builder::criterion)
+            .requirements(AdvancementRequirements.Strategy.OR)
+        this.criteria.forEach(builder::addCriterion)
         val recipe = ShapedRecipe(
             Objects.requireNonNullElse<String?>(this.group, "") as String,
-            CraftingRecipeJsonBuilder.toCraftingCategory(this.category),
+            RecipeBuilder.determineBookCategory(this.category),
             rawRecipe,
             output,
             this.showNotification
         )
 
-        exporter.accept(recipeKey, recipe, builder.build(recipeKey.value.withPrefixedPath("recipes/" + this.category.getName() + "/")))
+        exporter.accept(recipeKey, recipe, builder.build(recipeKey.location().withPrefix("recipes/" + this.category.folderName + "/")))
     }
 }

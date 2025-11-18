@@ -18,22 +18,23 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.NbtComponent
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.util.Identifier
+import net.minecraft.core.component.DataComponents
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.component.CustomData
+import kotlin.jvm.optionals.getOrNull
 
 object CustomItemHelper {
-    fun getNbt(itemStack: ItemStack): NbtCompound {
-        val galaxyData = itemStack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).copyNbt()
+    fun getNbt(itemStack: ItemStack): CompoundTag {
+        val galaxyData = itemStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag()
         return galaxyData.getCompoundOrEmpty("galaxy_data")
     }
 
     fun getItem(itemStack: ItemStack): CustomItem? {
         val customNbt = getNbt(itemStack)
 
-        return customNbt.getString("custom_item_identifier", "").let(Identifier::tryParse)
+        return customNbt.read("custom_item_identifier", ResourceLocation.CODEC).getOrNull()
             ?.let(CustomItem.registry::get)
             ?.run { readCustomNbt(customNbt) }
     }

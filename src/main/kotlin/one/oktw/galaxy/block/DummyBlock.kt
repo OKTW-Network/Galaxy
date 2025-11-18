@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,10 +18,10 @@
 
 package one.oktw.galaxy.block
 
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.BlockPos
+import net.minecraft.core.BlockPos
+import net.minecraft.resources.ResourceLocation
 import one.oktw.galaxy.block.entity.DummyBlockEntity
 
-class DummyBlock : CustomBlock(Identifier.of("galaxy", "block/dummy")) {
+class DummyBlock : CustomBlock(ResourceLocation.fromNamespaceAndPath("galaxy", "block/dummy")) {
     override fun createBlockEntity(pos: BlockPos) = DummyBlockEntity(blockEntityType, pos)
 }

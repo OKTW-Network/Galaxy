@@ -3,8 +3,8 @@
   "package": "one.oktw.galaxy.mixin.accessor",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "BeaconLevelAccessor",
-    "PlayerAbilitiesAccessor"
+    "AbilitiesAccessor",
+    "BeaconLevelAccessor"
   ],
   "client": [],
   "injectors": {

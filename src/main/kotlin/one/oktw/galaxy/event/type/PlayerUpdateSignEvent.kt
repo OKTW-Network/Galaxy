@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,8 +18,8 @@
 
 package one.oktw.galaxy.event.type
 
-import net.minecraft.block.entity.SignBlockEntity
-import net.minecraft.network.packet.c2s.play.UpdateSignC2SPacket
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.level.block.entity.SignBlockEntity
 
-class PlayerUpdateSignEvent(val packet: UpdateSignC2SPacket, val player: ServerPlayerEntity, val blockEntity: SignBlockEntity) : CancelableEvent()
+class PlayerUpdateSignEvent(val packet: ServerboundSignUpdatePacket, val player: ServerPlayer, val blockEntity: SignBlockEntity) : CancelableEvent()

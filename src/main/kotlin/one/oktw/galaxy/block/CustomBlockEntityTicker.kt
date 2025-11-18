@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2021
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,15 +18,15 @@
 
 package one.oktw.galaxy.block
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.BlockEntityTicker
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityTicker
+import net.minecraft.world.level.block.state.BlockState
 import one.oktw.galaxy.block.listener.CustomBlockTickListener
 
 class CustomBlockEntityTicker<T : BlockEntity> : BlockEntityTicker<T> {
-    override fun tick(world: World, pos: BlockPos, state: BlockState, blockEntity: T) {
+    override fun tick(world: Level, pos: BlockPos, state: BlockState, blockEntity: T) {
         if (blockEntity is CustomBlockTickListener) blockEntity.tick()
     }
 }

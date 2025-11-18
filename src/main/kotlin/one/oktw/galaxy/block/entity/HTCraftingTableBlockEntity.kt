@@ -19,21 +19,21 @@
 package one.oktw.galaxy.block.entity
 
 import kotlinx.coroutines.*
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.component.DataComponentTypes.ITEM_NAME
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.inventory.SimpleInventory
-import net.minecraft.item.ItemStack
-import net.minecraft.screen.ScreenHandlerType
-import net.minecraft.screen.slot.Slot
-import net.minecraft.screen.slot.SlotActionType
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.text.Text
-import net.minecraft.util.ActionResult
-import net.minecraft.util.Hand
-import net.minecraft.util.Identifier
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.math.BlockPos
+import net.minecraft.core.BlockPos
+import net.minecraft.core.component.DataComponents.ITEM_NAME
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.MenuType
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.phys.BlockHitResult
 import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
@@ -49,18 +49,18 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
     CustomBlockClickListener, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     private val previousPageButton = Gui(
         GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_UP).build(),
-        Text.translatable("UI.Button.PreviousPage")
+        Component.translatable("UI.Button.PreviousPage")
     ).createItemStack()
     private val nextPageButton = Gui(
         GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_DOWN).build(),
-        Text.translatable("UI.Button.NextPage")
+        Component.translatable("UI.Button.NextPage")
     ).createItemStack()
 
     private fun getListGui(): GUI {
         val itemBrowser = CustomItemBrowser(filterRecipe = true)
-        return GUI.Builder(ScreenHandlerType.GENERIC_9X3)
-            .setTitle(Text.translatable("UI.Title.HiTechCraftingTableList"))
-            .setBackground("A", Identifier.of("galaxy", "gui_font/container_layout/ht_crafting_table"))
+        return GUI.Builder(MenuType.GENERIC_9x3)
+            .setTitle(Component.translatable("UI.Title.HiTechCraftingTableList"))
+            .setBackground("A", ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/container_layout/ht_crafting_table"))
             .blockEntity(this)
             .build()
             .apply {
@@ -97,20 +97,20 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                 // Category Paging
                 addBinding(0, 0) {
                     cancel = true
-                    if (action == SlotActionType.PICKUP) itemBrowser.previousCategory()
+                    if (action == ClickType.PICKUP) itemBrowser.previousCategory()
                 }
                 addBinding(0, 1) {
                     cancel = true // Cancel creative clone item
                 }
                 addBinding(0, 2) {
                     cancel = true
-                    if (action == SlotActionType.PICKUP) itemBrowser.nextCategory()
+                    if (action == ClickType.PICKUP) itemBrowser.nextCategory()
                 }
 
                 // Handle Items
                 addBinding(2..7, 0..2) {
                     cancel = true
-                    if (action != SlotActionType.PICKUP) return@addBinding Unit
+                    if (action != ClickType.PICKUP) return@addBinding Unit
                     // Slot is 6 x 3
                     val index = this.y * 6 + (this.x - 2)
                     val item = itemBrowser.getItemByIndex(index) ?: return@addBinding Unit
@@ -121,31 +121,31 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                 // Handle Pages
                 addBinding(8, 0) {
                     cancel = true
-                    if (action == SlotActionType.PICKUP) itemBrowser.previousPage()
+                    if (action == ClickType.PICKUP) itemBrowser.previousPage()
                 }
                 addBinding(8, 2) {
                     cancel = true
-                    if (action == SlotActionType.PICKUP) itemBrowser.nextPage()
+                    if (action == ClickType.PICKUP) itemBrowser.nextPage()
                 }
             }
     }
 
-    private fun getRecipeGui(player: PlayerEntity, recipe: CustomItemRecipe): GUI {
-        val output = SimpleInventory(recipe.outputItem.createItemStack())
+    private fun getRecipeGui(player: Player, recipe: CustomItemRecipe): GUI {
+        val output = SimpleContainer(recipe.outputItem.createItemStack())
         val gui =
-            GUI.Builder(ScreenHandlerType.GENERIC_9X3)
-                .setTitle(Text.translatable("UI.Title.HiTechCraftingTableRecipe", recipe.outputItem.getName()))
-                .setBackground("B", Identifier.of("galaxy", "gui_font/container_layout/ht_crafting_table"))
+            GUI.Builder(MenuType.GENERIC_9x3)
+                .setTitle(Component.translatable("UI.Title.HiTechCraftingTableRecipe", recipe.outputItem.getName()))
+                .setBackground("B", ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/container_layout/ht_crafting_table"))
                 .blockEntity(this)
                 .addSlot(7, 1, object : Slot(output, 0, 0, 0) {
-                    override fun canInsert(stack: ItemStack) = false
+                    override fun mayPlace(stack: ItemStack) = false
 
-                    override fun canTakeItems(player: PlayerEntity): Boolean = recipe.isAffordable(player)
+                    override fun mayPickup(player: Player): Boolean = recipe.isAffordable(player)
 
-                    override fun onTakeItem(player: PlayerEntity, stack: ItemStack) {
+                    override fun onTake(player: Player, stack: ItemStack) {
                         recipe.takeItem(player)
-                        setStackNoCallbacks(recipe.outputItem.createItemStack()) // refill output
-                        super.onTakeItem(player, stack)
+                        set(recipe.outputItem.createItemStack()) // refill output
+                        super.onTake(player, stack)
                     }
                 })
                 .setSkipPick(7, 1)
@@ -160,21 +160,21 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                     }
                     addBinding(7, 1) {
                         // Allow creative clone true item
-                        if (action == SlotActionType.CLONE && player.isCreative) {
+                        if (action == ClickType.CLONE && player.isCreative) {
                             cancel = true
-                            val screen = player.currentScreenHandler
-                            if (screen.cursorStack.isEmpty) screen.cursorStack = recipe.outputItem.createItemStack().apply { count = maxCount }
+                            val screen = player.containerMenu
+                            if (screen.carried.isEmpty) screen.carried = recipe.outputItem.createItemStack().apply { count = maxStackSize }
                         }
                     }
                     onUpdate {
-                        output.setStack(0, recipe.getOutputItem(player))
+                        output.setItem(0, recipe.getOutputItem(player))
                     }
                 }
 
         // Multi item display animation
         val job = launch {
             var loop = 0
-            while (!(player as ServerPlayerEntity).isDisconnected) {
+            while (!(player as ServerPlayer).hasDisconnected()) {
                 gui.editInventory {
                     var i = 0
                     loop@ for (y in 0..2) for (x in 1..4) {
@@ -194,11 +194,11 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
     }
 
     override fun onClick(
-        player: PlayerEntity,
-        hand: Hand,
+        player: Player,
+        hand: InteractionHand,
         hit: BlockHitResult
-    ): ActionResult {
-        GUISBackStackManager.openGUI(player as ServerPlayerEntity, getListGui())
-        return ActionResult.SUCCESS_SERVER
+    ): InteractionResult {
+        GUISBackStackManager.openGUI(player as ServerPlayer, getListGui())
+        return InteractionResult.SUCCESS_SERVER
     }
 }

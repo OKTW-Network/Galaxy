@@ -18,12 +18,12 @@
 
 package one.oktw.galaxy.item.category
 
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 import one.oktw.galaxy.item.CustomItem
 import one.oktw.galaxy.item.Weapon
 
 class Weapon : CustomItemCategory() {
-    override val displayName: Text = Text.translatable("recipe.catalog.WEAPON")
+    override val displayName: Component = Component.translatable("recipe.catalog.WEAPON")
     override val displayItem = Weapon.PISTOL_LASOR
     override val items = CustomItem.registry.getAll().filterValues { it is Weapon }.values.toList()
 }

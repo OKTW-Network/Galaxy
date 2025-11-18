@@ -78,7 +78,6 @@ abstract class CustomItem(
             set(DataComponents.ITEM_NAME, this@CustomItem.getName())
             set(DataComponents.RARITY, Rarity.COMMON)
             set(DataComponents.MAX_STACK_SIZE, maxStack)
-            set(DataComponents.RARITY, Rarity.COMMON)
             set(
                 DataComponents.TOOLTIP_DISPLAY,
                 TooltipDisplay(hideTooltip, ReferenceSortedSets.emptySet())

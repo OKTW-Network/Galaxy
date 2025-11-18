@@ -21,8 +21,6 @@ package one.oktw.galaxy.block.event
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.sounds.SoundEvents
-import net.minecraft.sounds.SoundSource
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.phys.BlockHitResult
 import one.oktw.galaxy.block.CustomBlock
@@ -73,7 +71,6 @@ class AngelBlock {
             !justBroke.contains(player)
         ) {
             CustomBlockHelper.destroyAndDrop(player.level(), blockPos)
-            player.level().playSound(null, blockPos, SoundEvents.METAL_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F)
             justBroke.add(player)
         }
     }

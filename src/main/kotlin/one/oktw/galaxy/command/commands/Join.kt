@@ -88,7 +88,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
 
         ServerPlayNetworking.send(sourcePlayer, ProxyAPIPayload(CreateGalaxy(targetPlayer.id)))
         source.sendSuccess(
-            { Component.nullToEmpty(if (sourcePlayer.gameProfile == targetPlayer) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系") },
+            { Component.nullToEmpty(if (sourcePlayer.gameProfile.id == targetPlayer.id) "正在加入您的星系" else "正在加入 ${targetPlayer.name} 的星系") },
             false
         )
 
@@ -113,7 +113,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
 
                     Failed -> {
                         sourcePlayer.displayClientMessage(Component.nullToEmpty("星系載入失敗，請聯絡開發團隊！"), false)
-                        lock[source.player]?.unlock()
+                        lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }
                 }

@@ -53,7 +53,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(ItemCooldowns.class)
 public abstract class ItemCooldownManagerMixin_RealTime {
     @Unique
-    private static long lastTickNanos = System.nanoTime();
+    private long lastTickNanos = System.nanoTime();
 
     @Shadow
     private int tickCount;

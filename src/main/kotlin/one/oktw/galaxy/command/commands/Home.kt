@@ -113,9 +113,8 @@ class Home : Command {
                             )
                         )
                     }
-
-                    lock -= player.uuid
                 }
+                lock -= player.uuid
             }
         }
         return com.mojang.brigadier.Command.SINGLE_SUCCESS

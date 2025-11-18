@@ -63,7 +63,11 @@ class Spawn : Command {
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
 
-            val player = originPlayer.level().server.playerList.getPlayer(originPlayer.uuid) ?: return@launch
+            val player = originPlayer.level().server.playerList.getPlayer(originPlayer.uuid)
+            if (player == null) {
+                lock -= originPlayer.uuid
+                return@launch
+            }
             player.displayClientMessage(Component.translatable("Respond.TeleportStart").withStyle { it.withColor(ChatFormatting.GREEN) }, true)
 
             val world = player.level()

@@ -24,7 +24,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items.RECOVERY_COMPASS
 
 class Weapon private constructor(id: String, private val name: String) :
-    CustomItem(ResourceLocation.fromNamespaceAndPath("galaxy", "weapon/$id"), RECOVERY_COMPASS, macStack = 1) {
+    CustomItem(ResourceLocation.fromNamespaceAndPath("galaxy", "weapon/$id"), RECOVERY_COMPASS, maxStack = 1) {
     override val cacheable = false
 
     companion object {

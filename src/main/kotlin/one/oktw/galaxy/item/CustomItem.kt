@@ -38,7 +38,7 @@ abstract class CustomItem(
     private val baseItem: Item,
     private val itemModel: ResourceLocation = identifier,
     private val customModelData: CustomModelData? = null,
-    private val macStack: Int = 64,
+    private val maxStack: Int = 64,
     private val hideTooltip: Boolean = false,
 ) : Registrable {
     companion object {
@@ -77,7 +77,7 @@ abstract class CustomItem(
             set(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers(emptyList()))
             set(DataComponents.ITEM_NAME, this@CustomItem.getName())
             set(DataComponents.RARITY, Rarity.COMMON)
-            set(DataComponents.MAX_STACK_SIZE, macStack)
+            set(DataComponents.MAX_STACK_SIZE, maxStack)
             set(DataComponents.RARITY, Rarity.COMMON)
             set(
                 DataComponents.TOOLTIP_DISPLAY,

@@ -24,7 +24,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items.RECOVERY_COMPASS
 
 class Tool private constructor(id: String, private val name: String) :
-    CustomItem(ResourceLocation.fromNamespaceAndPath("galaxy", "tool/$id"), RECOVERY_COMPASS, macStack = 1) {
+    CustomItem(ResourceLocation.fromNamespaceAndPath("galaxy", "tool/$id"), RECOVERY_COMPASS, maxStack = 1) {
     override val cacheable = false
 
     companion object {

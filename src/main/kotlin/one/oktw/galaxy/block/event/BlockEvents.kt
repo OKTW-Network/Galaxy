@@ -56,7 +56,7 @@ class BlockEvents {
         }
 
         // CustomBlockClickListener
-        if (!player.isSecondaryUseActive || player.offhandItem.isEmpty && player.offhandItem.isEmpty) {
+        if (!player.isSecondaryUseActive || player.mainHandItem.isEmpty && player.offhandItem.isEmpty) {
             val packet = event.packet
             val hitResult = packet.hitResult
             val blockEntity = player.level().getBlockEntity(hitResult.blockPos) as? CustomBlockClickListener ?: return

@@ -18,23 +18,22 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import one.oktw.galaxy.block.entity.CustomBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-@Mixin(ServerGamePacketListenerImpl.class)
-public class SignStyle_NetworkHandler {
-    @Unique
-    private static final Pattern styles = Pattern.compile("&(?=[a-f0-9k-or])");
-
-    @Redirect(method = "handleSignUpdate", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;map(Ljava/util/function/Function;)Ljava/util/stream/Stream;"))
-    private Stream<String> onSignUpdate(Stream<String> instance, Function<String, String> function) {
-        return instance.map(text -> styles.matcher(text).replaceAll("§"));
+@Mixin(ClientboundLevelChunkPacketData.class)
+public class MixinCustomBlockEntity_ClientboundLevelChunkPacketData {
+    @Redirect(method = "<init>(Lnet/minecraft/world/level/chunk/LevelChunk;)V", at = @At(value = "INVOKE", target = "Ljava/util/Map;entrySet()Ljava/util/Set;"))
+    private Set<Map.Entry<BlockPos, BlockEntity>> removeCustomBlock(Map<BlockPos, BlockEntity> instance) {
+        return instance.entrySet().stream().filter(e -> !(e.getValue() instanceof CustomBlockEntity)).collect(Collectors.toSet());
     }
 }

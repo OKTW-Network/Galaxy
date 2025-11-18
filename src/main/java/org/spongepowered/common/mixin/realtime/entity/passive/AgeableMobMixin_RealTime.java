@@ -40,28 +40,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.mixin.realtime.entity.mob;
+package org.spongepowered.common.mixin.realtime.entity.passive;
 
-import net.minecraft.world.entity.Mob;
-import org.objectweb.asm.Opcodes;
+import net.minecraft.world.entity.AgeableMob;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
-import org.spongepowered.common.mixin.realtime.entity.LivingEntityMixin_RealTime;
+import org.spongepowered.common.mixin.realtime.entity.EntityMixin_RealTime;
 
-@Mixin(Mob.class)
-public abstract class MobEntityMixin_RealTime extends LivingEntityMixin_RealTime {
-    @Redirect(
-        method = "serverAiStep",
-        at = @At(
-            value = "FIELD",
-            target = "Lnet/minecraft/world/entity/Mob;noActionTime:I",
-            opcode = Opcodes.PUTFIELD
-        )
-    )
-    private void realTimeImpl$adjustForRealTimeEntityDespawnAge(final Mob self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.level()).realTimeBridge$getRealTimeTicks();
-        this.noActionTime += ticks;
+@Mixin(AgeableMob.class)
+public abstract class AgeableMobMixin_RealTime extends EntityMixin_RealTime {
+    @Shadow
+    public abstract void setAge(int int_1);
+
+    @Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/AgeableMob;setAge(I)V"))
+    private void realTimeImpl$adjustForRealTimeGrowingUp(final AgeableMob self, final int age) {
+        // Subtract the one the original update method added
+        final int diff = (int) ((RealTimeTrackingBridge) this.level()).realTimeBridge$getRealTimeTicks() - 1;
+        this.setAge(Math.min(0, age + diff));
     }
 }

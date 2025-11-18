@@ -53,7 +53,7 @@ import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 import org.spongepowered.common.mixin.realtime.entity.LivingEntityMixin_RealTime;
 
 @Mixin(Player.class)
-public abstract class PlayerEntityMixin_RealTime extends LivingEntityMixin_RealTime {
+public abstract class PlayerMixin_RealTime extends LivingEntityMixin_RealTime {
     @Shadow
     public int takeXpDelay;
     @Shadow

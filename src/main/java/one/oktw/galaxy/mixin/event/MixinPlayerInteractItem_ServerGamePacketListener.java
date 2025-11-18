@@ -18,21 +18,18 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
-import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
+import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.EntityEvent;
 import one.oktw.galaxy.event.EventManager;
-import one.oktw.galaxy.event.type.PlayerInteractBlockEvent;
+import one.oktw.galaxy.event.type.PlayerInteractItemEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -40,31 +37,26 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerGamePacketListenerImpl.class)
-public abstract class MixinPlayerInteractBlock_NetworkHandler extends ServerCommonPacketListenerImpl {
+public abstract class MixinPlayerInteractItem_ServerGamePacketListener extends ServerCommonPacketListenerImpl {
     @Shadow
     public ServerPlayer player;
 
-    public MixinPlayerInteractBlock_NetworkHandler(MinecraftServer server, Connection connection, CommonListenerCookie clientData) {
+    public MixinPlayerInteractItem_ServerGamePacketListener(MinecraftServer server, Connection connection, CommonListenerCookie clientData) {
         super(server, connection, clientData);
     }
 
-    @Inject(method = "handleUseItemOn", at = @At(
+    @Inject(method = "handleUseItem", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/server/level/ServerPlayerGameMode;useItemOn(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"
+        target = "Lnet/minecraft/server/level/ServerPlayerGameMode;useItem(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"
     ), cancellable = true)
-    private void onPlayerInteractBlock(ServerboundUseItemOnPacket packet, CallbackInfo info) {
-        PlayerInteractBlockEvent event = EventManager.safeEmit(new PlayerInteractBlockEvent(packet, player));
+    private void onPlayerInteractItem(ServerboundUseItemPacket packet, CallbackInfo info) {
+        PlayerInteractItemEvent event = EventManager.safeEmit(new PlayerInteractItemEvent(packet, player));
         if (event.getCancel()) {
             info.cancel();
-            if (event.getSwing()) player.swing(packet.getHand(), true);
-            // Re-sync block & inventory
-            ServerLevel world = player.level();
-            BlockPos blockPos = packet.getHitResult().getBlockPos();
             send(new ClientboundEntityEventPacket(player, EntityEvent.USE_ITEM_COMPLETE));
             send(new ClientboundSetHealthPacket(player.getHealth(), player.getFoodData().getFoodLevel(), player.getFoodData().getSaturationLevel()));
-            send(new ClientboundBlockUpdatePacket(world, blockPos));
-            send(new ClientboundBlockUpdatePacket(world, blockPos.relative(packet.getHitResult().getDirection())));
             player.containerMenu.sendAllDataToRemote();
         }
+        if (event.getSwing()) this.player.swing(packet.getHand(), true);
     }
 }

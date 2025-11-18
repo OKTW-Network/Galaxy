@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
 @Mixin(PortalProcessor.class)
-public abstract class PortalManagerMixin_RealTime {
+public abstract class PortalProcessorMixin_RealTime {
     @Shadow
     private int portalTime;
 

@@ -18,20 +18,17 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.server.rcon.thread.GenericThread;
-import org.slf4j.Logger;
+import net.minecraft.server.packs.repository.ServerPacksSource;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-@Mixin(GenericThread.class)
-public class MixinRCON_RconBase {
-    @Unique
-    boolean isLocal = false;
+import java.nio.file.Path;
 
-    @Redirect(method = "start", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
-    private void noLocalLog(Logger logger, String message, Object description) {
-        if (!isLocal) logger.info(message, description);
+@Mixin(ServerPacksSource.class)
+public class MixinGlobalDataPack_ServerPacksSource {
+    @ModifyArg(method = "createPackRepository(Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;)Lnet/minecraft/server/packs/repository/PackRepository;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/ServerPacksSource;createPackRepository(Ljava/nio/file/Path;Lnet/minecraft/world/level/validation/DirectoryValidator;)Lnet/minecraft/server/packs/repository/PackRepository;"), index = 0)
+    private static Path moveDataPackPath(Path dataPacksPath) {
+        return Path.of("datapacks");
     }
 }

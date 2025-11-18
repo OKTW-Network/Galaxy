@@ -29,11 +29,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Projectile.class)
-public abstract class MixinThrownCountdown_ProjectileEntity extends Entity {
+public abstract class MixinThrownCountdown_Projectile extends Entity {
     @Unique
     int maxAge = 0;
 
-    public MixinThrownCountdown_ProjectileEntity(EntityType<?> type, Level world) {
+    public MixinThrownCountdown_Projectile(EntityType<?> type, Level world) {
         super(type, world);
     }
 

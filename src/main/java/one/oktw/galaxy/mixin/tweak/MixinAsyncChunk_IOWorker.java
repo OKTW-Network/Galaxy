@@ -46,7 +46,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(IOWorker.class)
-public abstract class MixinAsyncChunk_StorageIoWorker {
+public abstract class MixinAsyncChunk_IOWorker {
     @Unique
     private final AtomicBoolean writeLock = new AtomicBoolean(false);
 

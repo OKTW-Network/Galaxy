@@ -18,22 +18,20 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import one.oktw.galaxy.block.entity.CustomBlockEntity;
+import net.minecraft.server.rcon.thread.GenericThread;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+@Mixin(GenericThread.class)
+public class MixinRCON_GenericThread {
+    @Unique
+    boolean isLocal = false;
 
-@Mixin(ClientboundLevelChunkPacketData.class)
-public class MixinCustomBlockEntity_ChunkData {
-    @Redirect(method = "<init>(Lnet/minecraft/world/level/chunk/LevelChunk;)V", at = @At(value = "INVOKE", target = "Ljava/util/Map;entrySet()Ljava/util/Set;"))
-    private Set<Map.Entry<BlockPos, BlockEntity>> removeCustomBlock(Map<BlockPos, BlockEntity> instance) {
-        return instance.entrySet().stream().filter(e -> !(e.getValue() instanceof CustomBlockEntity)).collect(Collectors.toSet());
+    @Redirect(method = "start", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
+    private void noLocalLog(Logger logger, String message, Object description) {
+        if (!isLocal) logger.info(message, description);
     }
 }

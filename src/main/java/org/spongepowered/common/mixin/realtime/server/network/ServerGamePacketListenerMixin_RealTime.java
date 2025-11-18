@@ -56,11 +56,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
 @Mixin(ServerGamePacketListenerImpl.class)
-public abstract class ServerPlayNetworkHandlerMixin_RealTime extends ServerCommonPacketListenerImpl {
+public abstract class ServerGamePacketListenerMixin_RealTime extends ServerCommonPacketListenerImpl {
     @Shadow
     public ServerPlayer player;
 
-    public ServerPlayNetworkHandlerMixin_RealTime(MinecraftServer server, Connection connection, CommonListenerCookie clientData) {
+    public ServerGamePacketListenerMixin_RealTime(MinecraftServer server, Connection connection, CommonListenerCookie clientData) {
         super(server, connection, clientData);
     }
 

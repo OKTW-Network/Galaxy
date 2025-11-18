@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(EmoteCommands.class)
-public class MixinPlayerChat_MeCommand {
+public class MixinPlayerChat_EmoteCommands {
     @Redirect(method = "method_43645", at = @At(
         value = "INVOKE",
         target = "Lnet/minecraft/server/players/PlayerList;broadcastChatMessage(Lnet/minecraft/network/chat/PlayerChatMessage;Lnet/minecraft/commands/CommandSourceStack;Lnet/minecraft/network/chat/ChatType$Bound;)V",

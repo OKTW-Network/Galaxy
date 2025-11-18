@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.net.Socket;
 
 @Mixin(RconClient.class)
-public class MixinRCON_RconClient extends MixinRCON_RconBase {
+public class MixinRCON_RconClient extends MixinRCON_GenericThread {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void checkLocal(ServerInterface server, String password, Socket socket, CallbackInfo ci) {
         if (socket.getInetAddress().isLoopbackAddress()) isLocal = true;

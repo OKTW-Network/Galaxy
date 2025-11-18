@@ -36,7 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Set;
 
 @Mixin(ServerGamePacketListenerImpl.class)
-public abstract class MixinAsyncChunk_ServerPlayNetworkHandler {
+public abstract class MixinAsyncChunk_ServerGamePacketListener {
     @Shadow
     public ServerPlayer player;
 

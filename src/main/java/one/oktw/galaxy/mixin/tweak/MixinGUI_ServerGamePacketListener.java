@@ -18,17 +18,25 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.server.packs.repository.ServerPacksSource;
+import net.minecraft.network.protocol.game.ServerboundRenameItemPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import one.oktw.galaxy.gui.GUI;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.nio.file.Path;
+@Mixin(ServerGamePacketListenerImpl.class)
+public class MixinGUI_ServerGamePacketListener {
+    @Shadow
+    public ServerPlayer player;
 
-@Mixin(ServerPacksSource.class)
-public class MixinGlobalDataPack_VanillaDataPackProvider {
-    @ModifyArg(method = "createPackRepository(Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;)Lnet/minecraft/server/packs/repository/PackRepository;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/ServerPacksSource;createPackRepository(Ljava/nio/file/Path;Lnet/minecraft/world/level/validation/DirectoryValidator;)Lnet/minecraft/server/packs/repository/PackRepository;"), index = 0)
-    private static Path moveDataPackPath(Path dataPacksPath) {
-        return Path.of("datapacks");
+    @Inject(method = "handleRenameItem", at = @At("RETURN"))
+    private void onRenameItem(ServerboundRenameItemPacket packet, CallbackInfo ci) {
+        if (this.player.containerMenu instanceof GUI.GuiContainer gui) {
+            gui.updateInputText(packet.getName());
+        }
     }
 }

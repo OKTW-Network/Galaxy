@@ -40,25 +40,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.mixin.realtime.entity.passive;
+package org.spongepowered.common.mixin.realtime.entity.mob;
 
-import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.monster.Creeper;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
-import org.spongepowered.common.mixin.realtime.entity.EntityMixin_RealTime;
 
-@Mixin(AgeableMob.class)
-public abstract class PassiveEntityMixin_RealTime extends EntityMixin_RealTime {
+@Mixin(Creeper.class)
+public abstract class CreeperMixin_RealTime {
+    @Unique
+    private boolean delay;
+
     @Shadow
-    public abstract void setAge(int int_1);
+    private int swell;
+    @Shadow
+    private int maxSwell;
 
-    @Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/AgeableMob;setAge(I)V"))
-    private void realTimeImpl$adjustForRealTimeGrowingUp(final AgeableMob self, final int age) {
-        // Subtract the one the original update method added
-        final int diff = (int) ((RealTimeTrackingBridge) this.level()).realTimeBridge$getRealTimeTicks() - 1;
-        this.setAge(Math.min(0, age + diff));
+    @Shadow
+    public abstract int getSwellDir();
+
+    @Redirect(
+        method = "tick",
+        at = @At(
+            value = "FIELD",
+            target = "Lnet/minecraft/world/entity/monster/Creeper;swell:I",
+            opcode = Opcodes.PUTFIELD,
+            ordinal = 0
+        ),
+        slice = @Slice(
+            from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/Creeper;playSound(Lnet/minecraft/sounds/SoundEvent;FF)V"),
+            to = @At(value = "CONSTANT", args = "intValue=0", ordinal = 0)
+        )
+    )
+    private void realTimeImpl$adjustForRealTimeCreeperFuseTime(final Creeper self, final int modifier) {
+        if (modifier != 0) {
+            final int ticks = (int) ((RealTimeTrackingBridge) self.level()).realTimeBridge$getRealTimeTicks();
+            this.swell += (getSwellDir() * ticks);
+
+            // delay 1 tick wait AI detect player distance
+            if (swell >= maxSwell && !delay) {
+                delay = true;
+                swell = maxSwell - 1;
+            } else if (delay) {
+                delay = false;
+            }
+        }
     }
 }

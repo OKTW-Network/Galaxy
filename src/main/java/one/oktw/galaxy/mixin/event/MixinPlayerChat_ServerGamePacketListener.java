@@ -36,11 +36,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ServerGamePacketListenerImpl.class)
-public abstract class MixinPlayerChat_NetworkHandler extends ServerCommonPacketListenerImpl {
+public abstract class MixinPlayerChat_ServerGamePacketListener extends ServerCommonPacketListenerImpl {
     @Shadow
     public ServerPlayer player;
 
-    public MixinPlayerChat_NetworkHandler(MinecraftServer server, Connection connection, CommonListenerCookie clientData) {
+    public MixinPlayerChat_ServerGamePacketListener(MinecraftServer server, Connection connection, CommonListenerCookie clientData) {
         super(server, connection, clientData);
     }
 

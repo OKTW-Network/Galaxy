@@ -40,56 +40,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.mixin.realtime.entity.mob;
+package org.spongepowered.common.mixin.realtime.server.network;
 
-import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayerGameMode;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
-@Mixin(Creeper.class)
-public abstract class CreeperEntityMixin_RealTime {
-    @Unique
-    private boolean delay;
+@Mixin(ServerPlayerGameMode.class)
+public abstract class ServerPlayerGameModeMixin_RealTime {
+    @Shadow
+    protected ServerLevel level;
 
     @Shadow
-    private int swell;
-    @Shadow
-    private int maxSwell;
-
-    @Shadow
-    public abstract int getSwellDir();
+    private int gameTicks;
 
     @Redirect(
         method = "tick",
         at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/world/entity/monster/Creeper;swell:I",
-            opcode = Opcodes.PUTFIELD,
-            ordinal = 0
-        ),
-        slice = @Slice(
-            from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/Creeper;playSound(Lnet/minecraft/sounds/SoundEvent;FF)V"),
-            to = @At(value = "CONSTANT", args = "intValue=0", ordinal = 0)
+            target = "Lnet/minecraft/server/level/ServerPlayerGameMode;gameTicks:I",
+            opcode = Opcodes.PUTFIELD
         )
     )
-    private void realTimeImpl$adjustForRealTimeCreeperFuseTime(final Creeper self, final int modifier) {
-        if (modifier != 0) {
-            final int ticks = (int) ((RealTimeTrackingBridge) self.level()).realTimeBridge$getRealTimeTicks();
-            this.swell += (getSwellDir() * ticks);
-
-            // delay 1 tick wait AI detect player distance
-            if (swell >= maxSwell && !delay) {
-                delay = true;
-                swell = maxSwell - 1;
-            } else if (delay) {
-                delay = false;
-            }
-        }
+    private void realTimeImpl$adjustForRealTimeDiggingTime(final ServerPlayerGameMode self, final int modifier) {
+        final int ticks = (int) ((RealTimeTrackingBridge) level.getServer()).realTimeBridge$getRealTimeTicks();
+        this.gameTicks += ticks;
     }
 }

@@ -33,7 +33,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import java.util.function.Predicate;
 
 @Mixin(ThrowableProjectile.class)
-public class MixinThrownCountdown_ThrownEntity {
+public class MixinThrownCountdown_ThrowableProjectile {
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/ProjectileUtil;getHitResultOnMoveVector(Lnet/minecraft/world/entity/Entity;Ljava/util/function/Predicate;)Lnet/minecraft/world/phys/HitResult;"))
     private HitResult addWaterHit(Entity entity, Predicate<Entity> predicate) {
         HitResult hit = ProjectileUtil.getHitResultOnMoveVector(entity, predicate);

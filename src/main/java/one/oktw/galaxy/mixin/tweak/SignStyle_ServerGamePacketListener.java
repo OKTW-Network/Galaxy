@@ -18,20 +18,23 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(ArmorStand.class)
-public abstract class MixinOptimizeArmorStand_ArmorStandEntity {
-    @Shadow
-    public abstract boolean isMarker();
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
-    @Inject(method = "pushEntities", at = @At("HEAD"), cancellable = true)
-    private void skipMarkerCramming(CallbackInfo ci) {
-        if (isMarker()) ci.cancel();
+@Mixin(ServerGamePacketListenerImpl.class)
+public class SignStyle_ServerGamePacketListener {
+    @Unique
+    private static final Pattern styles = Pattern.compile("&(?=[a-f0-9k-or])");
+
+    @Redirect(method = "handleSignUpdate", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;map(Ljava/util/function/Function;)Ljava/util/stream/Stream;"))
+    private Stream<String> onSignUpdate(Stream<String> instance, Function<String, String> function) {
+        return instance.map(text -> styles.matcher(text).replaceAll("§"));
     }
 }

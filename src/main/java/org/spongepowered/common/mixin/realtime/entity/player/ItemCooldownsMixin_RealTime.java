@@ -40,24 +40,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.mixin.realtime.entity;
+package org.spongepowered.common.mixin.realtime.entity.player;
 
-import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.item.ItemCooldowns;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
-@Mixin(ExperienceOrb.class)
-public abstract class ExperienceOrbEntityMixin_RealTime extends EntityMixin_RealTime {
+@Mixin(ItemCooldowns.class)
+public abstract class ItemCooldownsMixin_RealTime {
+    @Unique
+    private long lastTickNanos = System.nanoTime();
+
     @Shadow
-    private int age;
+    private int tickCount;
 
-    @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/ExperienceOrb;age:I", opcode = Opcodes.PUTFIELD))
-    private void realTimeImpl$adjustForRealTimeAge(final ExperienceOrb self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.level()).realTimeBridge$getRealTimeTicks();
-        this.age += ticks;
+    @Redirect(method = "tick",
+        at = @At(value = "FIELD", target = "Lnet/minecraft/world/item/ItemCooldowns;tickCount:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
+    private void realTimeImpl$adjustForRealTimeItemCooldown(final ItemCooldowns self, final int modifier) {
+        final long currentNanos = System.nanoTime();
+        long realTimeTicks = Math.max(1, (currentNanos - lastTickNanos) / 50000000);
+        lastTickNanos = currentNanos;
+        this.tickCount += (int) realTimeTicks;
     }
 }

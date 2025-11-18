@@ -41,7 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @Mixin(StructureTemplate.class)
-public class MixinCustomBlockEntity_Structure {
+public class MixinCustomBlockEntity_StructureTemplate {
     @Inject(method = "placeInWorld",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerLevelAccessor;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z", ordinal = 1), locals = LocalCapture.CAPTURE_FAILSOFT)
     private void hackPlace(ServerLevelAccessor world, BlockPos pos, BlockPos pivot, StructurePlaceSettings placementData, RandomSource random, int flags, CallbackInfoReturnable<Boolean> cir, List<StructureTemplate.StructureBlockInfo> list, BoundingBox blockBox, List<BlockPos> list2, List<BlockPos> list3, List<Pair<BlockPos, CompoundTag>> list4, int i, int j, int k, int l, int m, int n, List<StructureTemplate.StructureBlockInfo> list5, ProblemReporter.ScopedCollector logging, Iterator<StructureTemplate.StructureBlockInfo> var20, StructureTemplate.StructureBlockInfo structureBlockInfo, BlockPos blockPos, FluidState fluidState, BlockState blockState) {

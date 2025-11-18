@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(MapItem.class)
-public abstract class MixinMapExistingChunk_FilledMapItem {
+public abstract class MixinMapExistingChunk_MapItem {
     @Redirect(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getChunk(II)Lnet/minecraft/world/level/chunk/LevelChunk;"))
     private LevelChunk getExistingChunk(Level world, int x, int z) {
         ServerLevel serverWorld = (ServerLevel) world;

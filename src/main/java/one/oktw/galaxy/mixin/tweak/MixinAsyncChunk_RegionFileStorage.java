@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Mixin(RegionFileStorage.class)
-public abstract class MixinAsyncChunk_RegionBasedStorage {
+public abstract class MixinAsyncChunk_RegionFileStorage {
     @Unique
     private final ReentrantLock lock = new ReentrantLock();
 

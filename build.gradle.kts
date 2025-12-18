@@ -5,15 +5,15 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     //    "maven-publish"
     kotlin("jvm") version "2.2.20"
-    id("fabric-loom") version "1.13-SNAPSHOT"
+    id("net.fabricmc.fabric-loom-remap") version "1.14-SNAPSHOT"
 }
 
 val version = "0.0.1"
 val group = "one.oktw"
 
-val minecraftVersion = "1.21.10"
-val fabricLoaderVersion = "0.17.3"
-val fabricAPIVersion = "0.138.3+1.21.10"
+val minecraftVersion = "1.21.11"
+val fabricLoaderVersion = "0.18.3"
+val fabricAPIVersion = "0.140.0+1.21.11"
 val galaxyLibVersion = "f4e1b25"
 
 repositories {

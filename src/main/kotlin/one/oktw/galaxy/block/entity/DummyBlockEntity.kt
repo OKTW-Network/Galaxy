@@ -19,7 +19,7 @@
 package one.oktw.galaxy.block.entity
 
 import net.minecraft.core.BlockPos
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
@@ -28,7 +28,7 @@ import one.oktw.galaxy.block.CustomBlock
 class DummyBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : CustomBlockEntity(type, pos) {
     override fun loadAdditional(view: ValueInput) {
         super.loadAdditional(view)
-        view.getStringOr("id", "")?.let(ResourceLocation::tryParse)?.let(CustomBlock.registry::get)?.let {
+        view.getStringOr("id", "")?.let(Identifier::tryParse)?.let(CustomBlock.registry::get)?.let {
             if (it != CustomBlock.DUMMY) {
                 level?.removeBlockEntity(worldPosition)
                 level?.setBlockEntity(it.createBlockEntity(worldPosition).apply { readCopyableData(view) })

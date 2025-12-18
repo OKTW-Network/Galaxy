@@ -47,9 +47,9 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
 import org.jetbrains.annotations.Nullable;
@@ -80,7 +80,7 @@ public abstract class ServerLevelMixin_RealTime extends Level implements RealTim
 
     @Inject(method = "tickTime", at = @At("HEAD"))
     private void realTimeImpl$fixTimeOfDayForRealTime(CallbackInfo ci) {
-        if (this.serverLevelData.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)) {
+        if (this.serverLevelData.getGameRules().get(GameRules.ADVANCE_TIME)) {
             // Subtract the one the original tick method is going to add
             long diff = this.realTimeBridge$getRealTimeTicks() - 1;
             // Don't set if we're not changing it as other mods might be listening for changes

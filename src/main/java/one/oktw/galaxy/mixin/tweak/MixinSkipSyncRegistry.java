@@ -25,7 +25,7 @@ import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.event.registry.RegistryAttributeHolder;
 import net.fabricmc.fabric.impl.registry.sync.RegistrySyncManager;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -43,9 +43,9 @@ public class MixinSkipSyncRegistry {
     }
 
     // TODO(Ravel): no target class
-    @WrapOperation(method = "createAndPopulateRegistryMap", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/Registry;getKey(Ljava/lang/Object;)Lnet/minecraft/resources/ResourceLocation;"), require = 0)
-    private static ResourceLocation skipGalaxyEntries(Registry<?> instance, Object t, Operation<ResourceLocation> original) {
-        ResourceLocation id = original.call(instance, t);
+    @WrapOperation(method = "createAndPopulateRegistryMap", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/Registry;getKey(Ljava/lang/Object;)Lnet/minecraft/resources/Identifier;"), require = 0)
+    private static Identifier skipGalaxyEntries(Registry<?> instance, Object t, Operation<Identifier> original) {
+        Identifier id = original.call(instance, t);
         if (id.getNamespace().equals("galaxy")) {
             return null;
         }

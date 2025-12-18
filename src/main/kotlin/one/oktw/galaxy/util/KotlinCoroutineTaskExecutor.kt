@@ -19,7 +19,7 @@
 package one.oktw.galaxy.util
 
 import kotlinx.coroutines.*
-import net.minecraft.Util
+import net.minecraft.util.Util
 import net.minecraft.util.thread.PriorityConsecutiveExecutor
 import net.minecraft.util.thread.StrictQueue
 import net.minecraft.util.thread.StrictQueue.RunnableWithPriority

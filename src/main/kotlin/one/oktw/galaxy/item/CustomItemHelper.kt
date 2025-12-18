@@ -20,7 +20,7 @@ package one.oktw.galaxy.item
 
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
 import kotlin.jvm.optionals.getOrNull
@@ -34,7 +34,7 @@ object CustomItemHelper {
     fun getItem(itemStack: ItemStack): CustomItem? {
         val customNbt = getNbt(itemStack)
 
-        return customNbt.read("custom_item_identifier", ResourceLocation.CODEC).getOrNull()
+        return customNbt.read("custom_item_identifier", Identifier.CODEC).getOrNull()
             ?.let(CustomItem.registry::get)
             ?.run { readCustomNbt(customNbt) }
     }

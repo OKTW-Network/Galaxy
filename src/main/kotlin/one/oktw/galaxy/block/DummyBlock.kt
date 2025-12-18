@@ -19,9 +19,9 @@
 package one.oktw.galaxy.block
 
 import net.minecraft.core.BlockPos
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import one.oktw.galaxy.block.entity.DummyBlockEntity
 
-class DummyBlock : CustomBlock(ResourceLocation.fromNamespaceAndPath("galaxy", "block/dummy")) {
+class DummyBlock : CustomBlock(Identifier.fromNamespaceAndPath("galaxy", "block/dummy")) {
     override fun createBlockEntity(pos: BlockPos) = DummyBlockEntity(blockEntityType, pos)
 }

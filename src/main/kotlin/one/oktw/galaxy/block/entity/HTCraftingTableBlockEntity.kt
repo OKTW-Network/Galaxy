@@ -22,7 +22,7 @@ import kotlinx.coroutines.*
 import net.minecraft.core.BlockPos
 import net.minecraft.core.component.DataComponents.ITEM_NAME
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
@@ -60,7 +60,7 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
         val itemBrowser = CustomItemBrowser(filterRecipe = true)
         return GUI.Builder(MenuType.GENERIC_9x3)
             .setTitle(Component.translatable("UI.Title.HiTechCraftingTableList"))
-            .setBackground("A", ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/container_layout/ht_crafting_table"))
+            .setBackground("A", Identifier.fromNamespaceAndPath("galaxy", "gui_font/container_layout/ht_crafting_table"))
             .blockEntity(this)
             .build()
             .apply {
@@ -135,7 +135,7 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
         val gui =
             GUI.Builder(MenuType.GENERIC_9x3)
                 .setTitle(Component.translatable("UI.Title.HiTechCraftingTableRecipe", recipe.outputItem.getName()))
-                .setBackground("B", ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/container_layout/ht_crafting_table"))
+                .setBackground("B", Identifier.fromNamespaceAndPath("galaxy", "gui_font/container_layout/ht_crafting_table"))
                 .blockEntity(this)
                 .addSlot(7, 1, object : Slot(output, 0, 0, 0) {
                     override fun mayPlace(stack: ItemStack) = false

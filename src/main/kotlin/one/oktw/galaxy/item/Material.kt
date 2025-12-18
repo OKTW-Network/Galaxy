@@ -20,11 +20,11 @@ package one.oktw.galaxy.item
 
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Component.translatable
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Items.RECOVERY_COMPASS
 
 class Material private constructor(id: String, private val name: String) :
-    CustomItem(ResourceLocation.fromNamespaceAndPath("galaxy", "material/$id"), RECOVERY_COMPASS) {
+    CustomItem(Identifier.fromNamespaceAndPath("galaxy", "material/$id"), RECOVERY_COMPASS) {
     companion object {
         val RAW_BASE_PLATE = registry.register(Material("raw_base_plate", "item.Material.PART_RAW_BASE"))
         val BASE_PLATE = registry.register(Material("base_plate", "item.Material.PART_BASE"))

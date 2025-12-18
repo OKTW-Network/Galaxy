@@ -22,7 +22,7 @@ import net.fabricmc.fabric.api.`object`.builder.v1.block.entity.FabricBlockEntit
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks.*
 import net.minecraft.world.level.block.entity.BlockEntityType
@@ -31,8 +31,8 @@ import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.util.CustomRegistry
 import one.oktw.galaxy.util.Registrable
 
-open class CustomBlock(final override val identifier: ResourceLocation, val baseBlock: Block = BARRIER) : Registrable {
-    constructor(id: String, baseBlock: Block = BARRIER) : this(ResourceLocation.fromNamespaceAndPath("galaxy", "block/$id"), baseBlock)
+open class CustomBlock(final override val identifier: Identifier, val baseBlock: Block = BARRIER) : Registrable {
+    constructor(id: String, baseBlock: Block = BARRIER) : this(Identifier.fromNamespaceAndPath("galaxy", "block/$id"), baseBlock)
 
     protected val blockEntityType: BlockEntityType<CustomBlockEntity> = Registry.register(
         BuiltInRegistries.BLOCK_ENTITY_TYPE,

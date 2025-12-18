@@ -19,8 +19,8 @@
 package one.oktw.galaxy.mixin.tweak;
 
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.projectile.Arrow;
-import net.minecraft.world.entity.projectile.SpectralArrow;
+import net.minecraft.world.entity.projectile.arrow.Arrow;
+import net.minecraft.world.entity.projectile.arrow.SpectralArrow;
 import one.oktw.galaxy.mixin.interfaces.IThrownCountdown_Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

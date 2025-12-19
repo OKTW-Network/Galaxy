@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     //    "maven-publish"
-    kotlin("jvm") version "2.2.20"
+    kotlin("jvm") version "2.3.0"
     id("net.fabricmc.fabric-loom-remap") version "1.14-SNAPSHOT"
 }
 

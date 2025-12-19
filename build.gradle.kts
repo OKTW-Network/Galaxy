@@ -14,7 +14,7 @@ val group = "one.oktw"
 val minecraftVersion = "1.21.11"
 val fabricLoaderVersion = "0.18.3"
 val fabricAPIVersion = "0.140.0+1.21.11"
-val galaxyLibVersion = "f4e1b25"
+val galaxyLibVersion = "2235da5"
 
 repositories {
     mavenCentral()

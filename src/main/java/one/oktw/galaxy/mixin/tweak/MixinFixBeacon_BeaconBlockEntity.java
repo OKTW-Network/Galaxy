@@ -18,17 +18,17 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BeaconBlockEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.World;
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BeaconBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import one.oktw.galaxy.mixin.accessor.BeaconLevelAccessor;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -45,27 +45,27 @@ public abstract class MixinFixBeacon_BeaconBlockEntity extends BlockEntity {
     }
 
     @Shadow
-    public static void playSound(World world, BlockPos pos, SoundEvent sound) {
+    public static void playSound(Level world, BlockPos pos, SoundEvent sound) {
     }
 
-    @Inject(method = "tick", at = @At(value = "FIELD", opcode = Opcodes.GETSTATIC, target = "Lnet/minecraft/sound/SoundEvents;BLOCK_BEACON_AMBIENT:Lnet/minecraft/sound/SoundEvent;"), locals = LocalCapture.CAPTURE_FAILSOFT)
+    @Inject(method = "tick", at = @At(value = "FIELD", opcode = Opcodes.GETSTATIC, target = "Lnet/minecraft/sounds/SoundEvents;BEACON_AMBIENT:Lnet/minecraft/sounds/SoundEvent;"), locals = LocalCapture.CAPTURE_FAILSOFT)
     // TODO check local capture
-    private static void fixBeaconActivate(World world, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo ci, int i, int j, int k, BlockPos blockPos2, BeaconBlockEntity.BeamSegment beamSegment, int l, int n) {
+    private static void fixBeaconActivate(Level world, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo ci, int i, int j, int k, BlockPos blockPos2, BeaconBlockEntity.Section beamSegment, int l, int n) {
         BeaconLevelAccessor accessor = (BeaconLevelAccessor) blockEntity;
         boolean bl = n > 0;
-        boolean bl2 = accessor.getLevel() > 0;
+        boolean bl2 = accessor.getLevels() > 0;
         if (!bl && bl2) {
-            playSound(world, pos, SoundEvents.BLOCK_BEACON_ACTIVATE);
+            playSound(world, pos, SoundEvents.BEACON_ACTIVATE);
 
-            for (ServerPlayerEntity serverPlayerEntity : world.getNonSpectatingEntities(ServerPlayerEntity.class, (new Box(i, j, k, i, j - 4, k)).expand(10.0D, 5.0D, 10.0D))) {
-                Criteria.CONSTRUCT_BEACON.trigger(serverPlayerEntity, accessor.getLevel());
+            for (ServerPlayer serverPlayerEntity : world.getEntitiesOfClass(ServerPlayer.class, (new AABB(i, j, k, i, j - 4, k)).inflate(10.0D, 5.0D, 10.0D))) {
+                CriteriaTriggers.CONSTRUCT_BEACON.trigger(serverPlayerEntity, accessor.getLevels());
             }
         } else if (bl && !bl2) {
-            playSound(world, pos, SoundEvents.BLOCK_BEACON_DEACTIVATE);
+            playSound(world, pos, SoundEvents.BEACON_DEACTIVATE);
         }
     }
 
-    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;isClient()Z"), cancellable = true)
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isClientSide()Z"), cancellable = true)
     private static void skipBugActivate(CallbackInfo ci) {
         ci.cancel();
     }

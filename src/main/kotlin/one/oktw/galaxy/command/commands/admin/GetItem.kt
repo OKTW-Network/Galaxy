@@ -20,18 +20,18 @@ package one.oktw.galaxy.command.commands.admin
 
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import net.minecraft.command.argument.IdentifierArgumentType
-import net.minecraft.server.command.CommandManager
-import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.text.Text
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.Commands
+import net.minecraft.commands.arguments.ResourceLocationArgument
+import net.minecraft.network.chat.Component
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
 import one.oktw.galaxy.item.CustomItem
 
 class GetItem {
-    val command: LiteralArgumentBuilder<ServerCommandSource> = CommandManager.literal("getItem")
+    val command: LiteralArgumentBuilder<CommandSourceStack> = Commands.literal("getItem")
         .then(
-            CommandManager.argument("item", IdentifierArgumentType.identifier())
+            Commands.argument("item", ResourceLocationArgument.id())
                 .suggests { _, builder ->
                     CustomItem.registry.getAll().keys.forEach { identifier ->
                         if (identifier.toString().contains(builder.remaining, ignoreCase = true)) {
@@ -41,20 +41,20 @@ class GetItem {
                     return@suggests builder.buildFuture()
                 }
                 .executes {
-                    val identifier = IdentifierArgumentType.getIdentifier(it, "item")
+                    val identifier = ResourceLocationArgument.getId(it, "item")
                     val item = CustomItem.registry.get(identifier)
 
                     if (item == null) {
-                        it.source.sendError(Text.translatable("argument.item.id.invalid", identifier))
+                        it.source.sendFailure(Component.translatable("argument.item.id.invalid", identifier))
                         return@executes 0
                     }
 
                     val itemStack = item.createItemStack()
-                    val player = it.source.playerOrThrow
-                    player.giveOrDropStack(itemStack.copy())
+                    val player = it.source.playerOrException
+                    player.handleExtraItemsCreatedOnUse(itemStack.copy())
                     val pitch = ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f
-                    player.entityWorld.playSound(null, player.x, player.y, player.z, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2f, pitch)
-                    it.source.sendFeedback({ Text.translatable("commands.give.success.single", 1, itemStack.toHoverableText(), it.source.displayName) }, true)
+                    player.level().playSound(null, player.x, player.y, player.z, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2f, pitch)
+                    it.source.sendSuccess({ Component.translatable("commands.give.success.single", 1, itemStack.displayName, it.source.displayName) }, true)
 
                     return@executes Command.SINGLE_SUCCESS
                 }

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,8 +18,8 @@
 
 package one.oktw.galaxy.mixin.tweak;
 
-import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.server.rcon.RconClient;
+import net.minecraft.server.ServerInterface;
+import net.minecraft.server.rcon.thread.RconClient;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,9 +30,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.net.Socket;
 
 @Mixin(RconClient.class)
-public class MixinRCON_RconClient extends MixinRCON_RconBase {
+public class MixinRCON_RconClient extends MixinRCON_GenericThread {
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void checkLocal(DedicatedServer server, String password, Socket socket, CallbackInfo ci) {
+    private void checkLocal(ServerInterface server, String password, Socket socket, CallbackInfo ci) {
         if (socket.getInetAddress().isLoopbackAddress()) isLocal = true;
     }
 

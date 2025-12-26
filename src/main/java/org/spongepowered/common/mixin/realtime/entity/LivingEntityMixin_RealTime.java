@@ -42,7 +42,7 @@
  */
 package org.spongepowered.common.mixin.realtime.entity;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -57,16 +57,16 @@ public abstract class LivingEntityMixin_RealTime extends EntityMixin_RealTime {
     @Shadow
     public int hurtTime;
     @Shadow
-    protected int despawnCounter;
+    protected int noActionTime;
     @Shadow
-    protected int itemUseTimeLeft;
+    protected int useItemRemaining;
     @Shadow
-    protected int lastAttackedTicks;
+    protected int attackStrengthTicker;
 
-    @Redirect(method = "updatePostDeath",
-        at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;deathTime:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
+    @Redirect(method = "tickDeath",
+        at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;deathTime:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
     private void realTimeImpl$adjustForRealTimeDeathTime(final LivingEntity self, final int vanillaNewDeathTime) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.level()).realTimeBridge$getRealTimeTicks();
         int newDeathTime = this.deathTime + ticks;
         // At tick 20, XP is dropped and the death animation finishes. The
         // entity is also removed from the world... except in the case of
@@ -79,21 +79,21 @@ public abstract class LivingEntityMixin_RealTime extends EntityMixin_RealTime {
         this.deathTime = newDeathTime;
     }
 
-    @Redirect(method = "tickItemStackUsage", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;itemUseTimeLeft:I", opcode = Opcodes.GETFIELD))
+    @Redirect(method = "updateUsingItem", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;useItemRemaining:I", opcode = Opcodes.GETFIELD))
     private int realTimeImpl$adjustForRealTimeUseTime(final LivingEntity self) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
-        return itemUseTimeLeft - Math.min(itemUseTimeLeft, ticks) + 1;
+        final int ticks = (int) ((RealTimeTrackingBridge) self.level()).realTimeBridge$getRealTimeTicks();
+        return useItemRemaining - Math.min(useItemRemaining, ticks) + 1;
     }
 
-    @Redirect(method = "baseTick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;hurtTime:I", opcode = Opcodes.PUTFIELD))
+    @Redirect(method = "baseTick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;hurtTime:I", opcode = Opcodes.PUTFIELD))
     private void realTimeImpl$adjustForRealTimeHurtTime(final LivingEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.level()).realTimeBridge$getRealTimeTicks();
         hurtTime -= Math.min(hurtTime, ticks);
     }
 
-    @Redirect(method = "baseTick", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;timeUntilRegen:I", opcode = Opcodes.PUTFIELD))
+    @Redirect(method = "baseTick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;invulnerableTime:I", opcode = Opcodes.PUTFIELD))
     private void realTimeImpl$adjustForRealTimeUntilRegen(final LivingEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getEntityWorld()).realTimeBridge$getRealTimeTicks();
-        timeUntilRegen -= Math.min(timeUntilRegen, ticks);
+        final int ticks = (int) ((RealTimeTrackingBridge) self.level()).realTimeBridge$getRealTimeTicks();
+        invulnerableTime -= Math.min(invulnerableTime, ticks);
     }
 }

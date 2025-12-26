@@ -18,6 +18,6 @@
 
 package one.oktw.galaxy.event.type
 
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.level.ServerPlayer
 
-class PlayerJumpEvent(val player: ServerPlayerEntity) : Event
+class PlayerJumpEvent(val player: ServerPlayer) : Event

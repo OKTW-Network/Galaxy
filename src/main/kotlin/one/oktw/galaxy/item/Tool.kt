@@ -18,13 +18,13 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.item.Items.RECOVERY_COMPASS
-import net.minecraft.text.Text
-import net.minecraft.text.Text.translatable
-import net.minecraft.util.Identifier
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Component.translatable
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.Items.RECOVERY_COMPASS
 
 class Tool private constructor(id: String, private val name: String) :
-    CustomItem(Identifier.of("galaxy", "tool/$id"), RECOVERY_COMPASS, maxStackSize = 1) {
+    CustomItem(ResourceLocation.fromNamespaceAndPath("galaxy", "tool/$id"), RECOVERY_COMPASS, maxStack = 1) {
     override val cacheable = false
 
     companion object {
@@ -32,5 +32,5 @@ class Tool private constructor(id: String, private val name: String) :
         val CROWBAR = registry.register(Tool("crowbar", "item.Tool.CROWBAR"))
     }
 
-    override fun getName(): Text = translatable(name)
+    override fun getName(): Component = translatable(name)
 }

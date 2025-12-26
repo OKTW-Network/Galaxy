@@ -22,12 +22,12 @@ import com.mojang.brigadier.Command.SINGLE_SUCCESS
 import com.mojang.brigadier.CommandDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.minecraft.server.command.CommandManager
-import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.text.Text
-import net.minecraft.util.Formatting
-import net.minecraft.world.World
+import net.minecraft.ChatFormatting
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.Commands
+import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.level.Level
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import java.util.*
@@ -36,9 +36,9 @@ import java.util.concurrent.TimeUnit
 class Spawn : Command {
     private val lock = HashSet<UUID>()
 
-    override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
+    override fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
         dispatcher.register(
-            CommandManager.literal("spawn")
+            Commands.literal("spawn")
                 .executes { context ->
                     execute(context.source)
                     SINGLE_SUCCESS
@@ -47,7 +47,7 @@ class Spawn : Command {
         )
     }
 
-    private fun execute(source: ServerCommandSource) {
+    private fun execute(source: CommandSourceStack) {
         val originPlayer = source.player
 
         if (originPlayer == null || lock.contains(originPlayer.uuid)) return
@@ -56,47 +56,54 @@ class Spawn : Command {
 
         main?.launch {
             for (i in 0..4) {
-                originPlayer.sendMessage(Text.translatable("Respond.commandCountdown", 5 - i).styled { it.withColor(Formatting.GREEN) }, true)
+                originPlayer.displayClientMessage(
+                    Component.translatable("Respond.commandCountdown", 5 - i).withStyle { it.withColor(ChatFormatting.GREEN) },
+                    true
+                )
                 delay(TimeUnit.SECONDS.toMillis(1))
             }
 
-            val player = originPlayer.entityWorld.server.playerManager.getPlayer(originPlayer.uuid) ?: return@launch
-            player.sendMessage(Text.translatable("Respond.TeleportStart").styled { it.withColor(Formatting.GREEN) }, true)
+            val player = originPlayer.level().server.playerList.getPlayer(originPlayer.uuid)
+            if (player == null) {
+                lock -= originPlayer.uuid
+                return@launch
+            }
+            player.displayClientMessage(Component.translatable("Respond.TeleportStart").withStyle { it.withColor(ChatFormatting.GREEN) }, true)
 
-            val world = player.entityWorld
-            val type = world.registryKey
+            val world = player.level()
+            val type = world.dimension()
 
-            if (type == World.NETHER) {
-                player.sendMessage(Text.translatable("Respond.TeleportNothing").styled { it.withColor(Formatting.RED) }, true)
+            if (type == Level.NETHER) {
+                player.displayClientMessage(Component.translatable("Respond.TeleportNothing").withStyle { it.withColor(ChatFormatting.RED) }, true)
                 lock -= player.uuid
                 return@launch
             }
 
-            val oldPos = player.entityPos
+            val oldPos = player.position()
 
             player.stopRiding()
             if (player.isSleeping) {
-                player.wakeUp(true, true)
+                player.stopSleepInBed(true, true)
             }
 
-            if (type == World.END) {
-                val pos = ServerWorld.END_SPAWN_POS.toCenterPos()
-                player.networkHandler.requestTeleport(pos.x, pos.y, pos.z, 0.0f, 0.0f)
-                player.networkHandler.syncWithPlayerPosition()
+            if (type == Level.END) {
+                val pos = ServerLevel.END_SPAWN_POINT.center
+                player.connection.teleport(pos.x, pos.y, pos.z, 0.0f, 0.0f)
+                player.connection.resetPosition()
                 lock -= player.uuid
                 return@launch
             }
 
-            player.refreshPositionAndAngles(player.getWorldSpawnPos(world, world.spawnPoint.pos).toBottomCenterPos(), 0.0f, 0.0f)
+            player.snapTo(player.adjustSpawnLocation(world, world.respawnData.pos()).bottomCenter, 0.0f, 0.0f)
             // force teleport when player pos does not change at all
-            if (oldPos.distanceTo(player.entityPos) == 0.0) {
-                player.refreshPositionAndAngles(world.spawnPoint.pos, 0.0f, 0.0f)
+            if (oldPos.distanceTo(player.position()) == 0.0) {
+                player.snapTo(world.respawnData.pos(), 0.0f, 0.0f)
             }
 
-            while (!world.isSpaceEmpty(player) && player.y < world.topYInclusive) {
-                player.updatePosition(player.x, player.y + 1, player.z)
+            while (!world.noCollision(player) && player.y < world.maxY) {
+                player.absSnapTo(player.x, player.y + 1, player.z)
             }
-            player.networkHandler.requestTeleport(player.x, player.y, player.z, player.yaw, player.pitch)
+            player.connection.teleport(player.x, player.y, player.z, player.yRot, player.xRot)
             lock -= player.uuid
         }
     }

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,10 +18,10 @@
 
 package one.oktw.galaxy.event.type
 
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
+import net.minecraft.server.level.ServerPlayer
 
-class PlayerInteractBlockEvent(val packet: PlayerInteractBlockC2SPacket, val player: ServerPlayerEntity) : CancelableEvent() {
+class PlayerInteractBlockEvent(val packet: ServerboundUseItemOnPacket, val player: ServerPlayer) : CancelableEvent() {
     /**
      * Set swing will cancel event.
      */

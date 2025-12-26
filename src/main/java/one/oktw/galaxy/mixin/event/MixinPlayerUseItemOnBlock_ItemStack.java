@@ -18,9 +18,9 @@
 
 package one.oktw.galaxy.mixin.event;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.util.ActionResult;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import one.oktw.galaxy.event.EventManager;
 import one.oktw.galaxy.event.type.PlayerUseItemOnBlock;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,13 +30,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemStack.class)
 public class MixinPlayerUseItemOnBlock_ItemStack {
-    @Inject(method = "useOnBlock", at = @At(value = "HEAD"), cancellable = true)
-    private void useItemOnBlock(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
+    @Inject(method = "useOn", at = @At(value = "HEAD"), cancellable = true)
+    private void useItemOnBlock(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
         if (context.getPlayer() == null) return;
 
         PlayerUseItemOnBlock event = EventManager.safeEmit(new PlayerUseItemOnBlock(context));
         if (event.getCancel()) {
-            cir.setReturnValue(event.getSwing() ? ActionResult.SUCCESS_SERVER : ActionResult.CONSUME);
+            cir.setReturnValue(event.getSwing() ? InteractionResult.SUCCESS_SERVER : InteractionResult.CONSUME);
             cir.cancel();
         }
     }

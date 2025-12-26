@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2020
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -21,19 +21,19 @@ package one.oktw.galaxy.command.commands.admin
 import com.mojang.brigadier.arguments.FloatArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
-import net.minecraft.server.command.CommandManager
-import net.minecraft.server.command.ServerCommandSource
-import one.oktw.galaxy.mixin.accessor.PlayerAbilitiesAccessor
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.Commands
+import one.oktw.galaxy.mixin.accessor.AbilitiesAccessor
 
 class FlySpeed {
-    val command: LiteralArgumentBuilder<ServerCommandSource> = CommandManager.literal("flySpeed")
-        .then(CommandManager.argument("speed", FloatArgumentType.floatArg(0.0f, 1.0f)).executes { context -> execute(context) })
+    val command: LiteralArgumentBuilder<CommandSourceStack> = Commands.literal("flySpeed")
+        .then(Commands.argument("speed", FloatArgumentType.floatArg(0.0f, 1.0f)).executes { context -> execute(context) })
 
-    private fun execute(context: CommandContext<ServerCommandSource>): Int {
+    private fun execute(context: CommandContext<CommandSourceStack>): Int {
         val player = context.source.player ?: return com.mojang.brigadier.Command.SINGLE_SUCCESS
 
-        (player.abilities as PlayerAbilitiesAccessor).setFlySpeed(context.getArgument("speed", Float::class.java))
-        player.sendAbilitiesUpdate()
+        (player.abilities as AbilitiesAccessor).setFlyingSpeed(context.getArgument("speed", Float::class.java))
+        player.onUpdateAbilities()
 
         return com.mojang.brigadier.Command.SINGLE_SUCCESS
     }

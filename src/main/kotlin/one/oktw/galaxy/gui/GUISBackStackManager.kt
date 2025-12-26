@@ -23,47 +23,50 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.player.Player
 import one.oktw.galaxy.util.MinecraftAsyncExecutor
+import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentLinkedDeque
 
-class GUISBackStackManager(private val player: ServerPlayerEntity) :
-    CoroutineScope by CoroutineScope(MinecraftAsyncExecutor(player.entityWorld.server).asCoroutineDispatcher()) {
+class GUISBackStackManager(player: ServerPlayer) :
+    CoroutineScope by CoroutineScope(MinecraftAsyncExecutor(player.level().server).asCoroutineDispatcher()) {
+    private val player = WeakReference(player)
     private val stack = ConcurrentLinkedDeque<GUI>()
 
     companion object {
-        private val managers = MapMaker().weakKeys().makeMap<ServerPlayerEntity, GUISBackStackManager>()
+        private val managers = MapMaker().weakKeys().makeMap<ServerPlayer, GUISBackStackManager>()
 
-        fun openGUI(player: ServerPlayerEntity, gui: GUI) {
+        fun openGUI(player: ServerPlayer, gui: GUI) {
             managers.getOrPut(player) { GUISBackStackManager(player) }.open(gui)
         }
 
-        fun closeAll(player: ServerPlayerEntity) {
+        fun closeAll(player: ServerPlayer) {
             managers[player]?.stack?.clear()
-            player.closeHandledScreen()
+            player.closeContainer()
         }
     }
 
     fun open(gui: GUI) {
+        val player = player.get() ?: return
         gui.onClose { this.closeCallback(gui, it) }
         stack.offerLast(gui)
-        if (player.entityWorld.server.isOnThread) {
+        if (player.level().server.isSameThread) {
             // Delay 1 tick to workaround open GUI on close callback
-            launch { player.openHandledScreen(gui) }
-        } else runBlocking(player.entityWorld.server.asCoroutineDispatcher()) {
-            player.openHandledScreen(gui)
+            launch { player.openMenu(gui) }
+        } else runBlocking(player.level().server.asCoroutineDispatcher()) {
+            player.openMenu(gui)
         }
     }
 
-    private fun closeCallback(gui: GUI, player: PlayerEntity) {
-        if (player == this.player && gui == stack.lastOrNull()) {
+    private fun closeCallback(gui: GUI, player: Player) {
+        if (player == this.player.get() && gui == stack.lastOrNull()) {
             stack.pollLast() // Remove closed
 
             // Delay 1 tick to workaround open GUI on close callback
             launch {
                 while (stack.isNotEmpty()) {
-                    if (stack.last().let(player::openHandledScreen).isPresent) break // Try open previous
+                    if (stack.last().let(player::openMenu).isPresent) break // Try open previous
                     stack.pollLast() // Open fail, remove it
                 }
             }

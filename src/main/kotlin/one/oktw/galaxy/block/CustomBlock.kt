@@ -19,23 +19,23 @@
 package one.oktw.galaxy.block
 
 import net.fabricmc.fabric.api.`object`.builder.v1.block.entity.FabricBlockEntityTypeBuilder
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks.*
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.BlockPos
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks.*
+import net.minecraft.world.level.block.entity.BlockEntityType
 import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.util.CustomRegistry
 import one.oktw.galaxy.util.Registrable
 
-open class CustomBlock(final override val identifier: Identifier, val baseBlock: Block = BARRIER) : Registrable {
-    constructor(id: String, baseBlock: Block = BARRIER) : this(Identifier.of("galaxy", "block/$id"), baseBlock)
+open class CustomBlock(final override val identifier: ResourceLocation, val baseBlock: Block = BARRIER) : Registrable {
+    constructor(id: String, baseBlock: Block = BARRIER) : this(ResourceLocation.fromNamespaceAndPath("galaxy", "block/$id"), baseBlock)
 
     protected val blockEntityType: BlockEntityType<CustomBlockEntity> = Registry.register(
-        Registries.BLOCK_ENTITY_TYPE,
+        BuiltInRegistries.BLOCK_ENTITY_TYPE,
         identifier,
         FabricBlockEntityTypeBuilder.create({ pos, _ -> createBlockEntity(pos) }, BARRIER).build()
     )

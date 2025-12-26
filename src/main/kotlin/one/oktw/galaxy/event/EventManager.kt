@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2022
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,7 +19,7 @@
 package one.oktw.galaxy.event
 
 import kotlinx.coroutines.*
-import net.minecraft.util.thread.ThreadExecutor
+import net.minecraft.util.thread.BlockableEventLoop
 import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.event.annotation.EventListener
 import one.oktw.galaxy.event.type.Event
@@ -36,7 +36,7 @@ import kotlin.reflect.jvm.javaMethod
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.jvm.jvmName
 
-class EventManager(private val serverThread: ThreadExecutor<*>) : CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
+class EventManager(private val serverThread: BlockableEventLoop<*>) : CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     companion object {
         /**
          * Emit event if [EventManager] was initialized.
@@ -56,7 +56,7 @@ class EventManager(private val serverThread: ThreadExecutor<*>) : CoroutineScope
             asyncEventCallback[event::class]?.forEach { it(event) }
         }
 
-        if (!serverThread.isOnThread) {
+        if (!serverThread.isSameThread) {
             runBlocking(serverThread.asCoroutineDispatcher()) {
                 syncEventListeners[event::class]?.forEach { (obj, listeners) -> listeners.forEach { it.javaMethod?.invoke(obj, event) } }
                 syncEventCallback[Event::class]?.forEach { it(event) }

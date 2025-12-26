@@ -18,19 +18,19 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.component.type.CustomModelDataComponent
-import net.minecraft.item.Items.DIAMOND_HOE
-import net.minecraft.text.Text
-import net.minecraft.util.Identifier
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.Items.DIAMOND_HOE
+import net.minecraft.world.item.component.CustomModelData
 
-class Gui(customModelData: CustomModelDataComponent, private val name: Text? = null) :
+class Gui(customModelData: CustomModelData, private val name: Component? = null) :
     CustomItem(
-        Identifier.of("galaxy", "gui"),
+        ResourceLocation.fromNamespaceAndPath("galaxy", "gui"),
         DIAMOND_HOE,
-        itemModel = Identifier.of("galaxy", "gui/complex"),
+        itemModel = ResourceLocation.fromNamespaceAndPath("galaxy", "gui/complex"),
         customModelData = customModelData,
         hideTooltip = name == null
     ) {
 
-    override fun getName(): Text = name ?: Text.of("")
+    override fun getName(): Component = name ?: Component.empty()
 }

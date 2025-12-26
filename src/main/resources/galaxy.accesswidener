@@ -1,10 +1,10 @@
 accessWidener	v1	named
 
 # CloneCommand
-accessible    class    net/minecraft/server/command/CloneCommand$Mode
-accessible    class    net/minecraft/server/command/CloneCommand$BlockInfo
+accessible    class    net/minecraft/server/commands/CloneCommands$Mode
+accessible    class    net/minecraft/server/commands/CloneCommands$CloneBlockInfo
 
 # Async chunk load
-accessible    class    net/minecraft/world/storage/StorageIoWorker$Priority
-accessible field net/minecraft/world/storage/StorageIoWorker$Result nbt Lnet/minecraft/nbt/NbtCompound;
-accessible method net/minecraft/world/storage/StorageIoWorker$Result copyNbt ()Lnet/minecraft/nbt/NbtCompound;
+accessible    class    net/minecraft/world/level/chunk/storage/IOWorker$Priority
+accessible field net/minecraft/world/level/chunk/storage/IOWorker$PendingStore data Lnet/minecraft/nbt/CompoundTag;
+accessible method net/minecraft/world/level/chunk/storage/IOWorker$PendingStore copyData ()Lnet/minecraft/nbt/CompoundTag;

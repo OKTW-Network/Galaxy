@@ -18,26 +18,26 @@
 
 package one.oktw.galaxy.gui.utils
 
-import net.minecraft.screen.ScreenHandler
-import net.minecraft.screen.ScreenHandlerType
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.MenuType
 
-class InventoryUtils(private val type: ScreenHandlerType<out ScreenHandler>) {
+class InventoryUtils(private val type: MenuType<out AbstractContainerMenu>) {
     companion object {
         val genericScreenHandlerType = listOf(
-            ScreenHandlerType.GENERIC_9X1,
-            ScreenHandlerType.GENERIC_9X2,
-            ScreenHandlerType.GENERIC_9X3,
-            ScreenHandlerType.GENERIC_9X4,
-            ScreenHandlerType.GENERIC_9X5,
-            ScreenHandlerType.GENERIC_9X6
+            MenuType.GENERIC_9x1,
+            MenuType.GENERIC_9x2,
+            MenuType.GENERIC_9x3,
+            MenuType.GENERIC_9x4,
+            MenuType.GENERIC_9x5,
+            MenuType.GENERIC_9x6
         )
     }
 
     fun xyToIndex(x: Int, y: Int): Int {
         return when (type) {
             in genericScreenHandlerType -> y * 9 + x
-            ScreenHandlerType.GENERIC_3X3 -> y * 3 + x
-            ScreenHandlerType.HOPPER, ScreenHandlerType.ANVIL -> x
+            MenuType.GENERIC_3x3 -> y * 3 + x
+            MenuType.HOPPER, MenuType.ANVIL -> x
             else -> throw IllegalArgumentException("Unsupported container type: $type")
         }
     }
@@ -45,8 +45,8 @@ class InventoryUtils(private val type: ScreenHandlerType<out ScreenHandler>) {
     fun indexToXY(index: Int): Pair<Int, Int> {
         return when (type) {
             in genericScreenHandlerType -> Pair(index % 9, index / 9)
-            ScreenHandlerType.GENERIC_3X3 -> Pair(index % 3, index / 3)
-            ScreenHandlerType.HOPPER, ScreenHandlerType.ANVIL -> Pair(index, 0)
+            MenuType.GENERIC_3x3 -> Pair(index % 3, index / 3)
+            MenuType.HOPPER, MenuType.ANVIL -> Pair(index, 0)
             else -> throw IllegalArgumentException("Unsupported container type: $type")
         }
     }

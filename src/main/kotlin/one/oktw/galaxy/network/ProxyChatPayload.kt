@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,30 +19,30 @@
 package one.oktw.galaxy.network
 
 import io.netty.buffer.Unpooled.wrappedBuffer
-import net.minecraft.network.PacketByteBuf
-import net.minecraft.network.codec.PacketCodec
-import net.minecraft.network.packet.CustomPayload
-import net.minecraft.util.Identifier
+import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.network.codec.StreamCodec
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload
+import net.minecraft.resources.ResourceLocation
 import one.oktw.galaxy.proxy.api.ProxyAPI
 import one.oktw.galaxy.proxy.api.ProxyAPI.encode
 import one.oktw.galaxy.proxy.api.packet.Packet
 
 @JvmRecord
-data class ProxyChatPayload(val packet: Packet) : CustomPayload {
+data class ProxyChatPayload(val packet: Packet) : CustomPacketPayload {
     companion object {
-        private val PROXY_CHAT_IDENTIFIER = Identifier.of("galaxy", "proxy-chat")
-        val ID = CustomPayload.Id<ProxyChatPayload>(PROXY_CHAT_IDENTIFIER)
-        val CODEC: PacketCodec<PacketByteBuf, ProxyChatPayload> = PacketCodec.of(
+        private val PROXY_CHAT_IDENTIFIER = ResourceLocation.fromNamespaceAndPath("galaxy", "proxy-chat")
+        val ID = CustomPacketPayload.Type<ProxyChatPayload>(PROXY_CHAT_IDENTIFIER)
+        val CODEC: StreamCodec<FriendlyByteBuf, ProxyChatPayload> = StreamCodec.ofMember(
             { value, buf -> buf.writeBytes(wrappedBuffer(encode(value.packet))) },
             { buf ->
                 val packet = ProxyChatPayload(ProxyAPI.decode(buf.nioBuffer()))
                 // FIXME: Workaround force clear buffer to suppress "Packet was larger than I expected" error
                 buf.clear()
-                return@of packet
+                return@ofMember packet
             })
     }
 
-    override fun getId(): CustomPayload.Id<out CustomPayload> {
+    override fun type(): CustomPacketPayload.Type<out CustomPacketPayload> {
         return ID
     }
 }

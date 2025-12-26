@@ -42,8 +42,8 @@
  */
 package org.spongepowered.common.mixin.realtime.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -55,32 +55,32 @@ import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 @Mixin(Entity.class)
 public abstract class EntityMixin_RealTime {
     @Shadow
-    public int timeUntilRegen;
+    public int invulnerableTime;
     @Shadow
-    protected int ridingCooldown;
+    protected int boardingCooldown;
 
     @Shadow
-    public abstract World getEntityWorld();
+    public abstract Level level();
 
     @Redirect(method = "baseTick",
         at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/entity/Entity;ridingCooldown:I",
+            target = "Lnet/minecraft/world/entity/Entity;boardingCooldown:I",
             opcode = Opcodes.PUTFIELD
         ),
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lnet/minecraft/entity/Entity;stopRiding()V"
+                target = "Lnet/minecraft/world/entity/Entity;stopRiding()V"
             ),
             to = @At(
                 value = "INVOKE",
-                target = "Lnet/minecraft/entity/Entity;tickPortalTeleportation()V"
+                target = "Lnet/minecraft/world/entity/Entity;handlePortal()V"
             )
         )
     )
     private void realTimeImpl$adjustForRealTimeEntityCooldown(final Entity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) this.getEntityWorld()).realTimeBridge$getRealTimeTicks();
-        this.ridingCooldown = Math.max(0, this.ridingCooldown - ticks);
+        final int ticks = (int) ((RealTimeTrackingBridge) this.level()).realTimeBridge$getRealTimeTicks();
+        this.boardingCooldown = Math.max(0, this.boardingCooldown - ticks);
     }
 }

@@ -18,14 +18,14 @@
 
 package one.oktw.galaxy.item
 
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items.RECOVERY_COMPASS
-import net.minecraft.text.Text
-import net.minecraft.text.Text.translatable
-import net.minecraft.util.Identifier
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Component.translatable
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items.RECOVERY_COMPASS
 
 class Upgrade private constructor(val type: Type, val level: Int) :
-    CustomItem(Identifier.of("galaxy", "upgrade/${type.id(level)}"), RECOVERY_COMPASS, maxStackSize = 1) {
+    CustomItem(ResourceLocation.fromNamespaceAndPath("galaxy", "upgrade/${type.id(level)}"), RECOVERY_COMPASS, maxStack = 1) {
     companion object {
         val BASE = registry.register(Upgrade(Type.BASE, 0))
         val COOLING_LV1 = registry.register(Upgrade(Type.COOLING, 1))
@@ -71,7 +71,7 @@ class Upgrade private constructor(val type: Type, val level: Int) :
         fun getFromItem(item: ItemStack): Upgrade? = CustomItemHelper.getItem(item) as? Upgrade
     }
 
-    override fun getName(): Text = translatable("item.Upgrade.Item", translatable(type.itemName))
+    override fun getName(): Component = translatable("item.Upgrade.Item", translatable(type.itemName))
         .also { if (level > 0) it.append(" Lv.${level}") }
 
     enum class Type(private val id: String, val itemName: String) {

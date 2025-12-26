@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2024
+ * Copyright (C) 2018-2025
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -42,8 +42,8 @@
  */
 package org.spongepowered.common.mixin.realtime.blockentity;
 
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -54,16 +54,16 @@ import org.spongepowered.common.mixin.realtime.accessor.AbstractFurnaceBlockEnti
 
 @Mixin(value = AbstractFurnaceBlockEntity.class, priority = 1001)
 public abstract class AbstractFurnaceBlockEntityMixin_RealTime {
-    @Redirect(method = "tick",
+    @Redirect(method = "serverTick",
         at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/block/entity/AbstractFurnaceBlockEntity;litTimeRemaining:I",
+            target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;litTimeRemaining:I",
             opcode = Opcodes.PUTFIELD,
             ordinal = 0
         )
     )
     private static void realTimeImpl$adjustForRealTimeBurnTime(AbstractFurnaceBlockEntity self, int value) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getLevel()).realTimeBridge$getRealTimeTicks();
 
         AbstractFurnaceBlockEntityAccessor accessor = (AbstractFurnaceBlockEntityAccessor) self;
         final int burnTime = accessor.getLitTimeRemaining();
@@ -75,37 +75,37 @@ public abstract class AbstractFurnaceBlockEntityMixin_RealTime {
     }
 
     @Redirect(
-        method = "tick",
-        at = @At(value = "FIELD", target = "Lnet/minecraft/block/entity/AbstractFurnaceBlockEntity;cookingTimeSpent:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
+        method = "serverTick",
+        at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;cookingTimer:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
     private static void realTimeImpl$adjustForRealTimeCookTime(final AbstractFurnaceBlockEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getLevel()).realTimeBridge$getRealTimeTicks();
 
         AbstractFurnaceBlockEntityAccessor accessor = (AbstractFurnaceBlockEntityAccessor) self;
-        accessor.setCookingTimeSpent(Math.min(accessor.getCookingTotalTime(), accessor.getCookingTimeSpent() + ticks));
+        accessor.setCookingTimer(Math.min(accessor.getCookingTotalTime(), accessor.getCookingTimer() + ticks));
     }
 
     @Redirect(
-        method = "tick",
+        method = "serverTick",
         at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/block/entity/AbstractFurnaceBlockEntity;cookingTimeSpent:I",
+            target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;cookingTimer:I",
             opcode = Opcodes.PUTFIELD
         ),
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lnet/minecraft/util/math/MathHelper;clamp(III)I"
+                target = "Lnet/minecraft/util/Mth;clamp(III)I"
             ),
             to = @At(
                 value = "INVOKE",
-                target = "Lnet/minecraft/server/world/ServerWorld;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z"
+                target = "Lnet/minecraft/server/level/ServerLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"
             )
         )
     )
     private static void realTimeImpl$adjustForRealTimeCookTimeCooldown(final AbstractFurnaceBlockEntity self, final int modifier) {
-        final int ticks = (int) ((RealTimeTrackingBridge) self.getWorld()).realTimeBridge$getRealTimeTicks();
+        final int ticks = (int) ((RealTimeTrackingBridge) self.getLevel()).realTimeBridge$getRealTimeTicks();
 
         AbstractFurnaceBlockEntityAccessor accessor = (AbstractFurnaceBlockEntityAccessor) self;
-        accessor.setCookingTimeSpent(MathHelper.clamp(accessor.getCookingTimeSpent() - (2 * ticks), 0, accessor.getCookingTotalTime()));
+        accessor.setCookingTimer(Mth.clamp(accessor.getCookingTimer() - (2 * ticks), 0, accessor.getCookingTotalTime()));
     }
 }

@@ -20,17 +20,17 @@ package one.oktw.galaxy.command.commands.admin
 
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import net.minecraft.component.DataComponentTypes.ITEM_NAME
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.inventory.SimpleInventory
-import net.minecraft.item.ItemStack
-import net.minecraft.screen.ScreenHandlerType
-import net.minecraft.screen.slot.Slot
-import net.minecraft.screen.slot.SlotActionType
-import net.minecraft.server.command.CommandManager
-import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.text.Text
-import net.minecraft.util.Identifier
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.Commands
+import net.minecraft.core.component.DataComponents.ITEM_NAME
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.MenuType
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
 import one.oktw.galaxy.item.CustomItemBrowser
@@ -43,30 +43,30 @@ import one.oktw.galaxy.item.gui.GuiModelBuilder
 class Creative {
     private val previousPageButton = Gui(
         GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_UP).build(),
-        Text.translatable("UI.Button.PreviousPage")
+        Component.translatable("UI.Button.PreviousPage")
     ).createItemStack()
     private val nextPageButton = Gui(
         GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_DOWN).build(),
-        Text.translatable("UI.Button.NextPage")
+        Component.translatable("UI.Button.NextPage")
     ).createItemStack()
 
     private fun getListGui(): GUI {
         val itemBrowser = CustomItemBrowser()
-        val inventory = SimpleInventory(6 * 3)
-        return GUI.Builder(ScreenHandlerType.GENERIC_9X3)
-            .setTitle(Text.of("Galaxy"))
-            .setBackground("A", Identifier.of("galaxy", "gui_font/container_layout/ht_crafting_table"))
+        val inventory = SimpleContainer(6 * 3)
+        return GUI.Builder(MenuType.GENERIC_9x3)
+            .setTitle(Component.literal("Galaxy"))
+            .setBackground("A", ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/container_layout/ht_crafting_table"))
             .apply {
                 var i = 0
                 for (y in 0..2) for (x in 2..7) {
                     addSlot(x, y, object : Slot(inventory, i++, 0, 0) {
                         val slotIndex = i - 1
 
-                        override fun canInsert(stack: ItemStack) = false
+                        override fun mayPlace(stack: ItemStack) = false
 
-                        override fun onTakeItem(player: PlayerEntity, stack: ItemStack) {
-                            setStackNoCallbacks(itemBrowser.getCategoryItems()[slotIndex].createItemStack()) // refill
-                            super.onTakeItem(player, stack)
+                        override fun onTake(player: Player, stack: ItemStack) {
+                            set(itemBrowser.getCategoryItems()[slotIndex].createItemStack()) // refill
+                            super.onTake(player, stack)
                         }
                     })
                     setSkipPick(x, y)
@@ -87,9 +87,9 @@ class Creative {
 
                         // Category Item
                         val categoryItem = itemBrowser.getCategoryItems()
-                        inventory.clear()
+                        inventory.clearContent()
                         for (i in 0..categoryItem.lastIndex) {
-                            inventory.setStack(i, categoryItem[i].createItemStack())
+                            inventory.setItem(i, categoryItem[i].createItemStack())
                         }
 
                         // Category Paging
@@ -106,31 +106,31 @@ class Creative {
                 // Category Paging
                 addBinding(0, 0) {
                     cancel = true
-                    if (action == SlotActionType.PICKUP) itemBrowser.previousCategory()
+                    if (action == ClickType.PICKUP) itemBrowser.previousCategory()
                 }
                 addBinding(0, 1) {
                     cancel = true // Cancel creative clone item
                 }
                 addBinding(0, 2) {
                     cancel = true
-                    if (action == SlotActionType.PICKUP) itemBrowser.nextCategory()
+                    if (action == ClickType.PICKUP) itemBrowser.nextCategory()
                 }
 
                 // Handle Pages
                 addBinding(8, 0) {
                     cancel = true
-                    if (action == SlotActionType.PICKUP) itemBrowser.previousPage()
+                    if (action == ClickType.PICKUP) itemBrowser.previousPage()
                 }
                 addBinding(8, 2) {
                     cancel = true
-                    if (action == SlotActionType.PICKUP) itemBrowser.nextPage()
+                    if (action == ClickType.PICKUP) itemBrowser.nextPage()
                 }
             }
     }
 
-    val command: LiteralArgumentBuilder<ServerCommandSource> = CommandManager.literal("creative")
+    val command: LiteralArgumentBuilder<CommandSourceStack> = Commands.literal("creative")
         .executes {
-            val player = it.source.playerOrThrow
+            val player = it.source.playerOrException
             GUISBackStackManager.openGUI(player, getListGui())
             return@executes Command.SINGLE_SUCCESS
         }

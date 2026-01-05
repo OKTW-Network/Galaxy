@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -31,7 +31,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.storage.IOWorker;
 import net.minecraft.world.level.chunk.storage.IOWorker.Priority;
 import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
-import one.oktw.galaxy.util.KotlinCoroutineTaskExecutor;
+import one.oktw.galaxy.util.VirtualTaskExecutor;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
@@ -76,7 +76,7 @@ public abstract class MixinAsyncChunk_IOWorker {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void parallelExecutor(RegionStorageInfo storageKey, Path directory, boolean dsync, CallbackInfo ci) {
         pendingWrites = new ConcurrentSkipListMap<>(Comparator.comparingLong(ChunkPos::toLong));
-        consecutiveExecutor = new KotlinCoroutineTaskExecutor(3 /* FOREGROUND,BACKGROUND,SHUTDOWN */, "IOWorker-" + storageKey.type());
+        consecutiveExecutor = new VirtualTaskExecutor(3 /* FOREGROUND,BACKGROUND,SHUTDOWN */, "IOWorker-" + storageKey.type());
     }
 
     /**

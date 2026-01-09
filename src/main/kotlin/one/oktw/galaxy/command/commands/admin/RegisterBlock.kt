@@ -22,7 +22,7 @@ import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
-import net.minecraft.commands.arguments.ResourceLocationArgument
+import net.minecraft.commands.arguments.IdentifierArgument
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument
 import net.minecraft.network.chat.Component
 import one.oktw.galaxy.block.CustomBlock
@@ -37,7 +37,7 @@ class RegisterBlock {
     }
 
     private val block =
-        Commands.argument("block", ResourceLocationArgument.id())
+        Commands.argument("block", IdentifierArgument.id())
             .suggests { _, builder ->
                 CustomBlock.registry.getAll().keys.forEach { identifier ->
                     if (identifier.toString().contains(builder.remaining, ignoreCase = true)) {
@@ -47,7 +47,7 @@ class RegisterBlock {
                 return@suggests builder.buildFuture()
             }
             .executes {
-                val identifier = ResourceLocationArgument.getId(it, "block")
+                val identifier = IdentifierArgument.getId(it, "block")
                 val block = CustomBlock.registry.get(identifier)
 
                 if (block == null) {

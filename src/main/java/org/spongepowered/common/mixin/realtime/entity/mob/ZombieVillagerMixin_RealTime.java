@@ -42,7 +42,7 @@
  */
 package org.spongepowered.common.mixin.realtime.entity.mob;
 
-import net.minecraft.world.entity.monster.ZombieVillager;
+import net.minecraft.world.entity.monster.zombie.ZombieVillager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -59,7 +59,7 @@ public abstract class ZombieVillagerMixin_RealTime extends LivingEntityMixin_Rea
         method = "tick",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/monster/ZombieVillager;getConversionProgress()I",
+            target = "Lnet/minecraft/world/entity/monster/zombie/ZombieVillager;getConversionProgress()I",
             ordinal = 0
         )
     )

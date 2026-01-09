@@ -18,11 +18,11 @@
 
 package one.oktw.galaxy.util
 
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import java.util.*
 
 open class CustomRegistry<T : Registrable> {
-    private val registry = LinkedHashMap<ResourceLocation, T>()
+    private val registry = LinkedHashMap<Identifier, T>()
 
     @Throws(IllegalArgumentException::class)
     open fun register(obj: T): T {
@@ -33,7 +33,7 @@ open class CustomRegistry<T : Registrable> {
         return obj
     }
 
-    open fun get(identifier: ResourceLocation): T? = registry[identifier]
+    open fun get(identifier: Identifier): T? = registry[identifier]
 
-    open fun getAll(): Map<ResourceLocation, T> = Collections.unmodifiableMap(registry)
+    open fun getAll(): Map<Identifier, T> = Collections.unmodifiableMap(registry)
 }

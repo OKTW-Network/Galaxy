@@ -22,7 +22,7 @@ import io.netty.buffer.Unpooled.wrappedBuffer
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import one.oktw.galaxy.proxy.api.ProxyAPI
 import one.oktw.galaxy.proxy.api.ProxyAPI.encode
 import one.oktw.galaxy.proxy.api.packet.Packet
@@ -30,7 +30,7 @@ import one.oktw.galaxy.proxy.api.packet.Packet
 @JvmRecord
 data class ProxyChatPayload(val packet: Packet) : CustomPacketPayload {
     companion object {
-        private val PROXY_CHAT_IDENTIFIER = ResourceLocation.fromNamespaceAndPath("galaxy", "proxy-chat")
+        private val PROXY_CHAT_IDENTIFIER = Identifier.fromNamespaceAndPath("galaxy", "proxy-chat")
         val ID = CustomPacketPayload.Type<ProxyChatPayload>(PROXY_CHAT_IDENTIFIER)
         val CODEC: StreamCodec<FriendlyByteBuf, ProxyChatPayload> = StreamCodec.ofMember(
             { value, buf -> buf.writeBytes(wrappedBuffer(encode(value.packet))) },

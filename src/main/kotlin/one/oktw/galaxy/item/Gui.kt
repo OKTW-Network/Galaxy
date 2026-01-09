@@ -19,15 +19,15 @@
 package one.oktw.galaxy.item
 
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Items.DIAMOND_HOE
 import net.minecraft.world.item.component.CustomModelData
 
 class Gui(customModelData: CustomModelData, private val name: Component? = null) :
     CustomItem(
-        ResourceLocation.fromNamespaceAndPath("galaxy", "gui"),
+        Identifier.fromNamespaceAndPath("galaxy", "gui"),
         DIAMOND_HOE,
-        itemModel = ResourceLocation.fromNamespaceAndPath("galaxy", "gui/complex"),
+        itemModel = Identifier.fromNamespaceAndPath("galaxy", "gui/complex"),
         customModelData = customModelData,
         hideTooltip = name == null
     ) {

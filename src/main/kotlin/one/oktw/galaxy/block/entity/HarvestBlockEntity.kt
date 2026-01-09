@@ -25,7 +25,7 @@ import net.minecraft.core.component.DataComponentGetter
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.*
@@ -62,7 +62,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
     private var rangeCache = 0
 
     private val gui = GUI.Builder(MenuType.GENERIC_9x3).setTitle(Component.translatable("block.HARVEST"))
-        .setBackground("A", ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/container_layout/harvest")).blockEntity(this).apply {
+        .setBackground("A", Identifier.fromNamespaceAndPath("galaxy", "gui_font/container_layout/harvest")).blockEntity(this).apply {
             addSlot(4, 0, object : Slot(this@HarvestBlockEntity, TOOL_SLOT.first, 0, 0) { // Tool
                 override fun mayPlace(item: ItemStack) = isHoe(item)
             })

@@ -20,7 +20,7 @@ package one.oktw.galaxy.block.entity
 
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.Container
 import net.minecraft.world.InteractionHand
@@ -65,7 +65,7 @@ class TrashcanBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: It
         val gui = GUI
             .Builder(MenuType.GENERIC_9x6)
             .setTitle(Component.translatable("block.TRASHCAN"))
-            .setBackground("A", ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/container_layout/trashcan"))
+            .setBackground("A", Identifier.fromNamespaceAndPath("galaxy", "gui_font/container_layout/trashcan"))
             .blockEntity(this)
             .apply {
                 var i = 0

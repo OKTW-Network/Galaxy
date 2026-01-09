@@ -24,7 +24,7 @@ import net.minecraft.core.component.DataComponentGetter
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.Container
 import net.minecraft.world.ContainerHelper
@@ -70,7 +70,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
 
     private val gui = GUI.Builder(MenuType.GENERIC_9x6)
         .setTitle(Component.literal("Test GUI"))
-        .setBackground("A", ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/container_layout/test_gui"))
+        .setBackground("A", Identifier.fromNamespaceAndPath("galaxy", "gui_font/container_layout/test_gui"))
         .blockEntity(this)
         .apply {
             var i = 0
@@ -94,7 +94,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
 
     private val gui2 = GUI.Builder(MenuType.GENERIC_9x4)
         .setTitle(Component.literal("Test GUI2"))
-        .setBackground("B", ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/container_layout/test_gui"))
+        .setBackground("B", Identifier.fromNamespaceAndPath("galaxy", "gui_font/container_layout/test_gui"))
         .blockEntity(this)
         .apply {
             var i = 0
@@ -111,7 +111,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         }
     private val gui3 = GUI.Builder(MenuType.ANVIL)
         .setTitle(Component.literal("Test GUI3"))
-        .setBackground("C", ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/container_layout/test_gui"))
+        .setBackground("C", Identifier.fromNamespaceAndPath("galaxy", "gui_font/container_layout/test_gui"))
         .blockEntity(this).build()
         .apply {
             editInventory {

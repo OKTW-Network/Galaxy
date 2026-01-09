@@ -22,7 +22,7 @@ import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
-import net.minecraft.commands.arguments.ResourceLocationArgument
+import net.minecraft.commands.arguments.IdentifierArgument
 import net.minecraft.network.chat.Component
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
@@ -31,7 +31,7 @@ import one.oktw.galaxy.item.CustomItem
 class GetItem {
     val command: LiteralArgumentBuilder<CommandSourceStack> = Commands.literal("getItem")
         .then(
-            Commands.argument("item", ResourceLocationArgument.id())
+            Commands.argument("item", IdentifierArgument.id())
                 .suggests { _, builder ->
                     CustomItem.registry.getAll().keys.forEach { identifier ->
                         if (identifier.toString().contains(builder.remaining, ignoreCase = true)) {
@@ -41,7 +41,7 @@ class GetItem {
                     return@suggests builder.buildFuture()
                 }
                 .executes {
-                    val identifier = ResourceLocationArgument.getId(it, "item")
+                    val identifier = IdentifierArgument.getId(it, "item")
                     val item = CustomItem.registry.get(identifier)
 
                     if (item == null) {

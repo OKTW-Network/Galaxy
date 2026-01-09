@@ -18,8 +18,8 @@
 
 package one.oktw.galaxy.util
 
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 interface Registrable {
-    val identifier: ResourceLocation
+    val identifier: Identifier
 }

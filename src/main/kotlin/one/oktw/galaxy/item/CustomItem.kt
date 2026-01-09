@@ -22,7 +22,7 @@ import it.unimi.dsi.fastutil.objects.ReferenceSortedSets
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Rarity
@@ -34,9 +34,9 @@ import one.oktw.galaxy.util.CustomRegistry
 import one.oktw.galaxy.util.Registrable
 
 abstract class CustomItem(
-    override val identifier: ResourceLocation,
+    override val identifier: Identifier,
     private val baseItem: Item,
-    private val itemModel: ResourceLocation = identifier,
+    private val itemModel: Identifier = identifier,
     private val customModelData: CustomModelData? = null,
     private val maxStack: Int = 64,
     private val hideTooltip: Boolean = false,

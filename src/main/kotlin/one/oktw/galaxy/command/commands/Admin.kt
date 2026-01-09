@@ -31,7 +31,7 @@ class Admin : Command {
     override fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
         dispatcher.register(
             Commands.literal("admin")
-                .requires { source -> source.hasPermission(2) }
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Creative().command)
                 .then(GetItem().command)
                 .then(RegisterBlock.command)

@@ -24,7 +24,7 @@ import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.core.component.DataComponents.ITEM_NAME
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.ClickType
@@ -55,7 +55,7 @@ class Creative {
         val inventory = SimpleContainer(6 * 3)
         return GUI.Builder(MenuType.GENERIC_9x3)
             .setTitle(Component.literal("Galaxy"))
-            .setBackground("A", ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/container_layout/ht_crafting_table"))
+            .setBackground("A", Identifier.fromNamespaceAndPath("galaxy", "gui_font/container_layout/ht_crafting_table"))
             .apply {
                 var i = 0
                 for (y in 0..2) for (x in 2..7) {

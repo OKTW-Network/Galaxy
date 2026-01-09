@@ -20,12 +20,12 @@ package one.oktw.galaxy.item
 
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Component.translatable
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items.RECOVERY_COMPASS
 
 class Upgrade private constructor(val type: Type, val level: Int) :
-    CustomItem(ResourceLocation.fromNamespaceAndPath("galaxy", "upgrade/${type.id(level)}"), RECOVERY_COMPASS, maxStack = 1) {
+    CustomItem(Identifier.fromNamespaceAndPath("galaxy", "upgrade/${type.id(level)}"), RECOVERY_COMPASS, maxStack = 1) {
     companion object {
         val BASE = registry.register(Upgrade(Type.BASE, 0))
         val COOLING_LV1 = registry.register(Upgrade(Type.COOLING, 1))

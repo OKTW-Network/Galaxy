@@ -19,10 +19,10 @@
 package one.oktw.galaxy.item
 
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Items.DIAMOND_HOE
 
-class Misc private constructor(id: String) : CustomItem(ResourceLocation.fromNamespaceAndPath("galaxy", "misc/$id"), DIAMOND_HOE, hideTooltip = true) {
+class Misc private constructor(id: String) : CustomItem(Identifier.fromNamespaceAndPath("galaxy", "misc/$id"), DIAMOND_HOE, hideTooltip = true) {
     companion object {
         val PLACEHOLDER = registry.register(Misc("placeholder"))
     }

@@ -25,7 +25,7 @@ import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.FontDescription
 import net.minecraft.network.chat.MutableComponent
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.Container
 import net.minecraft.world.MenuProvider
@@ -56,13 +56,13 @@ class GUI private constructor(
     MenuProvider {
     companion object {
         val GUI_FONT_SHIFT_CHEST_START: Component = Component.literal("<")
-            .withStyle { it.withFont(FontDescription.Resource(ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/shift"))) }
+            .withStyle { it.withFont(FontDescription.Resource(Identifier.fromNamespaceAndPath("galaxy", "gui_font/shift"))) }
         val GUI_FONT_SHIFT_CHEST_END: Component = Component.literal(";>")
-            .withStyle { it.withFont(FontDescription.Resource(ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/shift"))) }
+            .withStyle { it.withFont(FontDescription.Resource(Identifier.fromNamespaceAndPath("galaxy", "gui_font/shift"))) }
         val GUI_FONT_SHIFT_ANVIL_START: Component = Component.literal("⟨")
-            .withStyle { it.withFont(FontDescription.Resource(ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/shift"))) }
+            .withStyle { it.withFont(FontDescription.Resource(Identifier.fromNamespaceAndPath("galaxy", "gui_font/shift"))) }
         val GUI_FONT_SHIFT_ANVIL_END: Component = Component.literal(";⟩")
-            .withStyle { it.withFont(FontDescription.Resource(ResourceLocation.fromNamespaceAndPath("galaxy", "gui_font/shift"))) }
+            .withStyle { it.withFont(FontDescription.Resource(Identifier.fromNamespaceAndPath("galaxy", "gui_font/shift"))) }
     }
 
     private val inventory = when (type) {
@@ -158,7 +158,7 @@ class GUI private constructor(
             return this
         }
 
-        fun setBackground(char: String, font: ResourceLocation): Builder {
+        fun setBackground(char: String, font: Identifier): Builder {
             val background = Component.empty()
                 .append(if (type == ANVIL) GUI_FONT_SHIFT_ANVIL_START else GUI_FONT_SHIFT_CHEST_START)
                 .append(Component.literal(char).withStyle { it.withFont(FontDescription.Resource(font)).withColor(ChatFormatting.WHITE) })

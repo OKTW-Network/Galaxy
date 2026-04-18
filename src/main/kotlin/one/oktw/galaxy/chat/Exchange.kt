@@ -20,7 +20,7 @@ package one.oktw.galaxy.chat
 
 import com.google.gson.GsonBuilder
 import com.mojang.serialization.JsonOps
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.createS2CPacket
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.core.RegistryAccess
 import net.minecraft.network.chat.ComponentSerialization
 import one.oktw.galaxy.Main
@@ -40,18 +40,17 @@ class Exchange {
 
         event.cancel = true
 
-        event.player.connection.send(
-            createS2CPacket(
-                ProxyChatPayload(
-                    MessageSend(
-                        sender = event.player.uuid,
-                        message = gson.toJson(
-                            ComponentSerialization.CODEC
-                                .encodeStart(registries.createSerializationContext(JsonOps.INSTANCE), event.message)
-                                .orThrow
-                        ),
-                        targets = listOf(ProxyAPI.globalChatChannel)
-                    )
+        ServerPlayNetworking.send(
+            event.player,
+            ProxyChatPayload(
+                MessageSend(
+                    sender = event.player.uuid,
+                    message = gson.toJson(
+                        ComponentSerialization.CODEC
+                            .encodeStart(registries.createSerializationContext(JsonOps.INSTANCE), event.message)
+                            .orThrow
+                    ),
+                    targets = listOf(ProxyAPI.globalChatChannel)
                 )
             )
         )

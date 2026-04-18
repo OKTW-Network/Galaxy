@@ -75,7 +75,7 @@ public abstract class MixinAsyncChunk_IOWorker {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void parallelExecutor(RegionStorageInfo storageKey, Path directory, boolean dsync, CallbackInfo ci) {
-        pendingWrites = new ConcurrentSkipListMap<>(Comparator.comparingLong(ChunkPos::toLong));
+        pendingWrites = new ConcurrentSkipListMap<>(Comparator.comparingLong(ChunkPos::pack));
         consecutiveExecutor = new KotlinCoroutineTaskExecutor(3 /* FOREGROUND,BACKGROUND,SHUTDOWN */, "IOWorker-" + storageKey.type());
     }
 
@@ -87,7 +87,7 @@ public abstract class MixinAsyncChunk_IOWorker {
     private void storePendingChunk() {
         if (!this.pendingWrites.isEmpty() && !writeLock.getAndSet(true)) {
             HashMap<Long, ArrayList<Tuple<ChunkPos, IOWorker.PendingStore>>> map = new HashMap<>();
-            pendingWrites.forEach((pos, result) -> map.computeIfAbsent(ChunkPos.asLong(pos.getRegionX(), pos.getRegionZ()), k -> new ArrayList<>()).add(new Tuple<>(pos, result)));
+            pendingWrites.forEach((pos, result) -> map.computeIfAbsent(ChunkPos.pack(pos.getRegionX(), pos.getRegionZ()), k -> new ArrayList<>()).add(new Tuple<>(pos, result)));
             map.values().forEach(list ->
                 consecutiveExecutor.schedule(new StrictQueue.RunnableWithPriority(Priority.FOREGROUND.ordinal(), () -> list.forEach(pair -> runStore(pair.getA(), pair.getB()))))
             );

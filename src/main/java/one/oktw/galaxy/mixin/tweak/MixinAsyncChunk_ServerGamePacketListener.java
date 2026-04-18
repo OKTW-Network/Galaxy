@@ -54,7 +54,7 @@ public abstract class MixinAsyncChunk_ServerGamePacketListener {
 
         int x = SectionPos.posToSectionCoord(clampHorizontal(packet.getX(this.player.getX())));
         int z = SectionPos.posToSectionCoord(clampHorizontal(packet.getZ(this.player.getZ())));
-        if (!player.level().getChunkSource().isPositionTicking(ChunkPos.asLong(x, z))) {
+        if (!player.level().getChunkSource().isPositionTicking(ChunkPos.pack(x, z))) {
             player.setDeltaMovement(Vec3.ZERO);
             teleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYRot(), this.player.getXRot());
             ci.cancel();

@@ -24,8 +24,8 @@ import net.minecraft.world.item.ItemStack
 import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.block.entity.TrashcanBlockEntity
 
-class TrashcanBlock(id: String, modelItem: ItemStack) : ModelCustomBlock(Identifier.fromNamespaceAndPath("galaxy", "block/$id"), modelItem) {
+class TrashcanBlock(id: String, modelItem: () -> ItemStack) : ModelCustomBlock(Identifier.fromNamespaceAndPath("galaxy", "block/$id"), modelItem) {
     override fun createBlockEntity(pos: BlockPos): CustomBlockEntity {
-        return TrashcanBlockEntity(blockEntityType, pos, modelItem)
+        return TrashcanBlockEntity(blockEntityType, pos, modelItem())
     }
 }

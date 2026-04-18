@@ -28,7 +28,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
@@ -97,20 +97,20 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                 // Category Paging
                 addBinding(0, 0) {
                     cancel = true
-                    if (action == ClickType.PICKUP) itemBrowser.previousCategory()
+                    if (action == ContainerInput.PICKUP) itemBrowser.previousCategory()
                 }
                 addBinding(0, 1) {
                     cancel = true // Cancel creative clone item
                 }
                 addBinding(0, 2) {
                     cancel = true
-                    if (action == ClickType.PICKUP) itemBrowser.nextCategory()
+                    if (action == ContainerInput.PICKUP) itemBrowser.nextCategory()
                 }
 
                 // Handle Items
                 addBinding(2..7, 0..2) {
                     cancel = true
-                    if (action != ClickType.PICKUP) return@addBinding Unit
+                    if (action != ContainerInput.PICKUP) return@addBinding Unit
                     // Slot is 6 x 3
                     val index = this.y * 6 + (this.x - 2)
                     val item = itemBrowser.getItemByIndex(index) ?: return@addBinding Unit
@@ -121,11 +121,11 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                 // Handle Pages
                 addBinding(8, 0) {
                     cancel = true
-                    if (action == ClickType.PICKUP) itemBrowser.previousPage()
+                    if (action == ContainerInput.PICKUP) itemBrowser.previousPage()
                 }
                 addBinding(8, 2) {
                     cancel = true
-                    if (action == ClickType.PICKUP) itemBrowser.nextPage()
+                    if (action == ContainerInput.PICKUP) itemBrowser.nextPage()
                 }
             }
     }
@@ -160,7 +160,7 @@ class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelI
                     }
                     addBinding(7, 1) {
                         // Allow creative clone true item
-                        if (action == ClickType.CLONE && player.isCreative) {
+                        if (action == ContainerInput.CLONE && player.isCreative) {
                             cancel = true
                             val screen = player.containerMenu
                             if (screen.carried.isEmpty) screen.carried = recipe.outputItem.createItemStack().apply { count = maxStackSize }

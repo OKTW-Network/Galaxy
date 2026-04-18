@@ -31,7 +31,7 @@ import net.minecraft.world.ContainerHelper
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
@@ -84,11 +84,11 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
             }
             addBinding(4, 2) {
                 cancel = true
-                if (action == ClickType.PICKUP) GUISBackStackManager.openGUI(player, gui2)
+                if (action == ContainerInput.PICKUP) GUISBackStackManager.openGUI(player, gui2)
             }
             addBinding(2, 2) {
                 cancel = true
-                if (action == ClickType.PICKUP) GUISBackStackManager.openGUI(player, gui3)
+                if (action == ContainerInput.PICKUP) GUISBackStackManager.openGUI(player, gui3)
             }
         }
 
@@ -106,7 +106,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
             }
             addBinding(4, 3) {
                 cancel = true
-                if (action == ClickType.PICKUP) GUISBackStackManager.closeAll(player)
+                if (action == ContainerInput.PICKUP) GUISBackStackManager.closeAll(player)
             }
         }
     private val gui3 = GUI.Builder(MenuType.ANVIL)
@@ -121,7 +121,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
             }
             addBinding(2) {
                 cancel = true
-                if (action == ClickType.PICKUP) player.sendSystemMessage(Component.literal(inputText))
+                if (action == ContainerInput.PICKUP) player.sendSystemMessage(Component.literal(inputText))
             }
         }
 

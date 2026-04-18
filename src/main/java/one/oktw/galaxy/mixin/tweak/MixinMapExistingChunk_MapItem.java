@@ -36,8 +36,8 @@ public abstract class MixinMapExistingChunk_MapItem {
     private LevelChunk getExistingChunk(Level world, int x, int z) {
         ServerLevel serverWorld = (ServerLevel) world;
         ChunkPos chunkPos = new ChunkPos(x, z);
-        if (serverWorld.getChunkSource().isPositionTicking(chunkPos.toLong())) { // TODO check this
-            LevelChunk chunk = world.getChunkSource().getChunkNow(chunkPos.x, chunkPos.z);
+        if (serverWorld.getChunkSource().isPositionTicking(chunkPos.pack())) { // TODO check this
+            LevelChunk chunk = world.getChunkSource().getChunkNow(x, z);
             if (chunk != null) return chunk;
         }
         return new EmptyLevelChunk(world, new ChunkPos(x, z), world.registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS));

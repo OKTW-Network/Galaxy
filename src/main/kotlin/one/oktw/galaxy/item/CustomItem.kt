@@ -54,24 +54,8 @@ abstract class CustomItem(
     }
 
     open val cacheable = true
-    private lateinit var cacheItemStack: ItemStack
-
-    abstract fun getName(): Component?
-
-    open fun writeCustomNbt(nbt: CompoundTag) {
-        nbt.putString("custom_item_identifier", identifier.toString())
-    }
-
-    open fun readCustomNbt(nbt: CompoundTag): CustomItem {
-        require(nbt.getStringOr("custom_item_identifier", "") == identifier.toString())
-
-        return this
-    }
-
-    open fun createItemStack(): ItemStack {
-        if (cacheable && this::cacheItemStack.isInitialized) return cacheItemStack.copy()
-
-        return ItemStack(baseItem).apply {
+    private val cacheItemStack: ItemStack by lazy {
+        ItemStack(baseItem).apply {
             set(DataComponents.ITEM_MODEL, itemModel)
             set(DataComponents.UNBREAKABLE, net.minecraft.util.Unit.INSTANCE)
             set(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers(emptyList()))
@@ -97,6 +81,20 @@ abstract class CustomItem(
                     nbt.put("galaxy_data", galaxyNbt)
                 }
             }
-        }.also { if (cacheable) cacheItemStack = it.copy() }
+        }
     }
+
+    abstract fun getName(): Component?
+
+    open fun writeCustomNbt(nbt: CompoundTag) {
+        nbt.putString("custom_item_identifier", identifier.toString())
+    }
+
+    open fun readCustomNbt(nbt: CompoundTag): CustomItem {
+        require(nbt.getStringOr("custom_item_identifier", "") == identifier.toString())
+
+        return this
+    }
+
+    open fun createItemStack(): ItemStack = if (cacheable) cacheItemStack.copy() else ItemStack(baseItem)
 }

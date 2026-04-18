@@ -20,6 +20,7 @@ package one.oktw.galaxy.block.event
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.advancements.CriteriaTriggers
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
@@ -39,11 +40,9 @@ class BlockEvents {
     private val usedLock = WeakHashMap<ServerPlayer, Int>()
 
     init {
-        ServerTickEvents.END_WORLD_TICK.register(
-            ServerTickEvents.EndWorldTick {
-                usedLock.entries.removeIf { (_, v) -> v + 3 < it.server.tickCount } // Packet task max delay 3 tick
-            }
-        )
+        ServerTickEvents.END_LEVEL_TICK.register { serverWorld: net.minecraft.server.level.ServerLevel ->
+            usedLock.entries.removeIf { (_, v) -> v + 3 < serverWorld.server.tickCount } // Packet task max delay 3 tick
+        }
     }
 
     @EventListener(true)

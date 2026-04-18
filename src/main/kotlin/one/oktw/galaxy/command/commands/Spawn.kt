@@ -56,7 +56,7 @@ class Spawn : Command {
 
         main?.launch {
             for (i in 0..4) {
-                originPlayer.displayClientMessage(
+                originPlayer.sendSystemMessage(
                     Component.translatable("Respond.commandCountdown", 5 - i).withStyle { it.withColor(ChatFormatting.GREEN) },
                     true
                 )
@@ -68,13 +68,13 @@ class Spawn : Command {
                 lock -= originPlayer.uuid
                 return@launch
             }
-            player.displayClientMessage(Component.translatable("Respond.TeleportStart").withStyle { it.withColor(ChatFormatting.GREEN) }, true)
+            player.sendSystemMessage(Component.translatable("Respond.TeleportStart").withStyle { it.withColor(ChatFormatting.GREEN) }, true)
 
             val world = player.level()
             val type = world.dimension()
 
             if (type == Level.NETHER) {
-                player.displayClientMessage(Component.translatable("Respond.TeleportNothing").withStyle { it.withColor(ChatFormatting.RED) }, true)
+                player.sendSystemMessage(Component.translatable("Respond.TeleportNothing").withStyle { it.withColor(ChatFormatting.RED) }, true)
                 lock -= player.uuid
                 return@launch
             }

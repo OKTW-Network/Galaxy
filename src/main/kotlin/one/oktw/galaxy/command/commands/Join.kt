@@ -102,17 +102,17 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                 if (data.uuid != targetPlayer.id) return
 
                 when (data.stage) {
-                    Queue -> sourcePlayer.displayClientMessage(Component.literal("正在等待星系載入"), false)
-                    Creating -> sourcePlayer.displayClientMessage(Component.literal("星系載入中..."), false)
-                    Starting -> sourcePlayer.displayClientMessage(Component.literal("星系正在啟動請稍後..."), false)
+                    Queue -> sourcePlayer.sendSystemMessage(Component.literal("正在等待星系載入"), false)
+                    Creating -> sourcePlayer.sendSystemMessage(Component.literal("星系載入中..."), false)
+                    Starting -> sourcePlayer.sendSystemMessage(Component.literal("星系正在啟動請稍後..."), false)
                     Started -> {
-                        sourcePlayer.displayClientMessage(Component.literal("星系已載入！"), false)
+                        sourcePlayer.sendSystemMessage(Component.literal("星系已載入！"), false)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }
 
                     Failed -> {
-                        sourcePlayer.displayClientMessage(Component.literal("星系載入失敗，請聯絡開發團隊！"), false)
+                        sourcePlayer.sendSystemMessage(Component.literal("星系載入失敗，請聯絡開發團隊！"), false)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }

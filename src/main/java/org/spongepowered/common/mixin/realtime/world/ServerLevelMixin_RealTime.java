@@ -75,19 +75,14 @@ public abstract class ServerLevelMixin_RealTime extends Level implements RealTim
     @Nullable
     public abstract MinecraftServer getServer();
 
-    @Shadow
-    public abstract void setDayTime(long timeOfDay);
+    // setDayTime was removed in 26.x - the realtime tick feature is non-functional
+    // @Shadow public abstract void setDayTime(long timeOfDay);
 
     @Inject(method = "tickTime", at = @At("HEAD"))
     private void realTimeImpl$fixTimeOfDayForRealTime(CallbackInfo ci) {
-        if (this.serverLevelData.getGameRules().get(GameRules.ADVANCE_TIME)) {
-            // Subtract the one the original tick method is going to add
-            long diff = this.realTimeBridge$getRealTimeTicks() - 1;
-            // Don't set if we're not changing it as other mods might be listening for changes
-            if (diff > 0) {
-                this.setDayTime(this.levelData.getDayTime() + diff);
-            }
-        }
+        // Note: In 26.x, getDayTime()/setDayTime() were removed from Level/ServerLevel.
+        // ADVANCE_TIME gamerule check and day time adjustment would need new implementation.
+        // This realtime feature may be partially non-functional in 26.x.
     }
 
     @Override

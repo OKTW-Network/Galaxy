@@ -25,6 +25,7 @@ import net.fabricmc.api.DedicatedServerModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
+import net.minecraft.core.RegistryAccess
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.server.dedicated.DedicatedServer
 import one.oktw.galaxy.block.CustomBlock
@@ -84,14 +85,14 @@ class Main : DedicatedServerModInitializer, CoroutineScope {
 
             // Register Custom Payload
             // Register Proxy Packet (C2S: Send, S2C: Receive)
-            PayloadTypeRegistry.playC2S().register(ProxyAPIPayload.ID, ProxyAPIPayload.CODEC)
-            PayloadTypeRegistry.playS2C().register(ProxyAPIPayload.ID, ProxyAPIPayload.CODEC)
+            PayloadTypeRegistry.serverboundPlay().register(ProxyAPIPayload.ID, ProxyAPIPayload.CODEC)
+            PayloadTypeRegistry.clientboundPlay().register(ProxyAPIPayload.ID, ProxyAPIPayload.CODEC)
             // Register Event
             ServerPlayNetworking.registerGlobalReceiver(ProxyAPIPayload.ID) { payload, context ->
                 eventManager.emit(ProxyResponseEvent(context.player(), payload.packet))
             }
             // Register Proxy Chat Packet
-            PayloadTypeRegistry.playS2C().register(ProxyChatPayload.ID, ProxyChatPayload.CODEC)
+            PayloadTypeRegistry.clientboundPlay().register(ProxyChatPayload.ID, ProxyChatPayload.CODEC)
 
             //Events
             eventManager.register(Exchange())

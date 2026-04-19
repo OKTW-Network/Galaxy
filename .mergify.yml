@@ -1,9 +1,9 @@
 queue_rules:
   - name: default
     queue_conditions:
-    - and:
-        - check-success = Docker-image
-        - check-success = Build
+      - and:
+          - check-success = Docker-image
+          - check-success = Build
 
 merge_queue:
   max_parallel_checks: 1
@@ -32,3 +32,5 @@ pull_request_rules:
     actions:
       queue:
         name: default
+merge_protections_settings:
+  reporting_method: check-runs

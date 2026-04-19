@@ -11,8 +11,8 @@ val version = "0.0.1"
 val group = "one.oktw"
 
 val minecraftVersion = "26.1.2"
-val fabricLoaderVersion = "0.19.1"
-val fabricAPIVersion = "0.145.4+26.1.2"
+val fabricLoaderVersion = "0.19.2"
+val fabricAPIVersion = "0.146.1+26.1.2"
 val galaxyLibVersion = "2235da5"
 
 repositories {

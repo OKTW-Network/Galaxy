@@ -46,12 +46,8 @@ jobs:
         run: echo IMAGE_TAG=$([ "$GITHUB_REF" = "refs/heads/master" ] && echo "latest" || ([ "$GITHUB_EVENT_NAME" = 'pull_request' ] && echo pr-${{github.event.pull_request.number}} || echo ${GITHUB_REF##*/})) >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
-      - name: Checkout submodules
-        shell: bash
-        run: |
-          auth_header="$(git config --local --get http.https://github.com/.extraheader)"
-          git submodule sync --recursive
-          git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+        with:
+          submodules: recursive
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # 8.0.1
         with:
           name: jar

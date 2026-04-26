@@ -23,8 +23,8 @@ import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.block.entity.HTCraftingTableBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
 
-class HTCraftingTable : ModelCustomBlock("ht_crafting_table", { CustomBlockItem.HT_CRAFTING_TABLE.createItemStack() }) {
+class HTCraftingTable : ModelCustomBlock("ht_crafting_table", CustomBlockItem.HT_CRAFTING_TABLE.createItemStack()) {
     override fun createBlockEntity(pos: BlockPos): CustomBlockEntity {
-        return HTCraftingTableBlockEntity(blockEntityType, pos, modelItem())
+        return HTCraftingTableBlockEntity(blockEntityType, pos, modelItem)
     }
 }

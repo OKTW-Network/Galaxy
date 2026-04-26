@@ -23,8 +23,8 @@ import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.block.entity.HarvestBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
 
-class HarvestBlock : ModelCustomBlock("harvest", { CustomBlockItem.HARVEST.createItemStack() }) {
+class HarvestBlock : ModelCustomBlock("harvest", CustomBlockItem.HARVEST.createItemStack()) {
     override fun createBlockEntity(pos: BlockPos): CustomBlockEntity {
-        return HarvestBlockEntity(blockEntityType, pos, modelItem())
+        return HarvestBlockEntity(blockEntityType, pos, modelItem)
     }
 }

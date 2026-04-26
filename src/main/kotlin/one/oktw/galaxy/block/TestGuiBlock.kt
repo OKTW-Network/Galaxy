@@ -23,8 +23,8 @@ import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.block.entity.TestGuiBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
 
-class TestGuiBlock : ModelCustomBlock("test_gui", { CustomBlockItem.TEST_GUI.createItemStack() }) {
+class TestGuiBlock : ModelCustomBlock("test_gui", CustomBlockItem.TEST_GUI.createItemStack()) {
     override fun createBlockEntity(pos: BlockPos): CustomBlockEntity {
-        return TestGuiBlockEntity(blockEntityType, pos, modelItem())
+        return TestGuiBlockEntity(blockEntityType, pos, modelItem)
     }
 }

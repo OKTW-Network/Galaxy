@@ -41,18 +41,14 @@ import one.oktw.galaxy.item.gui.GuiIcon
 import one.oktw.galaxy.item.gui.GuiModelBuilder
 
 class Creative {
-    private val previousPageButton by lazy {
-        Gui(
-            GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_UP).build(),
-            Component.translatable("UI.Button.PreviousPage")
-        ).createItemStack()
-    }
-    private val nextPageButton by lazy {
-        Gui(
-            GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_DOWN).build(),
-            Component.translatable("UI.Button.NextPage")
-        ).createItemStack()
-    }
+    private val previousPageButton = Gui(
+        GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_UP).build(),
+        Component.translatable("UI.Button.PreviousPage")
+    ).createItemStack()
+    private val nextPageButton = Gui(
+        GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_DOWN).build(),
+        Component.translatable("UI.Button.NextPage")
+    ).createItemStack()
 
     private fun getListGui(): GUI {
         val itemBrowser = CustomItemBrowser()

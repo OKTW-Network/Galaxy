@@ -22,4 +22,4 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.item.ItemStack
 
-data class GUIClickEvent(val player: ServerPlayer, val x: Int, val y: Int, val action: net.minecraft.world.inventory.ContainerInput, val item: ItemStack, var cancel: Boolean = false)
+data class GUIClickEvent(val player: ServerPlayer, val x: Int, val y: Int, val action: ContainerInput, val item: ItemStack, var cancel: Boolean = false)

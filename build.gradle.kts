@@ -50,20 +50,20 @@ fabricApi {
 }
 
 dependencies {
-    // Core - 26.1 is non-obfuscated, no mappings needed
+    // Core
     minecraft("com.mojang:minecraft:${minecraftVersion}")
     implementation("net.fabricmc:fabric-loader:${fabricLoaderVersion}")
 
-    // fabric api - use standard implementation
+    // fabric api
     implementation("net.fabricmc.fabric-api:fabric-api:${fabricAPIVersion}") {
         val gametest = fabricApi.module("fabric-gametest-api-v1", fabricAPIVersion) // Unused and cause client Registry remapping failed.
         exclude(gametest.group, gametest.name)
     }
 
-    // galaxy api - kept at current version as requested
+    // galaxy api
     implementation("one.oktw:galaxy-lib:${galaxyLibVersion}")
 
-    // Jar in Jar - use standard include
+    // Jar in Jar
     include("one.oktw:galaxy-lib:${galaxyLibVersion}:all")
 }
 

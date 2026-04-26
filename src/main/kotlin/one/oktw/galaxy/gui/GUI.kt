@@ -33,7 +33,7 @@ import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.*
-import net.minecraft.world.inventory.ContainerInput
+import net.minecraft.world.inventory.ContainerInput.*
 import net.minecraft.world.inventory.MenuType.*
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
@@ -247,7 +247,7 @@ class GUI private constructor(
                     bindings[slot]?.invoke(event)
                     rangeBindings.filterKeys { (xRange, yRange) -> x in xRange && y in yRange }.values.forEach { it.invoke(event) }
                     if (event.cancel) {
-                        if (action == ContainerInput.QUICK_CRAFT) resetQuickCraft()
+                        if (action == QUICK_CRAFT) resetQuickCraft()
                         return
                     }
                 }
@@ -255,14 +255,14 @@ class GUI private constructor(
 
             // Cancel player change inventory
             if (slot < inventory.containerSize && slot != -999 && !slotBindings.contains(slot)) {
-                if (action == ContainerInput.QUICK_CRAFT) resetQuickCraft()
-                if (action == ContainerInput.CLONE && player.isCreative) super.clicked(slot, button, action, player)
+                if (action == QUICK_CRAFT) resetQuickCraft()
+                if (action == CLONE && player.isCreative) super.clicked(slot, button, action, player)
                 return
             }
 
             when (action) {
-                ContainerInput.PICKUP, ContainerInput.SWAP, ContainerInput.CLONE, ContainerInput.QUICK_CRAFT -> super.clicked(slot, button, action, player)
-                ContainerInput.THROW -> {
+                PICKUP, SWAP, CLONE, QUICK_CRAFT -> super.clicked(slot, button, action, player)
+                THROW -> {
                     if (!player.canDropItems() || slot < 0) return
                     val inventorySlot = slots[slot]
                     val takeCount = if (button == 0) 1 else inventorySlot.item.count
@@ -284,7 +284,7 @@ class GUI private constructor(
                     }
                 }
 
-                ContainerInput.QUICK_MOVE -> {
+                QUICK_MOVE -> {
                     if (slot in 0 until inventory.containerSize && !slotBindings.contains(slot)) return
 
                     val inventorySlot = slots[slot]
@@ -314,7 +314,7 @@ class GUI private constructor(
                     }
                 }
 
-                ContainerInput.PICKUP_ALL -> { // Rewrite PICKUP_ALL only take from allow use slot & player inventory.
+                PICKUP_ALL -> { // Rewrite PICKUP_ALL only take from allow use slot & player inventory.
                     if (slot < 0) return
 
                     val cursorItemStack = player.containerMenu.carried

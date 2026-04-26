@@ -52,8 +52,8 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
 
     override fun tick() {
         if (entityUUID == null || --checkCooldown <= 0 && (level as ServerLevel).getEntity(entityUUID!!) == null) {
-            // Kill leak entities (remove tag check - tags is now Set<TagKey<?>> not Set<String> in 26.1)
-            (level as ServerLevel).getEntities(EntityType.ITEM_DISPLAY) { it.blockPosition() == worldPosition }.forEach {
+            // Kill leak entities
+            (level as ServerLevel).getEntities(EntityType.ITEM_DISPLAY) { it.blockPosition() == worldPosition && it.entityTags().contains("BLOCK") }.forEach {
                 it.kill(level as ServerLevel)
             }
 

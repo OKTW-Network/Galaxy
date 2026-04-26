@@ -65,12 +65,12 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
 
     override fun loadAdditional(view: ValueInput) {
         super.loadAdditional(view)
-        view.childOrEmpty("galaxy_data")?.getIntArray("model_entity")?.getOrNull()?.let { entityUUID = UUIDUtil.uuidFromIntArray(it) }
+        view.childOrEmpty("galaxy_data").getIntArray("model_entity").getOrNull()?.let { entityUUID = UUIDUtil.uuidFromIntArray(it) }
     }
 
     override fun readCopyableData(view: ValueInput) {
         super.readCopyableData(view)
-        view.childOrEmpty("galaxy_data")?.getString("facing")?.getOrNull()?.let { facing = Direction.byName(it) }
+        view.childOrEmpty("galaxy_data").getString("facing").getOrNull()?.let { facing = Direction.byName(it) }
     }
 
     override fun saveAdditional(view: ValueOutput) {
@@ -80,6 +80,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         facing?.let { data.putString("facing", it.name) }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun removeComponentsFromTag(view: ValueOutput) {
         val nbt = (view as TagValueOutput).buildResult().get("galaxy_data") as? CompoundTag ?: return
         nbt.remove("model_entity")

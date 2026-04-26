@@ -145,6 +145,7 @@ class TestGuiBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         components.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(inventory)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun removeComponentsFromTag(view: ValueOutput) {
         super.removeComponentsFromTag(view)
         view.discard("Items")

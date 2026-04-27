@@ -37,7 +37,10 @@ class AngelBlock {
     private val usedLock = HashSet<ServerPlayer>()
 
     init {
-        ServerTickEvents.END_LEVEL_TICK.register { justBroke.clear(); usedLock.clear() }
+        ServerTickEvents.END_LEVEL_TICK.register {
+            justBroke.clear()
+            usedLock.clear()
+        }
     }
 
     @EventListener(sync = true)

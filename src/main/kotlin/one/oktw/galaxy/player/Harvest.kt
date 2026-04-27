@@ -32,7 +32,7 @@ class Harvest {
     private val justHarvested = HashSet<ServerPlayer>()
 
     init {
-        ServerTickEvents.END_LEVEL_TICK.register { serverWorld -> justHarvested.clear() }
+        ServerTickEvents.END_LEVEL_TICK.register { justHarvested.clear() }
     }
 
     @EventListener(true)

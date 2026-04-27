@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,7 +23,7 @@ import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.block.entity.HarvestBlockEntity
 import one.oktw.galaxy.item.CustomBlockItem
 
-class HarvestBlock : ModelCustomBlock("harvest", CustomBlockItem.HARVEST.createItemStack()) {
+class HarvestBlock : ModelCustomBlock("harvest", CustomBlockItem.HARVEST) {
     override fun createBlockEntity(pos: BlockPos): CustomBlockEntity {
         return HarvestBlockEntity(blockEntityType, pos, modelItem)
     }

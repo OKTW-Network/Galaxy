@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -41,14 +41,18 @@ import one.oktw.galaxy.item.gui.GuiIcon
 import one.oktw.galaxy.item.gui.GuiModelBuilder
 
 class Creative {
-    private val previousPageButton = Gui(
-        GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_UP).build(),
-        Component.translatable("UI.Button.PreviousPage")
-    ).createItemStack()
-    private val nextPageButton = Gui(
-        GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_DOWN).build(),
-        Component.translatable("UI.Button.NextPage")
-    ).createItemStack()
+    private val previousPageButton by lazy {
+        Gui(
+            GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_UP).build(),
+            Component.translatable("UI.Button.PreviousPage")
+        ).createItemStack()
+    }
+    private val nextPageButton by lazy {
+        Gui(
+            GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_DOWN).build(),
+            Component.translatable("UI.Button.NextPage")
+        ).createItemStack()
+    }
 
     private fun getListGui(): GUI {
         val itemBrowser = CustomItemBrowser()

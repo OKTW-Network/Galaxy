@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -44,11 +44,12 @@ import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.block.listener.CustomBlockTickListener
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
+import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.Misc
 import one.oktw.galaxy.item.Upgrade
 import one.oktw.galaxy.util.HarvestUtil
 
-class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) :
+class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: CustomBlockItem) :
     ModelCustomBlockEntity(type, pos, modelItem, facing = Direction.NORTH), CustomBlockClickListener, WorldlyContainer, CustomBlockTickListener {
     companion object {
         private val TOOL_SLOT = 0..0
@@ -151,6 +152,7 @@ class HarvestBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: Ite
         components.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(inventory)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun removeComponentsFromTag(view: ValueOutput) {
         super.removeComponentsFromTag(view)
         view.discard("Items")

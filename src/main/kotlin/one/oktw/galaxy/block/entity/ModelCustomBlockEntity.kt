@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -25,16 +25,16 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.storage.TagValueOutput
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
 import one.oktw.galaxy.block.listener.CustomBlockTickListener
+import one.oktw.galaxy.item.CustomBlockItem
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
-open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, private val modelItem: ItemStack, facing: Direction? = null) :
+open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, private val modelItem: CustomBlockItem, facing: Direction? = null) :
     CustomBlockEntity(type, pos),
     CustomBlockTickListener {
 
@@ -95,7 +95,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
 
     private fun spawnEntity() {
         val entity = Display.ItemDisplay(EntityType.ITEM_DISPLAY, level!!)
-        entity.itemStack = modelItem
+        entity.itemStack = modelItem.createItemStack()
         entity.snapTo(worldPosition.x + 0.5, worldPosition.y + 0.5, worldPosition.z + 0.5, facing?.toYRot() ?: 0.0F, 0.0F)
         entity.addTag("BLOCK")
         entity.addTag(getId().toString())

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -37,6 +37,7 @@ import net.minecraft.world.phys.BlockHitResult
 import one.oktw.galaxy.block.listener.CustomBlockClickListener
 import one.oktw.galaxy.gui.GUI
 import one.oktw.galaxy.gui.GUISBackStackManager
+import one.oktw.galaxy.item.CustomBlockItem
 import one.oktw.galaxy.item.CustomItemBrowser
 import one.oktw.galaxy.item.Gui
 import one.oktw.galaxy.item.Misc
@@ -45,7 +46,7 @@ import one.oktw.galaxy.item.gui.GuiIcon
 import one.oktw.galaxy.item.gui.GuiModelBuilder
 import one.oktw.galaxy.item.recipe.CustomItemRecipe
 
-class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: ItemStack) : ModelCustomBlockEntity(type, pos, modelItem),
+class HTCraftingTableBlockEntity(type: BlockEntityType<*>, pos: BlockPos, modelItem: CustomBlockItem) : ModelCustomBlockEntity(type, pos, modelItem),
     CustomBlockClickListener, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     private val previousPageButton = Gui(
         GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_UP).build(),

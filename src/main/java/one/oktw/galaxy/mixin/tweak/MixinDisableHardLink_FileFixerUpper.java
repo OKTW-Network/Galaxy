@@ -28,10 +28,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.nio.file.Path;
 
 @Mixin(FileFixerUpper.class)
-public class MixinDisableAtomicAndHardLink_FileFixerUpper {
+public class MixinDisableHardLink_FileFixerUpper {
     @Inject(method = "detectFileSystemCapabilities", at = @At("RETURN"), cancellable = true)
-    private static void disableAtomicAndHardLink(Path dir, CallbackInfoReturnable<FileSystemCapabilities> cir) {
-        cir.cancel();
-        cir.setReturnValue(new FileSystemCapabilities(false, false));
+    private static void disableHardLink(Path dir, CallbackInfoReturnable<FileSystemCapabilities> cir) {
+        FileSystemCapabilities current = cir.getReturnValue();
+        cir.setReturnValue(new FileSystemCapabilities(current.atomicMove(), false));
     }
 }

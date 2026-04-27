@@ -10,7 +10,7 @@
     "MixinCustomBlockEntity_BarrierBlock",
     "MixinCustomBlockEntity_ClientboundLevelChunkPacketData",
     "MixinCustomBlockEntity_StructureTemplate",
-    "MixinDisableAtomicAndHardLink_FileFixerUpper",
+    "MixinDisableHardLink_FileFixerUpper",
     "MixinFixBeacon_BeaconBlockEntity",
     "MixinGlobalDataPack_ServerPacksSource",
     "MixinGUI_ServerGamePacketListener",

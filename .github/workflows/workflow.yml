@@ -6,9 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
       - name: cache
-        uses: actions/cache@v4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # 5.0.5
         with:
           path: |
             ~/.gradle/caches
@@ -18,16 +18,16 @@ jobs:
           restore-keys: |
             caches-
       - name: JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # 5.2.0
         with:
           distribution: "temurin"
-          java-version: "21"
+          java-version: "25"
       - name: Gradle
-        uses: gradle/actions/wrapper-validation@v4
+        uses: gradle/actions/wrapper-validation@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
       - name: Build
         run: ./gradlew --no-daemon build
       - name: Upload-Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: jar
           path: build/libs/Galaxy.jar
@@ -45,20 +45,16 @@ jobs:
         shell: bash
         run: echo IMAGE_TAG=$([ "$GITHUB_REF" = "refs/heads/master" ] && echo "latest" || ([ "$GITHUB_EVENT_NAME" = 'pull_request' ] && echo pr-${{github.event.pull_request.number}} || echo ${GITHUB_REF##*/})) >> $GITHUB_ENV
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Checkout submodules
-        shell: bash
-        run: |
-          auth_header="$(git config --local --get http.https://github.com/.extraheader)"
-          git submodule sync --recursive
-          git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
-      - uses: actions/download-artifact@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          submodules: recursive
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # 8.0.1
         with:
           name: jar
           path: docker/mods/Galaxy.jar
       - name: login
         if: env.USERNAME != '' && env.PASSWORD != ''
-        uses: docker/login-action@v3
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # 4.1.0
         with:
           registry: harbor.k8s.oktw.one
           username: ${{ secrets.OKTW_HARBOR_USERNAME }}

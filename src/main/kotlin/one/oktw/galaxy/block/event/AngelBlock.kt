@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -37,10 +37,10 @@ class AngelBlock {
     private val usedLock = HashSet<ServerPlayer>()
 
     init {
-        ServerTickEvents.END_WORLD_TICK.register(ServerTickEvents.EndWorldTick {
+        ServerTickEvents.END_LEVEL_TICK.register {
             justBroke.clear()
             usedLock.clear()
-        })
+        }
     }
 
     @EventListener(sync = true)

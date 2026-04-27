@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -84,14 +84,14 @@ class Main : DedicatedServerModInitializer, CoroutineScope {
 
             // Register Custom Payload
             // Register Proxy Packet (C2S: Send, S2C: Receive)
-            PayloadTypeRegistry.playC2S().register(ProxyAPIPayload.ID, ProxyAPIPayload.CODEC)
-            PayloadTypeRegistry.playS2C().register(ProxyAPIPayload.ID, ProxyAPIPayload.CODEC)
+            PayloadTypeRegistry.serverboundPlay().register(ProxyAPIPayload.ID, ProxyAPIPayload.CODEC)
+            PayloadTypeRegistry.clientboundPlay().register(ProxyAPIPayload.ID, ProxyAPIPayload.CODEC)
             // Register Event
             ServerPlayNetworking.registerGlobalReceiver(ProxyAPIPayload.ID) { payload, context ->
                 eventManager.emit(ProxyResponseEvent(context.player(), payload.packet))
             }
             // Register Proxy Chat Packet
-            PayloadTypeRegistry.playS2C().register(ProxyChatPayload.ID, ProxyChatPayload.CODEC)
+            PayloadTypeRegistry.clientboundPlay().register(ProxyChatPayload.ID, ProxyChatPayload.CODEC)
 
             //Events
             eventManager.register(Exchange())

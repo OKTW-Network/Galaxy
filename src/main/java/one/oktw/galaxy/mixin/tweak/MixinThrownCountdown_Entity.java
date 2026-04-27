@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class MixinThrownCountdown_Entity implements IThrownCountdown_Entity {
@@ -37,9 +37,9 @@ public abstract class MixinThrownCountdown_Entity implements IThrownCountdown_En
     @Shadow
     public abstract void discard();
 
-    @Inject(method = "updateInWaterStateAndDoWaterCurrentPushing",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;doWaterSplashEffect()V"))
-    private void countIntoWater(CallbackInfo ci) {
+    @Inject(method = "updateFluidInteraction",
+        at = @At(value = "RETURN"))
+    private void countIntoWater(CallbackInfoReturnable<Boolean> ci) {
         //noinspection ConstantConditions
         if (((Object) this) instanceof Arrow || ((Object) this) instanceof SpectralArrow) {
             if (intoWater > 10) {

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -39,11 +39,9 @@ class BlockEvents {
     private val usedLock = WeakHashMap<ServerPlayer, Int>()
 
     init {
-        ServerTickEvents.END_WORLD_TICK.register(
-            ServerTickEvents.EndWorldTick {
-                usedLock.entries.removeIf { (_, v) -> v + 3 < it.server.tickCount } // Packet task max delay 3 tick
-            }
-        )
+        ServerTickEvents.END_LEVEL_TICK.register { serverWorld ->
+            usedLock.entries.removeIf { (_, v) -> v + 3 < serverWorld.server.tickCount } // Packet task max delay 3 tick
+        }
     }
 
     @EventListener(true)

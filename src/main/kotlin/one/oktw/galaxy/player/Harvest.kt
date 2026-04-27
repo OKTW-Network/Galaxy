@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -32,7 +32,7 @@ class Harvest {
     private val justHarvested = HashSet<ServerPlayer>()
 
     init {
-        ServerTickEvents.END_WORLD_TICK.register(ServerTickEvents.EndWorldTick { justHarvested.clear() })
+        ServerTickEvents.END_LEVEL_TICK.register { justHarvested.clear() }
     }
 
     @EventListener(true)

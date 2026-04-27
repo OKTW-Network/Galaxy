@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,7 +20,7 @@ package one.oktw.galaxy.chat
 
 import com.google.gson.GsonBuilder
 import com.mojang.serialization.JsonOps
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.createS2CPacket
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.createClientboundPacket
 import net.minecraft.core.RegistryAccess
 import net.minecraft.network.chat.ComponentSerialization
 import one.oktw.galaxy.Main
@@ -41,7 +41,7 @@ class Exchange {
         event.cancel = true
 
         event.player.connection.send(
-            createS2CPacket(
+            createClientboundPacket(
                 ProxyChatPayload(
                     MessageSend(
                         sender = event.player.uuid,

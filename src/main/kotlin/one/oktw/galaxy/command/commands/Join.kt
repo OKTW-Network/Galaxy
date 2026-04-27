@@ -39,6 +39,7 @@ import one.oktw.galaxy.proxy.api.packet.SearchPlayer
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Duration.Companion.milliseconds
 
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     private val lock = ConcurrentHashMap<ServerPlayer, Mutex>()
@@ -120,7 +121,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             }
 
             main!!.eventManager.register(ProxyResponseEvent::class, listener)
-            delay(Duration.ofMinutes(5).toMillis()) // TODO change to kotlin Duration
+            delay(Duration.ofMinutes(5).toMillis().milliseconds)
             main!!.eventManager.unregister(ProxyResponseEvent::class, listener)
             lock[sourcePlayer]?.unlock()
             lock.remove(sourcePlayer)

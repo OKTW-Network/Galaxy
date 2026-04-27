@@ -59,10 +59,6 @@ import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin_RealTime extends Level implements RealTimeTrackingBridge {
-    @Shadow
-    @Final
-    private ServerLevelData serverLevelData;
-
     protected ServerLevelMixin_RealTime(WritableLevelData properties, ResourceKey<Level> registryRef, RegistryAccess registryManager, Holder<DimensionType> dimensionEntry, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates) {
         super(properties, registryRef, registryManager, dimensionEntry, isClient, debugWorld, seed, maxChainedNeighborUpdates);
     }

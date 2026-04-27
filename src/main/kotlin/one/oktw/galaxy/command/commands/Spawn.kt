@@ -32,6 +32,7 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 
 class Spawn : Command {
     private val lock = HashSet<UUID>()
@@ -60,7 +61,7 @@ class Spawn : Command {
                     Component.translatable("Respond.commandCountdown", 5 - i).withStyle { it.withColor(ChatFormatting.GREEN) },
                     true
                 )
-                delay(TimeUnit.SECONDS.toMillis(1))
+                delay(TimeUnit.SECONDS.toMillis(1).milliseconds)
             }
 
             val player = originPlayer.level().server.playerList.getPlayer(originPlayer.uuid)

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -27,7 +27,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
@@ -41,14 +41,18 @@ import one.oktw.galaxy.item.gui.GuiIcon
 import one.oktw.galaxy.item.gui.GuiModelBuilder
 
 class Creative {
-    private val previousPageButton = Gui(
-        GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_UP).build(),
-        Component.translatable("UI.Button.PreviousPage")
-    ).createItemStack()
-    private val nextPageButton = Gui(
-        GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_DOWN).build(),
-        Component.translatable("UI.Button.NextPage")
-    ).createItemStack()
+    private val previousPageButton by lazy {
+        Gui(
+            GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_UP).build(),
+            Component.translatable("UI.Button.PreviousPage")
+        ).createItemStack()
+    }
+    private val nextPageButton by lazy {
+        Gui(
+            GuiModelBuilder().withButton(GuiButton.BUTTON).withIcon(GuiIcon.ARROWHEAD_DOWN).build(),
+            Component.translatable("UI.Button.NextPage")
+        ).createItemStack()
+    }
 
     private fun getListGui(): GUI {
         val itemBrowser = CustomItemBrowser()
@@ -106,24 +110,24 @@ class Creative {
                 // Category Paging
                 addBinding(0, 0) {
                     cancel = true
-                    if (action == ClickType.PICKUP) itemBrowser.previousCategory()
+                    if (action == ContainerInput.PICKUP) itemBrowser.previousCategory()
                 }
                 addBinding(0, 1) {
                     cancel = true // Cancel creative clone item
                 }
                 addBinding(0, 2) {
                     cancel = true
-                    if (action == ClickType.PICKUP) itemBrowser.nextCategory()
+                    if (action == ContainerInput.PICKUP) itemBrowser.nextCategory()
                 }
 
                 // Handle Pages
                 addBinding(8, 0) {
                     cancel = true
-                    if (action == ClickType.PICKUP) itemBrowser.previousPage()
+                    if (action == ContainerInput.PICKUP) itemBrowser.previousPage()
                 }
                 addBinding(8, 2) {
                     cancel = true
-                    if (action == ClickType.PICKUP) itemBrowser.nextPage()
+                    if (action == ContainerInput.PICKUP) itemBrowser.nextPage()
                 }
             }
     }

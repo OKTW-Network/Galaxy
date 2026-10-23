@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -36,6 +36,7 @@ import one.oktw.galaxy.Main.Companion.main
 import one.oktw.galaxy.command.Command
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 
 class Home : Command {
     private val lock = HashSet<UUID>()
@@ -59,30 +60,30 @@ class Home : Command {
         // Check Stage
         val spawnPointPosition = player.respawnConfig?.respawnData?.pos()
         if (spawnPointPosition == null) {
-            player.displayClientMessage(Component.translatable("block.minecraft.spawn.not_valid").withStyle { it.withColor(ChatFormatting.RED) }, false)
+            player.sendSystemMessage(Component.translatable("block.minecraft.spawn.not_valid").withStyle { it.withColor(ChatFormatting.RED) }, false)
             lock -= player.uuid
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
 
         val teleportTarget = player.findRespawnPositionAndUseSpawnBlock(player.wonGame, TeleportTransition.DO_NOTHING)
         if (teleportTarget.missingRespawnBlock()) {
-            player.displayClientMessage(Component.translatable("block.minecraft.spawn.not_valid").withStyle { it.withColor(ChatFormatting.RED) }, false)
+            player.sendSystemMessage(Component.translatable("block.minecraft.spawn.not_valid").withStyle { it.withColor(ChatFormatting.RED) }, false)
             lock -= player.uuid
         } else {
             main?.launch {
                 for (i in 0..4) {
-                    player.displayClientMessage(
+                    player.sendSystemMessage(
                         Component.translatable("Respond.commandCountdown", 5 - i).withStyle { it.withColor(ChatFormatting.GREEN) },
                         true
                     )
-                    delay(TimeUnit.SECONDS.toMillis(1))
+                    delay(TimeUnit.SECONDS.toMillis(1).milliseconds)
                 }
-                player.displayClientMessage(Component.translatable("Respond.TeleportStart").withStyle { it.withColor(ChatFormatting.GREEN) }, true)
+                player.sendSystemMessage(Component.translatable("Respond.TeleportStart").withStyle { it.withColor(ChatFormatting.GREEN) }, true)
 
                 // Check Again (Actual Teleport Stage)
                 val realTeleportTarget = player.findRespawnPositionAndUseSpawnBlock(player.wonGame, TeleportTransition.DO_NOTHING)
                 if (realTeleportTarget.missingRespawnBlock()) {
-                    player.displayClientMessage(Component.translatable("block.minecraft.spawn.not_valid").withStyle { it.withColor(ChatFormatting.RED) }, false)
+                    player.sendSystemMessage(Component.translatable("block.minecraft.spawn.not_valid").withStyle { it.withColor(ChatFormatting.RED) }, false)
                     lock -= player.uuid
                     return@launch
                 }

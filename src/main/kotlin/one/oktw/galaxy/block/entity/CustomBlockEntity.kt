@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,6 +19,7 @@
 package one.oktw.galaxy.block.entity
 
 import net.minecraft.core.BlockPos
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityType
@@ -27,7 +28,7 @@ import net.minecraft.world.level.storage.ValueOutput
 
 // BlockEntity need extend
 open class CustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos) : BlockEntity(type, pos, Blocks.BARRIER.defaultBlockState()) {
-    fun getId() = BlockEntityType.getKey(type)!!
+    fun getId() = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(type)!!
 
     override fun loadAdditional(view: ValueInput) {
         super.loadAdditional(view)

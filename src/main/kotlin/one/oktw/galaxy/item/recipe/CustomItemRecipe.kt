@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -148,7 +148,7 @@ abstract class CustomItemRecipe {
                 // TODO Translate
                 val lore = listOf(
                     Component.literal("Accept:").withStyle { it.withColor(ChatFormatting.AQUA).withBold(true).withItalic(false) },
-                    *items.map { item -> item.name.copy().withStyle { it.withColor(ChatFormatting.WHITE).withItalic(false) } }.toTypedArray()
+                    *items.map { item -> item.getName(item.defaultInstance).copy().withStyle { it.withColor(ChatFormatting.WHITE).withItalic(false) } }.toTypedArray()
                 )
 
                 items.map { it.defaultInstance.copyWithCount(count).apply { set(LORE, ItemLore(lore)) } }

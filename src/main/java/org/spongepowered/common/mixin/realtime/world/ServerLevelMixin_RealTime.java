@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -49,24 +49,14 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.gamerules.GameRules;
-import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin_RealTime extends Level implements RealTimeTrackingBridge {
-    @Shadow
-    @Final
-    private ServerLevelData serverLevelData;
-
     protected ServerLevelMixin_RealTime(WritableLevelData properties, ResourceKey<Level> registryRef, RegistryAccess registryManager, Holder<DimensionType> dimensionEntry, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates) {
         super(properties, registryRef, registryManager, dimensionEntry, isClient, debugWorld, seed, maxChainedNeighborUpdates);
     }
@@ -74,21 +64,6 @@ public abstract class ServerLevelMixin_RealTime extends Level implements RealTim
     @Shadow
     @Nullable
     public abstract MinecraftServer getServer();
-
-    @Shadow
-    public abstract void setDayTime(long timeOfDay);
-
-    @Inject(method = "tickTime", at = @At("HEAD"))
-    private void realTimeImpl$fixTimeOfDayForRealTime(CallbackInfo ci) {
-        if (this.serverLevelData.getGameRules().get(GameRules.ADVANCE_TIME)) {
-            // Subtract the one the original tick method is going to add
-            long diff = this.realTimeBridge$getRealTimeTicks() - 1;
-            // Don't set if we're not changing it as other mods might be listening for changes
-            if (diff > 0) {
-                this.setDayTime(this.levelData.getDayTime() + diff);
-            }
-        }
-    }
 
     @Override
     public long realTimeBridge$getRealTimeTicks() {

@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -39,6 +39,7 @@ import one.oktw.galaxy.proxy.api.packet.SearchPlayer
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Duration.Companion.milliseconds
 
 class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()) {
     private val lock = ConcurrentHashMap<ServerPlayer, Mutex>()
@@ -102,17 +103,17 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
                 if (data.uuid != targetPlayer.id) return
 
                 when (data.stage) {
-                    Queue -> sourcePlayer.displayClientMessage(Component.literal("正在等待星系載入"), false)
-                    Creating -> sourcePlayer.displayClientMessage(Component.literal("星系載入中..."), false)
-                    Starting -> sourcePlayer.displayClientMessage(Component.literal("星系正在啟動請稍後..."), false)
+                    Queue -> sourcePlayer.sendSystemMessage(Component.literal("正在等待星系載入"), false)
+                    Creating -> sourcePlayer.sendSystemMessage(Component.literal("星系載入中..."), false)
+                    Starting -> sourcePlayer.sendSystemMessage(Component.literal("星系正在啟動請稍後..."), false)
                     Started -> {
-                        sourcePlayer.displayClientMessage(Component.literal("星系已載入！"), false)
+                        sourcePlayer.sendSystemMessage(Component.literal("星系已載入！"), false)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }
 
                     Failed -> {
-                        sourcePlayer.displayClientMessage(Component.literal("星系載入失敗，請聯絡開發團隊！"), false)
+                        sourcePlayer.sendSystemMessage(Component.literal("星系載入失敗，請聯絡開發團隊！"), false)
                         lock[sourcePlayer]?.unlock()
                         lock.remove(sourcePlayer)
                     }
@@ -120,7 +121,7 @@ class Join : Command, CoroutineScope by CoroutineScope(Dispatchers.Default + Sup
             }
 
             main!!.eventManager.register(ProxyResponseEvent::class, listener)
-            delay(Duration.ofMinutes(5).toMillis()) // TODO change to kotlin Duration
+            delay(Duration.ofMinutes(5).toMillis().milliseconds)
             main!!.eventManager.unregister(ProxyResponseEvent::class, listener)
             lock[sourcePlayer]?.unlock()
             lock.remove(sourcePlayer)

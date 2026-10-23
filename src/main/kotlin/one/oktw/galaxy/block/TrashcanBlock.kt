@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -20,11 +20,11 @@ package one.oktw.galaxy.block
 
 import net.minecraft.core.BlockPos
 import net.minecraft.resources.Identifier
-import net.minecraft.world.item.ItemStack
 import one.oktw.galaxy.block.entity.CustomBlockEntity
 import one.oktw.galaxy.block.entity.TrashcanBlockEntity
+import one.oktw.galaxy.item.CustomBlockItem
 
-class TrashcanBlock(id: String, modelItem: ItemStack) : ModelCustomBlock(Identifier.fromNamespaceAndPath("galaxy", "block/$id"), modelItem) {
+class TrashcanBlock(id: String, modelItem: CustomBlockItem) : ModelCustomBlock(Identifier.fromNamespaceAndPath("galaxy", "block/$id"), modelItem) {
     override fun createBlockEntity(pos: BlockPos): CustomBlockEntity {
         return TrashcanBlockEntity(blockEntityType, pos, modelItem)
     }

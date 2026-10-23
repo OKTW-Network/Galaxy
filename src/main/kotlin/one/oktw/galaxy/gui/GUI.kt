@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -33,7 +33,7 @@ import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.*
-import net.minecraft.world.inventory.ClickType.*
+import net.minecraft.world.inventory.ContainerInput.*
 import net.minecraft.world.inventory.MenuType.*
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
@@ -239,7 +239,7 @@ class GUI private constructor(
             // Unused
         }
 
-        override fun clicked(slot: Int, button: Int, action: ClickType, player: Player) {
+        override fun clicked(slot: Int, button: Int, action: ContainerInput, player: Player) {
             // Trigger binding
             if (slot in 0 until inventory.containerSize) {
                 inventoryUtils.indexToXY(slot).let { (x, y) ->

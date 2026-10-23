@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -25,16 +25,16 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.storage.TagValueOutput
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
 import one.oktw.galaxy.block.listener.CustomBlockTickListener
+import one.oktw.galaxy.item.CustomBlockItem
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
-open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, private val modelItem: ItemStack, facing: Direction? = null) :
+open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, private val modelItem: CustomBlockItem, facing: Direction? = null) :
     CustomBlockEntity(type, pos),
     CustomBlockTickListener {
 
@@ -53,7 +53,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
     override fun tick() {
         if (entityUUID == null || --checkCooldown <= 0 && (level as ServerLevel).getEntity(entityUUID!!) == null) {
             // Kill leak entities
-            (level as ServerLevel).getEntities(EntityType.ITEM_DISPLAY) { it.blockPosition() == worldPosition && it.tags.contains("BLOCK") }.forEach {
+            (level as ServerLevel).getEntities(EntityType.ITEM_DISPLAY) { it.blockPosition() == worldPosition && it.entityTags().contains("BLOCK") }.forEach {
                 it.kill(level as ServerLevel)
             }
 
@@ -65,12 +65,12 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
 
     override fun loadAdditional(view: ValueInput) {
         super.loadAdditional(view)
-        view.childOrEmpty("galaxy_data")?.getIntArray("model_entity")?.getOrNull()?.let { entityUUID = UUIDUtil.uuidFromIntArray(it) }
+        view.childOrEmpty("galaxy_data").getIntArray("model_entity").getOrNull()?.let { entityUUID = UUIDUtil.uuidFromIntArray(it) }
     }
 
     override fun readCopyableData(view: ValueInput) {
         super.readCopyableData(view)
-        view.childOrEmpty("galaxy_data")?.getString("facing")?.getOrNull()?.let { facing = Direction.byName(it) }
+        view.childOrEmpty("galaxy_data").getString("facing").getOrNull()?.let { facing = Direction.byName(it) }
     }
 
     override fun saveAdditional(view: ValueOutput) {
@@ -80,6 +80,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
         facing?.let { data.putString("facing", it.name) }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun removeComponentsFromTag(view: ValueOutput) {
         val nbt = (view as TagValueOutput).buildResult().get("galaxy_data") as? CompoundTag ?: return
         nbt.remove("model_entity")
@@ -94,7 +95,7 @@ open class ModelCustomBlockEntity(type: BlockEntityType<*>, pos: BlockPos, priva
 
     private fun spawnEntity() {
         val entity = Display.ItemDisplay(EntityType.ITEM_DISPLAY, level!!)
-        entity.itemStack = modelItem
+        entity.itemStack = modelItem.createItemStack()
         entity.snapTo(worldPosition.x + 0.5, worldPosition.y + 0.5, worldPosition.z + 0.5, facing?.toYRot() ?: 0.0F, 0.0F)
         entity.addTag("BLOCK")
         entity.addTag(getId().toString())

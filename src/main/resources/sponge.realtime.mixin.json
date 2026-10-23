@@ -21,6 +21,7 @@
     "server.network.ServerGamePacketListenerMixin_RealTime",
     "server.network.ServerPlayerGameModeMixin_RealTime",
     "world.ServerLevelMixin_RealTime",
+    "world.ServerClockManagerMixin_RealTime",
     "world.dimension.PortalProcessorMixin_RealTime"
   ],
   "server": [

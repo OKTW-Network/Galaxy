@@ -1,6 +1,6 @@
 /*
  * OKTW Galaxy Project
- * Copyright (C) 2018-2025
+ * Copyright (C) 2018-2026
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -33,7 +33,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(EmoteCommands.class)
 public class MixinPlayerChat_EmoteCommands {
-    @Redirect(method = "method_43645", at = @At(
+    @Redirect(method = "lambda$register$1", at = @At(
         value = "INVOKE",
         target = "Lnet/minecraft/server/players/PlayerList;broadcastChatMessage(Lnet/minecraft/network/chat/PlayerChatMessage;Lnet/minecraft/commands/CommandSourceStack;Lnet/minecraft/network/chat/ChatType$Bound;)V",
         ordinal = 0

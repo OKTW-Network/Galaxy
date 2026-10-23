@@ -38,8 +38,8 @@ public abstract class MixinThrownCountdown_Entity implements IThrownCountdown_En
     public abstract void discard();
 
     @Inject(method = "updateFluidInteraction",
-        at = @At(value = "RETURN"))
-    private void countIntoWater(CallbackInfoReturnable<Boolean> ci) {
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;doWaterSplashEffect()V"))
+    private void countIntoWater(CallbackInfoReturnable<Boolean> cir) {
         //noinspection ConstantConditions
         if (((Object) this) instanceof Arrow || ((Object) this) instanceof SpectralArrow) {
             if (intoWater > 10) {
